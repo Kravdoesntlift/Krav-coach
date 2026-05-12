@@ -2,19 +2,17 @@
 
 import { useEffect, useState } from "react";
 
-type Platform = "ios" | "android" | "desktop" | null;
+type Platform = "ios" | "android" | null;
 
 function detectPlatform(): Platform {
   if (typeof navigator === "undefined") return null;
   const ua = navigator.userAgent;
-  const isIOS = /iphone|ipad|ipod/i.test(ua);
-  const isAndroid = /android/i.test(ua);
-  if (isIOS) return "ios";
-  if (isAndroid) return "android";
-  return "desktop";
+  if (/iphone|ipad|ipod/i.test(ua)) return "ios";
+  if (/android/i.test(ua)) return "android";
+  return null;
 }
 
-function isInStandaloneMode(): boolean {
+function isStandalone(): boolean {
   if (typeof window === "undefined") return false;
   return (
     window.matchMedia("(display-mode: standalone)").matches ||
@@ -22,24 +20,27 @@ function isInStandaloneMode(): boolean {
   );
 }
 
+const DISMISS_KEY = "krav_install_dismissed_until";
+const DISMISS_DAYS = 7;
+
 export default function InstallPrompt() {
   const [platform, setPlatform] = useState<Platform>(null);
-  const [dismissed, setDismissed] = useState(true); // start hidden
+  const [visible, setVisible] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
-  const [showIOSSteps, setShowIOSSteps] = useState(false);
 
   useEffect(() => {
-    // Already installed? Do nothing.
-    if (isInStandaloneMode()) return;
-
-    // Already dismissed?
-    if (localStorage.getItem("krav_install_dismissed") === "1") return;
+    if (isStandalone()) return; // already installed
 
     const p = detectPlatform();
-    setPlatform(p);
-    setDismissed(false);
+    if (!p) return; // desktop — skip
 
-    // Android: capture beforeinstallprompt
+    // Check if dismissed and still within window
+    const until = localStorage.getItem(DISMISS_KEY);
+    if (until && Date.now() < Number(until)) return;
+
+    setPlatform(p);
+    setVisible(true);
+
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -49,24 +50,23 @@ export default function InstallPrompt() {
   }, []);
 
   function dismiss() {
-    localStorage.setItem("krav_install_dismissed", "1");
-    setDismissed(true);
+    const until = Date.now() + DISMISS_DAYS * 24 * 60 * 60 * 1000;
+    localStorage.setItem(DISMISS_KEY, String(until));
+    setVisible(false);
   }
 
   async function installAndroid() {
-    if (!deferredPrompt) {
-      setShowIOSSteps(true); // fallback
-      return;
+    if (deferredPrompt) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (deferredPrompt as any).prompt();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { outcome } = await (deferredPrompt as any).userChoice;
+      if (outcome === "accepted") { dismiss(); return; }
+      setDeferredPrompt(null);
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (deferredPrompt as any).prompt();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { outcome } = await (deferredPrompt as any).userChoice;
-    if (outcome === "accepted") dismiss();
-    setDeferredPrompt(null);
   }
 
-  if (dismissed || platform === null || platform === "desktop") return null;
+  if (!visible || !platform) return null;
 
   return (
     <div
@@ -84,18 +84,18 @@ export default function InstallPrompt() {
           </div>
           <div>
             <p className="text-white text-sm font-bold leading-tight">Instala a app</p>
-            <p className="text-zinc-500 text-xs mt-0.5">Acede mais rápido, sem browser</p>
+            <p className="text-zinc-500 text-xs mt-0.5">Acede mais rápido, sem abrir o browser</p>
           </div>
         </div>
-        <button onClick={dismiss} className="text-zinc-600 hover:text-zinc-400 transition-colors p-1 -m-1 shrink-0">
+        <button onClick={dismiss} className="text-zinc-600 hover:text-zinc-400 transition-colors p-1 -m-1 shrink-0" aria-label="Fechar">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
           </svg>
         </button>
       </div>
 
-      {/* Android: native install or fallback steps */}
-      {platform === "android" && !showIOSSteps && (
+      {/* Android */}
+      {platform === "android" && (
         <div className="space-y-2">
           {deferredPrompt ? (
             <button
@@ -106,39 +106,36 @@ export default function InstallPrompt() {
               Instalar agora
             </button>
           ) : (
-            <div className="space-y-2">
-              <p className="text-zinc-400 text-xs font-medium">No Chrome:</p>
-              <ol className="space-y-1.5">
-                {[
-                  { icon: "⋮", label: 'Toca nos "3 pontos" (canto superior direito)' },
-                  { icon: "＋", label: '"Adicionar ao ecrã inicial"' },
-                  { icon: "✓",  label: 'Confirma "Instalar"' },
-                ].map((s, i) => (
-                  <li key={i} className="flex items-center gap-2.5 text-xs text-zinc-400">
-                    <span
-                      className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black"
-                      style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
-                    >
-                      {i + 1}
-                    </span>
-                    {s.label}
-                  </li>
-                ))}
-              </ol>
-            </div>
+            <ol className="space-y-1.5">
+              {[
+                'Toca nos "⋮" (canto superior direito do Chrome)',
+                '"Adicionar ao ecrã inicial"',
+                'Confirma "Instalar"',
+              ].map((label, i) => (
+                <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-400">
+                  <span
+                    className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
+                    style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
+                  >
+                    {i + 1}
+                  </span>
+                  {label}
+                </li>
+              ))}
+            </ol>
           )}
         </div>
       )}
 
-      {/* iOS steps */}
+      {/* iOS */}
       {platform === "ios" && (
         <div className="space-y-2">
-          <p className="text-zinc-400 text-xs font-medium">No Safari:</p>
           <ol className="space-y-1.5">
             {[
-              'Toca em  (botão "Partilhar" na barra inferior)',
+              "Abre este site no Safari (não noutro browser)",
+              'Toca no ícone  (barra inferior do Safari)',
               '"Adicionar ao ecrã de início"',
-              'Toca em "Adicionar" (canto superior direito)',
+              'Toca "Adicionar" — fica no teu ecrã como uma app!',
             ].map((label, i) => (
               <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-400">
                 <span
@@ -151,7 +148,6 @@ export default function InstallPrompt() {
               </li>
             ))}
           </ol>
-          <p className="text-zinc-600 text-[11px]">⚠️ Abre este site no Safari — noutros browsers não funciona</p>
         </div>
       )}
     </div>
