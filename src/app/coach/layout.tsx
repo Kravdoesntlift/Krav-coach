@@ -33,6 +33,17 @@ export default async function CoachLayout({
     { href: "/coach/dashboard", label: "Clientes" },
     { href: "/coach/messages",  label: "Mensagens", badge: unread },
     { href: "/coach/plans/new", label: "Novo Plano" },
+    {
+      label: "Ferramentas",
+      children: [
+        { href: "/coach/sessions",       label: "📅 Sessões" },
+        { href: "/coach/automations",    label: "⚡ Automações" },
+        { href: "/coach/library",        label: "📚 Biblioteca" },
+        { href: "/coach/results",        label: "🏆 Resultados" },
+        { href: "/coach/manage-clients", label: "⚙️ Gerir Clientes" },
+        { href: "/coach/billing",        label: "💳 Faturação" },
+      ],
+    },
     { href: "/coach/profile",   label: "Perfil" },
   ];
 
