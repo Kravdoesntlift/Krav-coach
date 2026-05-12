@@ -27,9 +27,9 @@ export default async function LandingPage() {
   ];
 
   const steps = [
-    { n: "1", title: "Inscreve-te",          desc: "Regista-te em menos de 1 minuto. Gratuito para experimentar." },
-    { n: "2", title: "Recebe o teu plano",   desc: "O coach cria um plano personalizado para ti nas primeiras 24h." },
-    { n: "3", title: "Treina com suporte",   desc: "Segue o plano, regista os treinos e acompanha a tua evolução." },
+    { n: "1", title: "Inscreve-te",        desc: "Regista-te em menos de 1 minuto. Gratuito para experimentar." },
+    { n: "2", title: "Recebe o teu plano", desc: "O coach cria um plano personalizado para ti nas primeiras 24h." },
+    { n: "3", title: "Treina com suporte", desc: "Segue o plano, regista os treinos e acompanha a tua evolução." },
   ];
 
   const included = [
@@ -65,83 +65,83 @@ export default async function LandingPage() {
           </Link>
         </nav>
 
-        {/* ── HERO ─────────────────────────────────────────────── */}
-        <section className="max-w-2xl mx-auto px-5 pt-10 pb-20 text-center space-y-7">
-          {coach && (
-            <ScrollReveal delay={0} direction="up">
-              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full"
-                style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}>
-                {coach.avatar_url ? (
-                  <img src={coach.avatar_url} alt={coach.full_name} className="w-7 h-7 rounded-full object-cover" />
-                ) : (
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-black"
-                    style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>
-                    {initials}
+        {/* ── HERO — entra tudo junto como um bloco ────────────── */}
+        <section className="max-w-2xl mx-auto px-5 pt-10 pb-20 text-center">
+          <ScrollReveal direction="up" delay={0}>
+            <div className="space-y-7">
+              {/* Coach badge */}
+              {coach && (
+                <div>
+                  <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full"
+                    style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}>
+                    {coach.avatar_url ? (
+                      <img src={coach.avatar_url} alt={coach.full_name} className="w-7 h-7 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-black"
+                        style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>
+                        {initials}
+                      </div>
+                    )}
+                    <span className="text-brand-gold text-sm font-semibold">{coach.full_name}</span>
                   </div>
-                )}
-                <span className="text-brand-gold text-sm font-semibold">{coach.full_name}</span>
+                </div>
+              )}
+
+              <div className="space-y-4">
+                <h1 className="text-[2.6rem] sm:text-5xl font-black tracking-[-0.03em] leading-[1.05]">
+                  O teu treino.<br />
+                  <span style={{
+                    background: "linear-gradient(90deg,#E8C96B,#C9A84C,#A8893A)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}>
+                    Personalizado.
+                  </span>
+                </h1>
+                <p className="text-zinc-400 text-lg leading-relaxed max-w-sm mx-auto">
+                  {coach?.tagline || "Coaching fitness premium com acompanhamento real — no teu telemóvel, 24/7."}
+                </p>
               </div>
-            </ScrollReveal>
-          )}
 
-          <ScrollReveal delay={100} direction="up">
-            <div className="space-y-4">
-              <h1 className="text-[2.6rem] sm:text-5xl font-black tracking-[-0.03em] leading-[1.05]">
-                O teu treino.<br />
-                <span style={{
-                  background: "linear-gradient(90deg,#E8C96B,#C9A84C,#A8893A)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}>
-                  Personalizado.
-                </span>
-              </h1>
-              <p className="text-zinc-400 text-lg leading-relaxed max-w-sm mx-auto">
-                {coach?.tagline || "Coaching fitness premium com acompanhamento real — no teu telemóvel, 24/7."}
-              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link
+                  href={signupUrl}
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110"
+                  style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
+                >
+                  Começar agora — €127/mês
+                </Link>
+                <Link
+                  href="/auth/login"
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-2xl font-semibold text-zinc-400 text-base border border-zinc-800 hover:border-zinc-600 hover:text-white transition-all"
+                >
+                  Já tenho conta
+                </Link>
+              </div>
+
+              <p className="text-zinc-600 text-xs">Sem contratos. Cancela quando quiseres.</p>
             </div>
-          </ScrollReveal>
-
-          <ScrollReveal delay={200} direction="up">
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link
-                href={signupUrl}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110"
-                style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
-              >
-                Começar agora — €127/mês
-              </Link>
-              <Link
-                href="/auth/login"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-2xl font-semibold text-zinc-400 text-base border border-zinc-800 hover:border-zinc-600 hover:text-white transition-all"
-              >
-                Já tenho conta
-              </Link>
-            </div>
-          </ScrollReveal>
-
-          <ScrollReveal delay={300} direction="none">
-            <p className="text-zinc-600 text-xs">Sem contratos. Cancela quando quiseres.</p>
           </ScrollReveal>
         </section>
 
         {/* ── DIVIDER ──────────────────────────────────────────── */}
-        <ScrollReveal direction="none">
-          <div className="max-w-2xl mx-auto px-5 pb-6">
-            <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent)" }} />
-          </div>
-        </ScrollReveal>
+        <div className="max-w-2xl mx-auto px-5 pb-6">
+          <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.18), transparent)" }} />
+        </div>
 
-        {/* ── FEATURES ─────────────────────────────────────────── */}
+        {/* ── FEATURES — label entra, depois grid como grupo ───── */}
         <section className="max-w-2xl mx-auto px-5 pb-20 space-y-6">
+          {/* Título da secção */}
           <ScrollReveal direction="up">
             <p className="text-zinc-500 text-xs font-bold tracking-[0.18em] uppercase text-center">
               Tudo o que está incluído
             </p>
           </ScrollReveal>
+
+          {/* Grid: linha 1 entra, depois linha 2 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {features.map((f, i) => (
-              <ScrollReveal key={f.title} delay={i * 80} direction="up">
+              <ScrollReveal key={f.title} direction="up" delay={Math.floor(i / 2) * 100}>
                 <div
                   className="rounded-2xl p-5 space-y-2 h-full"
                   style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
@@ -156,13 +156,11 @@ export default async function LandingPage() {
         </section>
 
         {/* ── DIVIDER ──────────────────────────────────────────── */}
-        <ScrollReveal direction="none">
-          <div className="max-w-2xl mx-auto px-5 pb-6">
-            <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }} />
-          </div>
-        </ScrollReveal>
+        <div className="max-w-2xl mx-auto px-5 pb-6">
+          <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }} />
+        </div>
 
-        {/* ── HOW IT WORKS ─────────────────────────────────────── */}
+        {/* ── HOW IT WORKS — secção inteira entra como grupo ───── */}
         <section className="max-w-2xl mx-auto px-5 pb-20 space-y-6">
           <ScrollReveal direction="up">
             <p className="text-zinc-500 text-xs font-bold tracking-[0.18em] uppercase text-center">
@@ -171,7 +169,7 @@ export default async function LandingPage() {
           </ScrollReveal>
           <div className="space-y-3">
             {steps.map((s, i) => (
-              <ScrollReveal key={s.n} delay={i * 100} direction="left">
+              <ScrollReveal key={s.n} direction="up" delay={i * 90}>
                 <div
                   className="flex items-start gap-4 p-5 rounded-2xl"
                   style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.06)" }}
@@ -193,13 +191,11 @@ export default async function LandingPage() {
         </section>
 
         {/* ── DIVIDER ──────────────────────────────────────────── */}
-        <ScrollReveal direction="none">
-          <div className="max-w-2xl mx-auto px-5 pb-6">
-            <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }} />
-          </div>
-        </ScrollReveal>
+        <div className="max-w-2xl mx-auto px-5 pb-6">
+          <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }} />
+        </div>
 
-        {/* ── INSTALL ──────────────────────────────────────────── */}
+        {/* ── INSTALL — dois cards entram juntos ───────────────── */}
         <section className="max-w-2xl mx-auto px-5 pb-20 space-y-6">
           <ScrollReveal direction="up">
             <div className="space-y-2 text-center">
@@ -212,17 +208,17 @@ export default async function LandingPage() {
             </div>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <ScrollReveal delay={0} direction="left">
+          {/* Ambos os cards entram juntos como par */}
+          <ScrollReveal direction="up" delay={80}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* iOS */}
               <div
-                className="rounded-2xl p-5 space-y-4 h-full"
+                className="rounded-2xl p-5 space-y-4"
                 style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
               >
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 font-black text-black"
-                    style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
-                  >🍎</div>
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 font-black text-black"
+                    style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>🍎</div>
                   <div>
                     <p className="text-white font-bold text-sm">iPhone / iPad</p>
                     <p className="text-zinc-500 text-xs">Safari</p>
@@ -236,27 +232,22 @@ export default async function LandingPage() {
                     'Toca "Adicionar" — pronto! 🎉',
                   ].map((text, i) => (
                     <li key={i} className="flex items-start gap-3 text-xs text-zinc-400">
-                      <span
-                        className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
-                        style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
-                      >{i + 1}</span>
+                      <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
+                        style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>{i + 1}</span>
                       {text}
                     </li>
                   ))}
                 </ol>
               </div>
-            </ScrollReveal>
 
-            <ScrollReveal delay={100} direction="right">
+              {/* Android */}
               <div
-                className="rounded-2xl p-5 space-y-4 h-full"
+                className="rounded-2xl p-5 space-y-4"
                 style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
               >
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 font-black text-black"
-                    style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
-                  >🤖</div>
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 font-black text-black"
+                    style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>🤖</div>
                   <div>
                     <p className="text-white font-bold text-sm">Android</p>
                     <p className="text-zinc-500 text-xs">Chrome</p>
@@ -270,26 +261,24 @@ export default async function LandingPage() {
                     'Toca "Instalar" — pronto! 🎉',
                   ].map((text, i) => (
                     <li key={i} className="flex items-start gap-3 text-xs text-zinc-400">
-                      <span
-                        className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
-                        style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
-                      >{i + 1}</span>
+                      <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
+                        style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>{i + 1}</span>
                       {text}
                     </li>
                   ))}
                 </ol>
               </div>
-            </ScrollReveal>
-          </div>
+            </div>
+          </ScrollReveal>
 
-          <ScrollReveal direction="none" delay={200}>
+          <ScrollReveal direction="none" delay={160}>
             <p className="text-center text-zinc-600 text-xs">
               💡 Depois de instalada, a app funciona offline e recebe notificações de treino.
             </p>
           </ScrollReveal>
         </section>
 
-        {/* ── PRICE ────────────────────────────────────────────── */}
+        {/* ── PRICE — entra como bloco único ───────────────────── */}
         <section className="max-w-2xl mx-auto px-5 pb-20">
           <ScrollReveal direction="up">
             <div
@@ -309,13 +298,10 @@ export default async function LandingPage() {
               </div>
 
               <ul className="space-y-2.5">
-                {included.map((item, i) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-zinc-300"
-                    style={{ animationDelay: `${i * 40}ms` }}>
-                    <span
-                      className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold text-black"
-                      style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
-                    >✓</span>
+                {included.map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm text-zinc-300">
+                    <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold text-black"
+                      style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>✓</span>
                     {item}
                   </li>
                 ))}
