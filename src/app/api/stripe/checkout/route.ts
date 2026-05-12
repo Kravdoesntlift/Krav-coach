@@ -70,7 +70,12 @@ export async function POST(req: NextRequest) {
         .eq("id", clientId);
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXTAUTH_URL || "http://localhost:3000";
+    // Use request origin to ensure correct scheme + host in all environments
+    const siteUrl = (() => {
+      const envUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
+      if (envUrl.startsWith("http")) return envUrl.replace(/\/$/, "");
+      return req.nextUrl.origin;
+    })();
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
