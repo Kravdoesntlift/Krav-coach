@@ -20,7 +20,7 @@ function isStandalone(): boolean {
   );
 }
 
-const DISMISS_KEY = "krav_install_dismissed_until";
+const DISMISS_KEY = "krav_install_v2_until";
 const DISMISS_DAYS = 7;
 
 export default function InstallPrompt() {
