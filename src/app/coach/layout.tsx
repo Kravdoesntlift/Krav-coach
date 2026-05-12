@@ -1,0 +1,54 @@
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import Navbar from "@/components/Navbar";
+import BottomNav from "@/components/BottomNav";
+import { ChatIcon } from "@/components/ui/Icons";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+
+export default async function CoachLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) redirect("/auth/login");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .single();
+
+  const { count: unreadCount } = await supabase
+    .from("messages")
+    .select("*", { count: "exact", head: true })
+    .eq("receiver_id", user.id)
+    .is("read_at", null);
+
+  const unread = unreadCount ?? 0;
+
+  const coachNav = [
+    { href: "/coach/dashboard", label: "Clientes" },
+    { href: "/coach/messages",  label: "Mensagens", badge: unread },
+    { href: "/coach/plans/new", label: "Novo Plano" },
+    { href: "/coach/profile",   label: "Perfil" },
+  ];
+
+  const coachBottomNav = [
+    { href: "/coach/dashboard", label: "Clientes",   icon: "👥",                  badge: 0      },
+    { href: "/coach/messages",  label: "Mensagens",  icon: <ChatIcon size={22} />, badge: unread },
+    { href: "/coach/plans/new", label: "Novo Plano", icon: "+",                    badge: 0      },
+    { href: "/coach/profile",   label: "Perfil",     icon: "⚙",                   badge: 0      },
+  ];
+
+  return (
+    <div className="min-h-screen bg-black">
+      <ServiceWorkerRegister />
+      <Navbar profile={profile} navItems={coachNav} />
+      <main className="max-w-5xl mx-auto px-4 pt-6 md:pt-20 pb-24 md:pb-12">{children}</main>
+      <BottomNav items={coachBottomNav} userId={user.id} />
+    </div>
+  );
+}

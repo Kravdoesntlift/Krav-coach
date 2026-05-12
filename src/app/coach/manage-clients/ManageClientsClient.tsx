@@ -1,0 +1,275 @@
+"use client";
+
+import { useState, useTransition } from "react";
+import { assignClient, unassignClient } from "./actions";
+
+export interface ClientRow {
+  id: string;
+  full_name: string;
+  status: string | null;
+  avatar_url: string | null;
+  assignments: { assigned_role: string; coach_id: string }[];
+}
+
+interface Props {
+  allClients: ClientRow[];
+  coachId: string;
+  inviteUrl: string;
+}
+
+const ROLE_LABELS: Record<string, string> = {
+  coach: "Coach",
+  nutritionist: "Nutricionista",
+};
+
+const STATUS_LABELS: Record<string, { label: string; color: string }> = {
+  active:    { label: "Ativo",     color: "text-green-400 bg-green-400/10" },
+  paused:    { label: "Pausado",   color: "text-yellow-400 bg-yellow-400/10" },
+  cancelled: { label: "Cancelado", color: "text-red-400 bg-red-400/10" },
+};
+
+function Avatar({ name, url, size = 40 }: { name: string; url?: string | null; size?: number }) {
+  if (url) {
+    return (
+      <img src={url} alt={name} className="rounded-full object-cover shrink-0"
+        style={{ width: size, height: size }} />
+    );
+  }
+  const initials = name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+  return (
+    <div
+      className="rounded-full flex items-center justify-center shrink-0 font-bold text-sm"
+      style={{
+        width: size, height: size,
+        background: "linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.08))",
+        border: "1px solid rgba(201,168,76,0.2)", color: "#C9A84C",
+      }}
+    >
+      {initials}
+    </div>
+  );
+}
+
+function ClientCard({
+  client, coachId, onAssigned, onUnassigned,
+}: {
+  client: ClientRow; coachId: string;
+  onAssigned: (clientId: string, role: string) => void;
+  onUnassigned: (clientId: string, role: string) => void;
+}) {
+  const [pending, startTransition] = useTransition();
+  const [assignRole, setAssignRole] = useState("coach");
+  const [showRoleSelect, setShowRoleSelect] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const myAssignments = client.assignments.filter((a) => a.coach_id === coachId);
+  const isMyCoach = myAssignments.some((a) => a.assigned_role === "coach");
+  const isMyNutri  = myAssignments.some((a) => a.assigned_role === "nutritionist");
+
+  const st = STATUS_LABELS[client.status ?? "active"] ?? STATUS_LABELS["active"];
+
+  function handleAssign() {
+    setActionError(null);
+    startTransition(async () => {
+      const res = await assignClient(client.id, assignRole);
+      if (res.error) {
+        setActionError(res.error);
+      } else {
+        onAssigned(client.id, assignRole);
+        setShowRoleSelect(false);
+      }
+    });
+  }
+
+  function handleUnassign(role: string) {
+    setActionError(null);
+    startTransition(async () => {
+      const res = await unassignClient(client.id, role);
+      if (res.error) {
+        setActionError(res.error);
+      } else {
+        onUnassigned(client.id, role);
+      }
+    });
+  }
+
+  return (
+    <div className="card p-4 space-y-2">
+      <div className="flex items-center gap-3">
+        <Avatar name={client.full_name} url={client.avatar_url} size={44} />
+
+        <div className="flex-1 min-w-0">
+          <p className="text-white font-medium text-sm truncate">{client.full_name}</p>
+          <div className="flex flex-wrap items-center gap-1.5 mt-1">
+            <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${st.color}`}>
+              {st.label}
+            </span>
+            {myAssignments.map((a) => (
+              <span key={a.assigned_role}
+                className="text-[11px] px-2 py-0.5 rounded-full bg-brand-gold/10 text-brand-gold font-medium">
+                {ROLE_LABELS[a.assigned_role] ?? a.assigned_role}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex items-center gap-2 shrink-0">
+          {myAssignments.map((a) => (
+            <button key={a.assigned_role}
+              onClick={() => handleUnassign(a.assigned_role)}
+              disabled={pending}
+              className="px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs hover:bg-red-500/20 transition-colors disabled:opacity-50">
+              {pending ? "..." : `Remover`}
+            </button>
+          ))}
+
+          {(!isMyCoach || !isMyNutri) && (
+            showRoleSelect ? (
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={assignRole}
+                  onChange={(e) => { setAssignRole(e.target.value); setActionError(null); }}
+                  className="bg-zinc-800 border border-zinc-600 text-white text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:border-brand-gold"
+                >
+                  {!isMyCoach  && <option value="coach">Coach</option>}
+                  {!isMyNutri  && <option value="nutritionist">Nutricionista</option>}
+                </select>
+                <button
+                  onClick={handleAssign}
+                  disabled={pending}
+                  className="px-3 py-1.5 rounded-lg bg-brand-gold hover:bg-brand-gold-dark text-black text-xs font-semibold transition-colors disabled:opacity-50"
+                >
+                  {pending ? "A guardar..." : "Confirmar"}
+                </button>
+                <button
+                  onClick={() => { setShowRoleSelect(false); setActionError(null); }}
+                  className="w-6 h-6 rounded-full bg-zinc-700 text-zinc-400 text-xs hover:bg-zinc-600 transition-colors flex items-center justify-center"
+                >×</button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowRoleSelect(true)}
+                className="px-3 py-1.5 rounded-lg bg-zinc-800 border border-zinc-600 text-gray-300 text-xs hover:border-brand-gold hover:text-brand-gold transition-colors"
+              >
+                + Atribuir
+              </button>
+            )
+          )}
+        </div>
+      </div>
+
+      {/* Inline error message */}
+      {actionError && (
+        <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20">
+          <span className="text-red-400 text-xs shrink-0">⚠</span>
+          <p className="text-red-400 text-xs leading-relaxed">{actionError}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function ManageClientsClient({ allClients, coachId, inviteUrl }: Props) {
+  const [clients, setClients] = useState(allClients);
+  const [search, setSearch] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [tab, setTab] = useState<"mine" | "all">("mine");
+
+  function handleAssigned(clientId: string, role: string) {
+    setClients((prev) =>
+      prev.map((c) =>
+        c.id === clientId
+          ? { ...c, assignments: [...c.assignments, { assigned_role: role, coach_id: coachId }] }
+          : c
+      )
+    );
+  }
+
+  function handleUnassigned(clientId: string, role: string) {
+    setClients((prev) =>
+      prev.map((c) =>
+        c.id === clientId
+          ? { ...c, assignments: c.assignments.filter((a) => !(a.coach_id === coachId && a.assigned_role === role)) }
+          : c
+      )
+    );
+  }
+
+  function copyInvite() {
+    navigator.clipboard.writeText(inviteUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    });
+  }
+
+  const q = search.toLowerCase();
+  const filtered = clients.filter((c) => c.full_name.toLowerCase().includes(q));
+  const mine   = filtered.filter((c) => c.assignments.some((a) => a.coach_id === coachId));
+  const others = filtered.filter((c) => !c.assignments.some((a) => a.coach_id === coachId));
+
+  const displayed = tab === "mine" ? mine : others;
+
+  return (
+    <div className="space-y-5">
+      {/* Invite link */}
+      <div className="rounded-2xl p-4 flex items-center justify-between gap-4"
+        style={{
+          background: "linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03))",
+          border: "1px solid rgba(201,168,76,0.2)",
+        }}>
+        <div className="min-w-0">
+          <p className="text-brand-gold text-sm font-semibold">🔗 Link de convite</p>
+          <p className="text-zinc-500 text-xs mt-0.5 truncate">{inviteUrl}</p>
+          <p className="text-zinc-600 text-[11px] mt-1">
+            O cliente fica automaticamente atribuído a ti ao registar com este link.
+          </p>
+        </div>
+        <button onClick={copyInvite}
+          className={`shrink-0 px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+            copied ? "bg-green-600 text-white" : "bg-brand-gold hover:bg-brand-gold-dark text-black"
+          }`}>
+          {copied ? "✓ Copiado!" : "Copiar"}
+        </button>
+      </div>
+
+      {/* Tabs + Search */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setTab("mine")}
+          className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+            tab === "mine" ? "bg-brand-gold text-black" : "bg-zinc-800 text-zinc-400 hover:text-white"
+          }`}>
+          Os meus ({mine.length})
+        </button>
+        <button
+          onClick={() => setTab("all")}
+          className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+            tab === "all" ? "bg-zinc-600 text-white" : "bg-zinc-800 text-zinc-400 hover:text-white"
+          }`}>
+          Disponíveis ({others.length})
+        </button>
+        <input
+          type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+          placeholder="Pesquisar..." className="input flex-1 text-sm py-2" />
+      </div>
+
+      {/* Client list */}
+      <div className="space-y-3">
+        {displayed.map((c) => (
+          <ClientCard key={c.id} client={c} coachId={coachId}
+            onAssigned={handleAssigned} onUnassigned={handleUnassigned} />
+        ))}
+        {displayed.length === 0 && (
+          <div className="card p-10 text-center">
+            <p className="text-zinc-500 text-sm">
+              {tab === "mine"
+                ? "Ainda não tens clientes atribuídos. Vai ao separador 'Disponíveis'."
+                : search ? "Nenhum cliente encontrado." : "Sem outros clientes registados."}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
