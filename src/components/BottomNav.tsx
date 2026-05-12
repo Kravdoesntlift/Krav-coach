@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { logout } from "@/app/auth/actions";
 
 interface NavItem {
   href: string;
@@ -16,9 +17,10 @@ interface Props {
   items: NavItem[];
   moreItems?: NavItem[];
   userId?: string;
+  showLogout?: boolean;
 }
 
-export default function BottomNav({ items, moreItems, userId }: Props) {
+export default function BottomNav({ items, moreItems, userId, showLogout = true }: Props) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [extraUnread, setExtraUnread] = useState(0);
@@ -181,7 +183,7 @@ export default function BottomNav({ items, moreItems, userId }: Props) {
               <div className="w-9 h-1 rounded-full bg-zinc-700" />
             </div>
 
-            <div className="px-5 pb-8 grid grid-cols-3 gap-3">
+            <div className="px-5 pb-4 grid grid-cols-3 gap-3">
               {moreItems.map((item) => {
                 const active = pathname === item.href || pathname.startsWith(item.href + "/");
                 return (
@@ -204,6 +206,24 @@ export default function BottomNav({ items, moreItems, userId }: Props) {
                 );
               })}
             </div>
+
+            {showLogout && (
+              <div className="px-5 pb-8 pt-2 border-t border-white/[0.06]">
+                <form action={logout} className="w-full">
+                  <button
+                    type="submit"
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold text-zinc-500 hover:text-red-400 hover:bg-red-500/5 transition-all active:scale-95"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                      <polyline points="16 17 21 12 16 7"/>
+                      <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                    Terminar sessão
+                  </button>
+                </form>
+              </div>
+            )}
           </div>
         </>
       )}

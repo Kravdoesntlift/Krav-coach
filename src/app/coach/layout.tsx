@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
-import { ChatIcon } from "@/components/ui/Icons";
+import { ChatIcon, UserIcon } from "@/components/ui/Icons";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 export default async function CoachLayout({
@@ -40,7 +40,16 @@ export default async function CoachLayout({
     { href: "/coach/dashboard", label: "Clientes",   icon: "👥",                  badge: 0      },
     { href: "/coach/messages",  label: "Mensagens",  icon: <ChatIcon size={22} />, badge: unread },
     { href: "/coach/plans/new", label: "Novo Plano", icon: "+",                    badge: 0      },
-    { href: "/coach/profile",   label: "Perfil",     icon: "⚙",                   badge: 0      },
+    { href: "/coach/profile",   label: "Perfil",     icon: <UserIcon size={22} />, badge: 0      },
+  ];
+
+  const coachBottomMoreNav = [
+    { href: "/coach/sessions",       label: "Sessões",     icon: "📅", badge: 0 },
+    { href: "/coach/automations",    label: "Automações",  icon: "⚡", badge: 0 },
+    { href: "/coach/library",        label: "Biblioteca",  icon: "📚", badge: 0 },
+    { href: "/coach/results",        label: "Resultados",  icon: "🏆", badge: 0 },
+    { href: "/coach/manage-clients", label: "Gerir",       icon: "⚙️", badge: 0 },
+    { href: "/coach/billing",        label: "Faturação",   icon: "💳", badge: 0 },
   ];
 
   return (
@@ -48,7 +57,7 @@ export default async function CoachLayout({
       <ServiceWorkerRegister />
       <Navbar profile={profile} navItems={coachNav} />
       <main className="max-w-5xl mx-auto px-4 pt-6 md:pt-20 pb-24 md:pb-12">{children}</main>
-      <BottomNav items={coachBottomNav} userId={user.id} />
+      <BottomNav items={coachBottomNav} moreItems={coachBottomMoreNav} userId={user.id} />
     </div>
   );
 }
