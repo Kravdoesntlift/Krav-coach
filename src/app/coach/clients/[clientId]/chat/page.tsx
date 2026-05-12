@@ -13,19 +13,15 @@ export default async function CoachClientChatPage({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: client } = await supabase
-    .from("profiles")
-    .select("id, full_name")
-    .eq("id", clientId)
-    .single();
+  const [{ data: client }, { data: coachProfile }, { data: messages }] = await Promise.all([
+    supabase.from("profiles").select("id, full_name").eq("id", clientId).single(),
+    supabase.from("profiles").select("full_name").eq("id", user!.id).single(),
+    supabase.from("messages").select("*")
+      .or(`and(sender_id.eq.${user!.id},receiver_id.eq.${clientId}),and(sender_id.eq.${clientId},receiver_id.eq.${user!.id})`)
+      .order("created_at", { ascending: true }),
+  ]);
 
   if (!client) notFound();
-
-  const { data: messages } = await supabase
-    .from("messages")
-    .select("*")
-    .or(`and(sender_id.eq.${user!.id},receiver_id.eq.${clientId}),and(sender_id.eq.${clientId},receiver_id.eq.${user!.id})`)
-    .order("created_at", { ascending: true });
 
   return (
     <div className="space-y-4 page-enter">
@@ -43,6 +39,7 @@ export default async function CoachClientChatPage({
       <div className="card overflow-hidden">
         <ChatWindow
           currentUserId={user!.id}
+          currentUserName={coachProfile?.full_name ?? "Coach"}
           otherUser={client}
           initialMessages={(messages ?? []) as Message[]}
         />

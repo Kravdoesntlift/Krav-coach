@@ -64,6 +64,9 @@ export default async function ClientChatPage() {
     .or(`and(sender_id.eq.${user.id},receiver_id.eq.${coach.id}),and(sender_id.eq.${coach.id},receiver_id.eq.${user.id})`)
     .order("created_at", { ascending: true });
 
+  const { data: clientProfile } = await supabase
+    .from("profiles").select("full_name").eq("id", user.id).single();
+
   return (
     <div className="space-y-4 page-enter">
       {/* Limpa o badge ao abrir o chat */}
@@ -75,6 +78,7 @@ export default async function ClientChatPage() {
       <div className="card overflow-hidden">
         <ChatWindow
           currentUserId={user.id}
+          currentUserName={clientProfile?.full_name ?? "Cliente"}
           otherUser={coach}
           initialMessages={(messages ?? []) as Message[]}
         />

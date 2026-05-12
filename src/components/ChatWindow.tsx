@@ -7,11 +7,12 @@ import type { Message, Profile } from "@/lib/supabase/types";
 
 interface Props {
   currentUserId: string;
+  currentUserName: string;
   otherUser: Pick<Profile, "id" | "full_name">;
   initialMessages: Message[];
 }
 
-export default function ChatWindow({ currentUserId, otherUser, initialMessages }: Props) {
+export default function ChatWindow({ currentUserId, currentUserName, otherUser, initialMessages }: Props) {
   const router  = useRouter();
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [text, setText]         = useState("");
@@ -85,7 +86,7 @@ export default function ChatWindow({ currentUserId, otherUser, initialMessages }
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userId: otherUser.id,
-        title: `💬 ${otherUser.full_name}`,
+        title: `💬 ${currentUserName}`,
         body: trimmed.slice(0, 100),
         url: "/client/chat",
       }),

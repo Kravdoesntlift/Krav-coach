@@ -12,16 +12,17 @@ export async function sendPushToUser(
 ): Promise<{ ok: boolean; error?: string }> {
   const admin = createAdminClient();
 
-  const { data: sub, error: dbErr } = await admin
-    .from("push_subscriptions")
-    .select("subscription")
-    .eq("user_id", userId)
-    .maybeSingle();
+  const [{ data: sub, error: dbErr }, { count: unread }] = await Promise.all([
+    admin.from("push_subscriptions").select("subscription").eq("user_id", userId).maybeSingle(),
+    admin.from("messages").select("id", { count: "exact", head: true })
+      .eq("receiver_id", userId).is("read_at", null),
+  ]);
 
   if (dbErr) return { ok: false, error: `DB error: ${dbErr.message}` };
   if (!sub?.subscription) return { ok: false, error: "No subscription found" };
 
-  // Dynamic import to avoid module-level side effects
+  const badge = (unread ?? 0) + 1;
+
   const webpush = await import("web-push");
   webpush.default.setVapidDetails(
     process.env.VAPID_SUBJECT!,
@@ -32,7 +33,7 @@ export async function sendPushToUser(
   try {
     await webpush.default.sendNotification(
       sub.subscription as Parameters<typeof webpush.default.sendNotification>[0],
-      JSON.stringify({ title, body, url, icon: "/icon.svg" }),
+      JSON.stringify({ title, body, url, badge }),
     );
     return { ok: true };
   } catch (err: unknown) {

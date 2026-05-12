@@ -17,22 +17,29 @@ export async function POST(req: NextRequest) {
   const { userId, title, body, url } = await req.json();
 
   const admin = createAdminClient();
-  const { data: sub } = await admin
-    .from("push_subscriptions")
-    .select("subscription")
-    .eq("user_id", userId)
-    .single();
+
+  // Fetch subscription + unread count in parallel
+  const [{ data: sub }, { count: unread }] = await Promise.all([
+    admin.from("push_subscriptions").select("subscription").eq("user_id", userId).single(),
+    admin.from("messages").select("id", { count: "exact", head: true })
+      .eq("receiver_id", userId).is("read_at", null),
+  ]);
 
   if (!sub?.subscription) {
     return NextResponse.json({ error: "No subscription" }, { status: 404 });
   }
 
+  // badge = current unread + 1 (the message being sent right now)
+  const badge = (unread ?? 0) + 1;
+
   try {
-    await webpush.sendNotification(sub.subscription, JSON.stringify({ title, body, url }));
+    await webpush.sendNotification(
+      sub.subscription,
+      JSON.stringify({ title, body, url, badge }),
+    );
     return NextResponse.json({ ok: true });
   } catch (err: unknown) {
     const error = err as { statusCode?: number; message?: string };
-    // Subscription expired — clean up
     if (error.statusCode === 410) {
       await admin.from("push_subscriptions").delete().eq("user_id", userId);
     }
