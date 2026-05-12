@@ -248,113 +248,136 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
         <>
           {/* Exercise cards — scrollable */}
           <div className="flex-1 overflow-y-auto">
-            {sorted.map((ex, exIdx) => (
-              <div
-                key={ex.id}
-                className={`border-b border-zinc-800/50 transition-colors ${exIdx === step ? "bg-zinc-900" : "opacity-40"}`}
-              >
-                <button
-                  onClick={() => setStep(exIdx)}
-                  className="w-full flex items-center justify-between px-5 py-4"
-                >
-                  <div className="flex items-center gap-3 text-left">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                      setLogs[exIdx].every(s => s.done) ? "bg-green-500 text-white" : exIdx === step ? "bg-brand-gold text-black" : "bg-zinc-700 text-gray-400"
-                    }`}>
-                      {setLogs[exIdx].every(s => s.done) ? "✓" : exIdx + 1}
+            {(() => {
+              // Shared expanded content (set logs + navigation)
+              const renderExpanded = (exIdx: number, ex: (typeof sorted)[0]) => (
+                <div className="px-5 pb-5 space-y-3">
+                  {ex.video_url && (
+                    <a href={ex.video_url} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-brand-gold text-xs hover:underline">
+                      <span>▶</span> Ver demonstração
+                    </a>
+                  )}
+                  {ex.notes && <p className="text-gray-500 text-xs italic">{ex.notes}</p>}
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-[2rem_1fr_1fr_2.5rem] gap-2 text-xs text-gray-500 px-1">
+                      <span>#</span><span>Peso (kg)</span><span>Reps</span><span></span>
                     </div>
-                    <div>
-                      <p className={`font-semibold text-sm ${exIdx === step ? "text-white" : "text-gray-400"}`}>{ex.name}</p>
-                      <p className="text-gray-500 text-xs">{ex.sets} séries × {ex.reps} reps</p>
-                    </div>
-                  </div>
-                  {exIdx === step && <span className="text-brand-gold text-xs">ativo ▸</span>}
-                </button>
-
-                {exIdx === step && (
-                  <div className="px-5 pb-5 space-y-3">
-                    {/* Video link */}
-                    {ex.video_url && (
-                      <a
-                        href={ex.video_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-brand-gold text-xs hover:underline"
-                      >
-                        <span>▶</span> Ver demonstração
-                      </a>
-                    )}
-
-                    {ex.notes && (
-                      <p className="text-gray-500 text-xs italic">{ex.notes}</p>
-                    )}
-
-                    {/* Sets */}
-                    <div className="space-y-2">
-                      <div className="grid grid-cols-[2rem_1fr_1fr_2.5rem] gap-2 text-xs text-gray-500 px-1">
-                        <span>#</span>
-                        <span>Peso (kg)</span>
-                        <span>Reps</span>
-                        <span></span>
+                    {setLogs[exIdx].map((s, si) => (
+                      <div key={si} className={`grid grid-cols-[2rem_1fr_1fr_2.5rem] gap-2 items-center p-2 rounded-xl transition-colors ${s.done ? "bg-green-500/10 border border-green-500/20" : "bg-zinc-800"}`}>
+                        <span className="text-gray-500 text-xs text-center">{si + 1}</span>
+                        <input type="number" inputMode="decimal" value={s.weight}
+                          onChange={(e) => updateLog(exIdx, si, "weight", e.target.value)}
+                          placeholder="—"
+                          className="bg-zinc-700 rounded-lg px-2 py-1.5 text-white text-sm text-center w-full focus:outline-none focus:ring-1 focus:ring-brand-gold"
+                        />
+                        <input type="number" inputMode="numeric" value={s.reps}
+                          onChange={(e) => updateLog(exIdx, si, "reps", e.target.value)}
+                          className="bg-zinc-700 rounded-lg px-2 py-1.5 text-white text-sm text-center w-full focus:outline-none focus:ring-1 focus:ring-brand-gold"
+                        />
+                        <button onClick={() => toggleSet(exIdx, si)}
+                          className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all ${s.done ? "bg-green-500 text-white scale-105" : "bg-zinc-700 text-gray-400 hover:bg-green-500/30"}`}>
+                          ✓
+                        </button>
                       </div>
-                      {setLogs[exIdx].map((s, si) => (
-                        <div key={si} className={`grid grid-cols-[2rem_1fr_1fr_2.5rem] gap-2 items-center p-2 rounded-xl transition-colors ${s.done ? "bg-green-500/10 border border-green-500/20" : "bg-zinc-800"}`}>
-                          <span className="text-gray-500 text-xs text-center">{si + 1}</span>
-                          <input
-                            type="number"
-                            inputMode="decimal"
-                            value={s.weight}
-                            onChange={(e) => updateLog(exIdx, si, "weight", e.target.value)}
-                            placeholder="—"
-                            className="bg-zinc-700 rounded-lg px-2 py-1.5 text-white text-sm text-center w-full focus:outline-none focus:ring-1 focus:ring-brand-gold"
-                          />
-                          <input
-                            type="number"
-                            inputMode="numeric"
-                            value={s.reps}
-                            onChange={(e) => updateLog(exIdx, si, "reps", e.target.value)}
-                            className="bg-zinc-700 rounded-lg px-2 py-1.5 text-white text-sm text-center w-full focus:outline-none focus:ring-1 focus:ring-brand-gold"
-                          />
-                          <button
-                            onClick={() => toggleSet(exIdx, si)}
-                            className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all ${s.done ? "bg-green-500 text-white scale-105" : "bg-zinc-700 text-gray-400 hover:bg-green-500/30"}`}
-                          >
-                            ✓
+                    ))}
+                  </div>
+                  <div className="flex gap-2 pt-1">
+                    {exIdx > 0 && (
+                      <button onClick={() => setStep((s) => s - 1)}
+                        className="flex-1 py-2.5 rounded-xl bg-zinc-800 text-gray-400 text-sm hover:bg-zinc-700 transition-colors">
+                        ← Anterior
+                      </button>
+                    )}
+                    {exIdx < totalSteps - 1 ? (
+                      <button onClick={() => setStep((s) => s + 1)}
+                        className="flex-1 py-3 rounded-xl bg-brand-gold text-black text-sm font-bold hover:bg-brand-gold-dark transition-colors">
+                        Próximo →
+                      </button>
+                    ) : (
+                      <button onClick={() => setFinishing(true)}
+                        className="flex-1 py-3 rounded-xl bg-green-500 text-white text-sm font-bold hover:bg-green-600 transition-colors">
+                        Concluir treino 🏆
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+
+              const items: React.ReactNode[] = [];
+              let i = 0;
+              while (i < sorted.length) {
+                const ex = sorted[i];
+                const group = (ex as Exercise & { superset_group?: string | null }).superset_group?.trim() || null;
+
+                if (group) {
+                  // Collect all consecutive exercises sharing this superset group
+                  const groupItems: Array<{ ex: (typeof sorted)[0]; idx: number }> = [];
+                  let j = i;
+                  while (
+                    j < sorted.length &&
+                    ((sorted[j] as Exercise & { superset_group?: string | null }).superset_group?.trim() || null) === group
+                  ) {
+                    groupItems.push({ ex: sorted[j], idx: j });
+                    j++;
+                  }
+                  const isGroupActive = groupItems.some(({ idx }) => idx === step);
+
+                  items.push(
+                    <div key={`ss-${group}-${i}`} className={`border-l-2 border-orange-500/60 transition-opacity ${!isGroupActive ? "opacity-40" : ""}`}>
+                      <div className="px-5 pt-2 pb-1 flex items-center gap-2">
+                        <span className="text-[10px] bg-orange-500 text-black font-bold px-2 py-0.5 rounded-full">SS {group}</span>
+                        <span className="text-orange-400 text-xs font-semibold uppercase tracking-wide">Superset — sem descanso</span>
+                      </div>
+                      {groupItems.map(({ ex: gex, idx: gIdx }) => (
+                        <div key={gex.id} className={`border-b border-zinc-800/50 transition-colors ${gIdx === step ? "bg-zinc-900/80" : ""}`}>
+                          <button onClick={() => setStep(gIdx)} className="w-full flex items-center justify-between px-5 py-3">
+                            <div className="flex items-center gap-3 text-left">
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                                setLogs[gIdx].every(s => s.done) ? "bg-green-500 text-white" : gIdx === step ? "bg-orange-500 text-black" : "bg-zinc-700 text-gray-400"
+                              }`}>
+                                {setLogs[gIdx].every(s => s.done) ? "✓" : gIdx + 1}
+                              </div>
+                              <div>
+                                <p className={`font-semibold text-sm ${gIdx === step ? "text-white" : "text-gray-400"}`}>{gex.name}</p>
+                                <p className="text-gray-500 text-xs">{gex.sets} séries × {gex.reps} reps</p>
+                              </div>
+                            </div>
+                            {gIdx === step && <span className="text-orange-400 text-xs">ativo ▸</span>}
                           </button>
+                          {gIdx === step && renderExpanded(gIdx, gex)}
                         </div>
                       ))}
                     </div>
-
-                    {/* Navigation */}
-                    <div className="flex gap-2 pt-1">
-                      {step > 0 && (
-                        <button
-                          onClick={() => setStep((s) => s - 1)}
-                          className="flex-1 py-2.5 rounded-xl bg-zinc-800 text-gray-400 text-sm hover:bg-zinc-700 transition-colors"
-                        >
-                          ← Anterior
-                        </button>
-                      )}
-                      {step < totalSteps - 1 ? (
-                        <button
-                          onClick={() => setStep((s) => s + 1)}
-                          className="flex-1 py-3 rounded-xl bg-brand-gold text-black text-sm font-bold hover:bg-brand-gold-dark transition-colors"
-                        >
-                          Próximo →
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => setFinishing(true)}
-                          className="flex-1 py-3 rounded-xl bg-green-500 text-white text-sm font-bold hover:bg-green-600 transition-colors"
-                        >
-                          Concluir treino 🏆
-                        </button>
-                      )}
+                  );
+                  i = j;
+                } else {
+                  // Normal exercise (no superset)
+                  const exIdx = i;
+                  items.push(
+                    <div key={ex.id} className={`border-b border-zinc-800/50 transition-colors ${exIdx === step ? "bg-zinc-900" : "opacity-40"}`}>
+                      <button onClick={() => setStep(exIdx)} className="w-full flex items-center justify-between px-5 py-4">
+                        <div className="flex items-center gap-3 text-left">
+                          <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                            setLogs[exIdx].every(s => s.done) ? "bg-green-500 text-white" : exIdx === step ? "bg-brand-gold text-black" : "bg-zinc-700 text-gray-400"
+                          }`}>
+                            {setLogs[exIdx].every(s => s.done) ? "✓" : exIdx + 1}
+                          </div>
+                          <div>
+                            <p className={`font-semibold text-sm ${exIdx === step ? "text-white" : "text-gray-400"}`}>{ex.name}</p>
+                            <p className="text-gray-500 text-xs">{ex.sets} séries × {ex.reps} reps</p>
+                          </div>
+                        </div>
+                        {exIdx === step && <span className="text-brand-gold text-xs">ativo ▸</span>}
+                      </button>
+                      {exIdx === step && renderExpanded(exIdx, ex)}
                     </div>
-                  </div>
-                )}
-              </div>
-            ))}
+                  );
+                  i++;
+                }
+              }
+              return items;
+            })()}
           </div>
 
           {/* Bottom bar */}

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendPushToUser } from "@/lib/push";
 
 /**
  * GET /api/cron/automations
@@ -216,6 +217,32 @@ export async function GET(req: NextRequest) {
 
       sentToday.add(logKey);
       sent++;
+    }
+  }
+
+  // ── Monthly report push notifications (1st of each month) ────────────────
+  if (today.getUTCDate() === 1) {
+    const lastMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - 1, 1));
+    const monthParam = `${lastMonth.getUTCFullYear()}-${String(lastMonth.getUTCMonth() + 1).padStart(2, "0")}`;
+    const MONTH_NAMES_PT = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+    const monthName = MONTH_NAMES_PT[lastMonth.getUTCMonth()];
+
+    const { data: allClients } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("role", "client");
+
+    if (allClients && allClients.length > 0) {
+      await Promise.allSettled(
+        allClients.map((client) =>
+          sendPushToUser(
+            client.id,
+            "📊 O teu relatório mensal está pronto",
+            `O relatório de ${monthName} já está disponível. Vê como foi o teu mês!`,
+            `/client/report?m=${monthParam}`,
+          )
+        )
+      );
     }
   }
 
