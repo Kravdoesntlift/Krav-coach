@@ -202,6 +202,96 @@ export default async function LandingPage() {
           </div>
         </section>
 
+        {/* ── INSTALL ──────────────────────────────────────────── */}
+        <section className="max-w-2xl mx-auto px-5 pb-16 space-y-6">
+          <p className="text-zinc-500 text-xs font-bold tracking-[0.18em] uppercase text-center">
+            Instala a app no teu telemóvel
+          </p>
+          <p className="text-zinc-400 text-sm text-center -mt-2">
+            Funciona como uma app nativa — sem precisar de ir à App Store.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* iOS */}
+            <div
+              className="rounded-2xl p-5 space-y-4"
+              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 font-black text-black"
+                  style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
+                >
+                  🍎
+                </div>
+                <div>
+                  <p className="text-white font-bold text-sm">iPhone / iPad</p>
+                  <p className="text-zinc-500 text-xs">Safari</p>
+                </div>
+              </div>
+              <ol className="space-y-2.5">
+                {[
+                  { step: "1", text: "Abre kravcoaching.com no Safari" },
+                  { step: "2", text: "Toca no ícone ⎋ (barra inferior)" },
+                  { step: "3", text: '"Adicionar ao ecrã de início"' },
+                  { step: "4", text: 'Toca "Adicionar" — pronto! 🎉' },
+                ].map((s) => (
+                  <li key={s.step} className="flex items-start gap-3 text-xs text-zinc-400">
+                    <span
+                      className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
+                      style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
+                    >
+                      {s.step}
+                    </span>
+                    {s.text}
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            {/* Android */}
+            <div
+              className="rounded-2xl p-5 space-y-4"
+              style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 font-black text-black"
+                  style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
+                >
+                  🤖
+                </div>
+                <div>
+                  <p className="text-white font-bold text-sm">Android</p>
+                  <p className="text-zinc-500 text-xs">Chrome</p>
+                </div>
+              </div>
+              <ol className="space-y-2.5">
+                {[
+                  { step: "1", text: "Abre kravcoaching.com no Chrome" },
+                  { step: "2", text: 'Toca nos "⋮" (canto superior direito)' },
+                  { step: "3", text: '"Adicionar ao ecrã inicial"' },
+                  { step: "4", text: 'Toca "Instalar" — pronto! 🎉' },
+                ].map((s) => (
+                  <li key={s.step} className="flex items-start gap-3 text-xs text-zinc-400">
+                    <span
+                      className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
+                      style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
+                    >
+                      {s.step}
+                    </span>
+                    {s.text}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
+
+          <p className="text-center text-zinc-600 text-xs">
+            💡 Depois de instalada, a app funciona offline e recebe notificações de treino.
+          </p>
+        </section>
+
         {/* ── PRICE ────────────────────────────────────────────── */}
         <section className="max-w-2xl mx-auto px-5 pb-16">
           <div
