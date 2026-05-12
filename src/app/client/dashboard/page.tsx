@@ -4,14 +4,14 @@ import type { WorkoutPlan } from "@/lib/supabase/types";
 import WorkoutWeek from "@/components/client/WorkoutWeek";
 import TodayCard from "@/components/client/TodayCard";
 import CollapsibleMuscleMap from "@/components/client/CollapsibleMuscleMap";
-import WelcomeBanner from "@/components/client/WelcomeBanner";
+import DashboardOverlays from "@/components/client/DashboardOverlays";
 import WeeklySummary from "@/components/client/WeeklySummary";
 import MonthlyReport from "@/components/client/MonthlyReport";
 import CoachFeedbackBanner from "@/components/client/CoachFeedbackBanner";
 import ChallengeCards from "@/components/client/ChallengeCards";
 import ClientGoals from "@/components/client/ClientGoals";
 import OnboardingWrapper from "@/components/client/OnboardingWrapper";
-import AchievementUnlockModal from "@/components/client/AchievementUnlockModal";
+
 import type { WeeklyCheckin } from "@/lib/supabase/types";
 import MonthCalendar, { type DayStatus } from "@/components/client/MonthCalendar";
 import { computeAchievements } from "@/lib/achievements";
@@ -242,14 +242,12 @@ export default async function ClientDashboard() {
   return (
     <>
       <OnboardingWrapper clientId={user!.id} isComplete={isOnboardingComplete} />
-      <WelcomeBanner
+      <DashboardOverlays
         clientName={clientProfile?.full_name ?? ""}
         coachName={coachProfile?.full_name ?? ""}
         coachTagline={coachProfile?.tagline}
         coachId={coachProfile?.id ?? null}
         welcomed={!!clientProfile?.welcomed_at}
-      />
-      <AchievementUnlockModal
         achievements={achievements}
         seenAchievements={clientProfile?.seen_achievements ?? []}
       />

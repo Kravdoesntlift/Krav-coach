@@ -9,9 +9,10 @@ interface Props {
   coachTagline?: string | null;
   coachId?: string | null;
   welcomed: boolean;
+  onClose?: () => void;
 }
 
-export default function WelcomeBanner({ clientName, coachName, coachTagline, coachId, welcomed }: Props) {
+export default function WelcomeBanner({ clientName, coachName, coachTagline, coachId, welcomed, onClose }: Props) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -71,7 +72,7 @@ export default function WelcomeBanner({ clientName, coachName, coachTagline, coa
         </p>
 
         <button
-          onClick={() => setVisible(false)}
+          onClick={() => { setVisible(false); onClose?.(); }}
           className="btn-primary w-full py-3 text-base"
         >
           Vamos lá 💪
