@@ -1,6 +1,6 @@
 // ─── Cache Config ────────────────────────────────────────────────────────────
 // Bump version when deploying changes to precached assets (offline page, icons)
-const CACHE_NAME = "krav-v3";
+const CACHE_NAME = "krav-v5";
 const OFFLINE_URL = "/offline";
 
 // Assets to precache on install
@@ -73,13 +73,13 @@ self.addEventListener("push", (event) => {
   };
 
   event.waitUntil(
-    Promise.all([
-      self.registration.showNotification(title, options),
-      // Set app badge with unread count (iOS 16.4+ / Android Chrome)
-      data.badge != null && "setAppBadge" in self.navigator
-        ? self.navigator.setAppBadge(data.badge)
-        : Promise.resolve(),
-    ])
+    (async () => {
+      await self.registration.showNotification(title, options);
+      // Set app badge — iOS 16.4+ and Android Chrome
+      if (data.badge != null) {
+        try { await navigator.setAppBadge(data.badge); } catch (_) {}
+      }
+    })()
   );
 });
 
@@ -89,17 +89,13 @@ self.addEventListener("notificationclick", (event) => {
   const url = event.notification.data?.url || "/";
 
   event.waitUntil(
-    Promise.all([
-      // Clear badge when user taps the notification
-      "clearAppBadge" in self.navigator
-        ? self.navigator.clearAppBadge()
-        : Promise.resolve(),
-      clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
-        for (const client of clientList) {
-          if (client.url === url && "focus" in client) return client.focus();
-        }
-        if (clients.openWindow) return clients.openWindow(url);
-      }),
-    ])
+    (async () => {
+      try { await navigator.clearAppBadge(); } catch (_) {}
+      const clientList = await clients.matchAll({ type: "window", includeUncontrolled: true });
+      for (const client of clientList) {
+        if (client.url === url && "focus" in client) { client.focus(); return; }
+      }
+      if (clients.openWindow) await clients.openWindow(url);
+    })()
   );
 });
