@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { assignClient, unassignClient } from "./actions";
+import { assignClient, unassignClient, activateClient } from "./actions";
 
 export interface ClientRow {
   id: string;
@@ -24,6 +24,7 @@ const ROLE_LABELS: Record<string, string> = {
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   active:    { label: "Ativo",     color: "text-green-400 bg-green-400/10" },
+  pending:   { label: "Pendente",  color: "text-yellow-400 bg-yellow-400/10" },
   paused:    { label: "Pausado",   color: "text-yellow-400 bg-yellow-400/10" },
   cancelled: { label: "Cancelado", color: "text-red-400 bg-red-400/10" },
 };
@@ -51,11 +52,12 @@ function Avatar({ name, url, size = 40 }: { name: string; url?: string | null; s
 }
 
 function ClientCard({
-  client, coachId, onAssigned, onUnassigned,
+  client, coachId, onAssigned, onUnassigned, onActivated,
 }: {
   client: ClientRow; coachId: string;
   onAssigned: (clientId: string, role: string) => void;
   onUnassigned: (clientId: string, role: string) => void;
+  onActivated?: (clientId: string) => void;
 }) {
   const [pending, startTransition] = useTransition();
   const [assignRole, setAssignRole] = useState("coach");
@@ -65,6 +67,7 @@ function ClientCard({
   const myAssignments = client.assignments.filter((a) => a.coach_id === coachId);
   const isMyCoach = myAssignments.some((a) => a.assigned_role === "coach");
   const isMyNutri  = myAssignments.some((a) => a.assigned_role === "nutritionist");
+  const isPending  = client.status === "pending";
 
   const st = STATUS_LABELS[client.status ?? "active"] ?? STATUS_LABELS["active"];
 
@@ -115,6 +118,24 @@ function ClientCard({
 
         {/* Action buttons */}
         <div className="flex items-center gap-2 shrink-0">
+          {/* Activate button for pending clients */}
+          {isPending && isMyCoach && (
+            <button
+              onClick={() => {
+                setActionError(null);
+                startTransition(async () => {
+                  const res = await activateClient(client.id);
+                  if (res.error) setActionError(res.error);
+                  else onActivated?.(client.id);
+                });
+              }}
+              disabled={pending}
+              className="px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-semibold hover:bg-green-500/20 transition-colors disabled:opacity-50"
+            >
+              {pending ? "..." : "✓ Ativar"}
+            </button>
+          )}
+
           {myAssignments.map((a) => (
             <button key={a.assigned_role}
               onClick={() => handleUnassign(a.assigned_role)}
@@ -196,6 +217,12 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
     );
   }
 
+  function handleActivated(clientId: string) {
+    setClients((prev) =>
+      prev.map((c) => c.id === clientId ? { ...c, status: "active" } : c)
+    );
+  }
+
   function copyInvite() {
     navigator.clipboard.writeText(inviteUrl).then(() => {
       setCopied(true);
@@ -258,7 +285,7 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
       <div className="space-y-3">
         {displayed.map((c) => (
           <ClientCard key={c.id} client={c} coachId={coachId}
-            onAssigned={handleAssigned} onUnassigned={handleUnassigned} />
+            onAssigned={handleAssigned} onUnassigned={handleUnassigned} onActivated={handleActivated} />
         ))}
         {displayed.length === 0 && (
           <div className="card p-10 text-center">

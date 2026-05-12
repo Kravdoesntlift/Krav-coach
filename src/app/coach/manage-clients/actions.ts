@@ -57,6 +57,53 @@ export async function assignClient(clientId: string, role: string = "coach") {
   return { success: true };
 }
 
+export async function activateClient(clientId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Não autenticado." };
+
+  const { data: profile } = await supabase
+    .from("profiles").select("role, full_name").eq("id", user.id).single();
+  if (profile?.role !== "coach") return { error: "Sem permissão." };
+
+  const admin = createAdminClient();
+
+  // Set client status to active
+  const { error } = await admin
+    .from("profiles")
+    .update({ status: "active" })
+    .eq("id", clientId);
+
+  if (error) return { error: error.message };
+
+  // Notify client
+  try {
+    const { sendPushToUser } = await import("@/lib/push");
+    const { data: clientProf } = await admin
+      .from("profiles").select("full_name").eq("id", clientId).single();
+    const coachFirstName = (profile?.full_name ?? "").split(" ")[0] || "Coach";
+    sendPushToUser(
+      clientId,
+      "✅ Conta ativada!",
+      `O ${coachFirstName} ativou o teu acesso. Bem-vindo à KRAV! 💪`,
+      "/client/dashboard",
+    ).catch(() => {});
+
+    // Send activation message in chat
+    await admin.from("messages").insert({
+      sender_id: user.id,
+      receiver_id: clientId,
+      content: `✅ A tua conta está agora ativa! Já tens acesso total à app. Vamos começar a trabalhar juntos! 💪`,
+    });
+
+    void clientProf; // suppress unused warning
+  } catch { /* non-critical */ }
+
+  revalidatePath("/coach/manage-clients");
+  revalidatePath("/coach/dashboard");
+  return { success: true };
+}
+
 export async function unassignClient(clientId: string, role: string = "coach") {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

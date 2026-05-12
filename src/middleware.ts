@@ -54,6 +54,21 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Redirect pending clients — allow only /client/pending and /client/chat
+  if (user && pathname.startsWith("/client") &&
+      !pathname.startsWith("/client/pending") &&
+      !pathname.startsWith("/client/chat")) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("status")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.status === "pending") {
+      return NextResponse.redirect(new URL("/client/pending", request.url));
+    }
+  }
+
   return supabaseResponse;
 }
 
