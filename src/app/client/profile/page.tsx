@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import ProfileForm from "@/components/ProfileForm";
 import PushNotificationToggle from "@/components/PushNotificationToggle";
+import SubscriptionManager from "@/components/client/SubscriptionManager";
 
 export default async function ClientProfilePage() {
   const supabase = await createClient();
@@ -12,6 +13,16 @@ export default async function ClientProfilePage() {
     .eq("id", user!.id)
     .single();
 
+  // Fetch active subscription
+  const { data: subscription } = await supabase
+    .from("stripe_subscriptions")
+    .select("status, amount_cents, current_period_end")
+    .eq("client_id", user!.id)
+    .in("status", ["active", "past_due", "trialing"])
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   return (
     <div className="page-enter space-y-8">
       <div className="flex items-center justify-between">
@@ -22,6 +33,12 @@ export default async function ClientProfilePage() {
         <PushNotificationToggle />
       </div>
       <ProfileForm profile={profile} email={user!.email ?? ""} />
+      <SubscriptionManager
+        hasSubscription={!!subscription && !!profile?.stripe_customer_id}
+        status={subscription?.status ?? null}
+        renewsAt={subscription?.current_period_end ?? null}
+        amountCents={subscription?.amount_cents ?? null}
+      />
     </div>
   );
 }
