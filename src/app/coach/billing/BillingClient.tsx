@@ -54,6 +54,8 @@ export default function BillingClient({ clients }: Props) {
   const [amount, setAmount] = useState("");
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [portalError, setPortalError] = useState<string | null>(null);
+  const [generatedLink, setGeneratedLink] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const selectedClient = clients.find((c) => c.id === selectedClientId);
@@ -61,6 +63,7 @@ export default function BillingClient({ clients }: Props) {
   function handleCreateLink(e: React.FormEvent) {
     e.preventDefault();
     setCheckoutError(null);
+    setGeneratedLink(null);
     if (!selectedClientId || !amount) {
       setCheckoutError("Seleciona um cliente e indica o valor.");
       return;
@@ -89,11 +92,18 @@ export default function BillingClient({ clients }: Props) {
           setCheckoutError(data.error ?? "Erro ao criar link.");
           return;
         }
-        window.open(data.url, "_blank");
+        setGeneratedLink(data.url);
       } catch {
         setCheckoutError("Erro de ligação. Tenta novamente.");
       }
     });
+  }
+
+  function copyLink() {
+    if (!generatedLink) return;
+    navigator.clipboard.writeText(generatedLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   function handlePortal(clientId: string) {
@@ -182,12 +192,51 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...`}
             disabled={isPending || !stripeConfigured}
             className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isPending ? "A criar..." : "Criar link de pagamento"}
+            {isPending ? "A criar..." : "Gerar link de pagamento"}
           </button>
           {!stripeConfigured && (
             <p className="text-zinc-600 text-xs">Configura o Stripe primeiro para criar links de pagamento.</p>
           )}
         </form>
+
+        {/* Generated link */}
+        {generatedLink && (
+          <div className="mt-4 rounded-2xl p-4 space-y-3" style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.25)" }}>
+            <p className="text-brand-gold text-sm font-bold">✅ Link gerado — partilha com o cliente:</p>
+            <div className="flex items-center gap-2">
+              <input
+                readOnly
+                value={generatedLink}
+                className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-300 truncate"
+              />
+              <button
+                onClick={copyLink}
+                className="shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition-all"
+                style={{ background: copied ? "rgba(34,197,94,0.15)" : "rgba(201,168,76,0.15)", color: copied ? "#4ade80" : "#C9A84C", border: `1px solid ${copied ? "rgba(34,197,94,0.3)" : "rgba(201,168,76,0.3)"}` }}
+              >
+                {copied ? "Copiado ✓" : "Copiar"}
+              </button>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(`Olá! Aqui está o teu link de pagamento para o KRAV Premium Coaching (€${amount}/mês): ${generatedLink}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-white transition-all"
+                style={{ background: "rgba(37,211,102,0.15)", border: "1px solid rgba(37,211,102,0.3)" }}
+              >
+                📱 Partilhar no WhatsApp
+              </a>
+              <a
+                href={`mailto:${selectedClient?.email ?? ""}?subject=KRAV Premium Coaching — Link de Pagamento&body=${encodeURIComponent(`Olá!\n\nAqui está o teu link de pagamento para o KRAV Premium Coaching (€${amount}/mês):\n\n${generatedLink}\n\nQualquer dúvida, fala comigo.\n\nKrav`)}`}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-300 transition-all"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
+              >
+                ✉️ Enviar por Email
+              </a>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Client subscriptions */}

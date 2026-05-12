@@ -80,6 +80,7 @@ export async function POST(req: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: stripeCustomerId,
+      payment_method_types: ["card", "mb_way"],
       line_items: [
         {
           price_data: {
@@ -95,7 +96,7 @@ export async function POST(req: NextRequest) {
         coach_id: user.id,
         client_id: clientId,
       },
-      success_url: `${siteUrl}/coach/dashboard?payment=success`,
+      success_url: `${siteUrl}/coach/billing?payment=success`,
       cancel_url: `${siteUrl}/coach/billing`,
     });
 
