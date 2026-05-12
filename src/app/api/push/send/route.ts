@@ -29,8 +29,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No subscription" }, { status: 404 });
   }
 
-  // badge = current unread + 1 (the message being sent right now)
-  const badge = (unread ?? 0) + 1;
+  // badge = actual unread count (message is already inserted before push is called)
+  // minimum 1 so the badge always shows something when a notification fires
+  const badge = Math.max(1, unread ?? 0);
 
   try {
     await webpush.sendNotification(

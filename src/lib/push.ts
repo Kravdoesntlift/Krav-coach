@@ -21,7 +21,8 @@ export async function sendPushToUser(
   if (dbErr) return { ok: false, error: `DB error: ${dbErr.message}` };
   if (!sub?.subscription) return { ok: false, error: "No subscription found" };
 
-  const badge = (unread ?? 0) + 1;
+  // badge = actual unread count (message already inserted before push is called)
+  const badge = Math.max(1, unread ?? 0);
 
   const webpush = await import("web-push");
   webpush.default.setVapidDetails(

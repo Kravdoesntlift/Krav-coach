@@ -60,7 +60,14 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
       supabase.from("messages")
         .update({ read_at: new Date().toISOString() })
         .in("id", unread)
-        .then(() => router.refresh());
+        .then(() => {
+          router.refresh();
+          // Clear OS-level app badge immediately after marking messages as read
+          if ("clearAppBadge" in navigator) {
+            (navigator as Navigator & { clearAppBadge: () => Promise<void> })
+              .clearAppBadge().catch(() => {});
+          }
+        });
     }
   }, [messages, currentUserId, router]);
 
