@@ -53,14 +53,13 @@ export async function POST(req: NextRequest) {
         const periodEnd = periodEndTs ? new Date(periodEndTs * 1000).toISOString() : null;
 
         await admin.from("stripe_subscriptions").upsert({
+          id: subscription.id,          // primary key = Stripe subscription ID
           client_id: clientId,
           coach_id: coachId,
-          stripe_subscription_id: subscription.id,
-          stripe_customer_id: subscription.customer as string,
           status: subscription.status,
           amount_cents: amountCents,
           current_period_end: periodEnd,
-        }, { onConflict: "client_id" });
+        }, { onConflict: "id" });
 
         await admin
           .from("profiles")
@@ -84,7 +83,7 @@ export async function POST(req: NextRequest) {
             amount_cents: amountCents,
             current_period_end: periodEnd,
           })
-          .eq("stripe_subscription_id", subscription.id);
+          .eq("id", subscription.id);
 
         break;
       }
@@ -95,13 +94,13 @@ export async function POST(req: NextRequest) {
         const { data: sub } = await admin
           .from("stripe_subscriptions")
           .select("client_id")
-          .eq("stripe_subscription_id", subscription.id)
+          .eq("id", subscription.id)
           .maybeSingle();
 
         await admin
           .from("stripe_subscriptions")
           .update({ status: "cancelled" })
-          .eq("stripe_subscription_id", subscription.id);
+          .eq("id", subscription.id);
 
         if (sub?.client_id) {
           await admin
@@ -124,7 +123,7 @@ export async function POST(req: NextRequest) {
         await admin
           .from("stripe_subscriptions")
           .update({ status: "past_due" })
-          .eq("stripe_subscription_id", subscriptionId);
+          .eq("id", subscriptionId);
 
         break;
       }
