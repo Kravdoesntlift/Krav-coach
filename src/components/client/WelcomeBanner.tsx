@@ -1,28 +1,29 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { markWelcomed } from "@/app/client/actions_persistence";
 
 interface Props {
   clientName: string;
   coachName: string;
   coachTagline?: string | null;
   coachId?: string | null;
+  welcomed: boolean;
 }
 
-export default function WelcomeBanner({ clientName, coachName, coachTagline, coachId }: Props) {
+export default function WelcomeBanner({ clientName, coachName, coachTagline, coachId, welcomed }: Props) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    // If server says already welcomed, don't show
+    if (welcomed) return;
     // Only show when there's a real coach assigned
     if (!coachId) return;
 
-    // Key is per-coach so the banner re-shows if a new coach is assigned
-    const key = `krav_welcomed_${coachId}`;
-    if (!localStorage.getItem(key)) {
-      localStorage.setItem(key, "1");
-      setVisible(true);
-    }
-  }, [coachId]);
+    // Show banner and mark as welcomed immediately (fire and forget)
+    setVisible(true);
+    markWelcomed();
+  }, [coachId, welcomed]);
 
   if (!visible) return null;
 

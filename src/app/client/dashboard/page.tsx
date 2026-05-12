@@ -11,8 +11,10 @@ import CoachFeedbackBanner from "@/components/client/CoachFeedbackBanner";
 import ChallengeCards from "@/components/client/ChallengeCards";
 import ClientGoals from "@/components/client/ClientGoals";
 import OnboardingWrapper from "@/components/client/OnboardingWrapper";
+import AchievementUnlockModal from "@/components/client/AchievementUnlockModal";
 import type { WeeklyCheckin } from "@/lib/supabase/types";
 import MonthCalendar, { type DayStatus } from "@/components/client/MonthCalendar";
+import { computeAchievements } from "@/lib/achievements";
 
 export default async function ClientDashboard() {
   const supabase = await createClient();
@@ -68,7 +70,7 @@ export default async function ClientDashboard() {
   weekEnd.setUTCDate(monday.getUTCDate() + 6);
   const weekEndStr = weekEnd.toISOString().split("T")[0];
 
-  const [{ data: planThisWeek }, { data: feedback }, { data: clientProfile }, { data: currentCheckin }, { data: fullProfile }, { data: weekChallenges }, { data: challengeProgress }, { data: clientGoals }, { data: onboardingRecord }, { data: weekLogs }] = await Promise.all([
+  const [{ data: planThisWeek }, { data: feedback }, { data: clientProfile }, { data: currentCheckin }, { data: fullProfile }, { data: weekChallenges }, { data: challengeProgress }, { data: clientGoals }, { data: onboardingRecord }, { data: weekLogs }, { data: allCheckins }, { data: allRecords }, { data: allLogs }, { data: allPhotos }] = await Promise.all([
     supabase
       .from("workout_plans")
       .select(`*, workout_days(*, exercises(*), workout_completions(*))`)
@@ -81,7 +83,7 @@ export default async function ClientDashboard() {
       .eq("client_id", user!.id)
       .eq("week_start", weekStart)
       .maybeSingle(),
-    supabase.from("profiles").select("full_name, tagline").eq("id", user!.id).single(),
+    supabase.from("profiles").select("full_name, tagline, welcomed_at, seen_achievements").eq("id", user!.id).single(),
     supabase.from("weekly_checkins").select("*").eq("client_id", user!.id).eq("week_start", weekStart).maybeSingle(),
     supabase.from("profiles").select("subscription_renews_at").eq("id", user!.id).single(),
     supabase.from("challenges").select("*").eq("client_id", user!.id).eq("week_start", weekStart),
@@ -90,6 +92,10 @@ export default async function ClientDashboard() {
     supabase.from("client_onboarding").select("id").eq("client_id", user!.id).maybeSingle(),
     supabase.from("workout_logs").select("exercise_name").eq("client_id", user!.id)
       .gte("logged_at", weekStart).lte("logged_at", weekEndStr),
+    supabase.from("weekly_checkins").select("id").eq("client_id", user!.id),
+    supabase.from("personal_records").select("exercise_name").eq("client_id", user!.id),
+    supabase.from("workout_logs").select("sets").eq("client_id", user!.id),
+    supabase.from("progress_photos").select("id").eq("client_id", user!.id),
   ]);
 
   // Fallback: if no plan for this week, show the most recent plan
@@ -195,18 +201,57 @@ export default async function ClientDashboard() {
   const greeting = currentHour < 5 ? "Boa noite" : currentHour < 12 ? "Bom dia" : currentHour < 18 ? "Boa tarde" : "Boa noite";
   const firstName = (clientProfile?.full_name ?? "").split(" ")[0] || "Atleta";
 
-  const hasOnboarding = !!onboardingRecord;
+  const isOnboardingComplete = !!onboardingRecord;
+
+  // Compute achievements for unlock modal
+  let achStreak = 0, achTotalWeeks = 0, achHasPerfect = false, achTotalWorkouts = 0, achPerfectWeeks = 0;
+  for (const p of allPlans ?? []) {
+    const days = p.workout_days as { is_rest?: boolean; workout_completions: { client_id: string }[] }[];
+    const trainDays = days.filter((d) => !d.is_rest);
+    const completed = trainDays.filter((d) => d.workout_completions?.some((c) => c.client_id === user!.id)).length;
+    achTotalWorkouts += completed;
+    if (completed > 0) {
+      achTotalWeeks++;
+      if (completed === trainDays.length && trainDays.length > 0) { achHasPerfect = true; achPerfectWeeks++; }
+    }
+  }
+  for (const p of allPlans ?? []) {
+    const days = p.workout_days as { is_rest?: boolean; workout_completions: { client_id: string }[] }[];
+    const hasAny = days.some((d) => !d.is_rest && d.workout_completions?.some((c) => c.client_id === user!.id));
+    if (hasAny) achStreak++; else break;
+  }
+  const uniquePRExercises = new Set(allRecords?.map((r) => r.exercise_name) ?? []).size;
+  let achVolumeKg = 0;
+  for (const log of allLogs ?? []) {
+    for (const s of (log.sets as { weight_kg?: number; reps?: number; done: boolean }[]) ?? []) {
+      if (s.done && s.weight_kg && s.reps) achVolumeKg += s.weight_kg * s.reps;
+    }
+  }
+  const achievements = computeAchievements({
+    totalWeeksWithCompletion: achTotalWeeks,
+    streak: achStreak,
+    totalCheckins: allCheckins?.length ?? 0,
+    totalPRs: uniquePRExercises,
+    hasPerfectWeek: achHasPerfect,
+    totalWorkouts: achTotalWorkouts,
+    totalVolumeKg: achVolumeKg,
+    perfectWeeks: achPerfectWeeks,
+    totalPhotos: allPhotos?.length ?? 0,
+  });
 
   return (
     <>
-      {!hasOnboarding && (
-        <OnboardingWrapper clientId={user!.id} />
-      )}
+      <OnboardingWrapper clientId={user!.id} isComplete={isOnboardingComplete} />
       <WelcomeBanner
         clientName={clientProfile?.full_name ?? ""}
         coachName={coachProfile?.full_name ?? ""}
         coachTagline={coachProfile?.tagline}
         coachId={coachProfile?.id ?? null}
+        welcomed={!!clientProfile?.welcomed_at}
+      />
+      <AchievementUnlockModal
+        achievements={achievements}
+        seenAchievements={clientProfile?.seen_achievements ?? []}
       />
     <div className="space-y-4 md:space-y-6 page-enter">
       {/* Hero header */}

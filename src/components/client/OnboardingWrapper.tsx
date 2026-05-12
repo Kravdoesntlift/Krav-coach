@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import OnboardingModal from "./OnboardingModal";
 
-export default function OnboardingWrapper({ clientId }: { clientId: string }) {
+export default function OnboardingWrapper({ clientId, isComplete }: { clientId: string; isComplete: boolean }) {
   // Key is per-client so different clients on same device each see the modal
   const lsKey = `krav_onboarding_done_${clientId}`;
 
@@ -12,13 +12,15 @@ export default function OnboardingWrapper({ clientId }: { clientId: string }) {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
+    // If server says onboarding is done, skip localStorage check entirely
+    if (isComplete) return;
     try {
       const done = localStorage.getItem(lsKey);
       if (!done) setShow(true);
     } catch {
       // localStorage blocked (private browsing etc.) — don't show modal
     }
-  }, [lsKey]);
+  }, [lsKey, isComplete]);
 
   function handleComplete() {
     try { localStorage.setItem(lsKey, "1"); } catch { /* ignore */ }

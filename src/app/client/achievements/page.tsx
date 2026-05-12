@@ -21,7 +21,7 @@ export default async function AchievementsPage() {
       .order("week_start", { ascending: false }),
     supabase.from("weekly_checkins").select("id").eq("client_id", user!.id),
     supabase.from("personal_records").select("exercise_name").eq("client_id", user!.id),
-    supabase.from("profiles").select("full_name").eq("id", user!.id).single(),
+    supabase.from("profiles").select("full_name, seen_achievements").eq("id", user!.id).single(),
     supabase.from("workout_logs").select("sets").eq("client_id", user!.id),
     supabase.from("progress_photos").select("id").eq("client_id", user!.id),
   ]);
@@ -78,7 +78,7 @@ export default async function AchievementsPage() {
     <div className="page-enter space-y-6 pb-8">
 
       {/* ── Unlock celebration modal (client) ── */}
-      <AchievementUnlockModal achievements={achievements} />
+      <AchievementUnlockModal achievements={achievements} seenAchievements={profile?.seen_achievements ?? []} />
 
       {/* ── Hero header ── */}
       <div className="space-y-3">

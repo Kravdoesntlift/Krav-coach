@@ -3,27 +3,26 @@
 import { useEffect, useState } from "react";
 import Confetti from "@/components/ui/Confetti";
 import type { Achievement } from "@/lib/achievements";
-
-const STORAGE_KEY = "krav_seen_achievements";
+import { markAchievementsSeen } from "@/app/client/actions_persistence";
 
 interface Props {
   achievements: Achievement[];
+  seenAchievements: string[];
 }
 
-export default function AchievementUnlockModal({ achievements }: Props) {
+export default function AchievementUnlockModal({ achievements, seenAchievements }: Props) {
   const [queue, setQueue]         = useState<Achievement[]>([]);
   const [idx, setIdx]             = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [visible, setVisible]     = useState(false);
 
   useEffect(() => {
-    const seen  = new Set<string>(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]"));
+    const seen  = new Set(seenAchievements);
     const fresh = achievements.filter((a) => a.unlocked && !seen.has(a.id));
     if (fresh.length === 0) return;
 
-    // Mark all currently-unlocked as seen immediately
-    achievements.filter((a) => a.unlocked).forEach((a) => seen.add(a.id));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...seen]));
+    // Mark fresh achievements as seen (fire and forget)
+    markAchievementsSeen(fresh.map((a) => a.id));
 
     setQueue(fresh);
     setIdx(0);
