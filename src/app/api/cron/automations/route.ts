@@ -227,10 +227,12 @@ export async function GET(req: NextRequest) {
     const MONTH_NAMES_PT = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
     const monthName = MONTH_NAMES_PT[lastMonth.getUTCMonth()];
 
-    const { data: allClients } = await admin
-      .from("profiles")
-      .select("id")
-      .eq("role", "client");
+    // Only notify clients that are actually assigned to a coach
+    const { data: assignments } = await admin
+      .from("coach_clients")
+      .select("client_id");
+    const assignedIds = [...new Set((assignments ?? []).map((r) => r.client_id))];
+    const allClients = assignedIds.map((id) => ({ id }));
 
     if (allClients && allClients.length > 0) {
       await Promise.allSettled(

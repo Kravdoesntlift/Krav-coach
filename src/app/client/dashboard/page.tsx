@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { DAY_NAMES_FULL } from "@/lib/supabase/types";
 import type { WorkoutPlan } from "@/lib/supabase/types";
 import WorkoutWeek from "@/components/client/WorkoutWeek";
@@ -19,6 +20,7 @@ import { computeAchievements } from "@/lib/achievements";
 export default async function ClientDashboard() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/auth/login");
 
   const today = new Date();
   const currentHour = today.getHours(); // capture before any mutation

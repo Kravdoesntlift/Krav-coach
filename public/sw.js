@@ -1,11 +1,11 @@
 // ─── Cache Config ────────────────────────────────────────────────────────────
-const CACHE_NAME = "krav-v1";
+// Bump version when deploying changes to precached assets (offline page, icons)
+const CACHE_NAME = "krav-v3";
 const OFFLINE_URL = "/offline";
 
 // Assets to precache on install
 const PRECACHE_URLS = [
   OFFLINE_URL,
-  "/icon.svg",
   "/manifest.json",
 ];
 

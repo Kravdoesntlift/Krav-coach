@@ -6,7 +6,7 @@ import LiveWorkout from "./LiveWorkout";
 import { haptic, HAPTIC } from "@/lib/haptic";
 
 interface Props {
-  day: WorkoutDay & { exercises?: { id: string; name: string; sets: number; reps: number; notes?: string | null; video_url?: string | null; order_index: number }[] };
+  day: WorkoutDay & { exercises?: { id: string; name: string; sets: number; reps: number; notes?: string | null; video_url?: string | null; order_index: number; superset_group?: string | null }[] };
   clientId: string;
   isCompleted: boolean;
   completedCount: number;

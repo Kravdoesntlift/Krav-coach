@@ -59,11 +59,15 @@ export default async function BillingPage() {
         .from("stripe_subscriptions")
         .select("client_id, status, amount_cents, current_period_end")
         .in("client_id", allClientIds)
+        .order("created_at", { ascending: false }) // most recent first
     : { data: [] as SubRow[] };
 
+  // Keep only the most recent subscription per client (array is already sorted desc)
   const subMap = new Map<string, SubRow>();
   for (const sub of subscriptions ?? []) {
-    subMap.set(sub.client_id, sub as SubRow);
+    if (!subMap.has(sub.client_id)) {
+      subMap.set(sub.client_id, sub as SubRow);
+    }
   }
 
   const clients = (clientProfiles ?? []).map((cp) => ({

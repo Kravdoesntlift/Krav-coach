@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import BroadcastForm from "@/components/coach/BroadcastForm";
 import SmartAlerts from "@/components/coach/SmartAlerts";
@@ -9,6 +10,7 @@ import CoachClientList, { type ClientData } from "@/components/coach/CoachClient
 export default async function CoachDashboard() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/auth/login");
 
   // Current week
   const today = new Date();
