@@ -25,6 +25,16 @@
   ::selection { background: rgba(201,168,76,0.25); color: #fff; }
 }
 
+@layer utilities {
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @layer components {
 
   /* ── Buttons ──────────────────────────────────────────────── */

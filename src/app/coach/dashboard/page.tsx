@@ -220,21 +220,37 @@ export default async function CoachDashboard() {
   return (
     <div className="space-y-8 page-enter">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-          <p className="text-gray-400 text-sm mt-1">
-            {today.toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "long" })}
-          </p>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+            <p className="text-gray-400 text-sm mt-1">
+              {today.toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "long" })}
+            </p>
+          </div>
+          {/* Desktop actions */}
+          <div className="hidden sm:flex items-center gap-2">
+            <PushNotificationToggle />
+            <NotifyButton label="Notificar todos" />
+            <BroadcastForm />
+            <Link href="/coach/manage-clients" className="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm font-medium transition-colors">
+              👥 Gerir Clientes
+            </Link>
+            <Link href="/coach/plans/new" className="btn-primary text-sm">+ Novo Plano</Link>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+
+        {/* Mobile actions — scrollable row */}
+        <div className="flex sm:hidden items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none">
           <PushNotificationToggle />
-          <NotifyButton label="Notificar todos" />
+          <NotifyButton label="Notificar" />
           <BroadcastForm />
-          <Link href="/coach/manage-clients" className="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm font-medium transition-colors">
-            👥 Gerir Clientes
+          <Link href="/coach/manage-clients" className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-800 text-gray-300 text-sm font-medium whitespace-nowrap shrink-0">
+            👥 Gerir
           </Link>
-          <Link href="/coach/plans/new" className="btn-primary text-sm">+ Novo Plano</Link>
+          <Link href="/coach/plans/new" className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-bold whitespace-nowrap shrink-0 text-black" style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C)" }}>
+            + Plano
+          </Link>
         </div>
       </div>
 
