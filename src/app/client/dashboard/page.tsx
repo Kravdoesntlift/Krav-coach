@@ -14,6 +14,7 @@ import ClientGoals from "@/components/client/ClientGoals";
 import OnboardingWrapper from "@/components/client/OnboardingWrapper";
 import InstallPrompt from "@/components/client/InstallPrompt";
 import NotificationPrompt from "@/components/client/NotificationPrompt";
+import AppBadge from "@/components/client/AppBadge";
 
 import type { WeeklyCheckin } from "@/lib/supabase/types";
 import MonthCalendar, { type DayStatus } from "@/components/client/MonthCalendar";
@@ -245,6 +246,7 @@ export default async function ClientDashboard() {
 
   return (
     <>
+      <AppBadge userId={user!.id} />
       <NotificationPrompt />
       <OnboardingWrapper clientId={user!.id} isComplete={isOnboardingComplete} />
       <DashboardOverlays

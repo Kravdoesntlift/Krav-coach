@@ -51,7 +51,8 @@
       "Bash(git commit *)",
       "Bash(npm show *)",
       "Bash(node -e \"const v=JSON.parse\\(require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\)\\); console.log\\(v.filter\\(x=>x.startsWith\\('15.'\\)\\).slice\\(-10\\).join\\('\\\\n'\\)\\)\")",
-      "Bash(npx next *)"
+      "Bash(npx next *)",
+      "Bash(ls ~/.ssh/id_ed25519.pub 2>/dev/null && echo \"JA_EXISTE\" || echo \"NAO_EXISTE\")"
     ]
   }
 }

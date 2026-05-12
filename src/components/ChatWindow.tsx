@@ -85,8 +85,8 @@ export default function ChatWindow({ currentUserId, otherUser, initialMessages }
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userId: otherUser.id,
-        title: "Nova mensagem",
-        body: trimmed.slice(0, 80),
+        title: `💬 ${otherUser.full_name}`,
+        body: trimmed.slice(0, 100),
         url: "/client/chat",
       }),
     }).catch(() => {});

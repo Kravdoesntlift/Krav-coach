@@ -5,11 +5,12 @@ import { createClient } from "@/lib/supabase/client";
 
 interface Props {
   coachId: string;
+  coachName: string;
   clientId: string;
   clientName: string;
 }
 
-export default function QuickMessage({ coachId, clientId, clientName }: Props) {
+export default function QuickMessage({ coachId, coachName, clientId, clientName }: Props) {
   const [open, setOpen]       = useState(false);
   const [text, setText]       = useState("");
   const [sending, setSending] = useState(false);
@@ -46,8 +47,8 @@ export default function QuickMessage({ coachId, clientId, clientName }: Props) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userId: clientId,
-        title: "Nova mensagem do coach",
-        body: trimmed.slice(0, 80),
+        title: `💬 ${coachName}`,
+        body: trimmed.slice(0, 100),
         url: "/client/chat",
       }),
     }).catch(() => {});

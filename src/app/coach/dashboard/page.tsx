@@ -53,6 +53,14 @@ export default async function CoachDashboard() {
     prsByClient.set(pr.client_id, list);
   }
 
+  // Coach name (for push notification title)
+  const { data: coachProfile } = await supabase
+    .from("profiles")
+    .select("full_name")
+    .eq("id", user!.id)
+    .single();
+  const coachName = coachProfile?.full_name ?? "Coach";
+
   // All clients (with status) — from workout plans
   const { data: allPlans } = await supabase
     .from("workout_plans")
@@ -278,6 +286,7 @@ export default async function CoachDashboard() {
       ) : (
         <CoachClientList
           coachId={user!.id}
+          coachName={coachName}
           clients={allClients
             .sort((a, b) => {
               const ua = unreadByClient.get(a.id) ?? 0;

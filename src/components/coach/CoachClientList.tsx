@@ -33,6 +33,7 @@ export interface ClientData {
 interface Props {
   clients: ClientData[];
   coachId: string;
+  coachName: string;
 }
 
 function Avatar({ name, avatarUrl }: { name: string; avatarUrl?: string | null }) {
@@ -55,7 +56,7 @@ function Avatar({ name, avatarUrl }: { name: string; avatarUrl?: string | null }
   );
 }
 
-export default function CoachClientList({ clients, coachId }: Props) {
+export default function CoachClientList({ clients, coachId, coachName }: Props) {
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
@@ -165,7 +166,7 @@ export default function CoachClientList({ clients, coachId }: Props) {
 
                 {/* Quick message — outside Link */}
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <QuickMessage coachId={coachId} clientId={client.id} clientName={client.full_name} />
+                  <QuickMessage coachId={coachId} coachName={coachName} clientId={client.id} clientName={client.full_name} />
                 </div>
               </div>
             );
