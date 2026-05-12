@@ -1,8 +1,23 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import ScrollReveal from "@/components/ScrollReveal";
 
 export default async function LandingPage() {
+  // Se já tem sessão, vai direto para o dashboard
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    if (profile?.role === "coach") redirect("/coach/dashboard");
+    else redirect("/client/dashboard");
+  }
+
   const admin = createAdminClient();
 
   const { data: coach } = await admin
