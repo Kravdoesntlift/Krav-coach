@@ -4,7 +4,136 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import ScrollReveal from "@/components/ScrollReveal";
 
-export default async function LandingPage() {
+// ─── Translations ─────────────────────────────────────────────────────────────
+const t = {
+  pt: {
+    login:        "Entrar →",
+    hero_title:   <>O teu treino.<br /><span style={{ background: "linear-gradient(90deg,#E8C96B,#C9A84C,#A8893A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Personalizado.</span></>,
+    hero_tagline: "Coaching fitness premium com acompanhamento real — no teu telemóvel, 24/7.",
+    cta_primary:  "Começar agora — €127/mês",
+    cta_login:    "Já tenho conta",
+    no_contract:  "Sem contratos. Cancela quando quiseres.",
+    section_features: "Tudo o que está incluído",
+    section_how:  "Como funciona",
+    section_install: "Instala a app no teu telemóvel",
+    install_sub:  "Funciona como uma app nativa — sem precisar de ir à App Store.",
+    install_hint: "💡 Depois de instalada, a app funciona offline e recebe notificações de treino.",
+    ios_title:    "iPhone / iPad",
+    ios_browser:  "Safari",
+    ios_steps: [
+      "Abre kravcoaching.com no Safari",
+      "Toca no ícone ⎋ (barra inferior)",
+      '"Adicionar ao ecrã de início"',
+      'Toca "Adicionar" — pronto! 🎉',
+    ],
+    android_title:   "Android",
+    android_browser: "Chrome",
+    android_steps: [
+      "Abre kravcoaching.com no Chrome",
+      'Toca nos "⋮" (canto superior direito)',
+      '"Adicionar ao ecrã inicial"',
+      'Toca "Instalar" — pronto! 🎉',
+    ],
+    price_label:    "Plano Premium",
+    price_sub:      "Tudo incluído. Sem surpresas.",
+    price_cta:      "Aderir agora →",
+    price_note:     "Cancela a qualquer momento. Sem permanência.",
+    footer_login:   "Entrar",
+    footer_signup:  "Registar",
+    features: [
+      { icon: "📋", title: "Plano 100% personalizado",  desc: "Criado pelo teu coach com base no teu nível, objetivos e equipamento disponível." },
+      { icon: "📱", title: "App no teu telemóvel",      desc: "Instala como app, treina offline, recebe notificações. Funciona em iOS e Android." },
+      { icon: "💬", title: "Chat direto com o coach",   desc: "Tira dúvidas, partilha resultados e mantém-te motivado em tempo real." },
+      { icon: "📊", title: "Acompanhamento semanal",    desc: "Check-ins, feedback e ajustes contínuos ao plano conforme a tua evolução." },
+      { icon: "🏆", title: "Registo de progresso",      desc: "Peso, medidas, recordes pessoais e conquistas para veres até onde chegaste." },
+      { icon: "⚡", title: "Modo de treino ao vivo",    desc: "Timer de descanso, registo de séries e pesos — tudo durante o treino." },
+    ],
+    steps: [
+      { n: "1", title: "Inscreve-te",        desc: "Regista-te em menos de 1 minuto. Gratuito para experimentar." },
+      { n: "2", title: "Recebe o teu plano", desc: "O coach cria um plano personalizado para ti nas primeiras 24h." },
+      { n: "3", title: "Treina com suporte", desc: "Segue o plano, regista os treinos e acompanha a tua evolução." },
+    ],
+    included: [
+      "Plano de treino semanal personalizado",
+      "Ajustes semanais ao plano",
+      "Check-ins e análise de progresso",
+      "Chat privado com o coach",
+      "Registo de séries, pesos e medidas",
+      "Fotos de progresso",
+      "Recordes pessoais e conquistas",
+      "Relatório mensal de progresso",
+      "Notificações e lembretes",
+      "Acesso à app iOS e Android",
+    ],
+  },
+  en: {
+    login:        "Log in →",
+    hero_title:   <>Your training.<br /><span style={{ background: "linear-gradient(90deg,#E8C96B,#C9A84C,#A8893A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Personalised.</span></>,
+    hero_tagline: "Premium fitness coaching with real accountability — on your phone, 24/7.",
+    cta_primary:  "Get started — €127/month",
+    cta_login:    "I already have an account",
+    no_contract:  "No contracts. Cancel anytime.",
+    section_features: "Everything that's included",
+    section_how:  "How it works",
+    section_install: "Install the app on your phone",
+    install_sub:  "Works like a native app — no need to visit the App Store.",
+    install_hint: "💡 Once installed, the app works offline and receives workout notifications.",
+    ios_title:    "iPhone / iPad",
+    ios_browser:  "Safari",
+    ios_steps: [
+      "Open kravcoaching.com in Safari",
+      "Tap the ⎋ share icon (bottom bar)",
+      '"Add to Home Screen"',
+      'Tap "Add" — done! 🎉',
+    ],
+    android_title:   "Android",
+    android_browser: "Chrome",
+    android_steps: [
+      "Open kravcoaching.com in Chrome",
+      'Tap "⋮" (top right corner)',
+      '"Add to Home Screen"',
+      'Tap "Install" — done! 🎉',
+    ],
+    price_label:    "Premium Plan",
+    price_sub:      "Everything included. No surprises.",
+    price_cta:      "Join now →",
+    price_note:     "Cancel at any time. No commitment.",
+    footer_login:   "Log in",
+    footer_signup:  "Sign up",
+    features: [
+      { icon: "📋", title: "100% personalised plan",    desc: "Created by your coach based on your level, goals and available equipment." },
+      { icon: "📱", title: "App on your phone",         desc: "Install as an app, train offline, receive notifications. Works on iOS and Android." },
+      { icon: "💬", title: "Direct chat with your coach", desc: "Ask questions, share results and stay motivated in real time." },
+      { icon: "📊", title: "Weekly check-ins",          desc: "Check-ins, feedback and continuous plan adjustments as you progress." },
+      { icon: "🏆", title: "Progress tracking",         desc: "Weight, measurements, personal records and achievements to see how far you've come." },
+      { icon: "⚡", title: "Live workout mode",         desc: "Rest timer, set and weight tracking — all during your workout." },
+    ],
+    steps: [
+      { n: "1", title: "Sign up",           desc: "Register in under 1 minute. Free to try." },
+      { n: "2", title: "Get your plan",     desc: "Your coach creates a personalised plan for you within 24 hours." },
+      { n: "3", title: "Train with support", desc: "Follow the plan, log your workouts and track your progress." },
+    ],
+    included: [
+      "Personalised weekly training plan",
+      "Weekly plan adjustments",
+      "Check-ins and progress analysis",
+      "Private chat with your coach",
+      "Sets, weights and measurements log",
+      "Progress photos",
+      "Personal records and achievements",
+      "Monthly progress report",
+      "Notifications and reminders",
+      "Access to the iOS and Android app",
+    ],
+  },
+} as const;
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+export default async function LandingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>;
+}) {
   // Se já tem sessão, vai direto para o dashboard
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -18,8 +147,11 @@ export default async function LandingPage() {
     else redirect("/client/dashboard");
   }
 
-  const admin = createAdminClient();
+  const { lang } = await searchParams;
+  const isEN = lang === "en";
+  const c = isEN ? t.en : t.pt;
 
+  const admin = createAdminClient();
   const { data: coach } = await admin
     .from("profiles")
     .select("id, full_name, avatar_url, tagline")
@@ -28,37 +160,10 @@ export default async function LandingPage() {
     .maybeSingle();
 
   const signupUrl = coach ? `/auth/signup?coach=${coach.id}` : `/auth/signup`;
+  const signupUrlWithLang = isEN ? `${signupUrl}&lang=en` : signupUrl;
   const initials = coach?.full_name
     ? coach.full_name.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()
     : "K";
-
-  const features = [
-    { icon: "📋", title: "Plano 100% personalizado", desc: "Criado pelo teu coach com base no teu nível, objetivos e equipamento disponível." },
-    { icon: "📱", title: "App no teu telemóvel",     desc: "Instala como app, treina offline, recebe notificações. Funciona em iOS e Android." },
-    { icon: "💬", title: "Chat direto com o coach",  desc: "Tira dúvidas, partilha resultados e mantém-te motivado em tempo real." },
-    { icon: "📊", title: "Acompanhamento semanal",   desc: "Check-ins, feedback e ajustes contínuos ao plano conforme a tua evolução." },
-    { icon: "🏆", title: "Registo de progresso",     desc: "Peso, medidas, recordes pessoais e conquistas para veres até onde chegaste." },
-    { icon: "⚡", title: "Modo de treino ao vivo",   desc: "Timer de descanso, registo de séries e pesos — tudo durante o treino." },
-  ];
-
-  const steps = [
-    { n: "1", title: "Inscreve-te",        desc: "Regista-te em menos de 1 minuto. Gratuito para experimentar." },
-    { n: "2", title: "Recebe o teu plano", desc: "O coach cria um plano personalizado para ti nas primeiras 24h." },
-    { n: "3", title: "Treina com suporte", desc: "Segue o plano, regista os treinos e acompanha a tua evolução." },
-  ];
-
-  const included = [
-    "Plano de treino semanal personalizado",
-    "Ajustes semanais ao plano",
-    "Check-ins e análise de progresso",
-    "Chat privado com o coach",
-    "Registo de séries, pesos e medidas",
-    "Fotos de progresso",
-    "Recordes pessoais e conquistas",
-    "Relatório mensal de progresso",
-    "Notificações e lembretes",
-    "Acesso à app iOS e Android",
-  ];
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
@@ -75,12 +180,30 @@ export default async function LandingPage() {
           <span className="text-xl font-black tracking-tighter">
             KRAV<span style={{ color: "#C9A84C" }}>.</span>
           </span>
-          <Link href="/auth/login" className="text-sm text-zinc-400 hover:text-white transition-colors">
-            Entrar →
-          </Link>
+          <div className="flex items-center gap-4">
+            {/* Language toggle */}
+            {isEN ? (
+              <Link
+                href="/"
+                className="text-xs font-bold tracking-widest uppercase px-2.5 py-1 rounded-lg border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors"
+              >
+                PT
+              </Link>
+            ) : (
+              <Link
+                href="/?lang=en"
+                className="text-xs font-bold tracking-widest uppercase px-2.5 py-1 rounded-lg border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors"
+              >
+                EN
+              </Link>
+            )}
+            <Link href="/auth/login" className="text-sm text-zinc-400 hover:text-white transition-colors">
+              {c.login}
+            </Link>
+          </div>
         </nav>
 
-        {/* ── HERO — entra tudo junto como um bloco ────────────── */}
+        {/* ── HERO ─────────────────────────────────────────────── */}
         <section className="max-w-2xl mx-auto px-5 pt-10 pb-20 text-center">
           <ScrollReveal direction="up" delay={0}>
             <div className="space-y-7">
@@ -104,37 +227,30 @@ export default async function LandingPage() {
 
               <div className="space-y-4">
                 <h1 className="text-[2.6rem] sm:text-5xl font-black tracking-[-0.03em] leading-[1.05]">
-                  O teu treino.<br />
-                  <span style={{
-                    background: "linear-gradient(90deg,#E8C96B,#C9A84C,#A8893A)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}>
-                    Personalizado.
-                  </span>
+                  {c.hero_title}
                 </h1>
                 <p className="text-zinc-400 text-lg leading-relaxed max-w-sm mx-auto">
-                  {coach?.tagline || "Coaching fitness premium com acompanhamento real — no teu telemóvel, 24/7."}
+                  {coach?.tagline || c.hero_tagline}
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
-                  href={signupUrl}
+                  href={signupUrlWithLang}
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110"
                   style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
                 >
-                  Começar agora — €127/mês
+                  {c.cta_primary}
                 </Link>
                 <Link
                   href="/auth/login"
                   className="inline-flex items-center justify-center px-8 py-4 rounded-2xl font-semibold text-zinc-400 text-base border border-zinc-800 hover:border-zinc-600 hover:text-white transition-all"
                 >
-                  Já tenho conta
+                  {c.cta_login}
                 </Link>
               </div>
 
-              <p className="text-zinc-600 text-xs">Sem contratos. Cancela quando quiseres.</p>
+              <p className="text-zinc-600 text-xs">{c.no_contract}</p>
             </div>
           </ScrollReveal>
         </section>
@@ -144,18 +260,16 @@ export default async function LandingPage() {
           <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.18), transparent)" }} />
         </div>
 
-        {/* ── FEATURES — label entra, depois grid como grupo ───── */}
+        {/* ── FEATURES ─────────────────────────────────────────── */}
         <section className="max-w-2xl mx-auto px-5 pb-20 space-y-6">
-          {/* Título da secção */}
           <ScrollReveal direction="up">
             <p className="text-zinc-500 text-xs font-bold tracking-[0.18em] uppercase text-center">
-              Tudo o que está incluído
+              {c.section_features}
             </p>
           </ScrollReveal>
 
-          {/* Grid: linha 1 entra, depois linha 2 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {features.map((f, i) => (
+            {c.features.map((f, i) => (
               <ScrollReveal key={f.title} direction="up" delay={Math.floor(i / 2) * 100}>
                 <div
                   className="rounded-2xl p-5 space-y-2 h-full"
@@ -175,15 +289,15 @@ export default async function LandingPage() {
           <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }} />
         </div>
 
-        {/* ── HOW IT WORKS — secção inteira entra como grupo ───── */}
+        {/* ── HOW IT WORKS ─────────────────────────────────────── */}
         <section className="max-w-2xl mx-auto px-5 pb-20 space-y-6">
           <ScrollReveal direction="up">
             <p className="text-zinc-500 text-xs font-bold tracking-[0.18em] uppercase text-center">
-              Como funciona
+              {c.section_how}
             </p>
           </ScrollReveal>
           <div className="space-y-3">
-            {steps.map((s, i) => (
+            {c.steps.map((s, i) => (
               <ScrollReveal key={s.n} direction="up" delay={i * 90}>
                 <div
                   className="flex items-start gap-4 p-5 rounded-2xl"
@@ -210,20 +324,17 @@ export default async function LandingPage() {
           <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }} />
         </div>
 
-        {/* ── INSTALL — dois cards entram juntos ───────────────── */}
+        {/* ── INSTALL ──────────────────────────────────────────── */}
         <section className="max-w-2xl mx-auto px-5 pb-20 space-y-6">
           <ScrollReveal direction="up">
             <div className="space-y-2 text-center">
               <p className="text-zinc-500 text-xs font-bold tracking-[0.18em] uppercase">
-                Instala a app no teu telemóvel
+                {c.section_install}
               </p>
-              <p className="text-zinc-500 text-sm">
-                Funciona como uma app nativa — sem precisar de ir à App Store.
-              </p>
+              <p className="text-zinc-500 text-sm">{c.install_sub}</p>
             </div>
           </ScrollReveal>
 
-          {/* Ambos os cards entram juntos como par */}
           <ScrollReveal direction="up" delay={80}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* iOS */}
@@ -235,17 +346,12 @@ export default async function LandingPage() {
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 font-black text-black"
                     style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>🍎</div>
                   <div>
-                    <p className="text-white font-bold text-sm">iPhone / iPad</p>
-                    <p className="text-zinc-500 text-xs">Safari</p>
+                    <p className="text-white font-bold text-sm">{c.ios_title}</p>
+                    <p className="text-zinc-500 text-xs">{c.ios_browser}</p>
                   </div>
                 </div>
                 <ol className="space-y-2.5">
-                  {[
-                    "Abre kravcoaching.com no Safari",
-                    "Toca no ícone ⎋ (barra inferior)",
-                    '"Adicionar ao ecrã de início"',
-                    'Toca "Adicionar" — pronto! 🎉',
-                  ].map((text, i) => (
+                  {c.ios_steps.map((text, i) => (
                     <li key={i} className="flex items-start gap-3 text-xs text-zinc-400">
                       <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
                         style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>{i + 1}</span>
@@ -264,17 +370,12 @@ export default async function LandingPage() {
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 font-black text-black"
                     style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>🤖</div>
                   <div>
-                    <p className="text-white font-bold text-sm">Android</p>
-                    <p className="text-zinc-500 text-xs">Chrome</p>
+                    <p className="text-white font-bold text-sm">{c.android_title}</p>
+                    <p className="text-zinc-500 text-xs">{c.android_browser}</p>
                   </div>
                 </div>
                 <ol className="space-y-2.5">
-                  {[
-                    "Abre kravcoaching.com no Chrome",
-                    'Toca nos "⋮" (canto superior direito)',
-                    '"Adicionar ao ecrã inicial"',
-                    'Toca "Instalar" — pronto! 🎉',
-                  ].map((text, i) => (
+                  {c.android_steps.map((text, i) => (
                     <li key={i} className="flex items-start gap-3 text-xs text-zinc-400">
                       <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
                         style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>{i + 1}</span>
@@ -287,13 +388,11 @@ export default async function LandingPage() {
           </ScrollReveal>
 
           <ScrollReveal direction="none" delay={160}>
-            <p className="text-center text-zinc-600 text-xs">
-              💡 Depois de instalada, a app funciona offline e recebe notificações de treino.
-            </p>
+            <p className="text-center text-zinc-600 text-xs">{c.install_hint}</p>
           </ScrollReveal>
         </section>
 
-        {/* ── PRICE — entra como bloco único ───────────────────── */}
+        {/* ── PRICE ────────────────────────────────────────────── */}
         <section className="max-w-2xl mx-auto px-5 pb-20">
           <ScrollReveal direction="up">
             <div
@@ -304,16 +403,16 @@ export default async function LandingPage() {
               }}
             >
               <div className="text-center space-y-1">
-                <p className="text-zinc-500 text-xs font-bold tracking-widest uppercase">Plano Premium</p>
+                <p className="text-zinc-500 text-xs font-bold tracking-widest uppercase">{c.price_label}</p>
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="text-5xl font-black text-white">€127</span>
-                  <span className="text-zinc-500 text-base">/mês</span>
+                  <span className="text-zinc-500 text-base">{isEN ? "/month" : "/mês"}</span>
                 </div>
-                <p className="text-zinc-500 text-sm">Tudo incluído. Sem surpresas.</p>
+                <p className="text-zinc-500 text-sm">{c.price_sub}</p>
               </div>
 
               <ul className="space-y-2.5">
-                {included.map((item) => (
+                {c.included.map((item) => (
                   <li key={item} className="flex items-center gap-3 text-sm text-zinc-300">
                     <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold text-black"
                       style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>✓</span>
@@ -323,15 +422,13 @@ export default async function LandingPage() {
               </ul>
 
               <Link
-                href={signupUrl}
+                href={signupUrlWithLang}
                 className="block text-center w-full py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110"
                 style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
               >
-                Aderir agora →
+                {c.price_cta}
               </Link>
-              <p className="text-center text-zinc-600 text-xs">
-                Cancela a qualquer momento. Sem permanência.
-              </p>
+              <p className="text-center text-zinc-600 text-xs">{c.price_note}</p>
             </div>
           </ScrollReveal>
         </section>
@@ -342,8 +439,8 @@ export default async function LandingPage() {
             KRAV<span style={{ color: "#A8893A" }}>.</span>
           </span>
           <div className="flex gap-4">
-            <Link href="/auth/login" className="hover:text-zinc-400 transition-colors">Entrar</Link>
-            <Link href={signupUrl} className="hover:text-zinc-400 transition-colors">Registar</Link>
+            <Link href="/auth/login" className="hover:text-zinc-400 transition-colors">{c.footer_login}</Link>
+            <Link href={signupUrlWithLang} className="hover:text-zinc-400 transition-colors">{c.footer_signup}</Link>
           </div>
         </footer>
 
