@@ -154,7 +154,7 @@ export default async function CoachDashboard() {
   }
 
   const allClients = Array.from(allClientMap.values()).filter((c) => c.status !== "archived");
-  const weekClients = Array.from(clientMap.values());
+  const weekClients = Array.from(clientMap.values()).filter((c) => c.status !== "archived");
 
   // Smart alerts
   type AlertType = "no_checkin" | "renewal" | "overdue_renewal" | "no_completion" | "perfect_week" | "pr_week" | "at_risk";
