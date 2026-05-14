@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { assignClient, unassignClient, activateClient } from "./actions";
+import { useState, useTransition, useRef, useEffect } from "react";
+import { assignClient, unassignClient, activateClient, archiveClient, deleteClient } from "./actions";
 
 export interface ClientRow {
   id: string;
@@ -52,17 +52,35 @@ function Avatar({ name, url, size = 40 }: { name: string; url?: string | null; s
 }
 
 function ClientCard({
-  client, coachId, onAssigned, onUnassigned, onActivated,
+  client, coachId, onAssigned, onUnassigned, onActivated, onArchived, onDeleted,
 }: {
   client: ClientRow; coachId: string;
   onAssigned: (clientId: string, role: string) => void;
   onUnassigned: (clientId: string, role: string) => void;
   onActivated?: (clientId: string) => void;
+  onArchived?: (clientId: string) => void;
+  onDeleted?: (clientId: string) => void;
 }) {
   const [pending, startTransition] = useTransition();
   const [assignRole, setAssignRole] = useState("coach");
   const [showRoleSelect, setShowRoleSelect] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [showMenu, setShowMenu] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!showMenu) return;
+    function handler(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false);
+        setConfirmDelete(false);
+      }
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showMenu]);
 
   const myAssignments = client.assignments.filter((a) => a.coach_id === coachId);
   const isMyCoach = myAssignments.some((a) => a.assigned_role === "coach");
@@ -117,7 +135,7 @@ function ClientCard({
         </div>
 
         {/* Action buttons */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0" ref={menuRef}>
           {/* Activate button for pending clients */}
           {isPending && isMyCoach && (
             <button
@@ -177,6 +195,78 @@ function ClientCard({
               </button>
             )
           )}
+
+          {/* ⋯ menu — archive / delete */}
+          <div className="relative">
+            <button
+              onClick={() => { setShowMenu((v) => !v); setConfirmDelete(false); }}
+              className="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white text-sm flex items-center justify-center transition-colors"
+            >⋯</button>
+
+            {showMenu && (
+              <div
+                className="absolute right-0 top-9 z-50 min-w-[160px] rounded-xl overflow-hidden shadow-xl"
+                style={{ background: "#1a1a1c", border: "1px solid rgba(255,255,255,0.08)" }}
+              >
+                {/* Archive */}
+                <button
+                  onClick={() => {
+                    setShowMenu(false);
+                    setActionError(null);
+                    startTransition(async () => {
+                      const res = await archiveClient(client.id);
+                      if (res.error) setActionError(res.error);
+                      else onArchived?.(client.id);
+                    });
+                  }}
+                  disabled={pending}
+                  className="w-full text-left px-4 py-2.5 text-xs text-zinc-300 hover:bg-zinc-700/60 transition-colors flex items-center gap-2.5 disabled:opacity-50"
+                >
+                  <span>📦</span> Arquivar
+                </button>
+
+                <div className="h-px mx-3" style={{ background: "rgba(255,255,255,0.06)" }} />
+
+                {/* Delete — 2-step confirm */}
+                {confirmDelete ? (
+                  <div className="px-3 py-2.5 space-y-2">
+                    <p className="text-[11px] text-red-400 leading-snug">Apaga a conta permanentemente. Sem recuperação.</p>
+                    <div className="flex gap-1.5">
+                      <button
+                        onClick={() => {
+                          setShowMenu(false);
+                          setConfirmDelete(false);
+                          setActionError(null);
+                          startTransition(async () => {
+                            const res = await deleteClient(client.id);
+                            if (res.error) setActionError(res.error);
+                            else onDeleted?.(client.id);
+                          });
+                        }}
+                        disabled={pending}
+                        className="flex-1 px-2 py-1.5 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 text-[11px] font-semibold hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                      >
+                        {pending ? "..." : "Confirmar"}
+                      </button>
+                      <button
+                        onClick={() => setConfirmDelete(false)}
+                        className="px-2 py-1.5 rounded-lg bg-zinc-700 text-zinc-400 text-[11px] hover:bg-zinc-600 transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setConfirmDelete(true)}
+                    className="w-full text-left px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-2.5"
+                  >
+                    <span>🗑</span> Eliminar conta
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -223,6 +313,14 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
     );
   }
 
+  function handleArchived(clientId: string) {
+    setClients((prev) => prev.filter((c) => c.id !== clientId));
+  }
+
+  function handleDeleted(clientId: string) {
+    setClients((prev) => prev.filter((c) => c.id !== clientId));
+  }
+
   function copyInvite() {
     navigator.clipboard.writeText(inviteUrl).then(() => {
       setCopied(true);
@@ -231,7 +329,9 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
   }
 
   const q = search.toLowerCase();
-  const filtered = clients.filter((c) => c.full_name.toLowerCase().includes(q));
+  const filtered = clients
+    .filter((c) => c.status !== "archived")
+    .filter((c) => c.full_name.toLowerCase().includes(q));
   const mine   = filtered.filter((c) => c.assignments.some((a) => a.coach_id === coachId));
   const others = filtered.filter((c) => !c.assignments.some((a) => a.coach_id === coachId));
 
@@ -285,7 +385,8 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
       <div className="space-y-3">
         {displayed.map((c) => (
           <ClientCard key={c.id} client={c} coachId={coachId}
-            onAssigned={handleAssigned} onUnassigned={handleUnassigned} onActivated={handleActivated} />
+            onAssigned={handleAssigned} onUnassigned={handleUnassigned}
+            onActivated={handleActivated} onArchived={handleArchived} onDeleted={handleDeleted} />
         ))}
         {displayed.length === 0 && (
           <div className="card p-10 text-center">
