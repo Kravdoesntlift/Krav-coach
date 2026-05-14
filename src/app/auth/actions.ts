@@ -79,18 +79,28 @@ export async function signup(formData: FormData) {
   }
 
   // Auto-assign coach if signup came via invite link (?coach=COACH_ID)
-  if (coachId && data.user?.id) {
+  // If no coachId in URL, fall back to the first coach in the platform
+  if (data.user?.id) {
     try {
       const admin = createAdminClient();
-      // Verify the coachId exists and is actually a coach
-      const { data: coachProfile } = await admin
-        .from("profiles")
-        .select("id, role")
-        .eq("id", coachId)
-        .eq("role", "coach")
-        .maybeSingle();
+
+      // Resolve coachId — use param if valid, otherwise find first coach
+      let resolvedCoachId = coachId;
+      if (resolvedCoachId) {
+        const { data: check } = await admin
+          .from("profiles").select("id").eq("id", resolvedCoachId).eq("role", "coach").maybeSingle();
+        if (!check) resolvedCoachId = null;
+      }
+      if (!resolvedCoachId) {
+        const { data: firstCoach } = await admin
+          .from("profiles").select("id").eq("role", "coach").limit(1).maybeSingle();
+        resolvedCoachId = firstCoach?.id ?? null;
+      }
+
+      const coachProfile = resolvedCoachId ? { id: resolvedCoachId } : null;
 
       if (coachProfile) {
+        const coachId = coachProfile.id; // shadow outer coachId with resolved one
         // 1. Assign coach
         await admin.from("coach_clients").insert({
           coach_id: coachId,
@@ -123,7 +133,9 @@ export async function signup(formData: FormData) {
           "🆕 Novo cliente registado",
           `${fullName} acabou de criar conta. Ativa-o em Gerir Clientes.`,
           "/coach/manage-clients",
-        ).catch(() => {});
+        ).then((r) => {
+          if (!r.ok) console.warn("[signup] Push to coach failed:", r.error);
+        }).catch((e) => console.warn("[signup] Push to coach threw:", e));
       }
     } catch {
       // Non-critical — user is created, assignment just didn't happen
