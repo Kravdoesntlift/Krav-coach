@@ -230,7 +230,9 @@ export default async function LandingPage({
                   {c.hero_title}
                 </h1>
                 <p className="text-zinc-400 text-lg leading-relaxed max-w-sm mx-auto">
-                  {(isEN ? coach?.tagline_en || coach?.tagline : coach?.tagline) || c.hero_tagline}
+                  {isEN
+                    ? (coach?.tagline_en || c.hero_tagline)
+                    : (coach?.tagline    || c.hero_tagline)}
                 </p>
               </div>
 
