@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef, useEffect } from "react";
-import { assignClient, unassignClient, activateClient, archiveClient, deleteClient } from "./actions";
+import { assignClient, unassignClient, activateClient, archiveClient, unarchiveClient, deleteClient } from "./actions";
 
 export interface ClientRow {
   id: string;
@@ -52,13 +52,14 @@ function Avatar({ name, url, size = 40 }: { name: string; url?: string | null; s
 }
 
 function ClientCard({
-  client, coachId, onAssigned, onUnassigned, onActivated, onArchived, onDeleted,
+  client, coachId, onAssigned, onUnassigned, onActivated, onArchived, onUnarchived, onDeleted,
 }: {
   client: ClientRow; coachId: string;
   onAssigned: (clientId: string, role: string) => void;
   onUnassigned: (clientId: string, role: string) => void;
   onActivated?: (clientId: string) => void;
   onArchived?: (clientId: string) => void;
+  onUnarchived?: (clientId: string) => void;
   onDeleted?: (clientId: string) => void;
 }) {
   const [pending, startTransition] = useTransition();
@@ -83,9 +84,10 @@ function ClientCard({
   }, [showMenu]);
 
   const myAssignments = client.assignments.filter((a) => a.coach_id === coachId);
-  const isMyCoach = myAssignments.some((a) => a.assigned_role === "coach");
-  const isMyNutri  = myAssignments.some((a) => a.assigned_role === "nutritionist");
-  const isPending  = client.status === "pending";
+  const isMyCoach   = myAssignments.some((a) => a.assigned_role === "coach");
+  const isMyNutri   = myAssignments.some((a) => a.assigned_role === "nutritionist");
+  const isPending   = client.status === "pending";
+  const isArchived  = client.status === "archived";
 
   const st = STATUS_LABELS[client.status ?? "active"] ?? STATUS_LABELS["active"];
 
@@ -208,22 +210,40 @@ function ClientCard({
                 className="absolute right-0 top-9 z-50 min-w-[160px] rounded-xl overflow-hidden shadow-xl"
                 style={{ background: "#1a1a1c", border: "1px solid rgba(255,255,255,0.08)" }}
               >
-                {/* Archive */}
-                <button
-                  onClick={() => {
-                    setShowMenu(false);
-                    setActionError(null);
-                    startTransition(async () => {
-                      const res = await archiveClient(client.id);
-                      if (res.error) setActionError(res.error);
-                      else onArchived?.(client.id);
-                    });
-                  }}
-                  disabled={pending}
-                  className="w-full text-left px-4 py-2.5 text-xs text-zinc-300 hover:bg-zinc-700/60 transition-colors flex items-center gap-2.5 disabled:opacity-50"
-                >
-                  <span>📦</span> Arquivar
-                </button>
+                {/* Archive / Restore */}
+                {isArchived ? (
+                  <button
+                    onClick={() => {
+                      setShowMenu(false);
+                      setActionError(null);
+                      startTransition(async () => {
+                        const res = await unarchiveClient(client.id);
+                        if (res.error) setActionError(res.error);
+                        else onUnarchived?.(client.id);
+                      });
+                    }}
+                    disabled={pending}
+                    className="w-full text-left px-4 py-2.5 text-xs text-green-400 hover:bg-green-500/10 transition-colors flex items-center gap-2.5 disabled:opacity-50"
+                  >
+                    <span>♻️</span> Restaurar
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setShowMenu(false);
+                      setActionError(null);
+                      startTransition(async () => {
+                        const res = await archiveClient(client.id);
+                        if (res.error) setActionError(res.error);
+                        else onArchived?.(client.id);
+                      });
+                    }}
+                    disabled={pending}
+                    className="w-full text-left px-4 py-2.5 text-xs text-zinc-300 hover:bg-zinc-700/60 transition-colors flex items-center gap-2.5 disabled:opacity-50"
+                  >
+                    <span>📦</span> Arquivar
+                  </button>
+                )}
 
                 <div className="h-px mx-3" style={{ background: "rgba(255,255,255,0.06)" }} />
 
@@ -285,7 +305,7 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
   const [clients, setClients] = useState(allClients);
   const [search, setSearch] = useState("");
   const [copied, setCopied] = useState(false);
-  const [tab, setTab] = useState<"mine" | "all">("mine");
+  const [tab, setTab] = useState<"mine" | "all" | "archived">("mine");
 
   function handleAssigned(clientId: string, role: string) {
     setClients((prev) =>
@@ -314,7 +334,11 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
   }
 
   function handleArchived(clientId: string) {
-    setClients((prev) => prev.filter((c) => c.id !== clientId));
+    setClients((prev) => prev.map((c) => c.id === clientId ? { ...c, status: "archived" } : c));
+  }
+
+  function handleUnarchived(clientId: string) {
+    setClients((prev) => prev.map((c) => c.id === clientId ? { ...c, status: "active" } : c));
   }
 
   function handleDeleted(clientId: string) {
@@ -329,13 +353,13 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
   }
 
   const q = search.toLowerCase();
-  const filtered = clients
-    .filter((c) => c.status !== "archived")
-    .filter((c) => c.full_name.toLowerCase().includes(q));
-  const mine   = filtered.filter((c) => c.assignments.some((a) => a.coach_id === coachId));
-  const others = filtered.filter((c) => !c.assignments.some((a) => a.coach_id === coachId));
+  const allFiltered = clients.filter((c) => c.full_name.toLowerCase().includes(q));
+  const archived = allFiltered.filter((c) => c.status === "archived");
+  const active   = allFiltered.filter((c) => c.status !== "archived");
+  const mine     = active.filter((c) => c.assignments.some((a) => a.coach_id === coachId));
+  const others   = active.filter((c) => !c.assignments.some((a) => a.coach_id === coachId));
 
-  const displayed = tab === "mine" ? mine : others;
+  const displayed = tab === "mine" ? mine : tab === "all" ? others : archived;
 
   return (
     <div className="space-y-5">
@@ -361,7 +385,7 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
       </div>
 
       {/* Tabs + Search */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <button
           onClick={() => setTab("mine")}
           className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
@@ -376,9 +400,18 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
           }`}>
           Disponíveis ({others.length})
         </button>
+        {archived.length > 0 && (
+          <button
+            onClick={() => setTab("archived")}
+            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+              tab === "archived" ? "bg-zinc-600 text-white" : "bg-zinc-800 text-zinc-400 hover:text-white"
+            }`}>
+            📦 Arquivo ({archived.length})
+          </button>
+        )}
         <input
           type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-          placeholder="Pesquisar..." className="input flex-1 text-sm py-2" />
+          placeholder="Pesquisar..." className="input flex-1 text-sm py-2 min-w-[120px]" />
       </div>
 
       {/* Client list */}
@@ -386,13 +419,16 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
         {displayed.map((c) => (
           <ClientCard key={c.id} client={c} coachId={coachId}
             onAssigned={handleAssigned} onUnassigned={handleUnassigned}
-            onActivated={handleActivated} onArchived={handleArchived} onDeleted={handleDeleted} />
+            onActivated={handleActivated} onArchived={handleArchived}
+            onUnarchived={handleUnarchived} onDeleted={handleDeleted} />
         ))}
         {displayed.length === 0 && (
           <div className="card p-10 text-center">
             <p className="text-zinc-500 text-sm">
               {tab === "mine"
                 ? "Ainda não tens clientes atribuídos. Vai ao separador 'Disponíveis'."
+                : tab === "archived"
+                ? "Nenhum cliente arquivado."
                 : search ? "Nenhum cliente encontrado." : "Sem outros clientes registados."}
             </p>
           </div>

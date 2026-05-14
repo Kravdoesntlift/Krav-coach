@@ -104,6 +104,28 @@ export async function activateClient(clientId: string) {
   return { success: true };
 }
 
+export async function unarchiveClient(clientId: string) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Não autenticado." };
+
+  const { data: profile } = await supabase
+    .from("profiles").select("role").eq("id", user.id).single();
+  if (profile?.role !== "coach") return { error: "Sem permissão." };
+
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("profiles")
+    .update({ status: "active" })
+    .eq("id", clientId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath("/coach/manage-clients");
+  revalidatePath("/coach/dashboard");
+  return { success: true };
+}
+
 export async function archiveClient(clientId: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
