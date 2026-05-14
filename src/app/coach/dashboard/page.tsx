@@ -153,7 +153,7 @@ export default async function CoachDashboard() {
     if (c && !allClientMap.has(c.id)) allClientMap.set(c.id, c);
   }
 
-  const allClients = Array.from(allClientMap.values());
+  const allClients = Array.from(allClientMap.values()).filter((c) => c.status !== "archived");
   const weekClients = Array.from(clientMap.values());
 
   // Smart alerts
