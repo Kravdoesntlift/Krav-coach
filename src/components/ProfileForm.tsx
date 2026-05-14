@@ -6,13 +6,14 @@ import type { Profile } from "@/lib/supabase/types";
 import AvatarUpload from "@/components/AvatarUpload";
 
 interface Props {
-  profile: Profile & { avatar_url?: string | null; tagline?: string | null };
+  profile: Profile & { avatar_url?: string | null; tagline?: string | null; tagline_en?: string | null };
   email: string;
 }
 
 export default function ProfileForm({ profile, email }: Props) {
   const [fullName, setFullName] = useState(profile.full_name);
   const [tagline, setTagline] = useState(profile.tagline ?? "");
+  const [taglineEn, setTaglineEn] = useState(profile.tagline_en ?? "");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingName, setSavingName] = useState(false);
@@ -27,7 +28,10 @@ export default function ProfileForm({ profile, email }: Props) {
     setNameMsg(null);
     const supabase = createClient();
     const updates: Record<string, string> = { full_name: fullName.trim() };
-    if (profile.role === "coach") updates.tagline = tagline.trim();
+    if (profile.role === "coach") {
+      updates.tagline = tagline.trim();
+      updates.tagline_en = taglineEn.trim();
+    }
     const { error } = await supabase.from("profiles").update(updates).eq("id", profile.id);
     setNameMsg(error ? { type: "err", text: "Erro ao guardar." } : { type: "ok", text: "Guardado!" });
     setSavingName(false);
@@ -81,18 +85,30 @@ export default function ProfileForm({ profile, email }: Props) {
             <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className="input" required />
           </div>
 
-          {/* Coach tagline */}
+          {/* Coach taglines */}
           {profile.role === "coach" && (
-            <div>
-              <label className="label">
-                Tagline <span className="text-gray-600">(aparece aos clientes no onboarding)</span>
-              </label>
-              <input
-                type="text" value={tagline} onChange={(e) => setTagline(e.target.value)}
-                className="input" placeholder="ex: Transforma o teu corpo em 12 semanas"
-                maxLength={80}
-              />
-            </div>
+            <>
+              <div>
+                <label className="label">
+                  Tagline <span className="text-gray-600 text-[11px]">🇵🇹 Aparece na landing page e no onboarding</span>
+                </label>
+                <input
+                  type="text" value={tagline} onChange={(e) => setTagline(e.target.value)}
+                  className="input" placeholder="ex: Transforma o teu corpo em 12 semanas"
+                  maxLength={80}
+                />
+              </div>
+              <div>
+                <label className="label">
+                  Tagline em inglês <span className="text-gray-600 text-[11px]">🇬🇧 Aparece quando a landing está em EN</span>
+                </label>
+                <input
+                  type="text" value={taglineEn} onChange={(e) => setTaglineEn(e.target.value)}
+                  className="input" placeholder="ex: Transform your body in 12 weeks"
+                  maxLength={80}
+                />
+              </div>
+            </>
           )}
 
           <div className="flex items-center gap-3">

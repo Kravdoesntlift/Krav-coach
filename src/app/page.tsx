@@ -154,7 +154,7 @@ export default async function LandingPage({
   const admin = createAdminClient();
   const { data: coach } = await admin
     .from("profiles")
-    .select("id, full_name, avatar_url, tagline")
+    .select("id, full_name, avatar_url, tagline, tagline_en")
     .eq("role", "coach")
     .limit(1)
     .maybeSingle();
@@ -230,7 +230,7 @@ export default async function LandingPage({
                   {c.hero_title}
                 </h1>
                 <p className="text-zinc-400 text-lg leading-relaxed max-w-sm mx-auto">
-                  {coach?.tagline || c.hero_tagline}
+                  {(isEN ? coach?.tagline_en || coach?.tagline : coach?.tagline) || c.hero_tagline}
                 </p>
               </div>
 
