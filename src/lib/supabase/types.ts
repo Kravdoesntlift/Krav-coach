@@ -110,6 +110,7 @@ export interface ProgressPhoto {
   caption: string | null;
   taken_at: string;
   created_at: string;
+  angle: "front" | "side" | "back" | null;
 }
 
 export interface ClientOnboarding {

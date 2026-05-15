@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
   const caption = (formData.get("caption") as string | null)?.trim() || null;
+  const angle = (formData.get("angle") as string | null) || null;
 
   if (!file) {
     return NextResponse.json({ error: "Ficheiro em falta" }, { status: 400 });
@@ -51,6 +52,7 @@ export async function POST(req: NextRequest) {
       photo_url: urlData.publicUrl,
       caption,
       taken_at,
+      ...(angle ? { angle } : {}),
     })
     .select()
     .single();
