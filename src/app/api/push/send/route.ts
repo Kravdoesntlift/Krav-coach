@@ -16,6 +16,18 @@ export async function POST(req: NextRequest) {
 
   const { userId, title, body, url } = await req.json();
 
+  // Verify caller has a relationship with the target user
+  const { data: rel } = await supabase
+    .from("coach_clients")
+    .select("id")
+    .eq("coach_id", user.id)
+    .eq("client_id", userId)
+    .maybeSingle();
+  // Also allow coach to notify themselves (e.g. test)
+  if (!rel && userId !== user.id) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const admin = createAdminClient();
 
   // Fetch subscription + unread count in parallel

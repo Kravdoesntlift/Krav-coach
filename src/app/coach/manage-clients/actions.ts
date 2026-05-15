@@ -66,6 +66,10 @@ export async function activateClient(clientId: string) {
     .from("profiles").select("role, full_name").eq("id", user.id).single();
   if (profile?.role !== "coach") return { error: "Sem permissão." };
 
+  const { data: rel } = await supabase.from("coach_clients")
+    .select("id").eq("coach_id", user.id).eq("client_id", clientId).maybeSingle();
+  if (!rel) return { error: "Sem acesso a este cliente." };
+
   const admin = createAdminClient();
 
   // Set client status to active
@@ -113,6 +117,10 @@ export async function unarchiveClient(clientId: string) {
     .from("profiles").select("role").eq("id", user.id).single();
   if (profile?.role !== "coach") return { error: "Sem permissão." };
 
+  const { data: rel } = await supabase.from("coach_clients")
+    .select("id").eq("coach_id", user.id).eq("client_id", clientId).maybeSingle();
+  if (!rel) return { error: "Sem acesso a este cliente." };
+
   const admin = createAdminClient();
   const { error } = await admin
     .from("profiles")
@@ -135,6 +143,10 @@ export async function archiveClient(clientId: string) {
     .from("profiles").select("role").eq("id", user.id).single();
   if (profile?.role !== "coach") return { error: "Sem permissão." };
 
+  const { data: rel } = await supabase.from("coach_clients")
+    .select("id").eq("coach_id", user.id).eq("client_id", clientId).maybeSingle();
+  if (!rel) return { error: "Sem acesso a este cliente." };
+
   const admin = createAdminClient();
   const { error } = await admin
     .from("profiles")
@@ -156,6 +168,10 @@ export async function deleteClient(clientId: string) {
   const { data: profile } = await supabase
     .from("profiles").select("role").eq("id", user.id).single();
   if (profile?.role !== "coach") return { error: "Sem permissão." };
+
+  const { data: rel } = await supabase.from("coach_clients")
+    .select("id").eq("coach_id", user.id).eq("client_id", clientId).maybeSingle();
+  if (!rel) return { error: "Sem acesso a este cliente." };
 
   const admin = createAdminClient();
 

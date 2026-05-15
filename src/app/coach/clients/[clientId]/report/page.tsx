@@ -20,6 +20,11 @@ export default async function CoachClientReportPage({
   const { clientId } = await params;
   const { m } = await searchParams;
 
+  // Verify coach owns this client
+  const { data: rel } = await supabase.from("coach_clients")
+    .select("id").eq("coach_id", user.id).eq("client_id", clientId).maybeSingle();
+  if (!rel) redirect("/coach/dashboard");
+
   const admin = createAdminClient();
 
   // Parse month param or default to last month

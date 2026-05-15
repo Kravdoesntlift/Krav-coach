@@ -49,6 +49,11 @@ export async function POST(req: NextRequest) {
       if (!clientId) {
         return NextResponse.json({ error: "clientId é obrigatório." }, { status: 400 });
       }
+      // Verify this coach owns the client
+      const { data: rel } = await supabase.from("coach_clients")
+        .select("id").eq("coach_id", user.id).eq("client_id", clientId).maybeSingle();
+      if (!rel) return NextResponse.json({ error: "Sem acesso a este cliente." }, { status: 403 });
+
       const admin = createAdminClient();
       const { data: clientProfile } = await admin
         .from("profiles")

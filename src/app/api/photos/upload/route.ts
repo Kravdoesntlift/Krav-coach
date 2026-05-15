@@ -16,8 +16,19 @@ export async function POST(req: NextRequest) {
   const caption = (formData.get("caption") as string | null)?.trim() || null;
   const angle = (formData.get("angle") as string | null) || null;
 
+  const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+  const ALLOWED_EXTS = ["jpg", "jpeg", "png", "webp", "heic", "heif"];
+
   if (!file) {
     return NextResponse.json({ error: "Ficheiro em falta" }, { status: 400 });
+  }
+
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+  if (!ALLOWED_TYPES.includes(file.type) || !ALLOWED_EXTS.includes(ext)) {
+    return NextResponse.json({ error: "Tipo de ficheiro não permitido. Usa JPEG, PNG ou WebP." }, { status: 400 });
+  }
+  if (file.size > 15 * 1024 * 1024) {
+    return NextResponse.json({ error: "Ficheiro demasiado grande. Máximo 15MB." }, { status: 400 });
   }
 
   const admin = createAdminClient();
@@ -25,7 +36,6 @@ export async function POST(req: NextRequest) {
   // Ensure bucket exists (idempotent)
   await admin.storage.createBucket("progress-photos", { public: true }).catch(() => {});
 
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
   const path = `${user.id}/${Date.now()}.${ext}`;
   const bytes = await file.arrayBuffer();
 

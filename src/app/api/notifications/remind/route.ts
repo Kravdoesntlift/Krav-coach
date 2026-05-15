@@ -11,6 +11,10 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
+  // Only coaches can send notifications
+  const { data: callerProfile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (callerProfile?.role !== "coach") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
   const body = await req.json() as { type: string; clientId?: string; message?: string };
   const admin = createAdminClient();
 
@@ -25,6 +29,9 @@ export async function POST(req: NextRequest) {
   // Get target clients
   let targetIds: string[] = [];
   if (body.clientId) {
+    const { data: rel } = await admin.from("coach_clients")
+      .select("id").eq("coach_id", user.id).eq("client_id", body.clientId).maybeSingle();
+    if (!rel) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     targetIds = [body.clientId];
   } else {
     const { data: plans } = await admin

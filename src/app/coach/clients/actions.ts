@@ -163,12 +163,16 @@ export async function createGoal({
 
 export async function deleteGoal(goalId: string) {
   const supabase = await createClient();
-  await supabase.from("client_goals").delete().eq("id", goalId);
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase.from("client_goals").delete().eq("id", goalId).eq("coach_id", user.id);
 }
 
 export async function updateGoalProgress(goalId: string, currentValue: number, completed: boolean) {
   const supabase = await createClient();
-  await supabase.from("client_goals").update({ current_value: currentValue, completed }).eq("id", goalId);
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase.from("client_goals").update({ current_value: currentValue, completed }).eq("id", goalId).eq("coach_id", user.id);
 }
 
 // ─── PLAN TEMPLATES ──────────────────────────────────────────────────────────
@@ -245,7 +249,9 @@ export async function getTemplates() {
 
 export async function deleteTemplate(templateId: string) {
   const supabase = await createClient();
-  await supabase.from("plan_templates").delete().eq("id", templateId);
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase.from("plan_templates").delete().eq("id", templateId).eq("coach_id", user.id);
 }
 
 export async function applyTemplate(templateId: string, clientId: string, weekStart: string) {

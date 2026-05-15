@@ -10,6 +10,15 @@ export async function POST(req: NextRequest) {
 
   const { clientId } = await req.json() as { clientId: string };
 
+  // Verify caller is coach of this client
+  const { data: rel } = await supabase
+    .from("coach_clients")
+    .select("id")
+    .eq("coach_id", user.id)
+    .eq("client_id", clientId)
+    .maybeSingle();
+  if (!rel) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
   const admin = createAdminClient();
 
   const [{ data: onboarding }, { data: profile }] = await Promise.all([

@@ -1,5 +1,6 @@
 "use server";
 
+import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 // ─── ONBOARDING ───────────────────────────────────────────────────────────────
@@ -11,6 +12,10 @@ export async function saveOnboarding(data: {
   availability: number;
   equipment: string | null;
 }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || user.id !== data.clientId) return { error: "Sem permissão." };
+
   const admin = createAdminClient();
 
   const { error } = await admin.from("client_onboarding").upsert({
