@@ -62,7 +62,12 @@ export default async function ClientChatPage() {
     .from("messages")
     .select("*")
     .or(`and(sender_id.eq.${user.id},receiver_id.eq.${coach.id}),and(sender_id.eq.${coach.id},receiver_id.eq.${user.id})`)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: false })
+    .limit(50)
+    .then(({ data, error }) => ({
+      data: (data ?? []).reverse(),
+      error,
+    }));
 
   const { data: clientProfile } = await supabase
     .from("profiles").select("full_name").eq("id", user.id).single();

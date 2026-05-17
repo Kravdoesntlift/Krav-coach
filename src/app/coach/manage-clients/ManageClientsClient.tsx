@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef, useEffect } from "react";
+import Image from "next/image";
 import { assignClient, unassignClient, activateClient, archiveClient, unarchiveClient, deleteClient } from "./actions";
 
 export interface ClientRow {
@@ -32,8 +33,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 function Avatar({ name, url, size = 40 }: { name: string; url?: string | null; size?: number }) {
   if (url) {
     return (
-      <img src={url} alt={name} className="rounded-full object-cover shrink-0"
-        style={{ width: size, height: size }} />
+      <Image src={url} alt={name} width={size} height={size} className="rounded-full object-cover shrink-0" />
     );
   }
   const initials = name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
@@ -186,6 +186,7 @@ function ClientCard({
                 <button
                   onClick={() => { setShowRoleSelect(false); setActionError(null); }}
                   className="w-6 h-6 rounded-full bg-zinc-700 text-zinc-400 text-xs hover:bg-zinc-600 transition-colors flex items-center justify-center"
+                  aria-label="Cancelar"
                 >×</button>
               </div>
             ) : (

@@ -10,6 +10,16 @@ if (productionUrl && !allowedOrigins.includes(productionUrl)) {
 }
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        // Supabase Storage — avatars and progress photos
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+  },
   experimental: {
     viewTransition: true,
     serverActions: {

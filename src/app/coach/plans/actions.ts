@@ -57,30 +57,46 @@ export async function duplicatePlan(planId: string) {
 
   if (planErr || !newPlan) return { error: "Erro ao duplicar plano." };
 
-  // Clone days + exercises
-  for (const day of plan.workout_days ?? []) {
-    const { data: newDay } = await supabase
-      .from("workout_days")
-      .insert({
-        plan_id: newPlan.id,
-        day_of_week: day.day_of_week,
-        label: day.label,
-        order_index: day.order_index,
-      })
-      .select()
-      .single();
+  // Clone days + exercises — batch inserts
+  const sourceDays = plan.workout_days ?? [];
 
-    if (newDay && day.exercises?.length > 0) {
-      await supabase.from("exercises").insert(
-        day.exercises.map((ex: { name: string; sets: number; reps: string; notes: string | null; order_index: number }) => ({
-          day_id: newDay.id,
-          name: ex.name,
-          sets: ex.sets,
-          reps: ex.reps,
-          notes: ex.notes,
-          order_index: ex.order_index,
+  if (sourceDays.length > 0) {
+    const { data: insertedDays } = await supabase
+      .from("workout_days")
+      .insert(
+        sourceDays.map((day: { day_of_week: number; label: string | null; order_index: number }) => ({
+          plan_id: newPlan.id,
+          day_of_week: day.day_of_week,
+          label: day.label,
+          order_index: day.order_index,
         }))
-      );
+      )
+      .select("id, day_of_week, order_index");
+
+    if (insertedDays && insertedDays.length > 0) {
+      type InsertedDay = { id: string; day_of_week: number; order_index: number };
+      const allExercises: {
+        day_id: string; name: string; sets: number; reps: string;
+        notes: string | null; order_index: number;
+      }[] = [];
+
+      for (const day of sourceDays) {
+        const matched = (insertedDays as InsertedDay[]).find(
+          (d) => d.day_of_week === day.day_of_week && d.order_index === day.order_index
+        );
+        if (!matched) continue;
+        for (const ex of day.exercises ?? []) {
+          allExercises.push({
+            day_id: matched.id,
+            name: ex.name, sets: ex.sets, reps: ex.reps,
+            notes: ex.notes, order_index: ex.order_index,
+          });
+        }
+      }
+
+      if (allExercises.length > 0) {
+        await supabase.from("exercises").insert(allExercises);
+      }
     }
   }
 

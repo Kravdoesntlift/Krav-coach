@@ -92,6 +92,8 @@ export async function broadcastMessage(
   message: string,
   targetStatus: "all" | "active",
 ): Promise<{ error?: string; count?: number }> {
+  if (!message || message.trim().length === 0) return { error: "Mensagem vazia." };
+  if (message.length > 2000) return { error: "Mensagem demasiado longa (máx. 2000 caracteres)." };
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Não autenticado." };
@@ -170,18 +172,22 @@ export async function createGoal({
   return { goal };
 }
 
-export async function deleteGoal(goalId: string) {
+export async function deleteGoal(goalId: string): Promise<{ error?: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
-  await supabase.from("client_goals").delete().eq("id", goalId).eq("coach_id", user.id);
+  if (!user) return { error: "Não autenticado." };
+  const { error } = await supabase.from("client_goals").delete().eq("id", goalId).eq("coach_id", user.id);
+  if (error) return { error: error.message };
+  return {};
 }
 
-export async function updateGoalProgress(goalId: string, currentValue: number, completed: boolean) {
+export async function updateGoalProgress(goalId: string, currentValue: number, completed: boolean): Promise<{ error?: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
-  await supabase.from("client_goals").update({ current_value: currentValue, completed }).eq("id", goalId).eq("coach_id", user.id);
+  if (!user) return { error: "Não autenticado." };
+  const { error } = await supabase.from("client_goals").update({ current_value: currentValue, completed }).eq("id", goalId).eq("coach_id", user.id);
+  if (error) return { error: error.message };
+  return {};
 }
 
 // ─── PLAN TEMPLATES ──────────────────────────────────────────────────────────
@@ -208,33 +214,47 @@ export async function saveAsTemplate(planId: string, templateName: string) {
 
   if (tmplErr || !tmpl) return { error: tmplErr?.message };
 
-  for (const day of plan.workout_days ?? []) {
-    const { data: tDay } = await supabase
-      .from("plan_template_days")
-      .insert({
-        template_id: tmpl.id,
-        day_of_week: day.day_of_week,
-        label: day.label,
-        is_rest: day.is_rest,
-        order_index: day.order_index,
-      })
-      .select()
-      .single();
+  type PlanDay = { day_of_week: number; label: string | null; is_rest: boolean | null; order_index: number; exercises?: { name: string; sets: number; reps: number; notes: string | null; video_url: string | null; order_index: number }[] };
+  const allDays = (plan.workout_days as PlanDay[] ?? []).map((day) => ({
+    template_id: tmpl.id,
+    day_of_week: day.day_of_week,
+    label: day.label,
+    is_rest: day.is_rest,
+    order_index: day.order_index,
+  }));
 
-    if (tDay) {
-      const exercises = (day as Record<string, unknown>).exercises as { name: string; sets: number; reps: number; notes: string | null; video_url: string | null; order_index: number }[] ?? [];
-      if (exercises.length > 0) {
-        await supabase.from("plan_template_exercises").insert(
-          exercises.map((ex) => ({
-            template_day_id: tDay.id,
-            name: ex.name,
-            sets: ex.sets,
-            reps: ex.reps,
-            notes: ex.notes,
-            video_url: ex.video_url,
-            order_index: ex.order_index,
-          }))
+  if (allDays.length > 0) {
+    const { data: insertedDays } = await supabase
+      .from("plan_template_days")
+      .insert(allDays)
+      .select("id, day_of_week, order_index");
+
+    if (insertedDays && insertedDays.length > 0) {
+      // Match inserted days back to original by day_of_week + order_index
+      type InsertedDay = { id: string; day_of_week: number; order_index: number };
+      const allExercises: {
+        template_day_id: string;
+        name: string; sets: number; reps: number;
+        notes: string | null; video_url: string | null; order_index: number;
+      }[] = [];
+
+      for (const day of plan.workout_days as PlanDay[] ?? []) {
+        const matched = (insertedDays as InsertedDay[]).find(
+          (d) => d.day_of_week === day.day_of_week && d.order_index === day.order_index
         );
+        if (!matched) continue;
+        const exercises = day.exercises ?? [];
+        for (const ex of exercises) {
+          allExercises.push({
+            template_day_id: matched.id,
+            name: ex.name, sets: ex.sets, reps: ex.reps,
+            notes: ex.notes, video_url: ex.video_url, order_index: ex.order_index,
+          });
+        }
+      }
+
+      if (allExercises.length > 0) {
+        await supabase.from("plan_template_exercises").insert(allExercises);
       }
     }
   }
@@ -285,31 +305,46 @@ export async function applyTemplate(templateId: string, clientId: string, weekSt
 
   if (planErr || !plan) return { error: planErr?.message };
 
-  for (const tDay of tmpl.plan_template_days ?? []) {
-    const { data: day } = await supabase
-      .from("workout_days")
-      .insert({
-        plan_id: plan.id,
-        day_of_week: tDay.day_of_week,
-        label: tDay.label,
-        is_rest: tDay.is_rest,
-        order_index: tDay.order_index,
-      })
-      .select()
-      .single();
+  const templateDays = tmpl.plan_template_days ?? [];
 
-    if (day && tDay.plan_template_exercises?.length > 0) {
-      await supabase.from("exercises").insert(
-        tDay.plan_template_exercises.map((ex: { name: string; sets: number; reps: number; notes: string | null; video_url: string | null; order_index: number }) => ({
-          day_id: day.id,
-          name: ex.name,
-          sets: ex.sets,
-          reps: ex.reps,
-          notes: ex.notes,
-          video_url: ex.video_url,
-          order_index: ex.order_index,
+  if (templateDays.length > 0) {
+    const { data: insertedDays } = await supabase
+      .from("workout_days")
+      .insert(
+        templateDays.map((tDay: { day_of_week: number; label: string | null; is_rest: boolean | null; order_index: number }) => ({
+          plan_id: plan.id,
+          day_of_week: tDay.day_of_week,
+          label: tDay.label,
+          is_rest: tDay.is_rest,
+          order_index: tDay.order_index,
         }))
-      );
+      )
+      .select("id, day_of_week, order_index");
+
+    if (insertedDays && insertedDays.length > 0) {
+      type InsertedDay = { id: string; day_of_week: number; order_index: number };
+      const allExercises: {
+        day_id: string; name: string; sets: number; reps: number;
+        notes: string | null; video_url: string | null; order_index: number;
+      }[] = [];
+
+      for (const tDay of templateDays) {
+        const matched = (insertedDays as InsertedDay[]).find(
+          (d) => d.day_of_week === tDay.day_of_week && d.order_index === tDay.order_index
+        );
+        if (!matched) continue;
+        for (const ex of tDay.plan_template_exercises ?? []) {
+          allExercises.push({
+            day_id: matched.id,
+            name: ex.name, sets: ex.sets, reps: ex.reps,
+            notes: ex.notes, video_url: ex.video_url, order_index: ex.order_index,
+          });
+        }
+      }
+
+      if (allExercises.length > 0) {
+        await supabase.from("exercises").insert(allExercises);
+      }
     }
   }
 

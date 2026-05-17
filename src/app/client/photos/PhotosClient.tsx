@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { ProgressPhoto } from "@/lib/supabase/types";
 
@@ -63,10 +64,11 @@ function UploadSlot({
       <input ref={ref} type="file" accept="image/*" className="hidden" onChange={handleFile} />
       {preview ? (
         <div className="relative rounded-xl overflow-hidden bg-zinc-950" style={{ aspectRatio: "3/4" }}>
-          <img src={preview} alt={angle.label} className="w-full h-full object-cover" />
+          <Image src={preview} alt={angle.label} fill className="object-cover" />
           <button
             onClick={() => { onClear(); if (ref.current) ref.current.value = ""; }}
             className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/70 text-white text-xs flex items-center justify-center hover:bg-black transition-colors"
+            aria-label="Remover foto"
           >✕</button>
         </div>
       ) : (
@@ -394,9 +396,10 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
               <button
                 onClick={() => setLightbox(null)}
                 className="w-9 h-9 rounded-full bg-zinc-800 text-gray-400 hover:text-white flex items-center justify-center text-sm transition-colors"
+                aria-label="Fechar"
               >✕</button>
             </div>
-            <img src={lightbox.photo_url} alt="" className="w-full rounded-2xl max-h-[70vh] object-contain" />
+            <Image src={lightbox.photo_url} alt="" width={800} height={600} className="w-full rounded-2xl max-h-[70vh] object-contain" />
             <button
               onClick={() => deletePhoto(lightbox.id, lightbox.photo_url)}
               className="w-full py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm hover:bg-red-500/20 transition-colors"

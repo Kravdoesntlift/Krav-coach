@@ -28,10 +28,12 @@ export default function GoalForm({ clientId, initialGoals }: Props) {
   const [unit, setUnit] = useState("kg");
   const [deadline, setDeadline] = useState("");
   const [saving, setSaving] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   async function handleCreate() {
     if (!title.trim()) return;
     setSaving(true);
+    setActionError(null);
     const res = await createGoal({
       clientId,
       title: title.trim(),
@@ -40,7 +42,9 @@ export default function GoalForm({ clientId, initialGoals }: Props) {
       unit: unit.trim() || null,
       deadline: deadline || null,
     });
-    if (res?.goal) {
+    if (res?.error) {
+      setActionError(res.error);
+    } else if (res?.goal) {
       setGoals((prev) => [...prev, res.goal as Goal]);
       setTitle(""); setDescription(""); setTargetValue(""); setDeadline("");
       setOpen(false);
@@ -49,13 +53,23 @@ export default function GoalForm({ clientId, initialGoals }: Props) {
   }
 
   async function handleDelete(id: string) {
-    await deleteGoal(id);
+    setActionError(null);
+    const res = await deleteGoal(id);
+    if (res?.error) {
+      setActionError(res.error);
+      return;
+    }
     setGoals((prev) => prev.filter((g) => g.id !== id));
   }
 
   async function handleToggleComplete(goal: Goal) {
+    setActionError(null);
     const newVal = goal.completed ? 0 : (goal.target_value ?? 1);
-    await updateGoalProgress(goal.id, newVal, !goal.completed);
+    const res = await updateGoalProgress(goal.id, newVal, !goal.completed);
+    if (res?.error) {
+      setActionError(res.error);
+      return;
+    }
     setGoals((prev) => prev.map((g) => g.id === goal.id ? { ...g, current_value: newVal, completed: !g.completed } : g));
   }
 
@@ -64,12 +78,18 @@ export default function GoalForm({ clientId, initialGoals }: Props) {
       <div className="flex items-center justify-between">
         <h3 className="text-white font-semibold text-sm">Metas do cliente</h3>
         <button
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => { setOpen((v) => !v); setActionError(null); }}
           className="text-xs px-3 py-1.5 rounded-lg bg-brand-gold/10 border border-brand-gold/30 text-brand-gold hover:bg-brand-gold/20 transition-colors"
         >
           + Nova meta
         </button>
       </div>
+
+      {actionError && (
+        <div className="rounded-xl bg-red-500/10 border border-red-500/30 px-3 py-2">
+          <p className="text-red-400 text-xs">{actionError}</p>
+        </div>
+      )}
 
       {open && (
         <div className="bg-zinc-800 rounded-xl p-4 space-y-3">
@@ -172,10 +192,12 @@ export default function GoalForm({ clientId, initialGoals }: Props) {
                   <button
                     onClick={() => handleToggleComplete(goal)}
                     className={`w-7 h-7 rounded-lg text-xs flex items-center justify-center transition-colors ${goal.completed ? "bg-green-500/20 text-green-400" : "bg-zinc-700 text-gray-400 hover:text-green-400"}`}
+                    aria-label={goal.completed ? "Marcar como incompleta" : "Marcar como concluída"}
                   >✓</button>
                   <button
                     onClick={() => handleDelete(goal.id)}
                     className="w-7 h-7 rounded-lg bg-zinc-700 text-gray-400 hover:text-red-400 text-xs flex items-center justify-center transition-colors"
+                    aria-label="Eliminar meta"
                   >✕</button>
                 </div>
               </div>

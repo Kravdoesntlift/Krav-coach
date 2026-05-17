@@ -11,6 +11,8 @@ import ClientStatusForm from "@/components/coach/ClientStatusForm";
 import ChallengeForm from "@/components/coach/ChallengeForm";
 import GoalForm from "@/components/coach/GoalForm";
 import NotifyButton from "@/components/coach/NotifyButton";
+import Image from "next/image";
+import PhotoLightbox from "@/components/coach/PhotoLightbox";
 import type { ClientStatus } from "@/lib/supabase/types";
 
 const ENERGY_LABELS: Record<number, string> = {
@@ -109,10 +111,12 @@ export default async function ClientDetailPage({
         <div className="w-px h-4 bg-zinc-700" />
         <div className="flex items-center gap-3">
           {client.avatar_url ? (
-            <img
+            <Image
               src={client.avatar_url}
               alt={client.full_name}
-              className="w-10 h-10 rounded-full object-cover border border-zinc-700 shrink-0"
+              width={40}
+              height={40}
+              className="rounded-full object-cover border border-zinc-700 shrink-0"
             />
           ) : (
             <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-white font-bold shrink-0">
@@ -252,32 +256,14 @@ export default async function ClientDetailPage({
             Fotos de Progresso
             <span className="ml-2 text-xs font-normal text-zinc-500">{progressPhotos.length} foto{progressPhotos.length !== 1 ? "s" : ""}</span>
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {progressPhotos.map((photo) => (
-              <a
-                key={photo.id}
-                href={photo.photo_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative rounded-2xl overflow-hidden bg-zinc-900 group block"
-              >
-                <img
-                  src={photo.photo_url}
-                  alt={photo.caption ?? "Foto de progresso"}
-                  className="w-full object-contain max-h-64"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-gradient-to-t from-black/80 to-transparent">
-                  <p className="text-white text-xs font-medium">
-                    {new Date(photo.taken_at + "T00:00:00").toLocaleDateString("pt-PT", { day: "numeric", month: "short", year: "numeric" })}
-                  </p>
-                  {photo.caption && (
-                    <p className="text-gray-300 text-[11px] truncate">{photo.caption}</p>
-                  )}
-                </div>
-              </a>
-            ))}
-          </div>
+          <PhotoLightbox
+            photos={progressPhotos.map((p) => ({
+              id: p.id,
+              photo_url: p.photo_url,
+              caption: p.caption ?? null,
+              taken_at: p.taken_at,
+            }))}
+          />
         </section>
       )}
 

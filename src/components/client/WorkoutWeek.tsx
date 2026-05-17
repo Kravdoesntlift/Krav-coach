@@ -96,11 +96,12 @@ export default function WorkoutWeek({ plan, clientId, coachId }: Props) {
         {/* Day cards — collapsible */}
         <div
           style={{
-            overflow: "hidden",
-            maxHeight: weekOpen ? "9999px" : "0px",
-            transition: "max-height 0.4s cubic-bezier(0.4,0,0.2,1)",
+            display: "grid",
+            gridTemplateRows: weekOpen ? "1fr" : "0fr",
+            transition: "grid-template-rows 0.4s cubic-bezier(0.4,0,0.2,1)",
           }}
         >
+          <div style={{ overflow: "hidden" }}>
           <div className="space-y-3 pt-1">
             {sortedDays.map((day) => (
               <WorkoutDayCard
@@ -113,6 +114,7 @@ export default function WorkoutWeek({ plan, clientId, coachId }: Props) {
                 onUndo={handleDayUndo}
               />
             ))}
+          </div>
           </div>
         </div>
       </div>

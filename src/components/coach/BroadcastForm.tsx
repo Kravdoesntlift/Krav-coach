@@ -42,7 +42,7 @@ export default function BroadcastForm() {
     <div className="card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-white font-semibold">Mensagem em massa</h3>
-        <button onClick={() => setOpen(false)} className="text-gray-600 hover:text-white text-sm transition-colors">✕</button>
+        <button onClick={() => setOpen(false)} className="text-gray-600 hover:text-white text-sm transition-colors" aria-label="Fechar">✕</button>
       </div>
 
       {/* Target selector */}

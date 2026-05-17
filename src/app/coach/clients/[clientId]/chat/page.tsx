@@ -18,7 +18,9 @@ export default async function CoachClientChatPage({
     supabase.from("profiles").select("full_name").eq("id", user!.id).single(),
     supabase.from("messages").select("*")
       .or(`and(sender_id.eq.${user!.id},receiver_id.eq.${clientId}),and(sender_id.eq.${clientId},receiver_id.eq.${user!.id})`)
-      .order("created_at", { ascending: true }),
+      .order("created_at", { ascending: false })
+      .limit(50)
+      .then(({ data, error }) => ({ data: (data ?? []).reverse(), error })),
   ]);
 
   if (!client) notFound();

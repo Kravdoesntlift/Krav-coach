@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Message, Profile } from "@/lib/supabase/types";
 
+const PAGE_SIZE = 50;
+
 interface Props {
   currentUserId: string;
   currentUserName: string;
@@ -17,7 +19,10 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [text, setText]         = useState("");
   const [sending, setSending]   = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(initialMessages.length >= PAGE_SIZE);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // ── Supabase Realtime — mensagens instantâneas ────────────────────────────
   useEffect(() => {
@@ -45,10 +50,40 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
     return () => { supabase.removeChannel(channel); };
   }, [currentUserId, otherUser.id]);
 
+  // ── Load more (older messages) ────────────────────────────────────────────
+  async function loadMore() {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const oldest = messages[0]?.created_at;
+    const supabase = createClient();
+    const { data } = await supabase
+      .from("messages")
+      .select("*")
+      .or(
+        `and(sender_id.eq.${currentUserId},receiver_id.eq.${otherUser.id}),and(sender_id.eq.${otherUser.id},receiver_id.eq.${currentUserId})`
+      )
+      .lt("created_at", oldest ?? new Date().toISOString())
+      .order("created_at", { ascending: false })
+      .limit(PAGE_SIZE);
+    const older = ((data ?? []) as Message[]).reverse();
+    if (older.length < PAGE_SIZE) setHasMore(false);
+    // Preserve scroll position
+    const container = containerRef.current;
+    const prevScrollHeight = container?.scrollHeight ?? 0;
+    setMessages((prev) => [...older, ...prev]);
+    // After state update, restore scroll position
+    requestAnimationFrame(() => {
+      if (container) {
+        container.scrollTop = container.scrollHeight - prevScrollHeight;
+      }
+    });
+    setLoadingMore(false);
+  }
+
   // ── Scroll to bottom ──────────────────────────────────────────────────────
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, []);
 
   // ── Mark incoming as read ─────────────────────────────────────────────────
   useEffect(() => {
@@ -75,6 +110,7 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
   async function send() {
     const trimmed = text.trim();
     if (!trimmed) return;
+    if (trimmed.length > 2000) return;
     setSending(true);
     setText("");
 
@@ -142,7 +178,19 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
       </div>
 
       {/* ── Messages ── */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1" style={{ background: "#0a0a0a" }}>
+      <div ref={containerRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-1" style={{ background: "#0a0a0a" }}>
+        {/* Load more button */}
+        {hasMore && (
+          <div className="flex justify-center py-2">
+            <button
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="text-xs px-4 py-1.5 rounded-full border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors disabled:opacity-50"
+            >
+              {loadingMore ? "A carregar..." : "Carregar mais"}
+            </button>
+          </div>
+        )}
         {grouped.length === 0 && (
           <div className="text-center py-12">
             <p className="text-zinc-700 text-sm">Inicia a conversa com {otherUser.full_name}.</p>
@@ -209,12 +257,14 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
           onKeyDown={handleKey}
           placeholder="Escreve uma mensagem..."
           rows={1}
+          maxLength={2000}
           className="flex-1 bg-zinc-800/60 border border-zinc-700/60 rounded-2xl px-4 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-brand-gold/50 resize-none transition-colors overflow-hidden"
           style={{ minHeight: "40px", maxHeight: "120px" }}
         />
         <button
           onClick={send}
           disabled={!text.trim() || sending}
+          aria-label="Enviar mensagem"
           className="w-10 h-10 rounded-2xl flex items-center justify-center text-black font-bold transition-all active:scale-95 disabled:opacity-30 shrink-0"
           style={{ background: "linear-gradient(135deg,#E2C060,#A8893A)" }}
         >

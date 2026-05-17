@@ -82,11 +82,12 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
       {/* Achievement grid — collapsible */}
       <div
         style={{
-          overflow: "hidden",
-          maxHeight: open ? "9999px" : "0px",
-          transition: "max-height 0.4s cubic-bezier(0.4,0,0.2,1)",
+          display: "grid",
+          gridTemplateRows: open ? "1fr" : "0fr",
+          transition: "grid-template-rows 0.4s cubic-bezier(0.4,0,0.2,1)",
         }}
       >
+        <div style={{ overflow: "hidden" }}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-1">
           {items.map((a) => (
             <div
@@ -161,6 +162,7 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
               )}
             </div>
           ))}
+        </div>
         </div>
       </div>
     </section>

@@ -2,6 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
@@ -213,7 +214,7 @@ export default async function LandingPage({
                   <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full"
                     style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}>
                     {coach.avatar_url ? (
-                      <img src={coach.avatar_url} alt={coach.full_name} className="w-7 h-7 rounded-full object-cover" />
+                      <Image src={coach.avatar_url} alt={coach.full_name} width={28} height={28} className="rounded-full object-cover" />
                     ) : (
                       <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-black"
                         style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>
