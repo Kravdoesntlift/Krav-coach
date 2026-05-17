@@ -141,6 +141,15 @@ export async function createGoal({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Não autenticado." };
 
+  // Verify ownership before creating goal for this client
+  const { data: rel } = await supabase
+    .from("coach_clients")
+    .select("id")
+    .eq("coach_id", user.id)
+    .eq("client_id", clientId)
+    .maybeSingle();
+  if (!rel) return { error: "Sem acesso a este cliente." };
+
   const { data: goal, error } = await supabase
     .from("client_goals")
     .insert({ coach_id: user.id, client_id: clientId, title, description, target_value, unit, deadline })

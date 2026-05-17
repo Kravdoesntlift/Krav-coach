@@ -29,6 +29,16 @@ export default async function ClientDetailPage({
   const { clientId } = await params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) notFound();
+
+  // Verify this coach owns the client before exposing any data (prevents IDOR)
+  const { data: rel } = await supabase
+    .from("coach_clients")
+    .select("id")
+    .eq("coach_id", user.id)
+    .eq("client_id", clientId)
+    .maybeSingle();
+  if (!rel) notFound();
 
   const { data: client } = await supabase
     .from("profiles")
