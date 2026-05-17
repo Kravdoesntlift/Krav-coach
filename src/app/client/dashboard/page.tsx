@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { DAY_NAMES_FULL } from "@/lib/supabase/types";
 import type { WorkoutPlan } from "@/lib/supabase/types";
 import WorkoutWeek from "@/components/client/WorkoutWeek";
@@ -75,7 +76,7 @@ export default async function ClientDashboard() {
   weekEnd.setUTCDate(monday.getUTCDate() + 6);
   const weekEndStr = weekEnd.toISOString().split("T")[0];
 
-  const [{ data: planThisWeek }, { data: feedback }, { data: clientProfile }, { data: currentCheckin }, { data: fullProfile }, { data: weekChallenges }, { data: challengeProgress }, { data: clientGoals }, { data: onboardingRecord }, { data: weekLogs }, { data: allCheckins }, { data: allRecords }, { data: allLogs }, { data: allPhotos }] = await Promise.all([
+  const [{ data: planThisWeek }, { data: feedback }, { data: clientProfile }, { data: currentCheckin }, { data: fullProfile }, { data: weekChallenges }, { data: challengeProgress }, { data: clientGoals }, { data: onboardingRecord }, { data: weekLogs }, { data: allCheckins }, { data: allRecords }, { data: allLogs }, { data: allPhotos }, { data: latestWeeklyReport }] = await Promise.all([
     supabase
       .from("workout_plans")
       .select(`*, workout_days(*, exercises(*), workout_completions(*))`)
@@ -101,6 +102,8 @@ export default async function ClientDashboard() {
     supabase.from("personal_records").select("exercise_name").eq("client_id", user!.id),
     supabase.from("workout_logs").select("sets").eq("client_id", user!.id),
     supabase.from("progress_photos").select("id").eq("client_id", user!.id),
+    supabase.from("weekly_reports").select("id, week_start").eq("client_id", user!.id)
+      .order("week_start", { ascending: false }).limit(1).maybeSingle(),
   ]);
 
   // Fallback: if no plan for this week, show the most recent plan
@@ -318,6 +321,39 @@ export default async function ClientDashboard() {
 
       {/* Monthly report (1st of month) */}
       {monthlyData && <MonthlyReport {...monthlyData} />}
+
+      {/* Weekly AI report card */}
+      {latestWeeklyReport && (
+        <Link href="/client/weekly-report" className="block">
+          <div
+            className="rounded-2xl px-4 py-3.5 flex items-center gap-3 border transition-all active:scale-[0.98]"
+            style={{
+              background: "rgba(18,18,20,0.85)",
+              borderColor: "rgba(201,168,76,0.22)",
+            }}
+          >
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
+              style={{ background: "linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))" }}
+            >
+              📊
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-white font-bold text-sm">Ver relatório desta semana</p>
+              <p className="text-zinc-500 text-xs mt-0.5 truncate">
+                Treinos, métricas e mensagem do coach
+              </p>
+            </div>
+            <svg
+              width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="#C9A84C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+              className="shrink-0"
+            >
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </div>
+        </Link>
+      )}
 
       {/* TODAY CARD — hero do dia */}
       {plan && todayDay && !todayDay.is_rest && (

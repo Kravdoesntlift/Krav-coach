@@ -82,6 +82,7 @@ export default async function ClientLayout({
         { href: "/client/achievements", label: "Conquistas" },
         { href: "/client/photos", label: "Fotos" },
         { href: "/client/report", label: "Relatório" },
+        { href: "/client/weekly-report", label: "Rel. Semanal" },
       ],
     },
     { href: "/client/chat", label: "Chat", badge: unread },
@@ -97,11 +98,12 @@ export default async function ClientLayout({
   ];
 
   const clientBottomMoreNav = [
-    { href: "/client/history",      label: "Histórico",  icon: <CalendarIcon size={24} />, badge: 0 },
-    { href: "/client/records",      label: "PRs",        icon: <TrophyIcon size={24} />,   badge: 0 },
-    { href: "/client/achievements", label: "Conquistas", icon: <StarIcon size={24} />,     badge: 0 },
-    { href: "/client/photos",       label: "Fotos",      icon: <CameraIcon size={24} />,   badge: 0 },
-    { href: "/client/report",       label: "Relatório",  icon: <FileIcon size={24} />,     badge: 0 },
+    { href: "/client/history",        label: "Histórico",  icon: <CalendarIcon size={24} />, badge: 0 },
+    { href: "/client/records",        label: "PRs",        icon: <TrophyIcon size={24} />,   badge: 0 },
+    { href: "/client/achievements",   label: "Conquistas", icon: <StarIcon size={24} />,     badge: 0 },
+    { href: "/client/photos",         label: "Fotos",      icon: <CameraIcon size={24} />,   badge: 0 },
+    { href: "/client/report",         label: "Relatório",  icon: <FileIcon size={24} />,     badge: 0 },
+    { href: "/client/weekly-report",  label: "Rel. Semana", icon: <ChartIcon size={24} />,   badge: 0 },
   ];
 
   return (
