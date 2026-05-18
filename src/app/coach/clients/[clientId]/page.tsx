@@ -5,6 +5,7 @@ import { DAY_NAMES_FULL } from "@/lib/supabase/types";
 import { deletePlan, duplicatePlan } from "@/app/coach/plans/actions";
 import DeletePlanButton from "@/components/coach/DeletePlanButton";
 import DuplicatePlanButton from "@/components/coach/DuplicatePlanButton";
+import CreateProgramButton from "@/components/coach/CreateProgramButton";
 import FeedbackForm from "@/components/coach/FeedbackForm";
 import CoachNotes from "@/components/coach/CoachNotes";
 import ClientStatusForm from "@/components/coach/ClientStatusForm";
@@ -423,6 +424,7 @@ export default async function ClientDetailPage({
                       Editar
                     </Link>
                     <DuplicatePlanButton planId={plan.id} duplicatePlan={duplicatePlan} />
+                    <CreateProgramButton planId={plan.id} />
                     <div className="ml-auto">
                       <DeletePlanButton
                         planId={plan.id}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPushToUser } from "@/lib/push";
+import { sendInvoiceEmail, sendPaymentFailedEmail } from "@/lib/email";
 import Stripe from "stripe";
 
 export const runtime = "nodejs";
@@ -176,18 +177,96 @@ export async function POST(req: NextRequest) {
         break;
       }
 
+      case "invoice.paid": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId = typeof invoice.customer === "string"
+          ? invoice.customer : invoice.customer?.id;
+        if (!customerId) break;
+
+        const { data: profile } = await admin
+          .from("profiles")
+          .select("id, full_name")
+          .eq("stripe_customer_id", customerId)
+          .maybeSingle();
+        if (!profile) break;
+
+        const { data: authUser } = await admin.auth.admin.getUserById(profile.id);
+        const email = authUser?.user?.email;
+        if (!email) break;
+
+        const amountCents = invoice.amount_paid ?? 0;
+        const amountEur = `€ ${(amountCents / 100).toFixed(2).replace(".", ",")}`;
+        const subRef = invoice.parent?.subscription_details?.subscription;
+        const subscriptionId = typeof subRef === "string" ? subRef : subRef?.id ?? null;
+        const periodEnd = subscriptionId
+          ? (() => {
+              const { data: sub } = { data: null }; // will be fetched below via sync
+              return "";
+            })()
+          : "";
+
+        // Fetch period end from DB
+        let nextRenewal = "";
+        if (subscriptionId) {
+          const { data: sub } = await admin
+            .from("stripe_subscriptions")
+            .select("current_period_end")
+            .eq("id", subscriptionId)
+            .maybeSingle();
+          if (sub?.current_period_end) {
+            nextRenewal = new Date(sub.current_period_end).toLocaleDateString("pt-PT", {
+              day: "numeric", month: "long", year: "numeric",
+            });
+          }
+        }
+
+        const invoiceNumber = invoice.number ?? invoice.id.slice(-8).toUpperCase();
+
+        await sendInvoiceEmail({
+          to: email,
+          clientName: (profile.full_name ?? "").split(" ")[0] || "Cliente",
+          amountEur,
+          periodEnd: nextRenewal,
+          invoiceNumber,
+        }).catch((e: unknown) => console.error("[webhook] invoice email failed:", e));
+
+        break;
+      }
+
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice;
-        // In Stripe v22, subscription ID is under invoice.parent.subscription_details.subscription
         const subRef = invoice.parent?.subscription_details?.subscription;
         const subscriptionId = typeof subRef === "string" ? subRef : subRef?.id ?? null;
 
-        if (!subscriptionId) break;
+        if (subscriptionId) {
+          await admin
+            .from("stripe_subscriptions")
+            .update({ status: "past_due" })
+            .eq("id", subscriptionId);
+        }
 
-        await admin
-          .from("stripe_subscriptions")
-          .update({ status: "past_due" })
-          .eq("id", subscriptionId);
+        // Send failure email
+        const customerId = typeof invoice.customer === "string"
+          ? invoice.customer : invoice.customer?.id;
+        if (customerId) {
+          const { data: profile } = await admin
+            .from("profiles")
+            .select("id, full_name")
+            .eq("stripe_customer_id", customerId)
+            .maybeSingle();
+          if (profile) {
+            const { data: authUser } = await admin.auth.admin.getUserById(profile.id);
+            const email = authUser?.user?.email;
+            if (email) {
+              const amountCents = invoice.amount_due ?? 0;
+              await sendPaymentFailedEmail({
+                to: email,
+                clientName: (profile.full_name ?? "").split(" ")[0] || "Cliente",
+                amountEur: `€ ${(amountCents / 100).toFixed(2).replace(".", ",")}`,
+              }).catch((e: unknown) => console.error("[webhook] failure email failed:", e));
+            }
+          }
+        }
 
         break;
       }

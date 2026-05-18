@@ -5,6 +5,7 @@ import BottomNav from "@/components/BottomNav";
 import { ChatIcon, UserIcon } from "@/components/ui/Icons";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import GlobalBadgeSync from "@/components/GlobalBadgeSync";
+import InstallPrompt from "@/components/client/InstallPrompt";
 
 export default async function CoachLayout({
   children,
@@ -31,12 +32,14 @@ export default async function CoachLayout({
   const unread = unreadCount ?? 0;
 
   const coachNav = [
-    { href: "/coach/dashboard", label: "Clientes" },
-    { href: "/coach/messages",  label: "Mensagens", badge: unread },
-    { href: "/coach/plans/new", label: "Novo Plano" },
+    { href: "/coach/dashboard",  label: "Clientes" },
+    { href: "/coach/messages",   label: "Mensagens", badge: unread },
+    { href: "/coach/plans/new",  label: "Novo Plano" },
+    { href: "/coach/analytics",  label: "Analytics" },
     {
       label: "Ferramentas",
       children: [
+        { href: "/coach/setup",          label: "🚀 Configuração" },
         { href: "/coach/sessions",       label: "📅 Sessões" },
         { href: "/coach/automations",    label: "⚡ Automações" },
         { href: "/coach/library",        label: "📚 Biblioteca" },
@@ -45,7 +48,7 @@ export default async function CoachLayout({
         { href: "/coach/billing",        label: "💳 Faturação" },
       ],
     },
-    { href: "/coach/profile",   label: "Perfil" },
+    { href: "/coach/profile",    label: "Perfil" },
   ];
 
   const coachBottomNav = [
@@ -56,6 +59,8 @@ export default async function CoachLayout({
   ];
 
   const coachBottomMoreNav = [
+    { href: "/coach/analytics",      label: "Analytics",   icon: "📊", badge: 0 },
+    { href: "/coach/setup",          label: "Config.",     icon: "🚀", badge: 0 },
     { href: "/coach/sessions",       label: "Sessões",     icon: "📅", badge: 0 },
     { href: "/coach/automations",    label: "Automações",  icon: "⚡", badge: 0 },
     { href: "/coach/library",        label: "Biblioteca",  icon: "📚", badge: 0 },
@@ -68,6 +73,7 @@ export default async function CoachLayout({
     <div className="min-h-screen bg-black">
       <ServiceWorkerRegister />
       <GlobalBadgeSync userId={user.id} />
+      <InstallPrompt />
       <Navbar profile={profile} navItems={coachNav} />
       <main className="max-w-5xl mx-auto px-4 pt-6 md:pt-20 pb-24 md:pb-12">{children}</main>
       <BottomNav items={coachBottomNav} moreItems={coachBottomMoreNav} userId={user.id} />
