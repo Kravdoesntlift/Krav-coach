@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendPushToUser } from "@/lib/push";
 import Stripe from "stripe";
 
 export const runtime = "nodejs";
@@ -65,6 +66,47 @@ export async function POST(req: NextRequest) {
           .from("profiles")
           .update({ status: "active" })
           .eq("id", clientId);
+
+        // Self-service flow: assign client to coach, send welcome message & push notifications
+        if (session.metadata?.self_service === "true") {
+          // 1. Assign client to coach via coach_clients
+          await admin.from("coach_clients").upsert(
+            { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
+            { onConflict: "coach_id,client_id,assigned_role" }
+          );
+
+          // 2. Welcome message in chat
+          const [{ data: coachProfileData }, { data: clientProfileData }] = await Promise.all([
+            admin.from("profiles").select("full_name").eq("id", coachId).single(),
+            admin.from("profiles").select("full_name").eq("id", clientId).single(),
+          ]);
+          const coachFirst =
+            (coachProfileData?.full_name ?? "").split(" ")[0] || "Coach";
+          const clientFirst =
+            (clientProfileData?.full_name ?? "").split(" ")[0] || "atleta";
+
+          await admin.from("messages").insert({
+            sender_id: coachId,
+            receiver_id: clientId,
+            content: `Olá ${clientFirst}! 👋 Sou o ${coachFirst}, o teu coach na KRAV. O teu pagamento foi confirmado e já tens acesso total à app. Vamos começar esta jornada juntos! 💪`,
+          });
+
+          // 3. Notify coach of new paying client
+          await sendPushToUser(
+            coachId,
+            "Novo cliente pagante!",
+            `${clientFirst} subscreveu o teu programa.`,
+            `/coach/clients/${clientId}`,
+          ).catch(() => {});
+
+          // 4. Notify client
+          await sendPushToUser(
+            clientId,
+            "Pagamento confirmado!",
+            "Bem-vindo à KRAV! O teu coach vai contactar-te em breve.",
+            "/client/dashboard",
+          ).catch(() => {});
+        }
 
         break;
       }

@@ -6,6 +6,7 @@ import SmartAlerts from "@/components/coach/SmartAlerts";
 import NotifyButton from "@/components/coach/NotifyButton";
 import PushNotificationToggle from "@/components/PushNotificationToggle";
 import CoachClientList, { type ClientData } from "@/components/coach/CoachClientList";
+import SuggestPlanButton from "@/components/coach/SuggestPlanButton";
 
 export default async function CoachDashboard() {
   const supabase = await createClient();
@@ -70,7 +71,7 @@ export default async function CoachDashboard() {
   // Also clients explicitly assigned via coach_clients (may not have plans yet)
   const { data: assignedRows } = await supabase
     .from("coach_clients")
-    .select("client_id, profiles!coach_clients_client_id_fkey(id, full_name, status, subscription_renews_at, avatar_url)")
+    .select("client_id, profiles!coach_clients_client_id_fkey(id, full_name, status, subscription_renews_at, avatar_url, created_at)")
     .eq("coach_id", user!.id)
     .eq("assigned_role", "coach");
 
@@ -105,6 +106,22 @@ export default async function CoachDashboard() {
   for (const c of recentCheckins ?? []) {
     if (!lastCheckinByClient.has(c.client_id)) lastCheckinByClient.set(c.client_id, c.week_start);
   }
+
+  // New clients: assigned via coach_clients but with no workout_plans at all
+  const clientsWithPlansSet = new Set((allPlans ?? []).map((p) => p.client_id));
+  const newClients = (assignedRows ?? [])
+    .filter((r) => {
+      const c = r.profiles as unknown as AllClientEntry | null;
+      return c && !clientsWithPlansSet.has(r.client_id) && c.status !== "archived";
+    })
+    .map((r) => {
+      const c = r.profiles as unknown as AllClientEntry & { created_at?: string };
+      return {
+        id: r.client_id as string,
+        full_name: (c?.full_name ?? "Cliente") as string,
+        joined_at: (c?.created_at ?? null) as string | null,
+      };
+    });
 
   const todayMidnight = new Date(today);
   todayMidnight.setHours(0, 0, 0, 0);
@@ -274,6 +291,56 @@ export default async function CoachDashboard() {
 
       {/* Smart alerts */}
       <SmartAlerts alerts={alerts} />
+
+      {/* New clients without plans */}
+      {newClients.length > 0 && (
+        <section className="space-y-3">
+          <div className="flex items-center gap-2">
+            <p className="text-xs font-bold tracking-[0.14em] uppercase text-[#C9A84C]">
+              Novos clientes
+            </p>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-black text-black"
+              style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>
+              {newClients.length}
+            </span>
+          </div>
+          <div className="space-y-2">
+            {newClients.map((nc) => (
+              <div
+                key={nc.id}
+                className="flex items-center justify-between gap-3 rounded-2xl p-4"
+                style={{
+                  background: "rgba(201,168,76,0.05)",
+                  border: "1px solid rgba(201,168,76,0.18)",
+                }}
+              >
+                <div>
+                  <p className="text-white font-semibold text-sm">{nc.full_name}</p>
+                  {nc.joined_at && (
+                    <p className="text-zinc-500 text-xs mt-0.5">
+                      Aderiu em{" "}
+                      {new Date(nc.joined_at).toLocaleDateString("pt-PT", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <SuggestPlanButton clientId={nc.id} />
+                  <Link
+                    href={`/coach/clients/${nc.id}`}
+                    className="px-3 py-2 rounded-xl bg-zinc-800 text-zinc-300 text-sm font-medium hover:bg-zinc-700 transition-colors whitespace-nowrap"
+                  >
+                    Ver perfil
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Unified client list with search */}
       {allClients.length === 0 ? (
