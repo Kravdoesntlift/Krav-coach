@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import ChatWindow from "@/components/ChatWindow";
-import AppBadge from "@/components/client/AppBadge";
 import type { Message } from "@/lib/supabase/types";
 
 export default async function ClientChatPage() {
@@ -74,8 +73,6 @@ export default async function ClientChatPage() {
 
   return (
     <div className="space-y-4 page-enter">
-      {/* Limpa o badge ao abrir o chat */}
-      <AppBadge userId={user.id} />
       <div>
         <h1 className="text-2xl font-bold text-white">Mensagens</h1>
         <p className="text-gray-400 text-sm mt-1">Chat com o teu coach</p>

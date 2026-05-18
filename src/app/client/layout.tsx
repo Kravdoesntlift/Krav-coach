@@ -7,6 +7,7 @@ import type { NavItem } from "@/components/Navbar";
 import { DumbbellIcon, ClipboardIcon, ChatIcon, ChartIcon, UserIcon, CalendarIcon, TrophyIcon, StarIcon, CameraIcon, FileIcon } from "@/components/ui/Icons";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import PushPrompt from "@/components/PushPrompt";
+import GlobalBadgeSync from "@/components/GlobalBadgeSync";
 
 export default async function ClientLayout({
   children,
@@ -109,6 +110,7 @@ export default async function ClientLayout({
   return (
     <div className="min-h-screen bg-black">
       <ServiceWorkerRegister />
+      <GlobalBadgeSync userId={user.id} />
       <Navbar profile={profile} navItems={clientNav} />
       <main className="max-w-2xl mx-auto px-4 pt-6 md:pt-20 pb-24 md:pb-12">{children}</main>
       <BottomNav items={clientBottomNav} moreItems={clientBottomMoreNav} userId={user.id} />

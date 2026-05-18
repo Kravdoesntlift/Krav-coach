@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import { ChatIcon, UserIcon } from "@/components/ui/Icons";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import GlobalBadgeSync from "@/components/GlobalBadgeSync";
 
 export default async function CoachLayout({
   children,
@@ -66,6 +67,7 @@ export default async function CoachLayout({
   return (
     <div className="min-h-screen bg-black">
       <ServiceWorkerRegister />
+      <GlobalBadgeSync userId={user.id} />
       <Navbar profile={profile} navItems={coachNav} />
       <main className="max-w-5xl mx-auto px-4 pt-6 md:pt-20 pb-24 md:pb-12">{children}</main>
       <BottomNav items={coachBottomNav} moreItems={coachBottomMoreNav} userId={user.id} />
