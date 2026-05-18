@@ -58,17 +58,25 @@ export async function signupAndStartCheckout(
   }
   const clientId = authData.user.id;
 
-  // 3. Save onboarding data
-  // Map availableDays count → array [0..availableDays-1]
+  // 3. Save onboarding data — fill both old and new columns so the
+  //    dashboard `isOnboardingComplete` check passes immediately
   const days = Array.from({ length: availableDays }, (_, i) => i);
 
   await admin.from("client_onboarding").upsert(
     {
       client_id: clientId,
+      // new columns (used by AI plan)
       goal,
       level,
       available_days: days,
       injuries: injuries || null,
+      // old columns (checked by OnboardingWrapper / dashboard)
+      goals_text: goal,
+      fitness_level: level === "Iniciante" ? "beginner" : level === "Avançado" ? "advanced" : "intermediate",
+      availability: availableDays,
+      equipment: "Ginásio completo",
+      // mark as complete so dashboard never shows the quiz again
+      completed_at: new Date().toISOString(),
     },
     { onConflict: "client_id" }
   );
