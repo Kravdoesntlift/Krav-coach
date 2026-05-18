@@ -8,19 +8,27 @@ import { signupAndStartCheckout } from "./actions";
 type Goal = "lose_weight" | "gain_muscle" | "athletic";
 type Level = "beginner" | "intermediate" | "advanced";
 
+type Equipment =
+  | "gym_full"
+  | "gym_basic"
+  | "home_none"
+  | "home_weights"
+  | "outdoor";
+
 interface QuizState {
   goal: Goal | null;
   level: Level | null;
   availableDays: number;
   injuries: string;
   noInjuries: boolean;
+  equipment: Equipment | null;
   fullName: string;
   email: string;
   password: string;
   confirmPassword: string;
 }
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 // ─── Step option cards ────────────────────────────────────────────────────────
 
@@ -101,6 +109,7 @@ export default function StartPage() {
     availableDays: 3,
     injuries: "",
     noInjuries: false,
+    equipment: null,
     fullName: "",
     email: "",
     password: "",
@@ -118,7 +127,8 @@ export default function StartPage() {
     if (step === 2) return quiz.level !== null;
     if (step === 3) return quiz.availableDays >= 2;
     if (step === 4) return quiz.noInjuries || quiz.injuries.trim().length > 0;
-    if (step === 5) {
+    if (step === 5) return quiz.equipment !== null;
+    if (step === 6) {
       return (
         quiz.fullName.trim().length > 0 &&
         quiz.email.trim().length > 0 &&
@@ -135,7 +145,7 @@ export default function StartPage() {
       return;
     }
 
-    // Step 5 — submit
+    // Step 6 — submit
     setLoading(true);
     setError(null);
     try {
@@ -147,6 +157,7 @@ export default function StartPage() {
         level: quiz.level!,
         availableDays: quiz.availableDays,
         injuries: quiz.noInjuries ? "" : quiz.injuries.trim(),
+        equipment: quiz.equipment!,
       });
       if (result.error) {
         setError(result.error);
@@ -322,8 +333,49 @@ export default function StartPage() {
             </StepWrapper>
           )}
 
-          {/* STEP 5 — Criar conta */}
+          {/* STEP 5 — Equipamento */}
           {step === 5 && (
+            <StepWrapper title="Onde vais treinar?">
+              <OptionCard
+                selected={quiz.equipment === "gym_full"}
+                onClick={() => set("equipment", "gym_full")}
+                icon="🏋️"
+                label="Ginásio completo"
+                sub="Pesos livres, máquinas, cabos e mais"
+              />
+              <OptionCard
+                selected={quiz.equipment === "gym_basic"}
+                onClick={() => set("equipment", "gym_basic")}
+                icon="🏃"
+                label="Ginásio básico"
+                sub="Halteres, barras e equipamentos essenciais"
+              />
+              <OptionCard
+                selected={quiz.equipment === "home_weights"}
+                onClick={() => set("equipment", "home_weights")}
+                icon="🏠"
+                label="Casa com pesos"
+                sub="Halteres, bandas elásticas ou barra em casa"
+              />
+              <OptionCard
+                selected={quiz.equipment === "home_none"}
+                onClick={() => set("equipment", "home_none")}
+                icon="🛋️"
+                label="Casa sem equipamento"
+                sub="Apenas peso corporal (bodyweight)"
+              />
+              <OptionCard
+                selected={quiz.equipment === "outdoor"}
+                onClick={() => set("equipment", "outdoor")}
+                icon="🌳"
+                label="Ar livre"
+                sub="Parques, campos ou corrida ao exterior"
+              />
+            </StepWrapper>
+          )}
+
+          {/* STEP 6 — Criar conta */}
+          {step === 6 && (
             <StepWrapper title="Cria a tua conta">
               <div className="space-y-3">
                 <div>

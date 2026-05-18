@@ -67,46 +67,59 @@ export async function POST(req: NextRequest) {
           .update({ status: "active" })
           .eq("id", clientId);
 
-        // Self-service flow: assign client to coach, send welcome message & push notifications
-        if (session.metadata?.self_service === "true") {
-          // 1. Assign client to coach via coach_clients (insert, ignore if already exists)
-          const { error: ccErr } = await admin.from("coach_clients")
-            .insert({ coach_id: coachId, client_id: clientId, assigned_role: "coach" });
-          if (ccErr && ccErr.code !== "23505") {
-            console.error("[webhook] coach_clients insert error:", ccErr);
+        // Self-service flow: ensure assignment + send welcome message & push notifications
+        // We always run this when coach_id + client_id are in metadata (only set by our flow)
+        {
+          // 1. Ensure client is assigned to coach (upsert = safe to repeat)
+          const { error: ccErr } = await admin.from("coach_clients").upsert(
+            { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
+            { onConflict: "coach_id,client_id,assigned_role" }
+          );
+          if (ccErr) {
+            console.error("[webhook] coach_clients upsert error:", ccErr);
           }
 
-          // 2. Welcome message in chat
-          const [{ data: coachProfileData }, { data: clientProfileData }] = await Promise.all([
-            admin.from("profiles").select("full_name").eq("id", coachId).single(),
-            admin.from("profiles").select("full_name").eq("id", clientId).single(),
-          ]);
-          const coachFirst =
-            (coachProfileData?.full_name ?? "").split(" ")[0] || "Coach";
-          const clientFirst =
-            (clientProfileData?.full_name ?? "").split(" ")[0] || "atleta";
+          // 2. Welcome message in chat (only if no message exists yet)
+          const { data: existingMsg } = await admin
+            .from("messages")
+            .select("id")
+            .eq("sender_id", coachId)
+            .eq("receiver_id", clientId)
+            .limit(1)
+            .maybeSingle();
 
-          await admin.from("messages").insert({
-            sender_id: coachId,
-            receiver_id: clientId,
-            content: `Olá ${clientFirst}! 👋 Sou o ${coachFirst}, o teu coach na KRAV. O teu pagamento foi confirmado e já tens acesso total à app. Vamos começar esta jornada juntos! 💪`,
-          });
+          if (!existingMsg) {
+            const [{ data: coachProfileData }, { data: clientProfileData }] = await Promise.all([
+              admin.from("profiles").select("full_name").eq("id", coachId).single(),
+              admin.from("profiles").select("full_name").eq("id", clientId).single(),
+            ]);
+            const coachFirst =
+              (coachProfileData?.full_name ?? "").split(" ")[0] || "Coach";
+            const clientFirst =
+              (clientProfileData?.full_name ?? "").split(" ")[0] || "atleta";
 
-          // 3. Notify coach of new paying client
-          await sendPushToUser(
-            coachId,
-            "Novo cliente pagante!",
-            `${clientFirst} subscreveu o teu programa.`,
-            `/coach/clients/${clientId}`,
-          ).catch(() => {});
+            await admin.from("messages").insert({
+              sender_id: coachId,
+              receiver_id: clientId,
+              content: `Olá ${clientFirst}! 👋 Sou o ${coachFirst}, o teu coach na KRAV. O teu pagamento foi confirmado e já tens acesso total à app. Vamos começar esta jornada juntos! 💪`,
+            });
 
-          // 4. Notify client
-          await sendPushToUser(
-            clientId,
-            "Pagamento confirmado!",
-            "Bem-vindo à KRAV! O teu coach vai contactar-te em breve.",
-            "/client/dashboard",
-          ).catch(() => {});
+            // 3. Notify coach of new paying client
+            await sendPushToUser(
+              coachId,
+              "Novo cliente pagante!",
+              `${clientFirst} subscreveu o teu programa.`,
+              `/coach/clients/${clientId}`,
+            ).catch(() => {});
+
+            // 4. Notify client
+            await sendPushToUser(
+              clientId,
+              "Pagamento confirmado!",
+              "Bem-vindo à KRAV! O teu coach vai contactar-te em breve.",
+              "/client/dashboard",
+            ).catch(() => {});
+          }
         }
 
         break;

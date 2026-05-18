@@ -10,6 +10,7 @@ export interface SignupPayload {
   level: string;
   availableDays: number;
   injuries: string;
+  equipment: string;
 }
 
 export interface SignupResult {
@@ -20,7 +21,7 @@ export interface SignupResult {
 export async function signupAndStartCheckout(
   payload: SignupPayload
 ): Promise<SignupResult> {
-  const { fullName, email, password, goal, level, availableDays, injuries } = payload;
+  const { fullName, email, password, goal, level, availableDays, injuries, equipment } = payload;
 
   if (!process.env.STRIPE_SECRET_KEY) {
     return { error: "Stripe não configurado." };
@@ -72,13 +73,21 @@ export async function signupAndStartCheckout(
       injuries: injuries || null,
       // old columns (checked by OnboardingWrapper / dashboard)
       goals_text: goal,
-      fitness_level: level === "Iniciante" ? "beginner" : level === "Avançado" ? "advanced" : "intermediate",
+      fitness_level: level, // already English: beginner/intermediate/advanced
       availability: availableDays,
-      equipment: "Ginásio completo",
+      equipment,
       // mark as complete so dashboard never shows the quiz again
       completed_at: new Date().toISOString(),
     },
     { onConflict: "client_id" }
+  );
+
+  // 3b. Pre-assign client to coach immediately (don't wait for Stripe webhook)
+  //     The webhook will upsert again on payment — this ensures chat works as soon as
+  //     the client lands on /client/pending, even before Stripe confirms.
+  await admin.from("coach_clients").upsert(
+    { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
+    { onConflict: "coach_id,client_id,assigned_role" }
   );
 
   // 4. Create Stripe customer + checkout session

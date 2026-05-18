@@ -95,7 +95,7 @@ export default async function ClientDashboard() {
     supabase.from("challenges").select("*").eq("client_id", user!.id).eq("week_start", weekStart),
     supabase.from("challenge_progress").select("*").eq("client_id", user!.id),
     supabase.from("client_goals").select("*").eq("client_id", user!.id).eq("completed", false).order("created_at"),
-    supabase.from("client_onboarding").select("id").eq("client_id", user!.id).maybeSingle(),
+    supabase.from("client_onboarding").select("client_id").eq("client_id", user!.id).maybeSingle(),
     supabase.from("workout_logs").select("exercise_name").eq("client_id", user!.id)
       .gte("logged_at", weekStart).lte("logged_at", weekEndStr),
     supabase.from("weekly_checkins").select("id").eq("client_id", user!.id),
