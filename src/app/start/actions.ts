@@ -22,10 +22,26 @@ export interface SignupResult {
 export async function signupAndStartCheckout(
   payload: SignupPayload
 ): Promise<SignupResult> {
+  try {
+    return await _signupAndStartCheckout(payload);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[signupAndStartCheckout] unhandled error:", msg);
+    // Surface a readable message — hide internal details
+    if (msg.toLowerCase().includes("stripe") || msg.toLowerCase().includes("network") || msg.toLowerCase().includes("connect")) {
+      return { error: "Erro ao ligar ao sistema de pagamento. Tenta novamente em alguns segundos." };
+    }
+    return { error: "Ocorreu um erro inesperado. Tenta novamente." };
+  }
+}
+
+async function _signupAndStartCheckout(
+  payload: SignupPayload
+): Promise<SignupResult> {
   const { fullName, email, password, goal, level, availableDays, injuries, equipment } = payload;
 
   if (!process.env.STRIPE_SECRET_KEY) {
-    return { error: "Stripe não configurado." };
+    return { error: "Sistema de pagamento não configurado. Contacta o suporte." };
   }
 
   const admin = createAdminClient();
@@ -54,46 +70,43 @@ export async function signupAndStartCheckout(
   if (authErr || !authData.user) {
     const msg = authErr?.message ?? "Erro ao criar conta.";
     if (msg.toLowerCase().includes("already")) {
-      return { error: "Este email já tem uma conta. Tenta entrar." };
+      return { error: "Este email já tem uma conta. Tenta entrar em kravcoaching.com/auth/login" };
     }
-    return { error: msg };
+    return { error: `Erro ao criar conta: ${msg}` };
   }
   const clientId = authData.user.id;
 
-  // 3. Save onboarding data — fill both old and new columns so the
-  //    dashboard `isOnboardingComplete` check passes immediately
+  // 3. Save onboarding data
   const days = Array.from({ length: availableDays }, (_, i) => i);
-
   await admin.from("client_onboarding").upsert(
     {
       client_id: clientId,
-      // new columns (used by AI plan)
       goal,
       level,
       available_days: days,
       injuries: injuries || null,
-      // old columns (checked by OnboardingWrapper / dashboard)
       goals_text: goal,
-      fitness_level: level, // already English: beginner/intermediate/advanced
+      fitness_level: level,
       availability: availableDays,
       equipment,
-      // mark as complete so dashboard never shows the quiz again
       completed_at: new Date().toISOString(),
     },
     { onConflict: "client_id" }
   );
 
-  // 3b. Pre-assign client to coach immediately (don't wait for Stripe webhook)
+  // 3b. Pre-assign client to coach
   await admin.from("coach_clients").upsert(
     { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
     { onConflict: "coach_id,client_id,assigned_role" }
   );
 
-  // 3c. Sign the user in so the browser session cookie is set BEFORE the Stripe redirect.
-  //     Without this, the user returns from Stripe unauthenticated and post-payment
-  //     activation (welcome message, push, status=active) never runs.
+  // 3c. Sign user in so browser session cookie is set before Stripe redirect
   const supabase = await createClient();
-  await supabase.auth.signInWithPassword({ email, password });
+  const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+  if (signInErr) {
+    console.error("[signup] signIn after createUser failed:", signInErr.message);
+    // Non-fatal — user can log in manually after payment
+  }
 
   // 4. Create Stripe customer + checkout session
   const Stripe = (await import("stripe")).default;
@@ -101,7 +114,6 @@ export async function signupAndStartCheckout(
     apiVersion: "2026-04-22.dahlia" as "2026-04-22.dahlia",
   });
 
-  // Create Stripe customer
   const customer = await stripe.customers.create({
     email,
     name: fullName,
@@ -109,7 +121,6 @@ export async function signupAndStartCheckout(
   });
   const stripeCustomerId = customer.id;
 
-  // Persist stripe_customer_id on profile
   await admin
     .from("profiles")
     .update({ stripe_customer_id: stripeCustomerId })
@@ -121,7 +132,6 @@ export async function signupAndStartCheckout(
     return "http://localhost:3000";
   })();
 
-  // 5. Create checkout session
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     customer: stripeCustomerId,
@@ -131,7 +141,7 @@ export async function signupAndStartCheckout(
         price_data: {
           currency: "eur",
           product_data: { name: "KRAV Premium Coaching" },
-          unit_amount: 12700, // €127.00
+          unit_amount: 12700,
           recurring: { interval: "month" },
         },
         quantity: 1,
