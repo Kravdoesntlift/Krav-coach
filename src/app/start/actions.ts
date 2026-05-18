@@ -1,6 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 
 export interface SignupPayload {
   fullName: string;
@@ -83,12 +84,16 @@ export async function signupAndStartCheckout(
   );
 
   // 3b. Pre-assign client to coach immediately (don't wait for Stripe webhook)
-  //     The webhook will upsert again on payment — this ensures chat works as soon as
-  //     the client lands on /client/pending, even before Stripe confirms.
   await admin.from("coach_clients").upsert(
     { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
     { onConflict: "coach_id,client_id,assigned_role" }
   );
+
+  // 3c. Sign the user in so the browser session cookie is set BEFORE the Stripe redirect.
+  //     Without this, the user returns from Stripe unauthenticated and post-payment
+  //     activation (welcome message, push, status=active) never runs.
+  const supabase = await createClient();
+  await supabase.auth.signInWithPassword({ email, password });
 
   // 4. Create Stripe customer + checkout session
   const Stripe = (await import("stripe")).default;

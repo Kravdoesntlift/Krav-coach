@@ -1,6 +1,6 @@
 /**
  * Server-side push notification helper.
- * Can be called from server actions and API routes.
+ * Sends to ALL subscribed devices for a user (multi-device support).
  */
 import { createAdminClient } from "./supabase/admin";
 
@@ -12,37 +12,64 @@ export async function sendPushToUser(
 ): Promise<{ ok: boolean; error?: string }> {
   const admin = createAdminClient();
 
-  const [{ data: sub, error: dbErr }, { count: unread }] = await Promise.all([
-    admin.from("push_subscriptions").select("subscription").eq("user_id", userId).maybeSingle(),
+  const [{ data: subs, error: dbErr }, { count: unread }] = await Promise.all([
+    admin.from("push_subscriptions").select("id, subscription").eq("user_id", userId),
     admin.from("messages").select("id", { count: "exact", head: true })
       .eq("receiver_id", userId).is("read_at", null),
   ]);
 
   if (dbErr) return { ok: false, error: `DB error: ${dbErr.message}` };
-  if (!sub?.subscription) return { ok: false, error: "No subscription found" };
+  if (!subs || subs.length === 0) return { ok: false, error: "No subscription found for user" };
 
-  // badge = actual unread count (message already inserted before push is called)
   const badge = Math.max(1, unread ?? 0);
 
   const webpush = await import("web-push");
-  webpush.default.setVapidDetails(
-    process.env.VAPID_SUBJECT!,
-    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-    process.env.VAPID_PRIVATE_KEY!,
+
+  const vapidSubject = process.env.VAPID_SUBJECT;
+  const vapidPublic = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+  const vapidPrivate = process.env.VAPID_PRIVATE_KEY;
+
+  if (!vapidSubject || !vapidPublic || !vapidPrivate) {
+    return { ok: false, error: "VAPID keys not configured (VAPID_SUBJECT, NEXT_PUBLIC_VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)" };
+  }
+
+  // VAPID_SUBJECT must start with mailto: or https://
+  if (!vapidSubject.startsWith("mailto:") && !vapidSubject.startsWith("https://")) {
+    return { ok: false, error: `VAPID_SUBJECT must start with 'mailto:' or 'https://' — got: ${vapidSubject}` };
+  }
+
+  webpush.default.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
+
+  const payload = JSON.stringify({ title, body, url, badge });
+  const staleIds: string[] = [];
+  let anyOk = false;
+
+  await Promise.all(
+    subs.map(async (row) => {
+      try {
+        await webpush.default.sendNotification(
+          row.subscription as Parameters<typeof webpush.default.sendNotification>[0],
+          payload,
+        );
+        anyOk = true;
+      } catch (err: unknown) {
+        const error = err as { statusCode?: number; message?: string };
+        if (error.statusCode === 410 || error.statusCode === 404) {
+          // Subscription expired or invalid — mark for cleanup
+          staleIds.push(row.id);
+        } else {
+          console.error(`[push] sendNotification failed for user ${userId}:`, error.message);
+        }
+      }
+    })
   );
 
-  try {
-    await webpush.default.sendNotification(
-      sub.subscription as Parameters<typeof webpush.default.sendNotification>[0],
-      JSON.stringify({ title, body, url, badge }),
-    );
-    return { ok: true };
-  } catch (err: unknown) {
-    const error = err as { statusCode?: number; message?: string };
-    if (error.statusCode === 410) {
-      await admin.from("push_subscriptions").delete().eq("user_id", userId);
-      return { ok: false, error: "Subscription expired (410), cleaned up" };
-    }
-    return { ok: false, error: error.message ?? "Unknown webpush error" };
+  // Clean up stale subscriptions
+  if (staleIds.length > 0) {
+    await admin.from("push_subscriptions").delete().in("id", staleIds);
   }
+
+  return anyOk
+    ? { ok: true }
+    : { ok: false, error: "All subscriptions failed or were stale" };
 }
