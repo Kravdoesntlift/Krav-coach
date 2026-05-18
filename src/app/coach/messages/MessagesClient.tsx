@@ -13,6 +13,23 @@ export type Convo = {
   hasMessages: boolean;
 };
 
+// Generates a consistent gold-toned gradient from a UUID
+function avatarGradient(id: string) {
+  // Use last 6 chars of UUID as a simple hash
+  const h = parseInt(id.replace(/-/g, "").slice(-6), 16) % 360;
+  const palettes = [
+    "linear-gradient(135deg,#E2C060,#A8893A)", // gold
+    "linear-gradient(135deg,#6EE7B7,#059669)", // green
+    "linear-gradient(135deg,#93C5FD,#3B82F6)", // blue
+    "linear-gradient(135deg,#F9A8D4,#EC4899)", // pink
+    "linear-gradient(135deg,#FCA5A5,#EF4444)", // red
+    "linear-gradient(135deg,#C4B5FD,#8B5CF6)", // purple
+    "linear-gradient(135deg,#FCD34D,#F59E0B)", // amber
+    "linear-gradient(135deg,#6EE7F7,#0891B2)", // cyan
+  ];
+  return palettes[parseInt(id.replace(/-/g, "").slice(-2), 16) % palettes.length];
+}
+
 function formatRelative(iso: string) {
   if (!iso) return "";
   const diff = Date.now() - new Date(iso).getTime();
@@ -35,6 +52,12 @@ export default function MessagesClient({ convos }: { convos: Convo[] }) {
 
   const unreadCount = convos.filter((c) => c.unread > 0).length;
 
+  // Detect duplicate names to show extra identifier
+  const nameCounts = convos.reduce<Record<string, number>>((acc, c) => {
+    acc[c.clientName] = (acc[c.clientName] ?? 0) + 1;
+    return acc;
+  }, {});
+
   return (
     <div className="space-y-6 page-enter max-w-2xl mx-auto">
       {/* Header */}
@@ -48,7 +71,6 @@ export default function MessagesClient({ convos }: { convos: Convo[] }) {
           </p>
         </div>
 
-        {/* Search */}
         {convos.length > 0 && (
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">🔍</span>
@@ -84,66 +106,87 @@ export default function MessagesClient({ convos }: { convos: Convo[] }) {
         </p>
       ) : (
         <div className="space-y-2">
-          {filtered.map((c) => (
-            <Link
-              key={c.clientId}
-              href={`/coach/clients/${c.clientId}/chat`}
-              className="flex items-center gap-4 p-4 rounded-2xl transition-all group"
-              style={{
-                background: c.unread > 0
-                  ? "linear-gradient(135deg,rgba(201,168,76,0.07),rgba(10,10,10,0.9))"
-                  : "rgba(18,18,20,0.8)",
-                border: c.unread > 0
-                  ? "1px solid rgba(201,168,76,0.2)"
-                  : "1px solid rgba(39,39,42,0.5)",
-              }}
-            >
-              {/* Avatar */}
-              <div className="relative shrink-0">
-                {c.avatarUrl ? (
-                  <img
-                    src={c.avatarUrl}
-                    alt={c.clientName}
-                    className="w-11 h-11 rounded-full object-cover border border-zinc-700"
-                  />
-                ) : (
-                  <div
-                    className="w-11 h-11 rounded-full flex items-center justify-center font-black text-black text-sm shrink-0"
-                    style={{ background: "linear-gradient(135deg,#E2C060,#A8893A)" }}
-                  >
-                    {c.clientName.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                {c.unread > 0 && (
-                  <span
-                    className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-black"
-                    style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C)" }}
-                  >
-                    {c.unread > 9 ? "9+" : c.unread}
-                  </span>
-                )}
-              </div>
+          {filtered.map((c) => {
+            const isDuplicate = (nameCounts[c.clientName] ?? 0) > 1;
+            const shortId = c.clientId.slice(-4).toUpperCase();
 
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2">
-                  <p className={`font-semibold text-sm ${c.unread > 0 ? "text-white" : "text-zinc-300"}`}>
-                    {c.clientName}
-                  </p>
-                  <span className="text-zinc-600 text-[10px] shrink-0">{formatRelative(c.lastAt)}</span>
+            return (
+              <div
+                key={c.clientId}
+                className="flex items-center gap-3 p-3 rounded-2xl transition-all"
+                style={{
+                  background: c.unread > 0
+                    ? "linear-gradient(135deg,rgba(201,168,76,0.07),rgba(10,10,10,0.9))"
+                    : "rgba(18,18,20,0.8)",
+                  border: c.unread > 0
+                    ? "1px solid rgba(201,168,76,0.2)"
+                    : "1px solid rgba(39,39,42,0.5)",
+                }}
+              >
+                {/* Avatar */}
+                <div className="relative shrink-0">
+                  {c.avatarUrl ? (
+                    <img
+                      src={c.avatarUrl}
+                      alt={c.clientName}
+                      className="w-11 h-11 rounded-full object-cover border border-zinc-700"
+                    />
+                  ) : (
+                    <div
+                      className="w-11 h-11 rounded-full flex items-center justify-center font-black text-black text-sm shrink-0"
+                      style={{ background: avatarGradient(c.clientId) }}
+                    >
+                      {c.clientName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  {c.unread > 0 && (
+                    <span
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-black"
+                      style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C)" }}
+                    >
+                      {c.unread > 9 ? "9+" : c.unread}
+                    </span>
+                  )}
                 </div>
-                <p className={`text-xs mt-0.5 truncate ${c.unread > 0 ? "text-zinc-400" : "text-zinc-600"}`}>
-                  {c.hasMessages
-                    ? (c.lastMessage || "—")
-                    : <span className="italic text-zinc-700">Sem mensagens ainda — clica para iniciar</span>
-                  }
-                </p>
-              </div>
 
-              {/* Arrow */}
-              <span className="text-zinc-700 group-hover:text-zinc-400 text-xs shrink-0 transition-colors">→</span>
-            </Link>
-          ))}
+                {/* Content — links to chat */}
+                <Link
+                  href={`/coach/clients/${c.clientId}/chat`}
+                  className="flex-1 min-w-0 group"
+                >
+                  <div className="flex items-center gap-2">
+                    <p className={`font-semibold text-sm ${c.unread > 0 ? "text-white" : "text-zinc-300"}`}>
+                      {c.clientName}
+                    </p>
+                    {isDuplicate && (
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 shrink-0">
+                        #{shortId}
+                      </span>
+                    )}
+                    <span className="ml-auto text-zinc-600 text-[10px] shrink-0">{formatRelative(c.lastAt)}</span>
+                  </div>
+                  <p className={`text-xs mt-0.5 truncate ${c.unread > 0 ? "text-zinc-400" : "text-zinc-600"}`}>
+                    {c.hasMessages
+                      ? (c.lastMessage || "—")
+                      : <span className="italic text-zinc-700">Sem mensagens — clica para iniciar</span>
+                    }
+                  </p>
+                </Link>
+
+                {/* Profile quick-access button */}
+                <Link
+                  href={`/coach/clients/${c.clientId}`}
+                  title="Ver perfil completo"
+                  className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-zinc-600 hover:text-brand-gold hover:bg-zinc-800 transition-all"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </Link>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

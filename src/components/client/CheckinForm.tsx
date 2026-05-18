@@ -139,7 +139,18 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
 
     setLoading(false);
     if (dbError) { haptic(HAPTIC.error); setError("Erro ao guardar. Tenta novamente."); }
-    else { haptic(HAPTIC.success); setSuccess(true); }
+    else {
+      haptic(HAPTIC.success);
+      setSuccess(true);
+      // Notify coach — fire and forget, don't block UX
+      if (!existing) {
+        fetch("/api/push/checkin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ weekStart }),
+        }).catch(() => {});
+      }
+    }
   }
 
   if (success) {
