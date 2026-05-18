@@ -69,11 +69,12 @@ export async function POST(req: NextRequest) {
 
         // Self-service flow: assign client to coach, send welcome message & push notifications
         if (session.metadata?.self_service === "true") {
-          // 1. Assign client to coach via coach_clients
-          await admin.from("coach_clients").upsert(
-            { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
-            { onConflict: "coach_id,client_id,assigned_role" }
-          );
+          // 1. Assign client to coach via coach_clients (insert, ignore if already exists)
+          const { error: ccErr } = await admin.from("coach_clients")
+            .insert({ coach_id: coachId, client_id: clientId, assigned_role: "coach" });
+          if (ccErr && ccErr.code !== "23505") {
+            console.error("[webhook] coach_clients insert error:", ccErr);
+          }
 
           // 2. Welcome message in chat
           const [{ data: coachProfileData }, { data: clientProfileData }] = await Promise.all([
