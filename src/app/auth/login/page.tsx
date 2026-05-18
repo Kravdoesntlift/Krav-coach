@@ -139,7 +139,7 @@ export default function LoginPage() {
 
         <p className="text-center text-zinc-600 text-sm mt-5">
           Ainda não tens conta?{" "}
-          <Link href="/auth/signup" className="text-brand-gold hover:text-brand-gold-light transition-colors font-medium">
+          <Link href="/start" className="text-brand-gold hover:text-brand-gold-light transition-colors font-medium">
             Registar
           </Link>
         </p>
