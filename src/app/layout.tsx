@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
+import AppRefresh from "@/components/AppRefresh";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -35,7 +36,10 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icon.svg" />
         <link rel="icon" type="image/svg+xml" href="/icon.svg" />
       </head>
-      <body className="bg-black text-white antialiased font-sans">{children}</body>
+      <body className="bg-black text-white antialiased font-sans">
+        <AppRefresh />
+        {children}
+      </body>
     </html>
   );
 }
