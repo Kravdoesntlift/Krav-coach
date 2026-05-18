@@ -103,8 +103,9 @@ export default function SuggestPlanButton({ clientId }: { clientId: string }) {
           <div
             className="w-full max-w-lg rounded-3xl p-6 space-y-5 max-h-[85vh] overflow-y-auto"
             style={{
-              background: "linear-gradient(160deg, rgba(201,168,76,0.06) 0%, #0a0a0c 100%)",
-              border: "1px solid rgba(201,168,76,0.2)",
+              background: "#111113",
+              border: "1px solid rgba(201,168,76,0.25)",
+              boxShadow: "0 0 40px rgba(0,0,0,0.8)",
             }}
           >
             {/* Header */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Profile, WorkoutPlan } from "@/lib/supabase/types";
@@ -53,7 +53,7 @@ interface Template {
   days: DayInput[];
 }
 
-export default function PlanBuilder({ coachId, clients, preselectedClientId, existingPlan, templates = [] }: Props & { templates?: Template[] }) {
+export default function PlanBuilder({ coachId, clients, preselectedClientId, existingPlan, templates = [], suggestMode = false }: Props & { templates?: Template[]; suggestMode?: boolean }) {
   const router = useRouter();
   const isEdit = !!existingPlan;
 
@@ -79,6 +79,42 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
   const [showTemplates, setShowTemplates] = useState(false);
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+
+  // Load AI-suggested plan from sessionStorage when coming from SuggestPlanButton
+  useEffect(() => {
+    if (!suggestMode) return;
+    try {
+      const stored = sessionStorage.getItem("ai_suggested_plan");
+      if (!stored) return;
+      sessionStorage.removeItem("ai_suggested_plan");
+      const suggested = JSON.parse(stored) as {
+        name: string;
+        days: Array<{
+          day_of_week: number;
+          label: string;
+          is_rest: boolean;
+          exercises: Array<{ name: string; sets: number; reps: string; notes: string }>;
+        }>;
+      };
+      if (suggested.name) setPlanName(suggested.name);
+      setDays(
+        suggested.days.map((d) => ({
+          day_of_week: d.day_of_week,
+          label: d.label,
+          is_rest: d.is_rest,
+          exercises: (d.exercises ?? []).map((ex) => ({
+            name: ex.name,
+            sets: String(ex.sets),
+            reps: String(ex.reps),
+            notes: ex.notes ?? "",
+            video_url: "",
+            superset_group: "",
+          })),
+        }))
+      );
+    } catch { /* ignore parse errors */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suggestMode]);
 
   async function generateWithAI() {
     if (!clientId) { setError("Seleciona um cliente primeiro."); return; }

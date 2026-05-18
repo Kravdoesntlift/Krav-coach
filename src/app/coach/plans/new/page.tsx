@@ -5,9 +5,9 @@ import type { Profile } from "@/lib/supabase/types";
 export default async function NewPlanPage({
   searchParams,
 }: {
-  searchParams: Promise<{ client?: string }>;
+  searchParams: Promise<{ client?: string; suggest?: string }>;
 }) {
-  const { client: preselectedClientId } = await searchParams;
+  const { client: preselectedClientId, suggest } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -32,6 +32,7 @@ export default async function NewPlanPage({
         clients={(clients as Profile[]) ?? []}
         preselectedClientId={preselectedClientId}
         templates={templates ?? []}
+        suggestMode={suggest === "true"}
       />
     </div>
   );
