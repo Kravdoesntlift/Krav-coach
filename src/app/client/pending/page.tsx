@@ -9,26 +9,37 @@ import { sendPushToUser } from "@/lib/push";
 async function activateAfterPayment(userId: string, sessionId: string) {
   if (!process.env.STRIPE_SECRET_KEY) return;
 
-  const Stripe = (await import("stripe")).default;
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2026-04-22.dahlia" as "2026-04-22.dahlia",
-  });
+  // Retrieve session via raw fetch — bypass Stripe SDK networking issues
+  type StripeSession = {
+    metadata?: Record<string, string>;
+    payment_status?: string;
+    subscription?: {
+      id: string;
+      status: string;
+      items?: { data: Array<{ price?: { unit_amount: number | null }; current_period_end?: number }> };
+    } | string | null;
+  };
 
-  // Verify the session belongs to this user and is paid
-  let session: Awaited<ReturnType<typeof stripe.checkout.sessions.retrieve>>;
+  let session: StripeSession;
   try {
-    session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ["subscription"],
-    });
+    const resp = await fetch(
+      `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}?expand[]=subscription`,
+      {
+        headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` },
+        signal: AbortSignal.timeout(10000),
+      }
+    );
+    if (!resp.ok) return;
+    session = await resp.json() as StripeSession;
   } catch {
-    return; // Invalid session ID — ignore
+    return; // Network error — ignore
   }
 
   const clientId = session.metadata?.client_id;
   const coachId = session.metadata?.coach_id;
 
-  if (!clientId || clientId !== userId) return; // Session doesn't belong to this user
-  if (session.payment_status !== "paid") return; // Not paid yet
+  if (!clientId || clientId !== userId) return;
+  if (session.payment_status !== "paid") return;
 
   const admin = createAdminClient();
 
@@ -36,7 +47,9 @@ async function activateAfterPayment(userId: string, sessionId: string) {
   await admin.from("profiles").update({ status: "active" }).eq("id", clientId);
 
   // 2. Store subscription in DB (if not already there)
-  const sub = session.subscription as import("stripe").Stripe.Subscription | null;
+  const sub = typeof session.subscription === "object" && session.subscription !== null
+    ? session.subscription
+    : null;
   if (sub && coachId) {
     const item = sub.items?.data[0];
     const amountCents = item?.price?.unit_amount ?? null;

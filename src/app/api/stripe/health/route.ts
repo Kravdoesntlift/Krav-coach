@@ -38,71 +38,77 @@ export async function GET() {
     results.webhook_secret = { ok: false, detail: "Formato inválido — deve começar com whsec_" };
   }
 
-  // ── 3. Stripe API call — verify key is valid & live ─────────────────────────
+  // ── 3. Raw fetch test — bypass SDK entirely ──────────────────────────────────
   if (secretKey) {
     try {
-      const Stripe = (await import("stripe")).default;
-      const stripe = new Stripe(secretKey, {
-        apiVersion: "2026-04-22.dahlia" as "2026-04-22.dahlia",
-        httpClient: Stripe.createFetchHttpClient(),
-        maxNetworkRetries: 0,
+      const rawResp = await fetch("https://api.stripe.com/v1/balance", {
+        headers: { Authorization: `Bearer ${secretKey}` },
+        signal: AbortSignal.timeout(8000),
       });
-      // Check account status — charges_enabled must be true to accept payments
-      const balance = await stripe.balance.retrieve();
-      // Retrieve own account info via the balance object's livemode flag
-      const isLive = balance.livemode;
-      const chargesOk = true; // If balance retrieval succeeded, key is valid
-      const payoutsOk = true;
+      const rawBody = await rawResp.json() as Record<string, unknown>;
 
-      results.stripe_api = {
-        ok: true,
-        detail: `Chave válida ✓ — livemode: ${isLive}. ${!isLive ? "⚠️ ATENÇÃO: a chave é de TEST mode, não live!" : ""}`,
-      };
-
-      // ── 4. Check webhooks registered in Stripe ────────────────────────────
-      const webhooks = await stripe.webhookEndpoints.list({ limit: 10 });
-      const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/$/, "");
-      const ourEndpoint = `${siteUrl}/api/stripe/webhook`;
-      const match = webhooks.data.find((w) => w.url === ourEndpoint);
-
-      if (!match) {
-        results.webhook_registered = {
+      if (!rawResp.ok) {
+        // HTTP error from Stripe — key invalid, account restricted, etc.
+        const errMsg = (rawBody.error as Record<string, unknown>)?.message ?? JSON.stringify(rawBody);
+        results.stripe_api = {
           ok: false,
-          detail: `Nenhum webhook aponta para ${ourEndpoint}. Cria em Stripe → Developers → Webhooks.`,
+          detail: `HTTP ${rawResp.status} — ${errMsg}`,
         };
       } else {
-        const requiredEvents = [
-          "checkout.session.completed",
-          "customer.subscription.updated",
-          "customer.subscription.deleted",
-          "invoice.payment_failed",
-        ];
-        const missing = requiredEvents.filter((e) => !match.enabled_events.includes(e) && !match.enabled_events.includes("*"));
-        if (missing.length > 0) {
+        // Success — now also check webhooks using SDK
+        const isLive = rawBody.livemode as boolean;
+        results.stripe_api = {
+          ok: true,
+          detail: `Chave válida ✓ — livemode: ${isLive}. ${!isLive ? "⚠️ ATENÇÃO: a chave é de TEST mode, não live!" : ""}`,
+        };
+
+        // ── 4. Check webhooks registered in Stripe ──────────────────────────
+        const whResp = await fetch("https://api.stripe.com/v1/webhook_endpoints?limit=10", {
+          headers: { Authorization: `Bearer ${secretKey}` },
+          signal: AbortSignal.timeout(8000),
+        });
+        const whBody = await whResp.json() as { data?: Array<{ url: string; status: string; enabled_events: string[] }> };
+        const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/$/, "");
+        const ourEndpoint = `${siteUrl}/api/stripe/webhook`;
+        const match = (whBody.data ?? []).find((w) => w.url === ourEndpoint);
+
+        if (!match) {
           results.webhook_registered = {
             ok: false,
-            detail: `Webhook encontrado mas faltam eventos: ${missing.join(", ")}`,
+            detail: `Nenhum webhook aponta para ${ourEndpoint}. Cria em Stripe → Developers → Webhooks.`,
           };
         } else {
-          results.webhook_registered = {
+          const requiredEvents = [
+            "checkout.session.completed",
+            "customer.subscription.updated",
+            "customer.subscription.deleted",
+            "invoice.payment_failed",
+          ];
+          const missing = requiredEvents.filter((e) => !match.enabled_events.includes(e) && !match.enabled_events.includes("*"));
+          if (missing.length > 0) {
+            results.webhook_registered = {
+              ok: false,
+              detail: `Webhook encontrado mas faltam eventos: ${missing.join(", ")}`,
+            };
+          } else {
+            results.webhook_registered = {
+              ok: true,
+              detail: `Webhook ✓ — ${match.url} (status: ${match.status})`,
+            };
+          }
+        }
+
+        // ── 5. Webhook secret mode ─────────────────────────────────────────────
+        if (match && webhookSecret) {
+          results.webhook_secret_mode = {
             ok: true,
-            detail: `Webhook ✓ — ${match.url} (status: ${match.status})`,
+            detail: "Signing secret está definido — verifica que copiaste do webhook live (não do test)",
           };
         }
       }
-
-      // ── 5. Webhook secret matches a live whsec ──────────────────────────────
-      if (match && webhookSecret) {
-        const isLiveSecret = !webhookSecret.includes("test");
-        results.webhook_secret_mode = {
-          ok: true,
-          detail: "Signing secret está definido — verifica que copiaste do webhook live (não do test)",
-        };
-      }
-
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      results.stripe_api = { ok: false, detail: `Erro ao chamar Stripe API: ${msg}` };
+      results.stripe_api = { ok: false, detail: `Erro de rede ao chamar Stripe: ${msg}` };
     }
   }
 

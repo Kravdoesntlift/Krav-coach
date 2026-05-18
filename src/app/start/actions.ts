@@ -101,62 +101,72 @@ async function _signupAndStartCheckout(
     console.error("[signup] signIn after createUser failed:", signInErr.message);
   }
 
-  // 4. Create Stripe customer + checkout session
-  //    If Stripe fails we clean up the Supabase account so no orphan client appears
-  const Stripe = (await import("stripe")).default;
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2026-04-22.dahlia" as "2026-04-22.dahlia",
-    httpClient: Stripe.createFetchHttpClient(),
-    maxNetworkRetries: 1,
-  });
+  // 4. Create Stripe customer + checkout session via raw fetch (no SDK)
+  const STRIPE_KEY = process.env.STRIPE_SECRET_KEY!;
+  const stripeHeaders = {
+    Authorization: `Bearer ${STRIPE_KEY}`,
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
+
+  const siteUrl = (() => {
+    const envUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+    if (envUrl.startsWith("http")) return envUrl.replace(/\/$/, "");
+    return "http://localhost:3000";
+  })();
 
   let stripeCustomerId: string;
   let checkoutUrl: string;
 
   try {
-    const customer = await stripe.customers.create({
+    // 4a. Create customer
+    const custParams = new URLSearchParams({
       email,
       name: fullName,
-      metadata: { client_id: clientId, coach_id: coachId },
+      "metadata[client_id]": clientId,
+      "metadata[coach_id]": coachId,
     });
-    stripeCustomerId = customer.id;
+    const custResp = await fetch("https://api.stripe.com/v1/customers", {
+      method: "POST",
+      headers: stripeHeaders,
+      body: custParams.toString(),
+      signal: AbortSignal.timeout(15000),
+    });
+    const custBody = await custResp.json() as { id?: string; error?: { message: string } };
+    if (!custResp.ok || !custBody.id) {
+      throw new Error(`Stripe customer error (${custResp.status}): ${custBody.error?.message ?? JSON.stringify(custBody)}`);
+    }
+    stripeCustomerId = custBody.id;
 
-    await admin
-      .from("profiles")
-      .update({ stripe_customer_id: stripeCustomerId })
-      .eq("id", clientId);
+    await admin.from("profiles").update({ stripe_customer_id: stripeCustomerId }).eq("id", clientId);
 
-    const siteUrl = (() => {
-      const envUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
-      if (envUrl.startsWith("http")) return envUrl.replace(/\/$/, "");
-      return "http://localhost:3000";
-    })();
-
-    const session = await stripe.checkout.sessions.create({
+    // 4b. Create checkout session
+    const sessionParams = new URLSearchParams({
       mode: "subscription",
       customer: stripeCustomerId,
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price_data: {
-            currency: "eur",
-            product_data: { name: "KRAV Premium Coaching" },
-            unit_amount: 12700,
-            recurring: { interval: "month" },
-          },
-          quantity: 1,
-        },
-      ],
-      metadata: {
-        coach_id: coachId,
-        client_id: clientId,
-        self_service: "true",
-      },
+      "payment_method_types[0]": "card",
+      "line_items[0][price_data][currency]": "eur",
+      "line_items[0][price_data][product_data][name]": "KRAV Premium Coaching",
+      "line_items[0][price_data][unit_amount]": "12700",
+      "line_items[0][price_data][recurring][interval]": "month",
+      "line_items[0][quantity]": "1",
+      "metadata[coach_id]": coachId,
+      "metadata[client_id]": clientId,
+      "metadata[self_service]": "true",
       success_url: `${siteUrl}/client/pending?welcome=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/start`,
     });
+    const sessResp = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+      method: "POST",
+      headers: stripeHeaders,
+      body: sessionParams.toString(),
+      signal: AbortSignal.timeout(15000),
+    });
+    const sessBody = await sessResp.json() as { url?: string; error?: { message: string } };
+    if (!sessResp.ok || !sessBody.url) {
+      throw new Error(`Stripe session error (${sessResp.status}): ${sessBody.error?.message ?? JSON.stringify(sessBody)}`);
+    }
+    checkoutUrl = sessBody.url;
 
-    checkoutUrl = session.url!;
   } catch (stripeErr: unknown) {
     // Stripe failed — delete the Supabase account so no orphan client appears
     await admin.auth.admin.deleteUser(clientId).catch(() => {});
