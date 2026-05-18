@@ -12,5 +12,10 @@
       "path": "/api/cron/weekly-report",
       "schedule": "0 9 * * 0"
     }
-  ]
+  ],
+  "functions": {
+    "src/app/api/ai/**": { "maxDuration": 30 },
+    "src/app/api/stripe/webhook/route.ts": { "maxDuration": 15 },
+    "src/app/api/cron/**": { "maxDuration": 60 }
+  }
 }
