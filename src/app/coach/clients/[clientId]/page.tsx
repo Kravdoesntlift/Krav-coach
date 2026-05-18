@@ -250,22 +250,28 @@ export default async function ClientDetailPage({
       )}
 
       {/* Progress photos */}
-      {progressPhotos && progressPhotos.length > 0 && (
-        <section>
-          <h2 className="text-white font-semibold mb-3">
-            Fotos de Progresso
+      <section id="fotos">
+        <h2 className="text-white font-semibold mb-3">
+          Fotos de Progresso
+          {progressPhotos && progressPhotos.length > 0 && (
             <span className="ml-2 text-xs font-normal text-zinc-500">{progressPhotos.length} foto{progressPhotos.length !== 1 ? "s" : ""}</span>
-          </h2>
+          )}
+        </h2>
+        {!progressPhotos || progressPhotos.length === 0 ? (
+          <p className="text-zinc-600 text-sm">O cliente ainda não submeteu fotos de progresso.</p>
+        ) : (
           <PhotoLightbox
             photos={progressPhotos.map((p) => ({
               id: p.id,
               photo_url: p.photo_url,
-              caption: p.caption ?? null,
+              caption: (p as Record<string, unknown>).angle
+                ? `${String((p as Record<string, unknown>).angle) === "front" ? "Frente" : String((p as Record<string, unknown>).angle) === "side" ? "Lado" : "Costas"}${p.caption ? ` · ${p.caption}` : ""}`
+                : (p.caption ?? null),
               taken_at: p.taken_at,
             }))}
           />
-        </section>
-      )}
+        )}
+      </section>
 
       {/* Check-ins */}
       <section>

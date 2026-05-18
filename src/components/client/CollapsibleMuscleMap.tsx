@@ -31,11 +31,11 @@ export default function CollapsibleMuscleMap({ exerciseNames, loggedNames }: Pro
         <div className="flex items-center gap-2.5">
           <span className="text-base">💪</span>
           <div className="text-left">
-            <p className="text-white font-semibold text-sm leading-tight">Músculos activos</p>
+            <p className="text-white font-semibold text-sm leading-tight">Músculos ativos</p>
             <p className="text-zinc-600 text-xs mt-0.5">
               {exerciseNames.length > 0
                 ? `${exerciseNames.length} exercício${exerciseNames.length > 1 ? "s" : ""} esta semana`
-                : "Sem plano activo"}
+                : "Sem plano ativo"}
             </p>
           </div>
         </div>

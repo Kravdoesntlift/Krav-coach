@@ -125,7 +125,7 @@ export default function MuscleMap({ exerciseNames, loggedNames = [] }: Props) {
       {/* ── Header ── */}
       <div className="px-4 pt-4 pb-2 flex items-start justify-between">
         <div>
-          <p className="text-[10px] font-semibold tracking-widest uppercase text-zinc-500">Músculos activos</p>
+          <p className="text-[10px] font-semibold tracking-widest uppercase text-zinc-500">Músculos ativos</p>
           <h3 className="mt-0.5 text-base font-bold text-white leading-tight">Esta semana</h3>
         </div>
         {totalMuscles > 0 && (
