@@ -42,7 +42,11 @@ export async function GET() {
   if (secretKey) {
     try {
       const Stripe = (await import("stripe")).default;
-      const stripe = new Stripe(secretKey, { apiVersion: "2026-04-22.dahlia" as "2026-04-22.dahlia" });
+      const stripe = new Stripe(secretKey, {
+        apiVersion: "2026-04-22.dahlia" as "2026-04-22.dahlia",
+        httpClient: Stripe.createFetchHttpClient(),
+        maxNetworkRetries: 0,
+      });
       // Check account status — charges_enabled must be true to accept payments
       const balance = await stripe.balance.retrieve();
       // Retrieve own account info via the balance object's livemode flag
