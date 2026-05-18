@@ -76,6 +76,9 @@ async function _signupAndStartCheckout(
   }
   const clientId = authData.user.id;
 
+  // 2b. Set status = 'pending' immediately — only 'active' after payment confirmed
+  await admin.from("profiles").update({ status: "pending" }).eq("id", clientId);
+
   // 3. Save onboarding data
   const days = Array.from({ length: availableDays }, (_, i) => i);
   await admin.from("client_onboarding").upsert(
