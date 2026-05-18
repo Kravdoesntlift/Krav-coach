@@ -137,7 +137,7 @@ export async function signupAndStartCheckout(
       client_id: clientId,
       self_service: "true",
     },
-    success_url: `${siteUrl}/client/pending?welcome=true`,
+    success_url: `${siteUrl}/client/pending?welcome=true&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${siteUrl}/start`,
   });
 

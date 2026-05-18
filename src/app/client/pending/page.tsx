@@ -1,26 +1,139 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
+import { sendPushToUser } from "@/lib/push";
+
+// ─── Post-payment activation ──────────────────────────────────────────────────
+// Called when client lands here with ?session_id= from Stripe.
+// Verifies the session, activates the profile, sends welcome message + push.
+async function activateAfterPayment(userId: string, sessionId: string) {
+  if (!process.env.STRIPE_SECRET_KEY) return;
+
+  const Stripe = (await import("stripe")).default;
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2026-04-22.dahlia" as "2026-04-22.dahlia",
+  });
+
+  // Verify the session belongs to this user and is paid
+  let session: Awaited<ReturnType<typeof stripe.checkout.sessions.retrieve>>;
+  try {
+    session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ["subscription"],
+    });
+  } catch {
+    return; // Invalid session ID — ignore
+  }
+
+  const clientId = session.metadata?.client_id;
+  const coachId = session.metadata?.coach_id;
+
+  if (!clientId || clientId !== userId) return; // Session doesn't belong to this user
+  if (session.payment_status !== "paid") return; // Not paid yet
+
+  const admin = createAdminClient();
+
+  // 1. Activate profile
+  await admin.from("profiles").update({ status: "active" }).eq("id", clientId);
+
+  // 2. Store subscription in DB (if not already there)
+  const sub = session.subscription as import("stripe").Stripe.Subscription | null;
+  if (sub && coachId) {
+    const item = sub.items?.data[0];
+    const amountCents = item?.price?.unit_amount ?? null;
+    const periodEndTs = item?.current_period_end ?? null;
+    const periodEnd = periodEndTs ? new Date(periodEndTs * 1000).toISOString() : null;
+
+    await admin.from("stripe_subscriptions").upsert(
+      {
+        id: sub.id,
+        client_id: clientId,
+        coach_id: coachId,
+        status: sub.status,
+        amount_cents: amountCents,
+        current_period_end: periodEnd,
+      },
+      { onConflict: "id" }
+    );
+  }
+
+  if (!coachId) return;
+
+  // 3. Ensure coach assignment
+  await admin.from("coach_clients").upsert(
+    { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
+    { onConflict: "coach_id,client_id,assigned_role" }
+  );
+
+  // 4. Send welcome message (only once)
+  const { data: existingMsg } = await admin
+    .from("messages")
+    .select("id")
+    .eq("sender_id", coachId)
+    .eq("receiver_id", clientId)
+    .limit(1)
+    .maybeSingle();
+
+  if (!existingMsg) {
+    const [{ data: coachData }, { data: clientData }] = await Promise.all([
+      admin.from("profiles").select("full_name").eq("id", coachId).single(),
+      admin.from("profiles").select("full_name").eq("id", clientId).single(),
+    ]);
+    const coachFirst = (coachData?.full_name ?? "").split(" ")[0] || "Coach";
+    const clientFirst = (clientData?.full_name ?? "").split(" ")[0] || "Atleta";
+
+    await admin.from("messages").insert({
+      sender_id: coachId,
+      receiver_id: clientId,
+      content: `Olá ${clientFirst}! 👋 Sou o ${coachFirst}, o teu coach na KRAV. O teu pagamento foi confirmado e já tens acesso total à app. Vamos começar esta jornada juntos! 💪`,
+    });
+
+    // 5. Push to coach
+    await sendPushToUser(
+      coachId,
+      "Novo cliente pagante! 🎉",
+      `${clientFirst} subscreveu o teu programa.`,
+      `/coach/clients/${clientId}`,
+    ).catch(() => {});
+
+    // 6. Push to client (if they subscribed)
+    await sendPushToUser(
+      clientId,
+      "Pagamento confirmado!",
+      "Bem-vindo à KRAV! O teu plano está a ser preparado.",
+      "/client/dashboard",
+    ).catch(() => {});
+  }
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function PendingPage({
   searchParams,
 }: {
-  searchParams: Promise<{ welcome?: string }>;
+  searchParams: Promise<{ welcome?: string; session_id?: string }>;
 }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
 
-  // If already active, go to dashboard
+  const { welcome, session_id } = await searchParams;
+
+  // If Stripe redirected here after payment — activate immediately
+  if (welcome === "true" && session_id) {
+    await activateAfterPayment(user.id, session_id);
+  }
+
+  // Re-fetch profile after potential activation
   const { data: profile } = await supabase
     .from("profiles")
     .select("status, full_name")
     .eq("id", user.id)
     .single();
 
-  if (profile?.status !== "pending") redirect("/client/dashboard");
+  // Active clients go straight to dashboard
+  if (profile?.status === "active") redirect("/client/dashboard");
 
   const firstName = (profile?.full_name ?? "").split(" ")[0] || "Atleta";
-  const { welcome } = await searchParams;
   const isWelcome = welcome === "true";
 
   return (
@@ -60,7 +173,7 @@ export default async function PendingPage({
               </p>
             ) : (
               <p className="text-zinc-400 text-sm leading-relaxed">
-                A tua conta foi criada com sucesso. O teu coach irá ativá-la assim que confirmar o pagamento.
+                A tua conta foi criada. O teu coach irá ativá-la assim que confirmar o pagamento.
               </p>
             )}
           </div>
@@ -75,7 +188,7 @@ export default async function PendingPage({
                 ]
               : [
                   { icon: "✅", text: "Conta criada", done: true },
-                  { icon: "💳", text: "Pagamento confirmado pelo coach", done: false },
+                  { icon: "💳", text: "Pagamento a aguardar confirmação", done: false },
                   { icon: "🚀", text: "Acesso total à app", done: false },
                 ]
             ).map((s, i) => (
@@ -94,8 +207,8 @@ export default async function PendingPage({
           >
             <p className="text-zinc-400 text-xs leading-relaxed">
               {isWelcome
-                ? "Receberás uma notificação assim que o teu plano estiver pronto. Podes tambem falar com o teu coach no chat."
-                : "Ja tens acesso ao chat com o teu coach. Fala com ele se tiveres duvidas sobre o pagamento."}
+                ? "Podes já falar com o teu coach no chat enquanto o plano é preparado."
+                : "Já tens acesso ao chat com o teu coach. Fala com ele se tiveres dúvidas."}
             </p>
           </div>
         </div>
