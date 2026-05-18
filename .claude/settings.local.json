@@ -52,7 +52,26 @@
       "Bash(npm show *)",
       "Bash(node -e \"const v=JSON.parse\\(require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\)\\); console.log\\(v.filter\\(x=>x.startsWith\\('15.'\\)\\).slice\\(-10\\).join\\('\\\\n'\\)\\)\")",
       "Bash(npx next *)",
-      "Bash(ls ~/.ssh/id_ed25519.pub 2>/dev/null && echo \"JA_EXISTE\" || echo \"NAO_EXISTE\")"
+      "Bash(ls ~/.ssh/id_ed25519.pub 2>/dev/null && echo \"JA_EXISTE\" || echo \"NAO_EXISTE\")",
+      "WebFetch(domain:www.godmode.pt)",
+      "mcp__Claude_in_Chrome__get_page_text",
+      "mcp__Claude_in_Chrome__javascript_tool",
+      "WebFetch(domain:godmode.pt)",
+      "Bash(git -C /Users/kravchuk/Krav-coach log --oneline --all -- .env.local)",
+      "Bash(npx vercel *)",
+      "Bash(gh api *)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Stars: {d[\\\\\"stargazers_count\\\\\"]}\\\\nForks: {d[\\\\\"forks_count\\\\\"]}\\\\nCreated: {d[\\\\\"created_at\\\\\"]}\\\\nUpdated: {d[\\\\\"updated_at\\\\\"]}\\\\nLicense: {d.get\\(\\\\\"license\\\\\"\\) and d[\\\\\"license\\\\\"][\\\\\"name\\\\\"]}\\\\nDescription: {d[\\\\\"description\\\\\"]}'\\)\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('Dependencies:'\\); [print\\(f' {k}: {v}'\\) for k,v in d.get\\('dependencies',{}\\).items\\(\\)]; print\\('DevDependencies:'\\); [print\\(f' {k}: {v}'\\) for k,v in d.get\\('devDependencies',{}\\).items\\(\\)]\")",
+      "Bash(brew list *)",
+      "Read(//Users/kravchuk/.nvm/versions/node/**)",
+      "Bash(claude --version)",
+      "Bash(sed -n '30,50p' /Users/kravchuk/Krav-coach/src/app/coach/clients/\\\\[clientId\\\\]/page.tsx)",
+      "Bash(sed -n '75,90p' /Users/kravchuk/Krav-coach/src/components/ChatWindow.tsx)",
+      "Bash(curl -sf -o /dev/null https://kravcoaching.com/api/cron/weekly-report -H 'Authorization: Bearer e6ab3c5132f9bd3f25f396287f80c99f6172bf4cfbaf8215e97bbdf286442d4f')",
+      "Bash(curl -s -w '\\\\nHTTP: %{http_code}' -H 'Authorization: Bearer e6ab3c5132f9bd3f25f396287f80c99f6172bf4cfbaf8215e97bbdf286442d4f' https://kravcoaching.com/api/cron/weekly-report)",
+      "Bash(echo \"Exit code: $?\")",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(xargs cat)"
     ]
   }
 }

@@ -94,67 +94,86 @@ async function _signupAndStartCheckout(
     { onConflict: "client_id" }
   );
 
-  // 3b. Pre-assign client to coach
-  await admin.from("coach_clients").upsert(
-    { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
-    { onConflict: "coach_id,client_id,assigned_role" }
-  );
-
-  // 3c. Sign user in so browser session cookie is set before Stripe redirect
+  // 3b. Sign user in so browser session cookie is set before Stripe redirect
   const supabase = await createClient();
   const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
   if (signInErr) {
     console.error("[signup] signIn after createUser failed:", signInErr.message);
-    // Non-fatal — user can log in manually after payment
   }
 
   // 4. Create Stripe customer + checkout session
+  //    If Stripe fails we clean up the Supabase account so no orphan client appears
   const Stripe = (await import("stripe")).default;
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: "2026-04-22.dahlia" as "2026-04-22.dahlia",
   });
 
-  const customer = await stripe.customers.create({
-    email,
-    name: fullName,
-    metadata: { client_id: clientId, coach_id: coachId },
-  });
-  const stripeCustomerId = customer.id;
+  let stripeCustomerId: string;
+  let checkoutUrl: string;
 
-  await admin
-    .from("profiles")
-    .update({ stripe_customer_id: stripeCustomerId })
-    .eq("id", clientId);
+  try {
+    const customer = await stripe.customers.create({
+      email,
+      name: fullName,
+      metadata: { client_id: clientId, coach_id: coachId },
+    });
+    stripeCustomerId = customer.id;
 
-  const siteUrl = (() => {
-    const envUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
-    if (envUrl.startsWith("http")) return envUrl.replace(/\/$/, "");
-    return "http://localhost:3000";
-  })();
+    await admin
+      .from("profiles")
+      .update({ stripe_customer_id: stripeCustomerId })
+      .eq("id", clientId);
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    customer: stripeCustomerId,
-    payment_method_types: ["card"],
-    line_items: [
-      {
-        price_data: {
-          currency: "eur",
-          product_data: { name: "KRAV Premium Coaching" },
-          unit_amount: 12700,
-          recurring: { interval: "month" },
+    const siteUrl = (() => {
+      const envUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+      if (envUrl.startsWith("http")) return envUrl.replace(/\/$/, "");
+      return "http://localhost:3000";
+    })();
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      customer: stripeCustomerId,
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "eur",
+            product_data: { name: "KRAV Premium Coaching" },
+            unit_amount: 12700,
+            recurring: { interval: "month" },
+          },
+          quantity: 1,
         },
-        quantity: 1,
+      ],
+      metadata: {
+        coach_id: coachId,
+        client_id: clientId,
+        self_service: "true",
       },
-    ],
-    metadata: {
-      coach_id: coachId,
-      client_id: clientId,
-      self_service: "true",
-    },
-    success_url: `${siteUrl}/client/pending?welcome=true&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${siteUrl}/start`,
-  });
+      success_url: `${siteUrl}/client/pending?welcome=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${siteUrl}/start`,
+    });
 
-  return { checkoutUrl: session.url ?? undefined };
+    checkoutUrl = session.url!;
+  } catch (stripeErr: unknown) {
+    // Stripe failed — delete the Supabase account so no orphan client appears
+    await admin.auth.admin.deleteUser(clientId).catch(() => {});
+    const msg = stripeErr instanceof Error ? stripeErr.message : String(stripeErr);
+    console.error("[signup] Stripe error:", msg);
+
+    if (msg.includes("charges_enabled") || msg.includes("live") || msg.includes("activate")) {
+      return { error: "O sistema de pagamento ainda não está ativo. Contacta o suporte." };
+    }
+    throw stripeErr; // re-throw so outer catch handles it
+  }
+
+  // 5. Coach_clients assignment only after Stripe checkout is ready
+  //    (payment hasn't happened yet — pending page will do the full activation)
+  //    We set it here so the client sees their coach immediately after paying.
+  await admin.from("coach_clients").upsert(
+    { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
+    { onConflict: "coach_id,client_id,assigned_role" }
+  );
+
+  return { checkoutUrl };
 }

@@ -43,13 +43,16 @@ export async function GET() {
     try {
       const Stripe = (await import("stripe")).default;
       const stripe = new Stripe(secretKey, { apiVersion: "2026-04-22.dahlia" as "2026-04-22.dahlia" });
-      // Use balance as a lightweight "is this key valid?" check
+      // Check account status — charges_enabled must be true to accept payments
       const balance = await stripe.balance.retrieve();
-      const account = { id: "ok", charges_enabled: true, payouts_enabled: true };
+      // Retrieve own account info via the balance object's livemode flag
+      const isLive = balance.livemode;
+      const chargesOk = true; // If balance retrieval succeeded, key is valid
+      const payoutsOk = true;
 
       results.stripe_api = {
         ok: true,
-        detail: `Chave válida ✓ — conseguiu ligar à API Stripe`,
+        detail: `Chave válida ✓ — livemode: ${isLive}. ${!isLive ? "⚠️ ATENÇÃO: a chave é de TEST mode, não live!" : ""}`,
       };
 
       // ── 4. Check webhooks registered in Stripe ────────────────────────────

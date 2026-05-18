@@ -24,11 +24,12 @@ export default async function CoachMessagesPage() {
 
   for (const row of assignments ?? []) {
     const p = row.profiles as unknown as ClientProfile | null;
-    if (p && p.status !== "archived" && !clientMap.has(p.id)) clientMap.set(p.id, p);
+    // Only show active clients (not unpaid/pending/archived)
+    if (p && p.status === "active" && !clientMap.has(p.id)) clientMap.set(p.id, p);
   }
   for (const row of planClients ?? []) {
     const p = row.profiles as unknown as ClientProfile | null;
-    if (p && p.status !== "archived" && !clientMap.has(p.id)) clientMap.set(p.id, p);
+    if (p && p.status === "active" && !clientMap.has(p.id)) clientMap.set(p.id, p);
   }
 
   const allClientIds = [...clientMap.keys()];

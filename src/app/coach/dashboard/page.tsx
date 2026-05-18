@@ -112,7 +112,7 @@ export default async function CoachDashboard() {
   const newClients = (assignedRows ?? [])
     .filter((r) => {
       const c = r.profiles as unknown as AllClientEntry | null;
-      return c && !clientsWithPlansSet.has(r.client_id) && c.status !== "archived";
+      return c && !clientsWithPlansSet.has(r.client_id) && c.status === "active";
     })
     .map((r) => {
       const c = r.profiles as unknown as AllClientEntry & { created_at?: string };
@@ -170,8 +170,8 @@ export default async function CoachDashboard() {
     if (c && !allClientMap.has(c.id)) allClientMap.set(c.id, c);
   }
 
-  const allClients = Array.from(allClientMap.values()).filter((c) => c.status !== "archived");
-  const weekClients = Array.from(clientMap.values()).filter((c) => c.status !== "archived");
+  const allClients = Array.from(allClientMap.values()).filter((c) => c.status === "active");
+  const weekClients = Array.from(clientMap.values()).filter((c) => c.status === "active");
 
   // Smart alerts
   type AlertType = "no_checkin" | "renewal" | "overdue_renewal" | "no_completion" | "perfect_week" | "pr_week" | "at_risk";
