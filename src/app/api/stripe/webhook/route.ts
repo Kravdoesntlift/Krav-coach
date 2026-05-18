@@ -105,20 +105,26 @@ export async function POST(req: NextRequest) {
             });
 
             // 3. Notify coach of new paying client
-            await sendPushToUser(
+            const coachPush = await sendPushToUser(
               coachId,
               "Novo cliente pagante!",
               `${clientFirst} subscreveu o teu programa.`,
               `/coach/clients/${clientId}`,
-            ).catch(() => {});
+            ).catch((e: unknown) => ({ ok: false, error: String(e) }));
+            if (!coachPush.ok) {
+              console.error("[webhook] coach push failed:", coachPush.error);
+            }
 
             // 4. Notify client
-            await sendPushToUser(
+            const clientPush = await sendPushToUser(
               clientId,
               "Pagamento confirmado!",
               "Bem-vindo à KRAV! O teu coach vai contactar-te em breve.",
               "/client/dashboard",
-            ).catch(() => {});
+            ).catch((e: unknown) => ({ ok: false, error: String(e) }));
+            if (!clientPush.ok) {
+              console.error("[webhook] client push failed:", clientPush.error);
+            }
           }
         }
 
