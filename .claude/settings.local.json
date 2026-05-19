@@ -71,7 +71,10 @@
       "Bash(curl -s -w '\\\\nHTTP: %{http_code}' -H 'Authorization: Bearer e6ab3c5132f9bd3f25f396287f80c99f6172bf4cfbaf8215e97bbdf286442d4f' https://kravcoaching.com/api/cron/weekly-report)",
       "Bash(echo \"Exit code: $?\")",
       "Bash(echo \"EXIT: $?\")",
-      "Bash(xargs cat)"
+      "Bash(xargs cat)",
+      "Bash(grep -E \"actions\\\\.ts$\")",
+      "Bash(sed -n '28,35p' /Users/kravchuk/Krav-coach/src/app/api/stripe/webhook/route.ts)",
+      "Bash(sed -n '36,50p' /Users/kravchuk/Krav-coach/src/app/api/ai/suggest-plan/route.ts)"
     ]
   }
 }
