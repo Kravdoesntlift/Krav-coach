@@ -63,7 +63,7 @@ export async function sendInvoiceEmail({
 
       <p style="color:#52525b;font-size:12px;line-height:1.6;margin:0">
         Podes aceder à tua área de cliente em <a href="https://kravcoaching.com/client/dashboard" style="color:#C9A84C">kravcoaching.com</a>.
-        Para questões de faturação, contacta <a href="mailto:admin@kravcoach.com" style="color:#C9A84C">admin@kravcoach.com</a>.
+        Para questões de faturação, contacta <a href="mailto:kravdoesntlift@gmail.com" style="color:#C9A84C">kravdoesntlift@gmail.com</a>.
       </p>
     </div>
 
