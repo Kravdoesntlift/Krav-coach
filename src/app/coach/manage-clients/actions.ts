@@ -97,6 +97,33 @@ export async function activateClient(clientId: string) {
       receiver_id: clientId,
       content: `✅ A tua conta está agora ativa! Já tens acesso total à app. Vamos começar a trabalhar juntos! 💪`,
     });
+
+    // Check if this client was referred by another client → notify coach to reward referrer
+    const { data: referral } = await admin
+      .from("referrals")
+      .select("referrer_id, referred_email")
+      .eq("referred_user_id", clientId)
+      .maybeSingle();
+
+    if (referral) {
+      // Mark referral as active
+      await admin.from("referrals").update({ status: "active" }).eq("referred_user_id", clientId);
+
+      const { data: referrer } = await admin
+        .from("profiles").select("full_name").eq("id", referral.referrer_id).maybeSingle();
+      const referrerName = referrer?.full_name ?? "Um cliente";
+      const { data: newClient } = await admin
+        .from("profiles").select("full_name").eq("id", clientId).maybeSingle();
+      const newClientName = newClient?.full_name ?? "o novo cliente";
+
+      // Notify the coach
+      sendPushToUser(
+        user.id,
+        "🤝 Referral activado",
+        `${newClientName} foi indicado por ${referrerName}. Considera recompensá-lo!`,
+        `/coach/clients/${referral.referrer_id}`,
+      ).catch(() => {});
+    }
   } catch { /* non-critical */ }
 
   revalidatePath("/coach/manage-clients");

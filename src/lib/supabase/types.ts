@@ -211,7 +211,34 @@ export interface NutritionLog {
   protein_g: number | null;
   carbs_g: number | null;
   fat_g: number | null;
+  fiber_g: number | null;
+  sugar_g: number | null;
+  sodium_mg: number | null;
+  vit_c_mg: number | null;
+  vit_d_mcg: number | null;
+  vit_b12_mcg: number | null;
+  calcium_mg: number | null;
+  iron_mg: number | null;
+  potassium_mg: number | null;
+  magnesium_mg: number | null;
+  food_id: string | null;
+  serving_g: number | null;
   created_at: string;
+}
+
+export interface ClientNutritionGoals {
+  client_id: string;
+  goal: "cut" | "maintenance" | "bulk";
+  weight_kg: number | null;
+  height_cm: number | null;
+  age: number | null;
+  sex: "M" | "F" | null;
+  activity_level: "sedentary" | "light" | "moderate" | "active" | "very_active";
+  target_calories: number | null;
+  target_protein_g: number | null;
+  target_carbs_g: number | null;
+  target_fat_g: number | null;
+  updated_at: string;
 }
 
 export interface ReferralCode {

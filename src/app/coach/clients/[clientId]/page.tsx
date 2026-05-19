@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { DAY_NAMES_FULL } from "@/lib/supabase/types";
@@ -90,7 +91,7 @@ export default async function ClientDetailPage({
       .eq("client_id", clientId).order("created_at", { ascending: false }),
     supabase.from("progress_photos").select("*")
       .eq("client_id", clientId).order("taken_at", { ascending: false }),
-    supabase.from("nutrition_logs").select("logged_at,calories,protein_g,carbs_g,fat_g,meal_name")
+    createAdminClient().from("nutrition_logs").select("logged_at,calories,protein_g,carbs_g,fat_g,meal_name")
       .eq("client_id", clientId)
       .gte("logged_at", currentWeekStart)
       .lte("logged_at", currentWeekEnd)
