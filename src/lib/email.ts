@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM = process.env.RESEND_FROM ?? "KRAV Coaching <noreply@kravcoaching.com>";
+const FROM = process.env.RESEND_FROM ?? "KRAV Coaching <coaching@kravcoaching.com>";
 
 export async function sendInvoiceEmail({
   to,
