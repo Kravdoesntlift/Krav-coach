@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { ProgressPhoto } from "@/lib/supabase/types";
@@ -85,11 +85,128 @@ function UploadSlot({
   );
 }
 
-// ─── Side-by-side session comparison ─────────────────────────────────────────
+// ─── Drag slider for a single angle pair ──────────────────────────────────────
+function AngleSlider({
+  beforeUrl,
+  afterUrl,
+  label,
+}: {
+  beforeUrl: string | null;
+  afterUrl: string | null;
+  label: string;
+}) {
+  const [pos, setPos] = useState(50); // 0–100 %
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+
+  const updatePos = useCallback((clientX: number) => {
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const pct = Math.min(100, Math.max(0, ((clientX - rect.left) / rect.width) * 100));
+    setPos(pct);
+  }, []);
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    dragging.current = true;
+    const onMove = (ev: MouseEvent) => { if (dragging.current) updatePos(ev.clientX); };
+    const onUp   = () => { dragging.current = false; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    const onMove = (ev: TouchEvent) => updatePos(ev.touches[0].clientX);
+    const onEnd  = () => { window.removeEventListener("touchmove", onMove); window.removeEventListener("touchend", onEnd); };
+    window.addEventListener("touchmove", onMove, { passive: true });
+    window.addEventListener("touchend", onEnd);
+  };
+
+  if (!beforeUrl && !afterUrl) {
+    return (
+      <div className="rounded-xl overflow-hidden bg-zinc-950 relative flex items-center justify-center text-zinc-800 text-xs" style={{ aspectRatio: "3/4" }}>
+        —
+        <div className="absolute bottom-1 left-0 right-0 text-center">
+          <span className="text-[9px] text-zinc-700 bg-black/60 px-1.5 py-0.5 rounded-full">{label}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!beforeUrl || !afterUrl) {
+    const url  = beforeUrl ?? afterUrl!;
+    const badge = beforeUrl ? "Antes" : "Depois";
+    const goldBadge = !beforeUrl;
+    return (
+      <div className="rounded-xl overflow-hidden bg-zinc-950 relative" style={{ aspectRatio: "3/4" }}>
+        <img src={url} alt={label} className="w-full h-full object-cover" draggable={false} />
+        <div className={`absolute top-1.5 left-1.5 text-[9px] px-1.5 py-0.5 rounded-full font-bold ${goldBadge ? "text-black" : "bg-black/70 text-white"}`}
+          style={goldBadge ? { background: "rgba(201,168,76,0.9)" } : undefined}>
+          {badge}
+        </div>
+        <div className="absolute bottom-1 left-0 right-0 text-center">
+          <span className="text-[9px] text-zinc-500 bg-black/60 px-1.5 py-0.5 rounded-full">{label}</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="rounded-xl overflow-hidden relative select-none cursor-col-resize"
+      style={{ aspectRatio: "3/4", touchAction: "none" }}
+      onMouseDown={onMouseDown}
+      onTouchStart={onTouchStart}
+    >
+      {/* After (full) */}
+      <img src={afterUrl} alt={`${label} depois`} className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+
+      {/* Before (clipped) */}
+      <div className="absolute inset-0 overflow-hidden" style={{ width: `${pos}%` }}>
+        <img src={beforeUrl} alt={`${label} antes`} className="absolute inset-0 w-full h-full object-cover" style={{ width: `${10000 / pos}%`, maxWidth: "none" }} draggable={false} />
+      </div>
+
+      {/* Divider */}
+      <div
+        className="absolute top-0 bottom-0 w-0.5 bg-white/90 shadow-[0_0_8px_rgba(0,0,0,0.8)]"
+        style={{ left: `${pos}%`, transform: "translateX(-50%)" }}
+      >
+        {/* Handle */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white shadow-lg flex items-center justify-center">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4 2L1 6L4 10" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M8 2L11 6L8 10" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      {/* Labels */}
+      {pos > 15 && (
+        <div className="absolute top-1.5 left-1.5 bg-black/70 text-white text-[9px] px-1.5 py-0.5 rounded-full font-semibold pointer-events-none">
+          Antes
+        </div>
+      )}
+      {pos < 85 && (
+        <div
+          className="absolute top-1.5 right-1.5 text-black text-[9px] px-1.5 py-0.5 rounded-full font-bold pointer-events-none"
+          style={{ background: "rgba(201,168,76,0.9)" }}
+        >
+          Depois
+        </div>
+      )}
+      <div className="absolute bottom-1 left-0 right-0 text-center pointer-events-none">
+        <span className="text-[9px] text-zinc-400 bg-black/60 px-1.5 py-0.5 rounded-full">{label}</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Side-by-side session comparison with drag sliders ────────────────────────
 function SessionCompare({ before, after }: { before: Session; after: Session }) {
   return (
     <div className="space-y-3">
-      {/* Date headers */}
+      {/* Labels row */}
       <div className="grid grid-cols-3 gap-2">
         {ANGLES.map((a) => (
           <p key={a.key} className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest text-center">
@@ -98,73 +215,20 @@ function SessionCompare({ before, after }: { before: Session; after: Session }) 
         ))}
       </div>
 
-      {/* Before row */}
-      <div>
-        <div className="flex items-center gap-2 mb-1.5">
-          <div className="h-px flex-1 bg-zinc-800" />
-          <span className="text-[10px] text-zinc-500 font-medium">{fmtDate(before.date)}</span>
-          <div className="h-px flex-1 bg-zinc-800" />
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          {ANGLES.map((a) => (
-            <div
-              key={a.key}
-              className="rounded-xl overflow-hidden bg-zinc-900 relative"
-              style={{ aspectRatio: "3/4" }}
-            >
-              {before.photos[a.key] ? (
-                <img
-                  src={before.photos[a.key]!.photo_url}
-                  alt={a.label}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-zinc-700 text-xs">—</div>
-              )}
-              <div className="absolute top-1.5 left-1.5 bg-black/70 text-white text-[9px] px-1.5 py-0.5 rounded-full font-semibold">
-                Antes
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* After row */}
-      <div>
-        <div className="flex items-center gap-2 mb-1.5">
-          <div className="h-px flex-1 bg-zinc-800" />
-          <span className="text-[10px] text-zinc-500 font-medium">{fmtDate(after.date)}</span>
-          <div className="h-px flex-1 bg-zinc-800" />
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          {ANGLES.map((a) => (
-            <div
-              key={a.key}
-              className="rounded-xl overflow-hidden bg-zinc-900 relative"
-              style={{ aspectRatio: "3/4" }}
-            >
-              {after.photos[a.key] ? (
-                <img
-                  src={after.photos[a.key]!.photo_url}
-                  alt={a.label}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-zinc-700 text-xs">—</div>
-              )}
-              <div
-                className="absolute top-1.5 left-1.5 text-black text-[9px] px-1.5 py-0.5 rounded-full font-bold"
-                style={{ background: "rgba(201,168,76,0.9)" }}
-              >
-                Depois
-              </div>
-            </div>
-          ))}
-        </div>
+      {/* Sliders row */}
+      <div className="grid grid-cols-3 gap-2">
+        {ANGLES.map((a) => (
+          <AngleSlider
+            key={a.key}
+            label={a.label}
+            beforeUrl={before.photos[a.key]?.photo_url ?? null}
+            afterUrl={after.photos[a.key]?.photo_url ?? null}
+          />
+        ))}
       </div>
 
       <p className="text-zinc-700 text-[10px] text-center">
-        {fmtDate(before.date)} → {fmtDate(after.date)}
+        {fmtDate(before.date)} → {fmtDate(after.date)} · Arrasta para comparar
       </p>
     </div>
   );

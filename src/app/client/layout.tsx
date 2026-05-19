@@ -82,12 +82,16 @@ export default async function ClientLayout({
         { href: "/client/records", label: "PRs" },
         { href: "/client/achievements", label: "Conquistas" },
         { href: "/client/photos", label: "Fotos" },
-        { href: "/client/report", label: "Relatório" },
+        { href: "/client/report",     label: "Relatório" },
+        { href: "/client/report-pdf", label: "PDF Mensal" },
         { href: "/client/weekly-report", label: "Rel. Semanal" },
       ],
     },
-    { href: "/client/chat", label: "Chat", badge: unread },
-    { href: "/client/profile", label: "Perfil" },
+    { href: "/client/chat",     label: "Chat",      badge: unread },
+    { href: "/client/ai-coach",  label: "AI Coach" },
+    { href: "/client/nutrition", label: "Nutrição" },
+    { href: "/client/referral",  label: "Referências" },
+    { href: "/client/profile",   label: "Perfil" },
   ];
 
   const clientBottomNav = [
@@ -99,12 +103,16 @@ export default async function ClientLayout({
   ];
 
   const clientBottomMoreNav = [
+    { href: "/client/ai-coach",       label: "AI Coach",   icon: "🤖",                       badge: 0 },
     { href: "/client/history",        label: "Histórico",  icon: <CalendarIcon size={24} />, badge: 0 },
     { href: "/client/records",        label: "PRs",        icon: <TrophyIcon size={24} />,   badge: 0 },
     { href: "/client/achievements",   label: "Conquistas", icon: <StarIcon size={24} />,     badge: 0 },
     { href: "/client/photos",         label: "Fotos",      icon: <CameraIcon size={24} />,   badge: 0 },
     { href: "/client/report",         label: "Relatório",  icon: <FileIcon size={24} />,     badge: 0 },
+    { href: "/client/report-pdf",     label: "PDF Mensal", icon: "📄",                        badge: 0 },
     { href: "/client/weekly-report",  label: "Rel. Semana", icon: <ChartIcon size={24} />,   badge: 0 },
+    { href: "/client/nutrition",       label: "Nutrição",    icon: "🥗",                       badge: 0 },
+    { href: "/client/referral",       label: "Referências", icon: "🤝",                       badge: 0 },
   ];
 
   return (

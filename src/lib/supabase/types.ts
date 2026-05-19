@@ -201,6 +201,36 @@ export interface StripeSubscription {
   updated_at: string;
 }
 
+export interface NutritionLog {
+  id: string;
+  client_id: string;
+  logged_at: string;
+  meal_name: string;
+  description: string | null;
+  calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fat_g: number | null;
+  created_at: string;
+}
+
+export interface ReferralCode {
+  id: string;
+  client_id: string;
+  code: string;
+  created_at: string;
+}
+
+export interface Referral {
+  id: string;
+  referrer_id: string;
+  referred_email: string | null;
+  referred_user_id: string | null;
+  status: "pending" | "signed_up" | "active";
+  bonus_granted: boolean;
+  created_at: string;
+}
+
 export const DAY_NAMES = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 export const DAY_NAMES_FULL = [
   "Domingo",

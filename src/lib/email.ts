@@ -1,7 +1,10 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.RESEND_FROM ?? "André · KRAV Coaching <andre@kravcoaching.com>";
+
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 export async function sendInvoiceEmail({
   to,
@@ -74,7 +77,7 @@ export async function sendInvoiceEmail({
 </body>
 </html>`;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: `Recibo KRAV Coaching — ${amountEur}`,
@@ -93,7 +96,7 @@ export async function sendPaymentFailedEmail({
 }) {
   if (!process.env.RESEND_API_KEY) return;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: "Problema com o teu pagamento KRAV",

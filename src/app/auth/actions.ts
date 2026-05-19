@@ -54,6 +54,7 @@ export async function signup(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const coachId = (formData.get("coach_id") as string | null)?.trim() || null;
+  const refCode = (formData.get("ref_code") as string | null)?.trim().toUpperCase() || null;
 
   if (!fullName) return { error: "Insere o teu nome." };
   if (password.length < 6) return { error: "A password deve ter pelo menos 6 caracteres." };
@@ -126,7 +127,24 @@ export async function signup(formData: FormData) {
           content: `Olá ${clientFirstName}! 👋 Sou o ${coachFirstName}, o teu coach na KRAV. Bem-vindo ao teu programa personalizado! Assim que a tua conta for ativada tens acesso total à app. Qualquer dúvida fala comigo por aqui. Vamos a isso! 💪`,
         });
 
-        // 4. Notify coach of new signup
+        // 4. Record referral if signup came via referral link
+        if (refCode) {
+          const { data: refCodeRow } = await admin
+            .from("referral_codes")
+            .select("client_id")
+            .eq("code", refCode)
+            .maybeSingle();
+          if (refCodeRow) {
+            await admin.from("referrals").insert({
+              referrer_id:      refCodeRow.client_id,
+              referred_email:   email,
+              referred_user_id: data.user.id,
+              status:           "signed_up",
+            });
+          }
+        }
+
+        // 5. Notify coach of new signup
         const { sendPushToUser } = await import("@/lib/push");
         sendPushToUser(
           coachId,

@@ -8,12 +8,15 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
-  const [coachId, setCoachId] = useState<string | null>(null);
+  const [coachId, setCoachId]   = useState<string | null>(null);
+  const [refCode, setRefCode]   = useState<string | null>(null);
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
     const c = p.get("coach");
+    const r = p.get("ref");
     if (c) setCoachId(c);
+    if (r) setRefCode(r);
   }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -127,10 +130,10 @@ export default function SignupPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-3.5">
-              {/* Hidden coach id if coming via invite link */}
               {coachId && <input type="hidden" name="coach_id" value={coachId} />}
+              {refCode && <input type="hidden" name="ref_code" value={refCode} />}
 
-              {/* Invite banner */}
+              {/* Invite banner — coach invite */}
               {coachId && (
                 <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl"
                   style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}
@@ -138,6 +141,18 @@ export default function SignupPage() {
                   <span className="text-brand-gold text-lg shrink-0">🎯</span>
                   <p className="text-brand-gold/90 text-xs leading-relaxed">
                     Vais ser automaticamente atribuído ao teu coach ao criar a conta.
+                  </p>
+                </div>
+              )}
+
+              {/* Referral banner */}
+              {refCode && !coachId && (
+                <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl"
+                  style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}
+                >
+                  <span className="text-brand-gold text-lg shrink-0">🤝</span>
+                  <p className="text-brand-gold/90 text-xs leading-relaxed">
+                    Foste convidado por um membro KRAV. Bem-vindo!
                   </p>
                 </div>
               )}

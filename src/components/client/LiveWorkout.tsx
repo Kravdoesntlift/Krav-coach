@@ -4,6 +4,19 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Exercise } from "@/lib/supabase/types";
 
+function beep(freq = 880, duration = 0.15, vol = 0.4) {
+  try {
+    const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(); osc.stop(ctx.currentTime + duration);
+  } catch { /* ignore if AudioContext not available */ }
+}
+
 interface Props {
   exercises: Exercise[];
   dayId: string;
@@ -32,11 +45,44 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
   const [note, setNote] = useState("");
   const [finishing, setFinishing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const [prs, setPrs] = useState<Set<string>>(new Set());
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const elapsedRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const startedAt = useRef(Date.now());
 
   const cur = sorted[step];
   const totalSteps = sorted.length;
   const progress = ((step) / totalSteps) * 100;
+
+  // Elapsed workout timer
+  useEffect(() => {
+    elapsedRef.current = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startedAt.current) / 1000));
+    }, 1000);
+    return () => { if (elapsedRef.current) clearInterval(elapsedRef.current); };
+  }, []);
+
+  // Load previous PRs for these exercises
+  useEffect(() => {
+    (async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("workout_logs")
+        .select("exercise_name, sets")
+        .eq("client_id", clientId)
+        .in("exercise_name", sorted.map((e) => e.name));
+      if (!data) return;
+      const best: Record<string, number> = {};
+      for (const log of data) {
+        const sets = log.sets as { weight_kg?: number }[];
+        const max = Math.max(...sets.map((s) => s.weight_kg ?? 0));
+        if (!best[log.exercise_name] || max > best[log.exercise_name]) best[log.exercise_name] = max;
+      }
+      setPrs(new Set(Object.keys(best)));
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Rest timer ──────────────────────────────────────────────
   const startRest = useCallback((seconds: number) => {
@@ -51,10 +97,11 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
         if (s <= 1) {
           clearInterval(timerRef.current!);
           setRestActive(false);
-          // Vibrate on phones
           if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+          beep(880, 0.15); setTimeout(() => beep(1100, 0.2), 200);
           return 0;
         }
+        if (s === 4) beep(440, 0.1); // warning beep at 3s
         return s - 1;
       });
     }, 1000);
@@ -115,7 +162,16 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
   }
 
   const fmt = (s: number) => `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+  const fmtElapsed = (s: number) => `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
   const restPct = restLeft / restSeconds;
+
+  function checkPR(exIdx: number, setIdx: number) {
+    const log = setLogs[exIdx][setIdx];
+    const w = parseFloat(log.weight);
+    if (!w) return false;
+    const ex = sorted[exIdx];
+    return prs.has(ex.name) && w > 0;
+  }
 
   // ─────────────────────────────────────────────────────────
   return (
@@ -129,7 +185,9 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
           <p className="text-white font-bold text-sm">{dayLabel}</p>
           <p className="text-gray-500 text-xs">{step + 1} / {totalSteps} exercícios</p>
         </div>
-        <div className="w-9" /> {/* spacer */}
+        <div className="w-9 text-right">
+          <span className="text-xs text-zinc-500 tabular-nums font-mono">{fmtElapsed(elapsed)}</span>
+        </div>
       </div>
 
       {/* Progress bar */}
@@ -191,7 +249,8 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
           <div className="text-center pt-6">
             <p className="text-5xl mb-3">🏆</p>
             <h2 className="text-white text-2xl font-bold">Treino concluído!</h2>
-            <p className="text-gray-400 text-sm mt-1">Como correu?</p>
+            <p className="text-brand-gold font-bold text-sm mt-1">⏱ {fmtElapsed(elapsed)} de treino</p>
+            <p className="text-gray-400 text-xs mt-0.5">Como correu?</p>
           </div>
 
           {/* Feeling */}
@@ -264,7 +323,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                       <span>#</span><span>Peso (kg)</span><span>Reps</span><span></span>
                     </div>
                     {setLogs[exIdx].map((s, si) => (
-                      <div key={si} className={`grid grid-cols-[2rem_1fr_1fr_2.5rem] gap-2 items-center p-2 rounded-xl transition-colors ${s.done ? "bg-green-500/10 border border-green-500/20" : "bg-zinc-800"}`}>
+                      <div key={si} className={`grid grid-cols-[2rem_1fr_1fr_2.5rem] gap-2 items-center p-2 rounded-xl transition-colors ${s.done && checkPR(exIdx, si) ? "bg-yellow-500/10 border border-yellow-500/30" : s.done ? "bg-green-500/10 border border-green-500/20" : "bg-zinc-800"}`}>
                         <span className="text-gray-500 text-xs text-center">{si + 1}</span>
                         <input type="number" inputMode="decimal" value={s.weight}
                           onChange={(e) => updateLog(exIdx, si, "weight", e.target.value)}
