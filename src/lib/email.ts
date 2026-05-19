@@ -26,6 +26,7 @@ export async function sendInvoiceEmail({
   <div style="max-width:560px;margin:40px auto;padding:0 16px">
     <!-- Header -->
     <div style="text-align:center;margin-bottom:32px">
+      <img src="https://kravcoaching.com/icon.png" width="64" height="64" alt="KRAV" style="border-radius:16px;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto" />
       <p style="font-size:22px;font-weight:900;letter-spacing:-0.5px;color:#C9A84C;margin:0">KRAV.</p>
       <p style="color:#71717a;font-size:13px;margin:6px 0 0">Premium Coaching</p>
     </div>
