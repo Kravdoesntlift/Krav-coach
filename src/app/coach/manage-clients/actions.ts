@@ -83,8 +83,6 @@ export async function activateClient(clientId: string) {
   // Notify client
   try {
     const { sendPushToUser } = await import("@/lib/push");
-    const { data: clientProf } = await admin
-      .from("profiles").select("full_name").eq("id", clientId).single();
     const coachFirstName = (profile?.full_name ?? "").split(" ")[0] || "Coach";
     sendPushToUser(
       clientId,
@@ -99,8 +97,6 @@ export async function activateClient(clientId: string) {
       receiver_id: clientId,
       content: `✅ A tua conta está agora ativa! Já tens acesso total à app. Vamos começar a trabalhar juntos! 💪`,
     });
-
-    void clientProf; // suppress unused warning
   } catch { /* non-critical */ }
 
   revalidatePath("/coach/manage-clients");

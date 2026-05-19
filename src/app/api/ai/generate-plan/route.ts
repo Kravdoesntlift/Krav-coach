@@ -102,14 +102,26 @@ Regras:
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return NextResponse.json({ error: "IA não devolveu JSON válido" }, { status: 500 });
 
-    const plan = JSON.parse(jsonMatch[0]) as {
+    const raw_plan = JSON.parse(jsonMatch[0]) as {
       name: string;
       days: {
         day_of_week: number;
         label: string;
         is_rest: boolean;
-        exercises: { name: string; sets: number; reps: number; notes?: string }[];
+        exercises: { name: string; sets: number; reps: number | string; notes?: string }[];
       }[];
+    };
+
+    // Normalise reps to string (AI sometimes returns number, DB expects text)
+    const plan = {
+      ...raw_plan,
+      days: (raw_plan.days ?? []).map((d) => ({
+        ...d,
+        exercises: (d.exercises ?? []).map((e) => ({
+          ...e,
+          reps: String(e.reps),
+        })),
+      })),
     };
 
     return NextResponse.json({ plan });

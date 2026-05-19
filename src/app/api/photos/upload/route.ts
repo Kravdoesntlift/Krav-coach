@@ -88,23 +88,20 @@ export async function POST(req: NextRequest) {
   const coachIds = [...new Set((plans ?? []).map((p) => p.coach_id))];
   const clientName = clientProfile?.full_name ?? "O teu cliente";
 
-  const notifResults = await Promise.all(
-    coachIds.map((coachId) =>
-      sendPushToUser(
-        coachId,
-        "📸 Nova foto de progresso",
-        `${clientName} adicionou uma nova foto de progresso.`,
-        `/coach/clients/${user.id}`,
-      )
-    )
-  );
-
-  // Log for server-side debugging
   if (coachIds.length === 0) {
     console.log("[push] No coaches found for client", user.id);
   } else {
-    console.log("[push] Notification results:", JSON.stringify({ coachIds, notifResults }));
+    await Promise.all(
+      coachIds.map((coachId) =>
+        sendPushToUser(
+          coachId,
+          "📸 Nova foto de progresso",
+          `${clientName} adicionou uma nova foto de progresso.`,
+          `/coach/clients/${user.id}`,
+        ).catch((e: unknown) => console.error("[push] photo notify failed:", e))
+      )
+    );
   }
 
-  return NextResponse.json({ photo, _debug: { coachIds, notifResults } });
+  return NextResponse.json({ photo });
 }
