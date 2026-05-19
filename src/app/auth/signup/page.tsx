@@ -147,13 +147,16 @@ export default function SignupPage() {
 
               {/* Referral banner */}
               {refCode && !coachId && (
-                <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl"
+                <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-xl"
                   style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}
                 >
-                  <span className="text-brand-gold text-lg shrink-0">🤝</span>
-                  <p className="text-brand-gold/90 text-xs leading-relaxed">
-                    Foste convidado por um membro KRAV. Bem-vindo!
-                  </p>
+                  <span className="text-brand-gold text-lg shrink-0 mt-0.5">🤝</span>
+                  <div>
+                    <p className="text-brand-gold/90 text-xs font-semibold">Foste convidado por um membro KRAV!</p>
+                    <p className="text-brand-gold/60 text-[11px] mt-0.5 leading-relaxed">
+                      Bem-vindo. Quando quiseres também ganhar um mês grátis, convida alguém com o teu próprio link.
+                    </p>
+                  </div>
                 </div>
               )}
 

@@ -122,13 +122,13 @@ export default function ReferralPage() {
           </div>
 
           {/* How it works */}
-          <div className="card p-5 space-y-3">
+          <div className="card p-5 space-y-4">
             <p className="text-white text-sm font-semibold">Como funciona</p>
             <div className="space-y-3">
               {[
-                { step: "1", text: "Partilha o teu link personalizado com amigos" },
-                { step: "2", text: "O amigo regista-se e começa o treino" },
-                { step: "3", text: "Recebem um bónus os dois — fala com o teu coach para saber mais" },
+                { step: "1", text: "Partilhas o teu link com um amigo que queira transformar o corpo" },
+                { step: "2", text: "O amigo entra, paga e começa o programa de coaching" },
+                { step: "3", text: "Tu ganhas 1 mês grátis assim que ele ficar activo — o coach aplica automaticamente" },
               ].map(({ step, text }) => (
                 <div key={step} className="flex items-start gap-3">
                   <div
@@ -140,6 +140,15 @@ export default function ReferralPage() {
                   <p className="text-zinc-400 text-sm leading-relaxed">{text}</p>
                 </div>
               ))}
+            </div>
+            <div
+              className="rounded-xl px-3 py-2.5 flex items-start gap-2.5"
+              style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}
+            >
+              <span className="text-brand-gold text-base shrink-0">💡</span>
+              <p className="text-zinc-400 text-xs leading-relaxed">
+                O amigo convidado não recebe desconto automático — o incentivo dele é acesso a um coaching premium. Para ele também ganhar um mês grátis, basta convidar alguém.
+              </p>
             </div>
           </div>
 
