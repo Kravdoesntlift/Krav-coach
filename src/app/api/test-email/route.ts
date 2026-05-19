@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   await sendInvoiceEmail({
     to: "kravdoesntlift@gmail.com",
     clientName: "André",
-    amountEur: "€ 99,00",
+    amountEur: "€ 127,00",
     periodEnd: "19 de junho de 2026",
     invoiceNumber: "KRAV-TEST-001",
   });
