@@ -38,6 +38,7 @@ export default function AICoachPage() {
     const userMsg: Message = { role: "user", content: msg };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
+    if (inputRef.current) inputRef.current.style.height = "auto";
     setLoading(true);
 
     const history = messages.filter((m) => m.role !== "assistant" || messages.indexOf(m) > 0);
@@ -166,13 +167,17 @@ export default function AICoachPage() {
         <textarea
           ref={inputRef}
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => {
+            setInput(e.target.value);
+            e.target.style.height = "auto";
+            e.target.style.height = `${Math.min(e.target.scrollHeight, 112)}px`;
+          }}
           onKeyDown={handleKey}
           placeholder="Pergunta ao teu AI coach..."
           rows={1}
           maxLength={500}
-          className="flex-1 bg-transparent text-white text-sm placeholder-zinc-600 resize-none focus:outline-none max-h-28"
-          style={{ lineHeight: "1.5" }}
+          className="flex-1 bg-transparent text-white text-sm placeholder-zinc-600 resize-none focus:outline-none"
+          style={{ lineHeight: "1.5", minHeight: "24px", maxHeight: "112px", overflowY: "auto" }}
         />
         <button
           onClick={() => send()}

@@ -2,21 +2,13 @@
 
 import { useState, useCallback } from "react";
 import {
-  Document, Page, Text, View, StyleSheet, pdf, Font,
+  Document, Page, Text, View, StyleSheet, pdf,
 } from "@react-pdf/renderer";
 
 // ── PDF Styles ───────────────────────────────────────────────────────────────
 const GOLD = "#C9A84C";
 const DARK = "#111111";
 const ZINC = "#71717A";
-
-Font.register({
-  family: "Helvetica",
-  fonts: [
-    { src: "Helvetica" },
-    { src: "Helvetica-Bold", fontWeight: "bold" },
-  ],
-});
 
 const s = StyleSheet.create({
   page:         { backgroundColor: "#FFFFFF", padding: 40, fontFamily: "Helvetica", fontSize: 10 },

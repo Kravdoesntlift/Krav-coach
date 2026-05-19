@@ -109,6 +109,7 @@ export default function NutritionPage() {
   }
 
   async function deleteLog(id: string) {
+    if (!window.confirm("Apagar este registo?")) return;
     await supabase.from("nutrition_logs").delete().eq("id", id);
     setLogs((prev) => prev.filter((l) => l.id !== id));
   }

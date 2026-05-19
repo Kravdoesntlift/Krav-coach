@@ -41,11 +41,11 @@ export async function GET(req: NextRequest) {
       .gte("completed_at", startDate + "T00:00:00Z")
       .lte("completed_at", endDate + "T23:59:59Z"),
     admin.from("personal_records")
-      .select("exercise_name, weight_kg, reps, achieved_at")
+      .select("exercise_name, weight_kg, reps, recorded_at")
       .eq("client_id", user.id)
-      .gte("achieved_at", startDate)
-      .lte("achieved_at", endDate)
-      .order("achieved_at", { ascending: false }),
+      .gte("recorded_at", startDate)
+      .lte("recorded_at", endDate)
+      .order("recorded_at", { ascending: false }),
   ]);
 
   const clientName  = profile?.full_name ?? "Cliente";
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
     lastWeight,
     weightDelta: weightDelta !== null ? Math.round(weightDelta * 10) / 10 : null,
     avgEnergy:   avgEnergy !== null ? Math.round(avgEnergy * 10) / 10 : null,
-    prs:         (prs ?? []).slice(0, 5),
+    prs:         (prs ?? []).slice(0, 5).map((p) => ({ ...p, achieved_at: (p as Record<string, unknown>).recorded_at as string })),
     notes:       (checkins ?? []).filter((c) => c.notes).map((c) => ({ week: c.week_start, note: c.notes as string })).slice(0, 4),
   };
 

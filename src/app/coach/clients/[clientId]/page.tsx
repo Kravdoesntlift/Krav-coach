@@ -72,7 +72,11 @@ export default async function ClientDetailPage({
   mon.setUTCDate(today.getUTCDate() - ((dow + 6) % 7));
   const currentWeekStart = mon.toISOString().split("T")[0];
 
-  const [{ data: feedbackRow }, { data: coachNote }, { data: clientPRs }, { data: onboarding }, { data: challenges }, { data: goals }, { data: progressPhotos }] = await Promise.all([
+  const weekEndDate = new Date(mon);
+  weekEndDate.setUTCDate(mon.getUTCDate() + 6);
+  const currentWeekEnd = weekEndDate.toISOString().split("T")[0];
+
+  const [{ data: feedbackRow }, { data: coachNote }, { data: clientPRs }, { data: onboarding }, { data: challenges }, { data: goals }, { data: progressPhotos }, { data: nutritionLogs }] = await Promise.all([
     supabase.from("coach_feedback").select("message")
       .eq("coach_id", user!.id).eq("client_id", clientId).eq("week_start", currentWeekStart).maybeSingle(),
     supabase.from("coach_notes").select("content")
@@ -86,6 +90,11 @@ export default async function ClientDetailPage({
       .eq("client_id", clientId).order("created_at", { ascending: false }),
     supabase.from("progress_photos").select("*")
       .eq("client_id", clientId).order("taken_at", { ascending: false }),
+    supabase.from("nutrition_logs").select("logged_at,calories,protein_g,carbs_g,fat_g,meal_name")
+      .eq("client_id", clientId)
+      .gte("logged_at", currentWeekStart)
+      .lte("logged_at", currentWeekEnd)
+      .order("logged_at", { ascending: true }),
   ]);
 
   // Attention alert: no check-in in last 2 weeks
@@ -101,6 +110,16 @@ export default async function ClientDetailPage({
       prMap.set(pr.exercise_name, { weight_kg: pr.weight_kg, reps: pr.reps });
     }
   }
+
+  // Nutrition: aggregate by day for this week
+  type NLog = { logged_at: string; calories: number | null; protein_g: number | null; carbs_g: number | null; fat_g: number | null; meal_name: string };
+  const nutritionByDay = new Map<string, NLog[]>();
+  for (const log of (nutritionLogs ?? []) as NLog[]) {
+    if (!nutritionByDay.has(log.logged_at)) nutritionByDay.set(log.logged_at, []);
+    nutritionByDay.get(log.logged_at)!.push(log);
+  }
+  const nutritionDays = [...nutritionByDay.entries()].sort(([a], [b]) => b.localeCompare(a));
+  const totalNutritionLogs = nutritionLogs?.length ?? 0;
 
   return (
     <div className="space-y-10 page-enter">
@@ -432,6 +451,63 @@ export default async function ClientDetailPage({
                         deletePlan={deletePlan}
                       />
                     </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* ── Nutrition this week ────────────────────────────────────────── */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-white font-bold text-base">Nutrição — esta semana</h2>
+          {totalNutritionLogs > 0 && (
+            <span className="text-zinc-500 text-xs">{totalNutritionLogs} registos</span>
+          )}
+        </div>
+
+        {totalNutritionLogs === 0 ? (
+          <div
+            className="rounded-2xl p-6 text-center"
+            style={{ background: "rgba(18,18,20,0.7)", border: "1px solid rgba(255,255,255,0.05)" }}
+          >
+            <p className="text-zinc-600 text-sm">Sem registos de nutrição esta semana</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {nutritionDays.map(([date, logs]) => {
+              const cal  = logs.reduce((s, l) => s + (l.calories  ?? 0), 0);
+              const prot = logs.reduce((s, l) => s + (l.protein_g ?? 0), 0);
+              const carb = logs.reduce((s, l) => s + (l.carbs_g   ?? 0), 0);
+              const fat  = logs.reduce((s, l) => s + (l.fat_g     ?? 0), 0);
+              const fmtDate = new Date(date + "T00:00:00").toLocaleDateString("pt-PT", { weekday: "short", day: "numeric", month: "short" });
+              return (
+                <div
+                  key={date}
+                  className="rounded-2xl p-4 space-y-3"
+                  style={{ background: "rgba(18,18,20,0.7)", border: "1px solid rgba(255,255,255,0.05)" }}
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-white text-sm font-semibold capitalize">{fmtDate}</p>
+                    <div className="flex gap-3 text-xs">
+                      {cal  > 0 && <span className="text-brand-gold font-semibold">{cal} kcal</span>}
+                      {prot > 0 && <span className="text-blue-400">{prot}g P</span>}
+                      {carb > 0 && <span className="text-orange-400">{carb}g H</span>}
+                      {fat  > 0 && <span className="text-pink-400">{fat}g G</span>}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {logs.map((l, i) => (
+                      <span
+                        key={i}
+                        className="text-xs text-zinc-400 px-2 py-1 rounded-lg"
+                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
+                      >
+                        {l.meal_name}
+                      </span>
+                    ))}
                   </div>
                 </div>
               );
