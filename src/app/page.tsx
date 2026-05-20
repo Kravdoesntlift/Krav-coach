@@ -52,24 +52,33 @@ const t = {
       { icon: "⚡", title: "Modo de treino ao vivo",    desc: "Timer de descanso com beep, registo de séries e pesos — tudo durante o treino." },
     ],
     steps: [
-      { n: "1", title: "Inscreve-te",        desc: "Regista-te em menos de 1 minuto. Gratuito para experimentar." },
-      { n: "2", title: "Recebe o teu plano", desc: "O coach cria um plano personalizado para ti nas primeiras 24h." },
-      { n: "3", title: "Treina com suporte", desc: "Segue o plano, regista os treinos e acompanha a tua evolução." },
+      { n: "1", title: "Inscreve-te",        desc: "Preenche o questionário em 2 minutos. O coach recebe as tuas respostas de imediato." },
+      { n: "2", title: "Recebe o teu plano", desc: "Nas primeiras 24 horas úteis o coach cria e envia o teu plano personalizado na app." },
+      { n: "3", title: "Treina com suporte", desc: "Segue o plano, regista os treinos e acompanha a tua evolução — o coach está sempre disponível." },
     ],
     included: [
-      "Plano de treino semanal personalizado",
+      "Plano de treino semanal 100% personalizado",
       "Ajustes semanais ao plano",
       "Check-ins e análise de progresso",
       "Chat privado com o coach",
       "AI Coach disponível 24/7",
-      "Rastreio de nutrição e macros (base de dados USDA)",
+      "Rastreio de nutrição e macros (base de dados portuguesa)",
       "Registo de séries, pesos e medidas",
       "Fotos de progresso com comparação antes/depois",
       "Recordes pessoais e conquistas",
       "Relatório mensal em PDF",
       "Notificações e lembretes automáticos",
-      "Acesso à app iOS e Android",
+      "Acesso à app iOS e Android (PWA)",
     ],
+    faq: [
+      { q: "Quando recebo o meu plano?", a: "Nas primeiras 24 horas úteis após o registo, o coach cria e envia o teu plano personalizado diretamente na app." },
+      { q: "É realmente personalizado?", a: "100%. O teu coach cria o plano com base nas tuas respostas: objetivos, nível, dias disponíveis e equipamento. Não é um template genérico." },
+      { q: "Funciona para iniciantes?", a: "Sim. O plano é totalmente adaptado ao teu nível — seja iniciante, intermédio ou avançado." },
+      { q: "Posso cancelar quando quiser?", a: "Sim. Sem permanência, sem contratos. Cancelas a qualquer momento através da tua área de cliente no Stripe." },
+      { q: "E se não ficar satisfeito?", a: "Tens 7 dias para experimentar. Se não estiveres satisfeito, contacta o coach e reembolsamos sem perguntas." },
+    ],
+    guarantee: "Garantia de 7 dias",
+    guarantee_sub: "Experimenta sem risco. Reembolso total se não ficares satisfeito.",
   },
   en: {
     login:        "Log in →",
@@ -116,24 +125,33 @@ const t = {
       { icon: "⚡", title: "Live workout mode",         desc: "Rest timer with audio cue, set and weight tracking — all during your workout." },
     ],
     steps: [
-      { n: "1", title: "Sign up",           desc: "Register in under 1 minute. Free to try." },
-      { n: "2", title: "Get your plan",     desc: "Your coach creates a personalised plan for you within 24 hours." },
-      { n: "3", title: "Train with support", desc: "Follow the plan, log your workouts and track your progress." },
+      { n: "1", title: "Sign up",           desc: "Fill in the questionnaire in 2 minutes. Your coach receives your answers immediately." },
+      { n: "2", title: "Get your plan",     desc: "Within 24 working hours your coach creates and sends your personalised plan in the app." },
+      { n: "3", title: "Train with support", desc: "Follow the plan, log your workouts and track your progress — your coach is always available." },
     ],
     included: [
-      "Personalised weekly training plan",
+      "100% personalised weekly training plan",
       "Weekly plan adjustments",
       "Check-ins and progress analysis",
       "Private chat with your coach",
       "AI Coach available 24/7",
-      "Nutrition & macro tracking (USDA food database)",
+      "Nutrition & macro tracking (Portuguese food database)",
       "Sets, weights and measurements log",
       "Progress photos with before/after slider",
       "Personal records and achievements",
       "Monthly progress report (PDF)",
       "Automated notifications and reminders",
-      "Access to the iOS and Android app",
+      "Access to the iOS and Android app (PWA)",
     ],
+    faq: [
+      { q: "When do I get my plan?", a: "Within 24 working hours of signing up, your coach creates and sends your personalised plan directly in the app." },
+      { q: "Is it really personalised?", a: "100%. Your coach builds the plan based on your answers: goals, level, available days and equipment. Not a generic template." },
+      { q: "Does it work for beginners?", a: "Yes. The plan is fully adapted to your current level — beginner, intermediate or advanced." },
+      { q: "Can I cancel anytime?", a: "Yes. No commitment, no contracts. Cancel anytime through your Stripe customer portal." },
+      { q: "What if I'm not satisfied?", a: "You have 7 days to try it out. If you're not happy, contact your coach and we'll refund you, no questions asked." },
+    ],
+    guarantee: "7-day guarantee",
+    guarantee_sub: "Try it risk-free. Full refund if you're not satisfied.",
   },
 } as const;
 
@@ -440,10 +458,57 @@ export default async function LandingPage({
               >
                 {c.price_cta}
               </Link>
+
+              {/* Guarantee badge */}
+              <div className="flex items-center justify-center gap-2.5 py-3 px-4 rounded-2xl"
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <span className="text-lg">🛡️</span>
+                <div className="text-left">
+                  <p className="text-white text-xs font-bold">{c.guarantee}</p>
+                  <p className="text-zinc-500 text-xs">{c.guarantee_sub}</p>
+                </div>
+              </div>
+
               <p className="text-center text-zinc-600 text-xs">{c.price_note}</p>
             </div>
           </ScrollReveal>
         </section>
+
+        {/* ── DIVIDER ──────────────────────────────────────────── */}
+        <div className="max-w-2xl mx-auto px-5 pb-6">
+          <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }} />
+        </div>
+
+        {/* ── FAQ ──────────────────────────────────────────────── */}
+        <section className="max-w-2xl mx-auto px-5 pb-20 space-y-4">
+          <ScrollReveal direction="up">
+            <p className="text-zinc-500 text-xs font-bold tracking-[0.18em] uppercase text-center">
+              {isEN ? "Frequently asked questions" : "Perguntas frequentes"}
+            </p>
+          </ScrollReveal>
+
+          <div className="space-y-2">
+            {c.faq.map((item, i) => (
+              <ScrollReveal key={i} direction="up" delay={i * 60}>
+                <details className="group rounded-2xl overflow-hidden"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                  <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none select-none">
+                    <span className="text-white text-sm font-semibold pr-4">{item.q}</span>
+                    <span className="text-zinc-500 text-lg shrink-0 transition-transform group-open:rotate-45">+</span>
+                  </summary>
+                  <div className="px-5 pb-4">
+                    <p className="text-zinc-400 text-sm leading-relaxed">{item.a}</p>
+                  </div>
+                </details>
+              </ScrollReveal>
+            ))}
+          </div>
+        </section>
+
+        {/* ── DIVIDER ──────────────────────────────────────────── */}
+        <div className="max-w-2xl mx-auto px-5 pb-6">
+          <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }} />
+        </div>
 
         {/* ── FOOTER ───────────────────────────────────────────── */}
         <footer className="max-w-2xl mx-auto px-5 pb-10 flex items-center justify-between text-xs text-zinc-700">
