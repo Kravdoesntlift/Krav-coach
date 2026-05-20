@@ -181,7 +181,7 @@ export default async function LandingPage({
   const admin = createAdminClient();
   const { data: coach } = await admin
     .from("profiles")
-    .select("id, full_name, avatar_url, tagline, tagline_en")
+    .select("id, full_name, avatar_url, tagline, tagline_en, bio, bio_en, years_experience, credentials")
     .eq("role", "coach")
     .limit(1)
     .maybeSingle();
@@ -289,6 +289,73 @@ export default async function LandingPage({
         <div className="max-w-2xl mx-auto px-5 pb-6">
           <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.18), transparent)" }} />
         </div>
+
+        {/* ── COACH BIO ────────────────────────────────────────── */}
+        {coach && (coach.bio || coach.bio_en || (coach.credentials && coach.credentials.length > 0)) && (
+          <section className="max-w-2xl mx-auto px-5 pb-16">
+            <ScrollReveal direction="up">
+              <div
+                className="rounded-3xl p-6 space-y-5"
+                style={{
+                  background: "rgba(255,255,255,0.025)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                }}
+              >
+                {/* Header */}
+                <div className="flex items-center gap-4">
+                  {coach.avatar_url ? (
+                    <Image
+                      src={coach.avatar_url}
+                      alt={coach.full_name}
+                      width={64} height={64}
+                      className="rounded-2xl object-cover shrink-0"
+                    />
+                  ) : (
+                    <div
+                      className="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black text-black shrink-0"
+                      style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
+                    >
+                      {initials}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-white font-bold text-base">{coach.full_name}</p>
+                    <p className="text-zinc-500 text-xs mt-0.5">{isEN ? "Personal Trainer & Coach" : "Personal Trainer & Coach"}</p>
+                    {coach.years_experience && (
+                      <div className="inline-flex items-center gap-1.5 mt-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold text-black"
+                        style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>
+                        ★ {coach.years_experience}{isEN ? "+ years experience" : "+ anos de experiência"}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Bio */}
+                {(isEN ? coach.bio_en : coach.bio) && (
+                  <p className="text-zinc-400 text-sm leading-relaxed">
+                    {isEN ? coach.bio_en : coach.bio}
+                  </p>
+                )}
+
+                {/* Credentials */}
+                {coach.credentials && coach.credentials.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {(coach.credentials as string[]).map((c: string) => (
+                      <span
+                        key={c}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-300"
+                        style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}
+                      >
+                        <span style={{ color: "#C9A84C" }}>✓</span>
+                        {c}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </ScrollReveal>
+          </section>
+        )}
 
         {/* ── FEATURES ─────────────────────────────────────────── */}
         <section className="max-w-2xl mx-auto px-5 pb-20 space-y-6">

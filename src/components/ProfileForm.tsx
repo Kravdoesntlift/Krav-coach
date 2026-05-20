@@ -6,7 +6,15 @@ import type { Profile } from "@/lib/supabase/types";
 import AvatarUpload from "@/components/AvatarUpload";
 
 interface Props {
-  profile: Profile & { avatar_url?: string | null; tagline?: string | null; tagline_en?: string | null };
+  profile: Profile & {
+    avatar_url?: string | null;
+    tagline?: string | null;
+    tagline_en?: string | null;
+    bio?: string | null;
+    bio_en?: string | null;
+    years_experience?: number | null;
+    credentials?: string[] | null;
+  };
   email: string;
 }
 
@@ -14,6 +22,10 @@ export default function ProfileForm({ profile, email }: Props) {
   const [fullName, setFullName] = useState(profile.full_name);
   const [tagline, setTagline] = useState(profile.tagline ?? "");
   const [taglineEn, setTaglineEn] = useState(profile.tagline_en ?? "");
+  const [bio, setBio] = useState(profile.bio ?? "");
+  const [bioEn, setBioEn] = useState(profile.bio_en ?? "");
+  const [yearsExp, setYearsExp] = useState(String(profile.years_experience ?? ""));
+  const [credentials, setCredentials] = useState((profile.credentials ?? []).join("\n"));
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingName, setSavingName] = useState(false);
@@ -27,10 +39,17 @@ export default function ProfileForm({ profile, email }: Props) {
     setSavingName(true);
     setNameMsg(null);
     const supabase = createClient();
-    const updates: Record<string, string> = { full_name: fullName.trim() };
+    const updates: Record<string, unknown> = { full_name: fullName.trim() };
     if (profile.role === "coach") {
       updates.tagline = tagline.trim();
       updates.tagline_en = taglineEn.trim();
+      updates.bio = bio.trim();
+      updates.bio_en = bioEn.trim();
+      updates.years_experience = yearsExp ? parseInt(yearsExp, 10) : null;
+      updates.credentials = credentials
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean);
     }
     const { error } = await supabase.from("profiles").update(updates).eq("id", profile.id);
     setNameMsg(error ? { type: "err", text: "Erro ao guardar." } : { type: "ok", text: "Guardado!" });
@@ -85,12 +104,12 @@ export default function ProfileForm({ profile, email }: Props) {
             <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className="input" required />
           </div>
 
-          {/* Coach taglines */}
+          {/* Coach-only fields */}
           {profile.role === "coach" && (
             <>
               <div>
                 <label className="label">
-                  Tagline <span className="text-gray-600 text-[11px]">🇵🇹 Aparece na landing page e no onboarding</span>
+                  Tagline <span className="text-gray-600 text-[11px]">🇵🇹 Frase curta de impacto</span>
                 </label>
                 <input
                   type="text" value={tagline} onChange={(e) => setTagline(e.target.value)}
@@ -100,13 +119,60 @@ export default function ProfileForm({ profile, email }: Props) {
               </div>
               <div>
                 <label className="label">
-                  Tagline em inglês <span className="text-gray-600 text-[11px]">🇬🇧 Aparece quando a landing está em EN</span>
+                  Tagline em inglês <span className="text-gray-600 text-[11px]">🇬🇧</span>
                 </label>
                 <input
                   type="text" value={taglineEn} onChange={(e) => setTaglineEn(e.target.value)}
                   className="input" placeholder="ex: Transform your body in 12 weeks"
                   maxLength={80}
                 />
+              </div>
+
+              <div className="pt-2 border-t border-zinc-800 space-y-3">
+                <p className="text-zinc-500 text-xs font-semibold uppercase tracking-wider">Sobre ti — landing page</p>
+                <div>
+                  <label className="label">
+                    Anos de experiência <span className="text-gray-600 text-[11px]">Aparece como badge na landing</span>
+                  </label>
+                  <input
+                    type="number" min="0" max="50"
+                    value={yearsExp} onChange={(e) => setYearsExp(e.target.value)}
+                    className="input" placeholder="ex: 5"
+                  />
+                </div>
+                <div>
+                  <label className="label">
+                    Bio 🇵🇹 <span className="text-gray-600 text-[11px]">2–3 frases sobre a tua formação e abordagem</span>
+                  </label>
+                  <textarea
+                    value={bio} onChange={(e) => setBio(e.target.value)}
+                    className="input resize-none" rows={3}
+                    maxLength={300}
+                    placeholder="ex: Licenciado em Ciências do Desporto pela FMH. Especializado em treino de força e composição corporal. Já acompanhei mais de 100 clientes a transformar o seu corpo."
+                  />
+                </div>
+                <div>
+                  <label className="label">
+                    Bio 🇬🇧 <span className="text-gray-600 text-[11px]">Versão em inglês</span>
+                  </label>
+                  <textarea
+                    value={bioEn} onChange={(e) => setBioEn(e.target.value)}
+                    className="input resize-none" rows={3}
+                    maxLength={300}
+                    placeholder="ex: BSc in Sports Science. Specialised in strength training and body recomposition. Coached 100+ clients."
+                  />
+                </div>
+                <div>
+                  <label className="label">
+                    Credenciais / Diplomas <span className="text-gray-600 text-[11px]">Uma por linha — aparecem como badges</span>
+                  </label>
+                  <textarea
+                    value={credentials} onChange={(e) => setCredentials(e.target.value)}
+                    className="input resize-none" rows={4}
+                    placeholder={"Licenciado em Ciências do Desporto\nCertificado NSCA-CPT\n5 anos de experiência clínica\nEspecialista em perda de gordura"}
+                  />
+                  <p className="text-zinc-600 text-[11px] mt-1">Cada linha = 1 badge na landing page</p>
+                </div>
               </div>
             </>
           )}
