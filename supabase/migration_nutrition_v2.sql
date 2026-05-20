@@ -1,4 +1,5 @@
 -- Nutrition v2: add micronutrient columns + nutrition goals table
+-- Idempotent: safe to re-run
 
 -- Add new columns to nutrition_logs
 alter table nutrition_logs
@@ -33,6 +34,10 @@ create table if not exists client_nutrition_goals (
 );
 
 alter table client_nutrition_goals enable row level security;
+
+-- Drop existing policies first so re-running is safe
+drop policy if exists "client manage own nutrition goals" on client_nutrition_goals;
+drop policy if exists "coach read client nutrition goals" on client_nutrition_goals;
 
 create policy "client manage own nutrition goals"
   on client_nutrition_goals for all

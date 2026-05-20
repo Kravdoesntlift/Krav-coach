@@ -77,6 +77,7 @@ export default async function ClientDetailPage({
   weekEndDate.setUTCDate(mon.getUTCDate() + 6);
   const currentWeekEnd = weekEndDate.toISOString().split("T")[0];
 
+  const admin = createAdminClient();
   const [{ data: feedbackRow }, { data: coachNote }, { data: clientPRs }, { data: onboarding }, { data: challenges }, { data: goals }, { data: progressPhotos }, { data: nutritionLogs }] = await Promise.all([
     supabase.from("coach_feedback").select("message")
       .eq("coach_id", user!.id).eq("client_id", clientId).eq("week_start", currentWeekStart).maybeSingle(),
@@ -84,14 +85,14 @@ export default async function ClientDetailPage({
       .eq("coach_id", user!.id).eq("client_id", clientId).maybeSingle(),
     supabase.from("personal_records").select("*")
       .eq("client_id", clientId).order("recorded_at", { ascending: false }),
-    supabase.from("client_onboarding").select("*").eq("client_id", clientId).maybeSingle(),
+    admin.from("client_onboarding").select("*").eq("client_id", clientId).maybeSingle(),
     supabase.from("challenges").select("*")
       .eq("coach_id", user!.id).eq("client_id", clientId).eq("week_start", currentWeekStart),
     supabase.from("client_goals").select("*")
       .eq("client_id", clientId).order("created_at", { ascending: false }),
     supabase.from("progress_photos").select("*")
       .eq("client_id", clientId).order("taken_at", { ascending: false }),
-    createAdminClient().from("nutrition_logs").select("logged_at,calories,protein_g,carbs_g,fat_g,meal_name")
+    admin.from("nutrition_logs").select("logged_at,calories,protein_g,carbs_g,fat_g,meal_name")
       .eq("client_id", clientId)
       .gte("logged_at", currentWeekStart)
       .lte("logged_at", currentWeekEnd)
