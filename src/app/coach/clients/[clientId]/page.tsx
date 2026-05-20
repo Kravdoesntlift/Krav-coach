@@ -10,6 +10,7 @@ import CreateProgramButton from "@/components/coach/CreateProgramButton";
 import FeedbackForm from "@/components/coach/FeedbackForm";
 import CoachNotes from "@/components/coach/CoachNotes";
 import ClientStatusForm from "@/components/coach/ClientStatusForm";
+import RefundAndCancelButton from "@/components/coach/RefundAndCancelButton";
 import ChallengeForm from "@/components/coach/ChallengeForm";
 import GoalForm from "@/components/coach/GoalForm";
 import NotifyButton from "@/components/coach/NotifyButton";
@@ -189,12 +190,18 @@ export default async function ClientDetailPage({
       {/* Status & Subscription */}
       <section>
         <h2 className="text-white font-semibold mb-3">Estado da Subscrição</h2>
-        <div className="card p-5">
+        <div className="card p-5 space-y-4">
           <ClientStatusForm
             clientId={clientId}
             currentStatus={(client.status ?? "active") as ClientStatus}
             renewsAt={client.subscription_renews_at ?? null}
           />
+          {client.status !== "cancelled" && (
+            <RefundAndCancelButton
+              clientId={clientId}
+              clientName={client.full_name ?? "Cliente"}
+            />
+          )}
         </div>
       </section>
 
