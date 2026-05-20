@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import { logout } from "@/app/auth/actions";
 import type { NavItem } from "@/components/Navbar";
-import { DumbbellIcon, ClipboardIcon, ChatIcon, ChartIcon, UserIcon, CalendarIcon, TrophyIcon, StarIcon, CameraIcon, FileIcon } from "@/components/ui/Icons";
+import { DumbbellIcon, ClipboardIcon, ChatIcon, ChartIcon, UserIcon, CalendarIcon, TrophyIcon, StarIcon, CameraIcon, FileIcon, BotIcon, DownloadFileIcon, ForkKnifeIcon, UsersIcon } from "@/components/ui/Icons";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import PushPrompt from "@/components/PushPrompt";
 import GlobalBadgeSync from "@/components/GlobalBadgeSync";
@@ -103,16 +103,16 @@ export default async function ClientLayout({
   ];
 
   const clientBottomMoreNav = [
-    { href: "/client/ai-coach",       label: "AI Coach",   icon: "🤖",                       badge: 0 },
-    { href: "/client/history",        label: "Histórico",  icon: <CalendarIcon size={24} />, badge: 0 },
-    { href: "/client/records",        label: "PRs",        icon: <TrophyIcon size={24} />,   badge: 0 },
-    { href: "/client/achievements",   label: "Conquistas", icon: <StarIcon size={24} />,     badge: 0 },
-    { href: "/client/photos",         label: "Fotos",      icon: <CameraIcon size={24} />,   badge: 0 },
-    { href: "/client/report",         label: "Relatório",  icon: <FileIcon size={24} />,     badge: 0 },
-    { href: "/client/report-pdf",     label: "PDF Mensal", icon: "📄",                        badge: 0 },
-    { href: "/client/weekly-report",  label: "Rel. Semana", icon: <ChartIcon size={24} />,   badge: 0 },
-    { href: "/client/nutrition",       label: "Nutrição",    icon: "🥗",                       badge: 0 },
-    { href: "/client/referral",       label: "Referências", icon: "🤝",                       badge: 0 },
+    { href: "/client/ai-coach",      label: "AI Coach",    icon: <BotIcon size={24} />,          badge: 0 },
+    { href: "/client/history",       label: "Histórico",   icon: <CalendarIcon size={24} />,     badge: 0 },
+    { href: "/client/records",       label: "PRs",         icon: <TrophyIcon size={24} />,       badge: 0 },
+    { href: "/client/achievements",  label: "Conquistas",  icon: <StarIcon size={24} />,         badge: 0 },
+    { href: "/client/photos",        label: "Fotos",       icon: <CameraIcon size={24} />,       badge: 0 },
+    { href: "/client/report",        label: "Relatório",   icon: <FileIcon size={24} />,         badge: 0 },
+    { href: "/client/report-pdf",    label: "PDF Mensal",  icon: <DownloadFileIcon size={24} />, badge: 0 },
+    { href: "/client/weekly-report", label: "Rel. Semana", icon: <ChartIcon size={24} />,        badge: 0 },
+    { href: "/client/nutrition",     label: "Nutrição",    icon: <ForkKnifeIcon size={24} />,    badge: 0 },
+    { href: "/client/referral",      label: "Referências", icon: <UsersIcon size={24} />,        badge: 0 },
   ];
 
   return (

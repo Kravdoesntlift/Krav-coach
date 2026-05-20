@@ -166,3 +166,48 @@ export function TargetIcon({ size, className }: IconProps) {
     </svg>
   );
 }
+
+export function BotIcon({ size, className }: IconProps) {
+  return (
+    <svg {...d(size, className)}>
+      <rect x="3" y="8" width="18" height="12" rx="3" />
+      <path d="M9 12h.01M15 12h.01" strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M9 16h6" />
+      <path d="M12 8V5" />
+      <circle cx="12" cy="4" r="1.2" />
+    </svg>
+  );
+}
+
+export function DownloadFileIcon({ size, className }: IconProps) {
+  return (
+    <svg {...d(size, className)}>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <polyline points="8 15 12 19 16 15" />
+      <line x1="12" y1="11" x2="12" y2="19" />
+    </svg>
+  );
+}
+
+export function ForkKnifeIcon({ size, className }: IconProps) {
+  return (
+    <svg {...d(size, className)}>
+      <path d="M3 2v7c0 1.7 1.3 3 3 3s3-1.3 3-3V2" />
+      <line x1="6" y1="2" x2="6" y2="22" />
+      <path d="M21 2c0 0-4 2-4 9.5V22" />
+      <path d="M17 11.5V2" />
+    </svg>
+  );
+}
+
+export function UsersIcon({ size, className }: IconProps) {
+  return (
+    <svg {...d(size, className)}>
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
