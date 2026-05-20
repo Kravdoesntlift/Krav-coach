@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
+import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const t = {
@@ -181,7 +182,7 @@ export default async function LandingPage({
   const admin = createAdminClient();
   const { data: coach } = await admin
     .from("profiles")
-    .select("id, full_name, avatar_url, tagline, tagline_en, bio, bio_en, years_experience, credentials")
+    .select("id, full_name, avatar_url, tagline, tagline_en, bio, bio_en, years_experience, credentials, transformation_before_url, transformation_after_url")
     .eq("role", "coach")
     .limit(1)
     .maybeSingle();
@@ -350,6 +351,25 @@ export default async function LandingPage({
                         {c}
                       </span>
                     ))}
+                  </div>
+                )}
+
+                {/* Coach transformation slider */}
+                {coach.transformation_before_url && coach.transformation_after_url && (
+                  <div className="space-y-3 pt-2">
+                    <p className="text-zinc-500 text-xs font-bold tracking-[0.15em] uppercase text-center">
+                      {isEN ? "My own transformation" : "A minha própria transformação"}
+                    </p>
+                    <BeforeAfterSlider
+                      beforeUrl={coach.transformation_before_url}
+                      afterUrl={coach.transformation_after_url}
+                      beforeLabel={isEN ? "Before" : "Antes"}
+                      afterLabel={isEN ? "After" : "Depois"}
+                      aspectRatio="4/5"
+                    />
+                    <p className="text-zinc-600 text-xs text-center">
+                      {isEN ? "Drag the slider to compare" : "Arrasta o slider para comparar"}
+                    </p>
                   </div>
                 )}
               </div>

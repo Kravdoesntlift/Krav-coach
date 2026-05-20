@@ -3,6 +3,7 @@ import ProfileForm from "@/components/ProfileForm";
 import PushNotificationToggle from "@/components/PushNotificationToggle";
 import PushDebugPanel from "@/components/PushDebugPanel";
 import PublicLinkCard from "@/components/coach/PublicLinkCard";
+import TransformationUpload from "@/components/coach/TransformationUpload";
 
 export default async function CoachProfilePage() {
   const supabase = await createClient();
@@ -34,6 +35,15 @@ export default async function CoachProfilePage() {
       </div>
 
       <ProfileForm profile={profile} email={user!.email ?? ""} />
+
+      {profile?.role === "coach" && (
+        <div className="mt-6 card p-5">
+          <TransformationUpload
+            currentBeforeUrl={profile.transformation_before_url ?? null}
+            currentAfterUrl={profile.transformation_after_url ?? null}
+          />
+        </div>
+      )}
 
       <div className="mt-6">
         <PushDebugPanel />
