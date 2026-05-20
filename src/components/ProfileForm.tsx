@@ -146,8 +146,8 @@ export default function ProfileForm({ profile, email }: Props) {
                   </label>
                   <textarea
                     value={bio} onChange={(e) => setBio(e.target.value)}
-                    className="input resize-none" rows={3}
-                    maxLength={300}
+                    className="input resize-none" rows={4}
+                    maxLength={600}
                     placeholder="ex: Licenciado em Ciências do Desporto pela FMH. Especializado em treino de força e composição corporal. Já acompanhei mais de 100 clientes a transformar o seu corpo."
                   />
                 </div>
@@ -157,8 +157,8 @@ export default function ProfileForm({ profile, email }: Props) {
                   </label>
                   <textarea
                     value={bioEn} onChange={(e) => setBioEn(e.target.value)}
-                    className="input resize-none" rows={3}
-                    maxLength={300}
+                    className="input resize-none" rows={4}
+                    maxLength={600}
                     placeholder="ex: BSc in Sports Science. Specialised in strength training and body recomposition. Coached 100+ clients."
                   />
                 </div>
