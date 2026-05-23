@@ -23,58 +23,56 @@ interface Props {
 export default function BottomNav({ items, moreItems, userId, showLogout = true }: Props) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [extraUnread, setExtraUnread] = useState(0);
+  // Live unread count — null means "use server-rendered value"
+  const [liveUnread, setLiveUnread] = useState<number | null>(null);
 
   useEffect(() => { setDrawerOpen(false); }, [pathname]);
 
-  // Find the chat/messages item to know which href to badge
+  // Find the chat/messages item
   const msgItem = items.find(i =>
     i.href.includes("chat") || i.href.includes("messages")
   );
 
-  // Reset extra unread when user visits the chat/messages page
-  useEffect(() => {
-    if (msgItem && pathname.startsWith(msgItem.href)) {
-      setExtraUnread(0);
-    }
-  }, [pathname, msgItem]);
-
-  // Realtime subscription — increment badge on new incoming message
+  // Subscribe to messages table — recalculate real unread count on every change
   useEffect(() => {
     if (!userId || !msgItem) return;
     const supabase = createClient();
+
+    async function fetchUnread() {
+      const { count } = await supabase
+        .from("messages")
+        .select("id", { count: "exact", head: true })
+        .eq("receiver_id", userId!)
+        .is("read_at", null);
+      setLiveUnread(count ?? 0);
+    }
+
+    // Initial fetch
+    fetchUnread();
+
+    // Realtime — fires on INSERT (new msg) and UPDATE (msg marked read)
     const channel = supabase
       .channel(`unread-nav:${userId}`)
       .on(
         "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `receiver_id=eq.${userId}`,
-        },
-        () => {
-          // Only bump if not currently on the chat page
-          setExtraUnread((n) => n + 1);
-        }
+        { event: "*", schema: "public", table: "messages", filter: `receiver_id=eq.${userId}` },
+        fetchUnread
       )
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [userId, msgItem]);
+  }, [userId, msgItem]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isMoreActive = moreItems?.some(
     (item) => pathname === item.href || pathname.startsWith(item.href + "/")
   );
 
   function getBadge(item: NavItem) {
-    const base = item.badge ?? 0;
     if (msgItem && item.href === msgItem.href) {
-      // Don't show extra if already on that page
-      const onPage = pathname.startsWith(msgItem.href);
-      return base + (onPage ? 0 : extraUnread);
+      // Use live count when available, fall back to server-rendered prop
+      return liveUnread ?? (item.badge ?? 0);
     }
-    return base;
+    return item.badge ?? 0;
   }
 
   return (
