@@ -45,6 +45,7 @@ export default async function CoachLayout({
         { href: "/coach/library",        label: "📚 Biblioteca" },
         { href: "/coach/results",        label: "🏆 Resultados" },
         { href: "/coach/manage-clients", label: "⚙️ Gerir Clientes" },
+        { href: "/coach/challenges",     label: "🏆 Desafio Mensal" },
         { href: "/coach/billing",        label: "💳 Faturação" },
       ],
     },
@@ -66,6 +67,7 @@ export default async function CoachLayout({
     { href: "/coach/library",        label: "Biblioteca",  icon: "📚", badge: 0 },
     { href: "/coach/results",        label: "Resultados",  icon: "🏆", badge: 0 },
     { href: "/coach/manage-clients", label: "Gerir",       icon: "⚙️", badge: 0 },
+    { href: "/coach/challenges",     label: "Desafio",     icon: "🏆", badge: 0 },
     { href: "/coach/billing",        label: "Faturação",   icon: "💳", badge: 0 },
   ];
 

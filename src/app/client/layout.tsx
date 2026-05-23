@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import { logout } from "@/app/auth/actions";
 import type { NavItem } from "@/components/Navbar";
-import { DumbbellIcon, ClipboardIcon, ChatIcon, ChartIcon, UserIcon, CalendarIcon, TrophyIcon, StarIcon, CameraIcon, FileIcon, BotIcon, DownloadFileIcon, ForkKnifeIcon, UsersIcon } from "@/components/ui/Icons";
+import { DumbbellIcon, ClipboardIcon, ChatIcon, ChartIcon, UserIcon, CalendarIcon, TrophyIcon, StarIcon, CameraIcon, FileIcon, BotIcon, DownloadFileIcon, ForkKnifeIcon, UsersIcon, FlameIcon } from "@/components/ui/Icons";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import PushPrompt from "@/components/PushPrompt";
 import GlobalBadgeSync from "@/components/GlobalBadgeSync";
@@ -88,10 +88,12 @@ export default async function ClientLayout({
       ],
     },
     { href: "/client/chat",     label: "Chat",      badge: unread },
-    { href: "/client/ai-coach",  label: "AI Coach" },
-    { href: "/client/nutrition", label: "Nutrição" },
-    { href: "/client/referral",  label: "Referências" },
-    { href: "/client/profile",   label: "Perfil" },
+    { href: "/client/ai-coach",   label: "AI Coach" },
+    { href: "/client/nutrition",  label: "Nutrição" },
+    { href: "/client/daily-log",  label: "Registo" },
+    { href: "/client/leaderboard", label: "Leaderboard" },
+    { href: "/client/referral",   label: "Referências" },
+    { href: "/client/profile",    label: "Perfil" },
   ];
 
   const clientBottomNav = [
@@ -111,8 +113,10 @@ export default async function ClientLayout({
     { href: "/client/report",        label: "Relatório",   icon: <FileIcon size={24} />,         badge: 0 },
     { href: "/client/report-pdf",    label: "PDF Mensal",  icon: <DownloadFileIcon size={24} />, badge: 0 },
     { href: "/client/weekly-report", label: "Rel. Semana", icon: <ChartIcon size={24} />,        badge: 0 },
-    { href: "/client/nutrition",     label: "Nutrição",    icon: <ForkKnifeIcon size={24} />,    badge: 0 },
-    { href: "/client/referral",      label: "Referências", icon: <UsersIcon size={24} />,        badge: 0 },
+    { href: "/client/nutrition",      label: "Nutrição",     icon: <ForkKnifeIcon size={24} />,   badge: 0 },
+    { href: "/client/daily-log",     label: "Registo",      icon: <FlameIcon size={24} />,       badge: 0 },
+    { href: "/client/leaderboard",   label: "Leaderboard",  icon: <TrophyIcon size={24} />,      badge: 0 },
+    { href: "/client/referral",      label: "Referências",  icon: <UsersIcon size={24} />,       badge: 0 },
   ];
 
   return (
