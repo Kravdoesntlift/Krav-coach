@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import ProgressTabs, { TimelineEvent } from "./ProgressTabs";
 
@@ -155,15 +156,60 @@ export default async function ProgressPage() {
   // Sort descending by date
   timelineEvents.sort((a, b) => b.date.localeCompare(a.date));
 
+  const hubLinks = [
+    { href: "/client/checkin",    emoji: "📋", label: "Check-in",    sub: "Semanal" },
+    { href: "/client/daily-log",  emoji: "🔥", label: "Registo",     sub: "Passos & Água" },
+    { href: "/client/history",    emoji: "📅", label: "Histórico",   sub: "Treinos" },
+    { href: "/client/records",    emoji: "🏆", label: "PRs",         sub: "Records" },
+    { href: "/client/achievements",emoji: "⭐", label: "Conquistas",  sub: "Badges" },
+    { href: "/client/photos",     emoji: "📸", label: "Fotos",       sub: "Progresso" },
+    { href: "/client/report",     emoji: "📊", label: "Relatórios",  sub: "Mensal" },
+    { href: "/client/leaderboard",emoji: "🥇", label: "Ranking",     sub: "Leaderboard" },
+  ];
+
   return (
-    <ProgressTabs
-      exercises={exercises as { name: string; points: { date: string; topSet: number; volume: number; doneSets: number }[] }[]}
-      measurements={measurements}
-      completedDates={completedDates}
-      currentStreak={currentStreak}
-      longestStreak={longestStreak}
-      totalWorkouts={completedDates.length}
-      timeline={timelineEvents}
-    />
+    <div className="space-y-6 page-enter">
+      {/* Quick-access hub */}
+      <div className="grid grid-cols-4 gap-2">
+        {hubLinks.map(({ href, emoji, label, sub }) => (
+          <Link
+            key={href}
+            href={href}
+            className="flex flex-col items-center gap-1 py-4 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition-colors text-center"
+          >
+            <span className="text-2xl leading-none">{emoji}</span>
+            <span className="text-white text-[11px] font-semibold leading-tight">{label}</span>
+            <span className="text-zinc-600 text-[10px] leading-tight">{sub}</span>
+          </Link>
+        ))}
+      </div>
+
+      {/* Stats strip */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="bg-zinc-900 rounded-2xl p-3 text-center border border-zinc-800">
+          <p className="text-2xl font-black text-white">{currentStreak}</p>
+          <p className="text-zinc-500 text-[11px] mt-0.5">dias seguidos 🔥</p>
+        </div>
+        <div className="bg-zinc-900 rounded-2xl p-3 text-center border border-zinc-800">
+          <p className="text-2xl font-black text-white">{completedDates.length}</p>
+          <p className="text-zinc-500 text-[11px] mt-0.5">treinos totais</p>
+        </div>
+        <div className="bg-zinc-900 rounded-2xl p-3 text-center border border-zinc-800">
+          <p className="text-2xl font-black text-white">{longestStreak}</p>
+          <p className="text-zinc-500 text-[11px] mt-0.5">melhor série</p>
+        </div>
+      </div>
+
+      {/* Detailed tabs (charts, timeline, measurements) */}
+      <ProgressTabs
+        exercises={exercises as { name: string; points: { date: string; topSet: number; volume: number; doneSets: number }[] }[]}
+        measurements={measurements}
+        completedDates={completedDates}
+        currentStreak={currentStreak}
+        longestStreak={longestStreak}
+        totalWorkouts={completedDates.length}
+        timeline={timelineEvents}
+      />
+    </div>
   );
 }

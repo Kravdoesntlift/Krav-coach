@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
-import { ChatIcon, UserIcon } from "@/components/ui/Icons";
+import { ChatIcon, UserIcon, ChartIcon } from "@/components/ui/Icons";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import GlobalBadgeSync from "@/components/GlobalBadgeSync";
 import InstallPrompt from "@/components/client/InstallPrompt";
@@ -31,43 +31,41 @@ export default async function CoachLayout({
 
   const unread = unreadCount ?? 0;
 
+  // Desktop navbar
   const coachNav = [
     { href: "/coach/dashboard",  label: "Clientes" },
     { href: "/coach/messages",   label: "Mensagens", badge: unread },
-    { href: "/coach/plans/new",  label: "Novo Plano" },
     { href: "/coach/analytics",  label: "Analytics" },
     {
       label: "Ferramentas",
       children: [
-        { href: "/coach/setup",          label: "🚀 Configuração" },
+        { href: "/coach/plans/new",      label: "➕ Novo Plano" },
         { href: "/coach/sessions",       label: "📅 Sessões" },
-        { href: "/coach/automations",    label: "⚡ Automações" },
-        { href: "/coach/library",        label: "📚 Biblioteca" },
-        { href: "/coach/results",        label: "🏆 Resultados" },
-        { href: "/coach/manage-clients", label: "⚙️ Gerir Clientes" },
         { href: "/coach/challenges",     label: "🏆 Desafio Mensal" },
+        { href: "/coach/manage-clients", label: "⚙️ Gerir Clientes" },
+        { href: "/coach/library",        label: "📚 Biblioteca" },
+        { href: "/coach/setup",          label: "🚀 Configuração" },
         { href: "/coach/billing",        label: "💳 Faturação" },
       ],
     },
     { href: "/coach/profile",    label: "Perfil" },
   ];
 
+  // Bottom nav — 4 core items + more drawer for tools
   const coachBottomNav = [
-    { href: "/coach/dashboard", label: "Clientes",   icon: "👥",                  badge: 0      },
-    { href: "/coach/messages",  label: "Mensagens",  icon: <ChatIcon size={22} />, badge: unread },
-    { href: "/coach/plans/new", label: "Novo Plano", icon: "+",                    badge: 0      },
-    { href: "/coach/profile",   label: "Perfil",     icon: <UserIcon size={22} />, badge: 0      },
+    { href: "/coach/dashboard", label: "Clientes",   icon: "👥",                   badge: 0      },
+    { href: "/coach/messages",  label: "Mensagens",  icon: <ChatIcon size={22} />,  badge: unread },
+    { href: "/coach/analytics", label: "Analytics",  icon: <ChartIcon size={22} />, badge: 0      },
+    { href: "/coach/profile",   label: "Perfil",     icon: <UserIcon size={22} />,  badge: 0      },
   ];
 
   const coachBottomMoreNav = [
-    { href: "/coach/analytics",      label: "Analytics",   icon: "📊", badge: 0 },
-    { href: "/coach/setup",          label: "Config.",     icon: "🚀", badge: 0 },
+    { href: "/coach/plans/new",      label: "Novo Plano",  icon: "➕", badge: 0 },
     { href: "/coach/sessions",       label: "Sessões",     icon: "📅", badge: 0 },
-    { href: "/coach/automations",    label: "Automações",  icon: "⚡", badge: 0 },
-    { href: "/coach/library",        label: "Biblioteca",  icon: "📚", badge: 0 },
-    { href: "/coach/results",        label: "Resultados",  icon: "🏆", badge: 0 },
-    { href: "/coach/manage-clients", label: "Gerir",       icon: "⚙️", badge: 0 },
     { href: "/coach/challenges",     label: "Desafio",     icon: "🏆", badge: 0 },
+    { href: "/coach/manage-clients", label: "Gerir",       icon: "⚙️", badge: 0 },
+    { href: "/coach/library",        label: "Biblioteca",  icon: "📚", badge: 0 },
+    { href: "/coach/setup",          label: "Config.",     icon: "🚀", badge: 0 },
     { href: "/coach/billing",        label: "Faturação",   icon: "💳", badge: 0 },
   ];
 

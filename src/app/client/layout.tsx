@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import { logout } from "@/app/auth/actions";
 import type { NavItem } from "@/components/Navbar";
-import { DumbbellIcon, ClipboardIcon, ChatIcon, ChartIcon, UserIcon, CalendarIcon, TrophyIcon, StarIcon, CameraIcon, FileIcon, BotIcon, DownloadFileIcon, ForkKnifeIcon, UsersIcon, FlameIcon } from "@/components/ui/Icons";
+import { DumbbellIcon, ChatIcon, ChartIcon, UserIcon, ForkKnifeIcon } from "@/components/ui/Icons";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import PushPrompt from "@/components/PushPrompt";
 import GlobalBadgeSync from "@/components/GlobalBadgeSync";
@@ -71,54 +71,45 @@ export default async function ClientLayout({
 
   const unread = unreadCount ?? 0;
 
+  // Desktop navbar — clean grouped structure
   const clientNav: NavItem[] = [
     { href: "/client/dashboard", label: "Treino" },
-    { href: "/client/checkin", label: "Check-in" },
+    { href: "/client/nutrition", label: "Nutrição" },
+    { href: "/client/chat",      label: "Chat",  badge: unread },
     {
-      label: "Evolução",
+      label: "Progresso",
       children: [
-        { href: "/client/progress", label: "Progressão" },
-        { href: "/client/history", label: "Histórico" },
-        { href: "/client/records", label: "PRs" },
-        { href: "/client/achievements", label: "Conquistas" },
-        { href: "/client/photos", label: "Fotos" },
-        { href: "/client/report",     label: "Relatório" },
-        { href: "/client/report-pdf", label: "PDF Mensal" },
-        { href: "/client/weekly-report", label: "Rel. Semanal" },
+        { href: "/client/progress",     label: "📈 Análise" },
+        { href: "/client/checkin",      label: "📋 Check-in" },
+        { href: "/client/daily-log",    label: "🔥 Registo Diário" },
+        { href: "/client/history",      label: "📅 Histórico" },
+        { href: "/client/records",      label: "🏆 PRs" },
+        { href: "/client/achievements", label: "⭐ Conquistas" },
+        { href: "/client/photos",       label: "📸 Fotos" },
+        { href: "/client/report",       label: "📊 Relatório Mensal" },
+        { href: "/client/weekly-report",label: "📄 Relatório Semanal" },
+        { href: "/client/leaderboard",  label: "🥇 Leaderboard" },
       ],
     },
-    { href: "/client/chat",     label: "Chat",      badge: unread },
-    { href: "/client/ai-coach",   label: "AI Coach" },
-    { href: "/client/nutrition",  label: "Nutrição" },
-    { href: "/client/daily-log",    label: "Registo" },
-    { href: "/client/leaderboard",  label: "Leaderboard" },
-    { href: "/client/integrations", label: "Integrações" },
-    { href: "/client/referral",     label: "Referências" },
-    { href: "/client/profile",    label: "Perfil" },
+    {
+      label: "Perfil",
+      children: [
+        { href: "/client/profile",      label: "👤 A minha conta" },
+        { href: "/client/ai-coach",     label: "🤖 AI Coach" },
+        { href: "/client/sessions",     label: "📅 Sessões" },
+        { href: "/client/integrations", label: "⌚ Integrações" },
+        { href: "/client/referral",     label: "👥 Referências" },
+      ],
+    },
   ];
 
+  // Bottom nav — 5 clean items, no more drawer
   const clientBottomNav = [
-    { href: "/client/dashboard", label: "Treino",    icon: <DumbbellIcon size={22} />,   badge: 0 },
-    { href: "/client/checkin",   label: "Check-in",  icon: <ClipboardIcon size={22} />,  badge: 0 },
-    { href: "/client/chat",      label: "Chat",      icon: <ChatIcon size={22} />,       badge: unread },
-    { href: "/client/progress",  label: "Progresso", icon: <ChartIcon size={22} />,      badge: 0 },
-    { href: "/client/profile",   label: "Perfil",    icon: <UserIcon size={22} />,       badge: 0 },
-  ];
-
-  const clientBottomMoreNav = [
-    { href: "/client/ai-coach",      label: "AI Coach",    icon: <BotIcon size={24} />,          badge: 0 },
-    { href: "/client/history",       label: "Histórico",   icon: <CalendarIcon size={24} />,     badge: 0 },
-    { href: "/client/records",       label: "PRs",         icon: <TrophyIcon size={24} />,       badge: 0 },
-    { href: "/client/achievements",  label: "Conquistas",  icon: <StarIcon size={24} />,         badge: 0 },
-    { href: "/client/photos",        label: "Fotos",       icon: <CameraIcon size={24} />,       badge: 0 },
-    { href: "/client/report",        label: "Relatório",   icon: <FileIcon size={24} />,         badge: 0 },
-    { href: "/client/report-pdf",    label: "PDF Mensal",  icon: <DownloadFileIcon size={24} />, badge: 0 },
-    { href: "/client/weekly-report", label: "Rel. Semana", icon: <ChartIcon size={24} />,        badge: 0 },
-    { href: "/client/nutrition",      label: "Nutrição",     icon: <ForkKnifeIcon size={24} />,   badge: 0 },
-    { href: "/client/daily-log",     label: "Registo",      icon: <FlameIcon size={24} />,       badge: 0 },
-    { href: "/client/leaderboard",   label: "Leaderboard",  icon: <TrophyIcon size={24} />,      badge: 0 },
-    { href: "/client/integrations",  label: "Integrações",  icon: <span className="text-xl">⌚</span>, badge: 0 },
-    { href: "/client/referral",      label: "Referências",  icon: <UsersIcon size={24} />,       badge: 0 },
+    { href: "/client/dashboard", label: "Treino",   icon: <DumbbellIcon size={22} />, badge: 0 },
+    { href: "/client/nutrition", label: "Nutrição", icon: <ForkKnifeIcon size={22} />, badge: 0 },
+    { href: "/client/chat",      label: "Chat",     icon: <ChatIcon size={22} />,     badge: unread },
+    { href: "/client/progress",  label: "Progresso",icon: <ChartIcon size={22} />,    badge: 0 },
+    { href: "/client/profile",   label: "Perfil",   icon: <UserIcon size={22} />,     badge: 0 },
   ];
 
   return (
@@ -127,7 +118,7 @@ export default async function ClientLayout({
       <GlobalBadgeSync userId={user.id} />
       <Navbar profile={profile} navItems={clientNav} />
       <main className="max-w-2xl mx-auto px-4 pt-6 md:pt-20 pb-24 md:pb-12">{children}</main>
-      <BottomNav items={clientBottomNav} moreItems={clientBottomMoreNav} userId={user.id} />
+      <BottomNav items={clientBottomNav} userId={user.id} />
       <PushPrompt />
     </div>
   );
