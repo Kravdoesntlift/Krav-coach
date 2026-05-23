@@ -154,6 +154,18 @@ export async function signup(formData: FormData) {
         ).then((r) => {
           if (!r.ok) console.warn("[signup] Push to coach failed:", r.error);
         }).catch((e) => console.warn("[signup] Push to coach threw:", e));
+
+        // 6. Send welcome email to new client
+        const { sendWelcomeEmail } = await import("@/lib/email");
+        const siteUrl =
+          process.env.NEXT_PUBLIC_SITE_URL ||
+          (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+        sendWelcomeEmail({
+          to:         email,
+          clientName: fullName,
+          coachName:  coachProf?.full_name ?? "Coach",
+          siteUrl,
+        }).catch((e) => console.warn("[signup] Welcome email failed:", e));
       }
     } catch {
       // Non-critical — user is created, assignment just didn't happen

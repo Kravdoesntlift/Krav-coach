@@ -15,7 +15,7 @@ export default function PushNotificationToggle() {
   const [supported, setSupported] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [testStatus, setTestStatus] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [testLoading, setTestLoading] = useState(false);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function PushNotificationToggle() {
 
   async function toggle() {
     setLoading(true);
-    setTestStatus(null);
+    setStatus(null);
     try {
       const reg = await navigator.serviceWorker.ready;
 
@@ -43,41 +43,53 @@ export default function PushNotificationToggle() {
         }
         setSubscribed(false);
       } else {
+        // Subscribe at browser level first
         const sub = await reg.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
         });
+
+        // Save to server
         const res = await fetch("/api/push/subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(sub),
         });
-        if (res.ok) {
+
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok && data.ok !== false) {
           setSubscribed(true);
+          setStatus("✅ Notificações ativadas!");
         } else {
-          const data = await res.json().catch(() => ({}));
-          console.error("Failed to save subscription:", data);
+          // Rollback browser subscription so state stays consistent
+          await sub.unsubscribe();
+          const msg = data.error ?? "Erro ao guardar subscrição";
+          setStatus(`❌ ${msg}`);
+          console.error("[push] Failed to save subscription:", data);
         }
       }
-    } catch (err) {
-      console.error("Push toggle failed:", err);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Erro desconhecido";
+      setStatus(`❌ ${msg}`);
+      console.error("[push] Toggle failed:", err);
     }
     setLoading(false);
   }
 
   async function sendTest() {
     setTestLoading(true);
-    setTestStatus(null);
+    setStatus(null);
     try {
       const res = await fetch("/api/push/debug", { method: "POST" });
       const data = await res.json();
       if (data.ok) {
-        setTestStatus("✅ Notificação enviada! Deves recebê-la agora.");
+        setStatus("✅ Notificação enviada! Deves recebê-la agora.");
       } else {
-        setTestStatus(`❌ Erro: ${data.error ?? "Desconhecido"}`);
+        setStatus(`❌ ${data.error ?? "Desconhecido"}`);
       }
     } catch {
-      setTestStatus("❌ Erro de rede ao enviar teste.");
+      setStatus("❌ Erro de rede ao enviar teste.");
     }
     setTestLoading(false);
   }
@@ -113,9 +125,9 @@ export default function PushNotificationToggle() {
         )}
       </div>
 
-      {testStatus && (
-        <p className="text-xs px-1" style={{ color: testStatus.startsWith("✅") ? "#C9A84C" : "#f87171" }}>
-          {testStatus}
+      {status && (
+        <p className="text-xs px-1" style={{ color: status.startsWith("✅") ? "#C9A84C" : "#f87171" }}>
+          {status}
         </p>
       )}
     </div>

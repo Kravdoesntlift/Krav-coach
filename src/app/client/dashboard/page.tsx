@@ -13,6 +13,7 @@ import CoachFeedbackBanner from "@/components/client/CoachFeedbackBanner";
 import ChallengeCards from "@/components/client/ChallengeCards";
 import ClientGoals from "@/components/client/ClientGoals";
 import OnboardingWrapper from "@/components/client/OnboardingWrapper";
+import SetupChecklist from "@/components/client/SetupChecklist";
 import InstallPrompt from "@/components/client/InstallPrompt";
 import NotificationPrompt from "@/components/client/NotificationPrompt";
 import AppBadge from "@/components/client/AppBadge";
@@ -89,7 +90,7 @@ export default async function ClientDashboard() {
       .eq("client_id", user!.id)
       .eq("week_start", weekStart)
       .maybeSingle(),
-    supabase.from("profiles").select("full_name, tagline, welcomed_at, seen_achievements").eq("id", user!.id).single(),
+    supabase.from("profiles").select("full_name, tagline, welcomed_at, seen_achievements, avatar_url").eq("id", user!.id).single(),
     supabase.from("weekly_checkins").select("*").eq("client_id", user!.id).eq("week_start", weekStart).maybeSingle(),
     supabase.from("profiles").select("subscription_renews_at").eq("id", user!.id).single(),
     supabase.from("challenges").select("*").eq("client_id", user!.id).eq("week_start", weekStart),
@@ -105,6 +106,14 @@ export default async function ClientDashboard() {
     supabase.from("weekly_reports").select("id, week_start").eq("client_id", user!.id)
       .order("week_start", { ascending: false }).limit(1).maybeSingle(),
   ]);
+
+  // Quick nutrition log check (for setup checklist)
+  const { data: anyNutritionLog } = await supabase
+    .from("nutrition_logs")
+    .select("id")
+    .eq("client_id", user!.id)
+    .limit(1)
+    .maybeSingle();
 
   // Fallback: if no plan for this week, show the most recent plan
   let plan = planThisWeek;
@@ -284,6 +293,16 @@ export default async function ClientDashboard() {
           </div>
         )}
       </div>
+
+      {/* Setup checklist — shown to new clients until all steps are done */}
+      <SetupChecklist
+        clientId={user!.id}
+        hasCompletedOnboarding={isOnboardingComplete}
+        hasLoggedCheckin={!!currentCheckin}
+        hasLoggedNutrition={!!anyNutritionLog}
+        hasCompletedWorkout={completedDays > 0}
+        hasProfilePhoto={!!clientProfile?.avatar_url}
+      />
 
       {/* Install app prompt */}
       <InstallPrompt />

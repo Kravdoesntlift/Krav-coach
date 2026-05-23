@@ -2,14 +2,25 @@
 
 import { useState } from "react";
 
+interface Device {
+  id: string;
+  subscribedAt: string;
+  endpoint: string;
+}
+
+interface VapidInfo {
+  ok: boolean;
+  subject: string | null;
+  publicKey: string | null;
+  privateKey: string;
+  error: string | null;
+}
+
 interface DebugInfo {
   userId: string;
-  hasSubscription: boolean;
-  subscribedAt: string | null;
-  totalSubscriptionsInDB: number;
-  coachIds: string[];
-  coachSubscriptionStatus: Record<string, boolean>;
-  vapidConfigured: boolean;
+  deviceCount: number;
+  devices: Device[];
+  vapid: VapidInfo;
 }
 
 export default function PushDebugPanel() {
@@ -19,18 +30,26 @@ export default function PushDebugPanel() {
 
   async function fetchDebug() {
     setLoading(true);
-    const res = await fetch("/api/push/debug");
-    const json = await res.json();
-    setInfo(json);
+    try {
+      const res = await fetch("/api/push/debug");
+      const json = await res.json();
+      setInfo(json);
+    } catch {
+      setTestResult("❌ Erro ao carregar diagnóstico.");
+    }
     setLoading(false);
   }
 
   async function sendTest() {
     setLoading(true);
     setTestResult(null);
-    const res = await fetch("/api/push/debug", { method: "POST" });
-    const json = await res.json();
-    setTestResult(json.ok ? "✅ Notificação enviada! Deves recebê-la agora." : `❌ Erro: ${json.error}`);
+    try {
+      const res = await fetch("/api/push/debug", { method: "POST" });
+      const json = await res.json();
+      setTestResult(json.ok ? "✅ Notificação enviada! Deves recebê-la agora." : `❌ Erro: ${json.error}`);
+    } catch {
+      setTestResult("❌ Erro de rede.");
+    }
     setLoading(false);
   }
 
@@ -49,29 +68,28 @@ export default function PushDebugPanel() {
 
       {info && (
         <div className="space-y-2 text-xs">
-          <Row label="VAPID configurado" value={info.vapidConfigured} />
-          <Row label="Tens subscrição push" value={info.hasSubscription} />
-          {info.subscribedAt && (
-            <div className="flex items-center justify-between py-1 border-b border-zinc-800">
-              <span className="text-gray-500">Subscrito em</span>
-              <span className="text-gray-300">{new Date(info.subscribedAt).toLocaleString("pt-PT")}</span>
-            </div>
+          <Row label="VAPID configurado" value={info.vapid.ok} />
+          {info.vapid.error && (
+            <p className="text-red-400 text-[11px] px-1">{info.vapid.error}</p>
           )}
+          <Row label="Dispositivos subscritos" value={info.deviceCount > 0} />
           <div className="flex items-center justify-between py-1 border-b border-zinc-800">
-            <span className="text-gray-500">Total subscrições na DB</span>
-            <span className="text-gray-300">{info.totalSubscriptionsInDB}</span>
+            <span className="text-gray-500">Total de dispositivos</span>
+            <span className="text-gray-300">{info.deviceCount}</span>
           </div>
-          {info.coachIds.length > 0 && (
-            <div className="py-1">
-              <p className="text-gray-500 mb-1">Coaches com plano atribuído:</p>
-              {info.coachIds.map((id) => (
-                <div key={id} className="flex items-center justify-between py-0.5">
-                  <span className="text-gray-600 font-mono text-[10px]">{id.slice(0, 8)}…</span>
-                  <span className={info.coachSubscriptionStatus[id] ? "text-green-400" : "text-red-400"}>
-                    {info.coachSubscriptionStatus[id] ? "✓ Subscrito" : "✗ Sem subscrição"}
-                  </span>
-                </div>
-              ))}
+          {info.devices.map((d) => (
+            <div key={d.id} className="py-1 border-b border-zinc-800 space-y-0.5">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-500">Subscrito em</span>
+                <span className="text-gray-300">{new Date(d.subscribedAt).toLocaleString("pt-PT")}</span>
+              </div>
+              <p className="text-gray-600 font-mono text-[10px] truncate">{d.endpoint}</p>
+            </div>
+          ))}
+          {info.vapid.subject && (
+            <div className="flex items-center justify-between py-1 border-b border-zinc-800">
+              <span className="text-gray-500">VAPID subject</span>
+              <span className="text-gray-300 text-[10px] truncate max-w-[160px]">{info.vapid.subject}</span>
             </div>
           )}
         </div>
@@ -86,7 +104,9 @@ export default function PushDebugPanel() {
           📨 Enviar notificação de teste para mim
         </button>
         {testResult && (
-          <p className="text-xs text-center text-gray-400">{testResult}</p>
+          <p className="text-xs text-center" style={{ color: testResult.startsWith("✅") ? "#C9A84C" : "#f87171" }}>
+            {testResult}
+          </p>
         )}
       </div>
     </div>

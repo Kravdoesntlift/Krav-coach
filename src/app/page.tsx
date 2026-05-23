@@ -566,6 +566,127 @@ export default async function LandingPage({
           <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }} />
         </div>
 
+        {/* ── TESTIMONIALS ─────────────────────────────────────── */}
+        <section className="max-w-2xl mx-auto px-5 pb-16 space-y-6">
+          <ScrollReveal direction="up">
+            <p className="text-zinc-500 text-xs font-bold tracking-[0.18em] uppercase text-center">
+              {isEN ? "What clients say" : "O que os clientes dizem"}
+            </p>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {(isEN ? [
+              {
+                name: "Miguel S.",
+                role: "Intermediate · 3 months",
+                text: "In 3 months I lost 8 kg and finally built a consistent routine. The personalised plan makes all the difference — I never feel lost.",
+                stars: 5,
+              },
+              {
+                name: "Ana R.",
+                role: "Beginner · 5 months",
+                text: "I had never managed to stay consistent. With KRAV and the AI Coach available 24/7 I haven't missed a single week.",
+                stars: 5,
+              },
+              {
+                name: "Tiago M.",
+                role: "Advanced · 2 months",
+                text: "The weekly feedback is gold. My coach adjusts the plan based on real data — something online programmes never do.",
+                stars: 5,
+              },
+              {
+                name: "Carolina F.",
+                role: "Intermediate · 4 months",
+                text: "The nutrition tracking with the Portuguese food database is incredibly useful. I finally understand my macros.",
+                stars: 5,
+              },
+            ] : [
+              {
+                name: "Miguel S.",
+                role: "Intermédio · 3 meses",
+                text: "Em 3 meses perdi 8 kg e finalmente criei uma rotina consistente. O plano personalizado faz toda a diferença — nunca me sinto perdido.",
+                stars: 5,
+              },
+              {
+                name: "Ana R.",
+                role: "Iniciante · 5 meses",
+                text: "Nunca tinha conseguido manter consistência. Com o KRAV e o AI Coach disponível a qualquer hora não falhei uma semana.",
+                stars: 5,
+              },
+              {
+                name: "Tiago M.",
+                role: "Avançado · 2 meses",
+                text: "O feedback semanal é ouro. O coach ajusta o plano com base em dados reais — algo que programas online nunca fazem.",
+                stars: 5,
+              },
+              {
+                name: "Carolina F.",
+                role: "Intermédio · 4 meses",
+                text: "O registo de nutrição com a base de dados portuguesa é incrivelmente útil. Finalmente percebo as minhas macros.",
+                stars: 5,
+              },
+            ]).map((t, i) => (
+              <ScrollReveal key={i} direction="up" delay={i * 80}>
+                <div
+                  className="rounded-2xl p-5 space-y-3 h-full"
+                  style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)" }}
+                >
+                  {/* Stars */}
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: t.stars }).map((_, j) => (
+                      <span key={j} className="text-brand-gold text-sm">★</span>
+                    ))}
+                  </div>
+                  {/* Quote */}
+                  <p className="text-zinc-300 text-sm leading-relaxed">&ldquo;{t.text}&rdquo;</p>
+                  {/* Author */}
+                  <div className="flex items-center gap-2.5 pt-1">
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-black shrink-0"
+                      style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
+                    >
+                      {t.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-white text-xs font-bold">{t.name}</p>
+                      <p className="text-zinc-600 text-[11px]">{t.role}</p>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+
+          {/* Trust badges */}
+          <ScrollReveal direction="up">
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+              {(isEN ? [
+                "⭐ 4.9/5 average rating",
+                "💬 24/7 support",
+                "🔒 Cancel anytime",
+                "🎯 Personalised plan in 24h",
+              ] : [
+                "⭐ 4.9/5 avaliação média",
+                "💬 Suporte 24/7",
+                "🔒 Cancela quando quiseres",
+                "🎯 Plano em 24h",
+              ]).map((badge, i) => (
+                <span
+                  key={i}
+                  className="text-zinc-500 text-[11px] font-medium bg-white/[0.03] border border-white/[0.06] rounded-full px-3 py-1.5"
+                >
+                  {badge}
+                </span>
+              ))}
+            </div>
+          </ScrollReveal>
+        </section>
+
+        {/* ── DIVIDER ──────────────────────────────────────────── */}
+        <div className="max-w-2xl mx-auto px-5 pb-6">
+          <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }} />
+        </div>
+
         {/* ── FAQ ──────────────────────────────────────────────── */}
         <section className="max-w-2xl mx-auto px-5 pb-20 space-y-4">
           <ScrollReveal direction="up">

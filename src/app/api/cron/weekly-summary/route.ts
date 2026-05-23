@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPushToUser } from "@/lib/push";
+import { sendWeeklySummaryEmail } from "@/lib/email";
 
 /**
  * GET /api/cron/weekly-summary
@@ -36,6 +37,16 @@ export async function GET(req: NextRequest) {
   if (!clients?.length) return NextResponse.json({ sent: 0 });
 
   const clientIds = clients.map((c) => c.id);
+
+  // Fetch emails from auth.users for the email summary
+  const emailMap = new Map<string, string>();
+  try {
+    // listUsers returns up to 1000 by default; for larger deployments paginate
+    const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 });
+    for (const u of users) {
+      if (u.email) emailMap.set(u.id, u.email);
+    }
+  } catch { /* non-critical — push still works without email */ }
 
   // Fetch all data for the week in parallel
   const [
@@ -108,6 +119,26 @@ export async function GET(req: NextRequest) {
 
     const result = await sendPushToUser(client.id, title, body, "/client/progress");
     if (result.ok) sent++;
+
+    // Also send email summary (fire-and-forget, non-critical)
+    const clientEmail = emailMap.get(client.id);
+    if (clientEmail) {
+      const siteUrl =
+        process.env.NEXT_PUBLIC_SITE_URL ||
+        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://kravcoaching.com");
+      sendWeeklySummaryEmail({
+        to: clientEmail,
+        clientName: client.full_name ?? "Atleta",
+        weekStart,
+        weekEnd,
+        workouts,
+        didCheckin,
+        steps,
+        didNutrition,
+        score,
+        siteUrl,
+      }).catch((e) => console.warn("[weekly-summary] email failed:", e));
+    }
   }
 
   return NextResponse.json({ sent, total: clients.length, weekStart });

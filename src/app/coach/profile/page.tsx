@@ -5,6 +5,7 @@ import PushNotificationToggle from "@/components/PushNotificationToggle";
 import PushDebugPanel from "@/components/PushDebugPanel";
 import PublicLinkCard from "@/components/coach/PublicLinkCard";
 import TransformationUpload from "@/components/coach/TransformationUpload";
+import { logout } from "@/app/auth/actions";
 
 const tools = [
   { href: "/coach/sessions",       emoji: "📅", label: "Sessões",        sub: "Agendar & gerir" },
@@ -32,7 +33,21 @@ export default async function CoachProfilePage() {
           <h1 className="text-2xl font-bold text-white">Perfil</h1>
           <p className="text-gray-400 text-sm mt-1">Conta & ferramentas</p>
         </div>
-        <PushNotificationToggle />
+        <div className="flex items-center gap-2">
+          <PushNotificationToggle />
+          {/* Logout icon — always visible at the top */}
+          <form action={logout}>
+            <button
+              type="submit"
+              title="Terminar sessão"
+              className="flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-red-400 hover:bg-red-500/5 hover:border-red-500/20 transition-all duration-150"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
+          </form>
+        </div>
       </div>
 
       {/* Tools hub grid */}
@@ -67,6 +82,19 @@ export default async function CoachProfilePage() {
       )}
 
       <PushDebugPanel />
+
+      {/* Logout */}
+      <form action={logout}>
+        <button
+          type="submit"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-medium text-zinc-500 hover:text-red-400 hover:bg-red-500/5 border border-zinc-800 hover:border-red-500/20 transition-all duration-150"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Terminar sessão
+        </button>
+      </form>
     </div>
   );
 }

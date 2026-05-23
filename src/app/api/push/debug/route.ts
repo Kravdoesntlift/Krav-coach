@@ -60,8 +60,12 @@ export async function POST() {
     "/",
   );
 
-  return NextResponse.json(result.ok
-    ? { ok: true, message: "Notificação enviada!" }
-    : { ok: false, error: result.error }
-  );
+  if (result.ok) return NextResponse.json({ ok: true, message: "Notificação enviada!" });
+
+  // Friendlier message when the user hasn't enabled push notifications yet
+  const friendlyError = result.error?.includes("No subscription found")
+    ? "Ativa as notificações primeiro tocando no sino 🔔"
+    : (result.error ?? "Erro desconhecido");
+
+  return NextResponse.json({ ok: false, error: friendlyError });
 }

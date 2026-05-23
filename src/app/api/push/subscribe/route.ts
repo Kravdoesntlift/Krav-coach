@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -13,18 +14,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid subscription: missing endpoint" }, { status: 400 });
   }
 
-  // Upsert by user_id + endpoint so each device gets its own row
-  const { error } = await supabase.from("push_subscriptions").upsert(
+  // Use admin client to bypass any RLS issues on push_subscriptions
+  const admin = createAdminClient();
+
+  // Try upsert by user_id + endpoint (one row per device)
+  const { error: err1 } = await admin.from("push_subscriptions").upsert(
     { user_id: user.id, subscription },
     { onConflict: "user_id,endpoint" }
   );
 
-  if (error) {
-    // Fallback: try upsert by user_id only (if migration hasn't run yet)
-    await supabase.from("push_subscriptions").upsert(
+  if (err1) {
+    // Fallback: upsert by user_id only (single-device mode)
+    const { error: err2 } = await admin.from("push_subscriptions").upsert(
       { user_id: user.id, subscription },
       { onConflict: "user_id" }
     );
+
+    if (err2) {
+      console.error("[push/subscribe] DB upsert failed:", err2);
+      return NextResponse.json({ ok: false, error: err2.message }, { status: 500 });
+    }
   }
 
   return NextResponse.json({ ok: true });

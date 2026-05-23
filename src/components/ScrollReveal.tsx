@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface Props {
   children: React.ReactNode;
@@ -18,6 +18,8 @@ export default function ScrollReveal({
   distance = 28,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
+  // Start visible on SSR; JS will hide then animate in once mounted
+  const [ready, setReady] = useState(false);
 
   const getTransform = () => {
     if (direction === "up")    return `translateY(${distance}px)`;
@@ -27,28 +29,26 @@ export default function ScrollReveal({
   };
 
   useEffect(() => {
+    setReady(true);
     const el = ref.current;
     if (!el) return;
 
-    const initialTransform = getTransform();
+    // Apply hidden state now that JS is running
+    el.style.opacity = "0";
+    el.style.transform = getTransform();
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Animate in
           el.style.transition = `opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1)`;
           el.style.transitionDelay = `${delay}ms`;
           el.style.opacity = "1";
-          el.style.transform = "translate(0,0)";
-        } else {
-          // Reset instantly (no transition) so it replays on next scroll
-          el.style.transition = "none";
-          el.style.transitionDelay = "0ms";
-          el.style.opacity = "0";
-          el.style.transform = initialTransform;
+          el.style.transform = "none";
+          // Animate in only once — stop observing after reveal
+          observer.disconnect();
         }
       },
-      { threshold: 0.12 }
+      { threshold: 0.08 }
     );
 
     observer.observe(el);
@@ -60,11 +60,7 @@ export default function ScrollReveal({
     <div
       ref={ref}
       className={className}
-      style={{
-        opacity: 0,
-        transform: getTransform(),
-        willChange: "opacity, transform",
-      }}
+      style={ready ? { willChange: "opacity, transform" } : undefined}
     >
       {children}
     </div>
