@@ -15,12 +15,20 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${siteUrl}/client/integrations?error=strava_denied`);
   }
 
-  // Decode user id from state
-  let clientId: string;
+  // Decode state and verify CSRF nonce against cookie
+  let uid: string;
+  let nonce: string;
   try {
-    clientId = Buffer.from(state, "base64url").toString("utf-8");
+    const decoded = JSON.parse(Buffer.from(state, "base64url").toString("utf-8")) as { uid: string; nonce: string };
+    uid = decoded.uid;
+    nonce = decoded.nonce;
   } catch {
     return NextResponse.redirect(`${siteUrl}/client/integrations?error=strava_state`);
+  }
+
+  const cookieNonce = req.cookies.get("strava_oauth_nonce")?.value;
+  if (!cookieNonce || cookieNonce !== nonce) {
+    return NextResponse.redirect(`${siteUrl}/client/integrations?error=strava_csrf`);
   }
 
   // Exchange code for token
@@ -51,7 +59,7 @@ export async function GET(req: NextRequest) {
     .from("health_integrations")
     .upsert(
       {
-        client_id: clientId,
+        client_id: uid,
         provider: "strava",
         access_token: tokenData.access_token,
         refresh_token: tokenData.refresh_token,
@@ -66,5 +74,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${siteUrl}/client/integrations?error=strava_save`);
   }
 
-  return NextResponse.redirect(`${siteUrl}/client/integrations?connected=strava`);
+  const response = NextResponse.redirect(`${siteUrl}/client/integrations?connected=strava`);
+  // Clear the nonce cookie
+  response.cookies.delete("strava_oauth_nonce");
+  return response;
 }

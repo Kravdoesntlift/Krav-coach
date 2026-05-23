@@ -3,22 +3,19 @@ import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
-// GET — redirect user to Strava OAuth consent page
 export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.redirect(new URL("/auth/login", process.env.NEXT_PUBLIC_SITE_URL!));
 
   const clientId = process.env.STRAVA_CLIENT_ID;
-  if (!clientId) {
-    return NextResponse.json({ error: "Strava não configurado." }, { status: 503 });
-  }
+  if (!clientId) return NextResponse.json({ error: "Strava não configurado." }, { status: 503 });
+
+  // CSRF: encode userId + random nonce, store nonce in cookie
+  const nonce = crypto.randomUUID();
+  const state = Buffer.from(JSON.stringify({ uid: user.id, nonce })).toString("base64url");
 
   const redirectUri = `${process.env.NEXT_PUBLIC_SITE_URL}/api/strava/callback`;
-
-  // State = base64 of user id (used in callback to identify user)
-  const state = Buffer.from(user.id).toString("base64url");
-
   const params = new URLSearchParams({
     client_id: clientId,
     redirect_uri: redirectUri,
@@ -28,5 +25,16 @@ export async function GET() {
     state,
   });
 
-  return NextResponse.redirect(`https://www.strava.com/oauth/authorize?${params.toString()}`);
+  const response = NextResponse.redirect(`https://www.strava.com/oauth/authorize?${params.toString()}`);
+
+  // Store nonce in a short-lived HttpOnly cookie (10 min)
+  response.cookies.set("strava_oauth_nonce", nonce, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 600,
+    path: "/",
+  });
+
+  return response;
 }

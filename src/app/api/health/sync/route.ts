@@ -3,9 +3,23 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 
-// POST — receive health data from Apple Shortcuts or any token-authenticated source
-// Body: { token, steps?, water_ml?, date?, source? }
-// date defaults to today (UTC) if omitted
+// Simple in-process rate limiter: max 20 requests per token per hour
+const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
+const RATE_LIMIT = 20;
+const WINDOW_MS = 60 * 60 * 1000;
+
+function isRateLimited(key: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(key);
+  if (!entry || now - entry.windowStart > WINDOW_MS) {
+    rateLimitMap.set(key, { count: 1, windowStart: now });
+    return false;
+  }
+  if (entry.count >= RATE_LIMIT) return true;
+  entry.count++;
+  return false;
+}
+
 export async function POST(req: NextRequest) {
   let body: Record<string, unknown>;
   try {
@@ -23,6 +37,11 @@ export async function POST(req: NextRequest) {
   };
 
   if (!token) return NextResponse.json({ error: "token obrigatório." }, { status: 400 });
+
+  // Rate limit by token (prefix to avoid collisions)
+  if (isRateLimited(`sync:${token}`)) {
+    return NextResponse.json({ error: "Demasiados pedidos. Tenta mais tarde." }, { status: 429 });
+  }
 
   const admin = createAdminClient();
 

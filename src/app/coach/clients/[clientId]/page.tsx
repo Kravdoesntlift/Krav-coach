@@ -14,6 +14,7 @@ import RefundAndCancelButton from "@/components/coach/RefundAndCancelButton";
 import ChallengeForm from "@/components/coach/ChallengeForm";
 import GoalForm from "@/components/coach/GoalForm";
 import NotifyButton from "@/components/coach/NotifyButton";
+import MacroGoalsCoach from "@/components/coach/MacroGoalsCoach";
 import Image from "next/image";
 import PhotoLightbox from "@/components/coach/PhotoLightbox";
 import type { ClientStatus } from "@/lib/supabase/types";
@@ -256,6 +257,9 @@ export default async function ClientDetailPage({
           <GoalForm clientId={clientId} initialGoals={(goals ?? []) as Parameters<typeof GoalForm>[0]["initialGoals"]} />
         </div>
       </section>
+
+      {/* Macro goals — coach sets precision nutrition targets for this client */}
+      <MacroGoalsCoach clientId={clientId} />
 
       {/* Coach notes (private) */}
       <CoachNotes coachId={user!.id} clientId={clientId} existing={coachNote?.content ?? null} />
