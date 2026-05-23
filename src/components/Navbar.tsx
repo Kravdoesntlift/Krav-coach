@@ -153,7 +153,7 @@ function DropdownItem({ item, pathname }: { item: NavItem; pathname: string }) {
 
       {open && (
         <div
-          className="absolute top-full left-0 mt-2 w-44 rounded-2xl overflow-hidden shadow-2xl slide-up-enter"
+          className="absolute top-full left-0 mt-2 w-56 rounded-2xl overflow-hidden shadow-2xl slide-up-enter"
           style={{
             background: "rgba(14,14,18,0.97)",
             backdropFilter: "blur(20px)",
