@@ -90,9 +90,10 @@ export default async function ClientLayout({
     { href: "/client/chat",     label: "Chat",      badge: unread },
     { href: "/client/ai-coach",   label: "AI Coach" },
     { href: "/client/nutrition",  label: "Nutrição" },
-    { href: "/client/daily-log",  label: "Registo" },
-    { href: "/client/leaderboard", label: "Leaderboard" },
-    { href: "/client/referral",   label: "Referências" },
+    { href: "/client/daily-log",    label: "Registo" },
+    { href: "/client/leaderboard",  label: "Leaderboard" },
+    { href: "/client/integrations", label: "Integrações" },
+    { href: "/client/referral",     label: "Referências" },
     { href: "/client/profile",    label: "Perfil" },
   ];
 
@@ -116,6 +117,7 @@ export default async function ClientLayout({
     { href: "/client/nutrition",      label: "Nutrição",     icon: <ForkKnifeIcon size={24} />,   badge: 0 },
     { href: "/client/daily-log",     label: "Registo",      icon: <FlameIcon size={24} />,       badge: 0 },
     { href: "/client/leaderboard",   label: "Leaderboard",  icon: <TrophyIcon size={24} />,      badge: 0 },
+    { href: "/client/integrations",  label: "Integrações",  icon: <span className="text-xl">⌚</span>, badge: 0 },
     { href: "/client/referral",      label: "Referências",  icon: <UsersIcon size={24} />,       badge: 0 },
   ];
 
