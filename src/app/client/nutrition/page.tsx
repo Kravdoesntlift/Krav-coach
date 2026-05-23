@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { NutritionLog, ClientNutritionGoals } from "@/lib/supabase/types";
 import { searchLocalFoods } from "@/lib/pt-foods";
+
+const BarcodeScanner = lazy(() => import("@/components/client/BarcodeScanner"));
 
 // ─── TDEE calculation ─────────────────────────────────────────────────────────
 const ACTIVITY_LABELS: Record<string, string> = {
@@ -41,6 +43,8 @@ interface FoodResult {
   id: string;
   name: string;
   source?: "local" | "custom" | "off";
+  /** Pre-fills the quantity input when set (fast food, packaged items). */
+  servingSize?: number;
   per100g: {
     calories: number | null; protein: number | null; carbs: number | null; fat: number | null;
     fiber: number | null; sugar: number | null; sodium: number | null;
@@ -164,6 +168,9 @@ function FoodSearch({
   const [searchErr, setSearchErr] = useState<string | null>(null);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // ── Barcode scanner state ──
+  const [showScanner, setShowScanner] = useState(false);
+
   // ── Tab 2: Create food state ──
   const [cfName,     setCfName]     = useState("");
   const [cfBrand,    setCfBrand]    = useState("");
@@ -202,6 +209,7 @@ function FoodSearch({
           id: f.id,
           name: f.name,
           source: "local" as const,
+          servingSize: f.servingSize,
           per100g: {
             calories: f.per100g.calories, protein: f.per100g.protein,
             carbs: f.per100g.carbs, fat: f.per100g.fat,
@@ -244,6 +252,7 @@ function FoodSearch({
         // Fallback: just show local + custom results
         const localMatches = searchLocalFoods(query).map((f) => ({
           id: f.id, name: f.name, source: "local" as const,
+          servingSize: f.servingSize,
           per100g: {
             calories: f.per100g.calories, protein: f.per100g.protein,
             carbs: f.per100g.carbs, fat: f.per100g.fat,
@@ -269,6 +278,7 @@ function FoodSearch({
     if (ingQuery.length < 2) { setIngResults([]); return; }
     const localMatches = searchLocalFoods(ingQuery).map((f) => ({
       id: f.id, name: f.name, source: "local" as const,
+      servingSize: f.servingSize,
       per100g: {
         calories: f.per100g.calories, protein: f.per100g.protein,
         carbs: f.per100g.carbs, fat: f.per100g.fat,
@@ -496,20 +506,53 @@ function FoodSearch({
           {/* ── Tab 1: Search ── */}
           {tab === "search" && (
             <div className="space-y-4">
-              {/* Search input */}
-              <div className="relative">
-                <input
-                  autoFocus
-                  value={query}
-                  onChange={(e) => { setQuery(e.target.value); setSelected(null); }}
-                  placeholder="Ex: frango, aveia, banana..."
-                  className="input text-sm pr-10"
-                />
-                {searching && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    <div className="w-4 h-4 border-2 border-brand-gold border-t-transparent rounded-full animate-spin" />
-                  </div>
-                )}
+              {/* Barcode scanner overlay */}
+              {showScanner && (
+                <Suspense fallback={null}>
+                  <BarcodeScanner
+                    onFound={(food) => {
+                      setShowScanner(false);
+                      setSelected(food);
+                      setQuery(food.name);
+                      setResults([]);
+                    }}
+                    onClose={() => setShowScanner(false)}
+                  />
+                </Suspense>
+              )}
+
+              {/* Search input + barcode button */}
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <input
+                    autoFocus
+                    value={query}
+                    onChange={(e) => { setQuery(e.target.value); setSelected(null); }}
+                    placeholder="Ex: frango, aveia, banana..."
+                    className="input text-sm pr-10"
+                  />
+                  {searching && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <div className="w-4 h-4 border-2 border-brand-gold border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                </div>
+                {/* Barcode scan button */}
+                <button
+                  type="button"
+                  onClick={() => setShowScanner(true)}
+                  title="Scan código de barras"
+                  className="flex items-center justify-center w-11 h-11 rounded-xl bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-brand-gold hover:border-brand-gold/40 transition-colors shrink-0"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9V6a1 1 0 0 1 1-1h3M3 15v3a1 1 0 0 0 1 1h3M15 5h3a1 1 0 0 1 1 1v3M15 19h3a1 1 0 0 0 1-1v-3"/>
+                    <line x1="7" y1="8" x2="7" y2="16"/>
+                    <line x1="10" y1="8" x2="10" y2="16"/>
+                    <line x1="13" y1="8" x2="13" y2="12"/>
+                    <line x1="16" y1="8" x2="16" y2="16"/>
+                    <line x1="13" y1="14" x2="13" y2="16"/>
+                  </svg>
+                </button>
               </div>
 
               {searchErr && <p className="text-red-400 text-xs">{searchErr}</p>}
@@ -520,7 +563,7 @@ function FoodSearch({
                   {results.map((f) => (
                     <button
                       key={f.id}
-                      onClick={() => setSelected(f)}
+                      onClick={() => { setSelected(f); if (f.servingSize) setGrams(String(f.servingSize)); }}
                       className="w-full text-left px-3 py-3 rounded-xl hover:bg-zinc-800 transition-colors"
                     >
                       <div className="flex items-center gap-1.5">
@@ -532,7 +575,7 @@ function FoodSearch({
                       <p className="text-zinc-500 text-[10px] mt-0.5">
                         {f.per100g.calories != null ? `${f.per100g.calories} kcal` : ""}
                         {f.per100g.protein != null ? ` · ${f.per100g.protein}g prot` : ""}
-                        {" por 100g"}
+                        {f.servingSize ? ` · porção: ${f.servingSize}g` : " · por 100g"}
                       </p>
                     </button>
                   ))}
@@ -556,12 +599,25 @@ function FoodSearch({
                       )}
                       <p className="text-white text-sm font-semibold">{selected.name}</p>
                     </div>
-                    <p className="text-zinc-500 text-[10px]">por 100g</p>
+                    <p className="text-zinc-500 text-[10px]">
+                      {selected.servingSize ? `porção padrão: ${selected.servingSize}g` : "por 100g"}
+                    </p>
                   </div>
 
                   {/* Grams input */}
                   <div>
-                    <label className="label">Quantidade (gramas)</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="label">Quantidade (gramas)</label>
+                      {selected.servingSize && (
+                        <button
+                          type="button"
+                          onClick={() => setGrams(String(selected.servingSize))}
+                          className="text-[11px] text-brand-gold hover:underline"
+                        >
+                          Repor porção ({selected.servingSize}g)
+                        </button>
+                      )}
+                    </div>
                     <input
                       type="number"
                       value={grams}
