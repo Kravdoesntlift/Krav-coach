@@ -591,7 +591,7 @@ export default async function LandingPage({
               {
                 name: "Tiago M.",
                 role: "Advanced · 2 months",
-                text: "I was already training but plateaued for ages. The coach spotted issues with my programming straight away. Bench went up 12 kg in 2 months which is mad.",
+                text: "I'd been training for years but stopped making progress. The coach spotted issues with my programming straight away. Bench went up 12 kg in 2 months which is mad.",
                 stars: 5,
               },
               {
@@ -616,7 +616,7 @@ export default async function LandingPage({
               {
                 name: "Tiago M.",
                 role: "Avançado · 2 meses",
-                text: "Já treinava há anos mas estava em plateau há muito tempo. O coach identificou logo problemas na minha programação. O supino subiu 12 kg em 2 meses, é loucura.",
+                text: "Já treinava há anos mas tinha parado de evoluir. O coach identificou logo problemas na minha programação. O supino subiu 12 kg em 2 meses, é loucura.",
                 stars: 5,
               },
               {
