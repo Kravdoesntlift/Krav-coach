@@ -23,17 +23,37 @@ const CATEGORY_ORDER = [
   "Quadríceps", "Glúteos & Posteriores", "Gémeos", "Core & Abdómen", "Outros",
 ];
 
-function getCategory(muscleGroups: string[]): string {
-  const first = (muscleGroups[0] ?? "").toLowerCase();
-  if (first.includes("peito")) return "Peito";
-  if (first.includes("dorsal") || first.includes("costas") || first.includes("trapézio") || first.includes("rombó")) return "Costas";
-  if (first.includes("deltóide") || first.includes("ombro")) return "Ombros";
-  if (first.includes("bíceps") || first.includes("braquial")) return "Bíceps";
-  if (first.includes("tríceps")) return "Tríceps";
-  if (first.includes("quadríceps")) return "Quadríceps";
-  if (first.includes("glúteo") || first.includes("isquiotibiais") || first.includes("lombar") || first.includes("adutor") || first.includes("full body")) return "Glúteos & Posteriores";
-  if (first.includes("gastrocnémio") || first.includes("sóleo") || first.includes("gémeo")) return "Gémeos";
-  if (first.includes("core") || first.includes("abdominal") || first.includes("oblíquos") || first.includes("reto")) return "Core & Abdómen";
+// Strip accents so Portuguese characters never fail includes() due to NFC/NFD encoding mismatches
+function norm(s: string): string {
+  return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
+function getCategory(name: string, muscleGroups: string[]): string {
+  const f = norm(muscleGroups[0] ?? "");
+  const n = norm(name);
+
+  // ── by first muscle group ──────────────────────────────────────────────────
+  if (f.includes("peito")) return "Peito";
+  if (f.includes("dorsal") || f.includes("costas") || f.includes("trapezio") || f.includes("romboide") || f.includes("romboi")) return "Costas";
+  if (f.includes("deltoide") || f.includes("ombro")) return "Ombros";
+  if (f.includes("biceps") || f.includes("braquial")) return "Bíceps";
+  if (f.includes("triceps")) return "Tríceps";
+  if (f.includes("quadriceps")) return "Quadríceps";
+  if (f.includes("gluteo") || f.includes("isquiotibiais") || f.includes("lombar") || f.includes("adutor")) return "Glúteos & Posteriores";
+  if (f.includes("gastrocnemio") || f.includes("soleo") || f.includes("gemeo")) return "Gémeos";
+  if (f.includes("core") || f.includes("abdominal") || f.includes("obliquo") || f.includes("reto")) return "Core & Abdómen";
+
+  // ── fallback by exercise name ──────────────────────────────────────────────
+  if (n.includes("supino") || n.includes("crucifixo") || n.includes("pec deck") || n.includes("chest press") || n.includes("flexoes") || n.includes("flexao")) return "Peito";
+  if (n.includes("remada") || n.includes("pulldown") || n.includes("puxada") || n.includes("dominada") || n.includes("chin-up") || n.includes("peso morto") || n.includes("deadlift") || n.includes("pullover") || n.includes("straight arm")) return "Costas";
+  if (n.includes("press militar") || n.includes("arnold") || n.includes("elevacoes") || n.includes("passaro") || n.includes("face pull") || n.includes("upright") || n.includes("shrug") || n.includes("encolher") || n.includes("pike push")) return "Ombros";
+  if (n.includes("rosca") || n.includes("curl") || n.includes("hammer")) return "Bíceps";
+  if (n.includes("triceps") || n.includes("skull") || n.includes("pushdown") || n.includes("mergulhos") || n.includes("kickback") || n.includes("extensao acima")) return "Tríceps";
+  if (n.includes("agachamento") || n.includes("squat") || n.includes("leg press") || n.includes("leg extension") || n.includes("extensao de pernas") || n.includes("afundo") || n.includes("hack") || n.includes("step up") || n.includes("lunges")) return "Quadríceps";
+  if (n.includes("hip thrust") || n.includes("glute bridge") || n.includes("romanian") || n.includes("leg curl") || n.includes("good morning") || n.includes("abducao") || n.includes("aducao") || n.includes("kick back") || n.includes("superman")) return "Glúteos & Posteriores";
+  if (n.includes("calcanhar") || n.includes("calf raise")) return "Gémeos";
+  if (n.includes("prancha") || n.includes("plank") || n.includes("crunch") || n.includes("elevacao de pernas") || n.includes("russian") || n.includes("ab wheel") || n.includes("mountain climber") || n.includes("dead bug")) return "Core & Abdómen";
+
   return "Outros";
 }
 
@@ -170,7 +190,7 @@ function ExerciseCard({
       </div>
 
       {item.description && (
-        <p className="text-xs text-zinc-500 line-clamp-2">{item.description}</p>
+        <p className="text-xs text-zinc-500 leading-relaxed">{item.description}</p>
       )}
 
       {item.video_url ? (
@@ -215,7 +235,7 @@ export default function LibraryClient({ items, coachId }: Props) {
 
   // Group by category
   const grouped = CATEGORY_ORDER.reduce<Record<string, ExerciseLibraryItem[]>>((acc, cat) => {
-    const inCat = filtered.filter((item) => getCategory(item.muscle_groups) === cat);
+    const inCat = filtered.filter((item) => getCategory(item.name, item.muscle_groups) === cat);
     if (inCat.length > 0) acc[cat] = inCat;
     return acc;
   }, {});

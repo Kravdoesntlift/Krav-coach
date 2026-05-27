@@ -104,7 +104,7 @@ const DEFAULT_EXERCISES: { name: string; muscle_groups: string[]; description: s
   { name: "Mountain Climber", muscle_groups: ["Core", "Deltóides", "Quadríceps"], description: "Em posição de flexão. Alterna trazendo os joelhos ao peito rapidamente. Combina core com cardio." },
   { name: "Dead Bug", muscle_groups: ["Core", "Lombar"], description: "Deitado no chão, braços para cima, joelhos a 90°. Estende o braço direito e a perna esquerda simultaneamente mantendo a lombar colada ao chão. Alterna." },
   // FULL BODY / CASA
-  { name: "Burpee", muscle_groups: ["Full body", "Cardio"], description: "De pé, desce as mãos ao chão, salta para a posição de flexão, faz uma flexão, salta os pés para as mãos e salta para cima com os braços acima da cabeça." },
+  { name: "Burpee", muscle_groups: ["Core", "Quadríceps", "Glúteos", "Peito", "Deltóides"], description: "De pé, desce as mãos ao chão, salta para a posição de flexão, faz uma flexão, salta os pés para as mãos e salta para cima com os braços acima da cabeça. Exercício full body de alta intensidade." },
   { name: "Afundo Alternado", muscle_groups: ["Quadríceps", "Glúteos"], description: "Sem pesos. Afundo alternado no mesmo lugar ou em deslocamento." },
   { name: "Pike Push-Up", muscle_groups: ["Deltóide anterior", "Tríceps"], description: "Mãos e pés no chão em forma de V invertido. Dobra os cotovelos baixando a cabeça ao chão. Simula o press de ombros." },
   { name: "Superman", muscle_groups: ["Lombar", "Glúteos", "Trapézio"], description: "Deitado de barriga para baixo. Eleva simultaneamente os braços e as pernas do chão contraindo a lombar e os glúteos." },
