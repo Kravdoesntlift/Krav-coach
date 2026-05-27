@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition, useOptimistic } from "react";
-import { addExercise, deleteExercise } from "./actions";
+import { addExercise, deleteExercise, seedDefaultLibrary } from "./actions";
 
 export interface ExerciseLibraryItem {
   id: string;
@@ -129,6 +129,7 @@ export default function LibraryClient({ items, coachId }: Props) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState<string | null>(null);
+  const [seedMsg, setSeedMsg] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   const [optimisticItems, updateOptimisticItems] = useOptimistic(
@@ -215,7 +216,29 @@ export default function LibraryClient({ items, coachId }: Props) {
         >
           {showForm ? "Cancelar" : "+ Adicionar exercício"}
         </button>
+        {items.length === 0 && (
+          <button
+            onClick={() => {
+              setSeedMsg(null);
+              startTransition(async () => {
+                const res = await seedDefaultLibrary();
+                if (res.error) setSeedMsg(res.error);
+                else setSeedMsg(`✅ ${res.count} exercícios importados com sucesso!`);
+              });
+            }}
+            disabled={pending}
+            className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-semibold border transition-all"
+            style={{ borderColor: "rgba(201,168,76,0.3)", color: "#C9A84C", background: "rgba(201,168,76,0.07)" }}
+          >
+            {pending ? "A importar..." : "⬇ Importar biblioteca padrão"}
+          </button>
+        )}
       </div>
+      {seedMsg && (
+        <p className="text-sm font-medium" style={{ color: seedMsg.startsWith("✅") ? "#C9A84C" : "#f87171" }}>
+          {seedMsg}
+        </p>
+      )}
 
       {/* Inline add form */}
       {showForm && (
