@@ -192,7 +192,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
         name: lib.name,
         sets: "3",
         reps: "10",
-        notes: lib.description ? lib.description.slice(0, 80) : "",
+        notes: "",
         video_url: lib.video_url ?? "",
         superset_group: "",
       }],
