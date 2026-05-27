@@ -22,11 +22,20 @@ interface DayInput {
   exercises: ExerciseInput[];
 }
 
+interface LibraryExercise {
+  id: string;
+  name: string;
+  muscle_groups: string[];
+  description: string | null;
+  video_url: string | null;
+}
+
 interface Props {
   coachId: string;
   clients: Profile[];
   preselectedClientId?: string;
   existingPlan?: WorkoutPlan;
+  libraryItems?: LibraryExercise[];
 }
 
 function planToDayInputs(plan: WorkoutPlan): DayInput[] {
@@ -53,7 +62,7 @@ interface Template {
   days: DayInput[];
 }
 
-export default function PlanBuilder({ coachId, clients, preselectedClientId, existingPlan, templates = [], suggestMode = false }: Props & { templates?: Template[]; suggestMode?: boolean }) {
+export default function PlanBuilder({ coachId, clients, preselectedClientId, existingPlan, libraryItems = [], templates = [], suggestMode = false }: Props & { templates?: Template[]; suggestMode?: boolean }) {
   const router = useRouter();
   const isEdit = !!existingPlan;
 
@@ -78,6 +87,8 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
   const [templateSaved, setTemplateSaved] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [aiGenerating, setAiGenerating] = useState(false);
+  const [libraryPicker, setLibraryPicker] = useState<number | null>(null); // day_of_week being picked
+  const [librarySearch, setLibrarySearch] = useState("");
   const [aiError, setAiError] = useState<string | null>(null);
 
   // Load AI-suggested plan from sessionStorage when coming from SuggestPlanButton
@@ -172,6 +183,22 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
     updateDay(dayOfWeek, {
       exercises: [...(day?.exercises ?? []), { name: "", sets: "3", reps: "10", notes: "", video_url: "", superset_group: "" }],
     });
+  }
+
+  function importFromLibrary(dayOfWeek: number, lib: LibraryExercise) {
+    const day = days.find((d) => d.day_of_week === dayOfWeek);
+    updateDay(dayOfWeek, {
+      exercises: [...(day?.exercises ?? []), {
+        name: lib.name,
+        sets: "3",
+        reps: "10",
+        notes: lib.description ? lib.description.slice(0, 80) : "",
+        video_url: lib.video_url ?? "",
+        superset_group: "",
+      }],
+    });
+    setLibraryPicker(null);
+    setLibrarySearch("");
   }
 
   function updateExercise(dayOfWeek: number, idx: number, patch: Partial<ExerciseInput>) {
@@ -307,6 +334,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
   const selectedDays = new Set(days.map((d) => d.day_of_week));
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Basic info */}
       <div className="card p-6 space-y-4">
@@ -520,12 +548,24 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                   </div>
                 ))}
 
-                <button
-                  type="button" onClick={() => addExercise(day.day_of_week)}
-                  className="w-full py-2.5 rounded-lg border border-dashed border-zinc-700 text-gray-500 hover:border-zinc-500 hover:text-gray-300 text-sm transition-colors"
-                >
-                  + Adicionar exercício
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    type="button" onClick={() => addExercise(day.day_of_week)}
+                    className="flex-1 py-2.5 rounded-lg border border-dashed border-zinc-700 text-gray-500 hover:border-zinc-500 hover:text-gray-300 text-sm transition-colors"
+                  >
+                    + Escrever exercício
+                  </button>
+                  {libraryItems.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => { setLibraryPicker(day.day_of_week); setLibrarySearch(""); }}
+                      className="px-4 py-2.5 rounded-lg border text-sm font-semibold transition-colors"
+                      style={{ borderColor: "rgba(201,168,76,0.35)", color: "#C9A84C", background: "rgba(201,168,76,0.07)" }}
+                    >
+                      📚 Da biblioteca
+                    </button>
+                  )}
+                </div>
               </div>
             </>
           )}
@@ -554,5 +594,67 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
         </button>
       </div>
     </form>
+
+    {/* Library picker modal */}
+
+    {libraryPicker !== null && (
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.8)", backdropFilter: "blur(8px)" }}>
+        <div className="w-full max-w-lg rounded-2xl flex flex-col animate-fade-in" style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)", maxHeight: "80vh" }}>
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+            <h3 className="font-bold text-white">Importar da biblioteca</h3>
+            <button onClick={() => setLibraryPicker(null)} className="w-8 h-8 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">✕</button>
+          </div>
+          {/* Search */}
+          <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+            <input
+              type="text"
+              autoFocus
+              placeholder="Pesquisar exercício..."
+              value={librarySearch}
+              onChange={(e) => setLibrarySearch(e.target.value)}
+              className="input w-full"
+            />
+          </div>
+          {/* List */}
+          <div className="overflow-y-auto flex-1 p-3 space-y-1">
+            {libraryItems
+              .filter((ex) =>
+                ex.name.toLowerCase().includes(librarySearch.toLowerCase()) ||
+                ex.muscle_groups.some((mg) => mg.toLowerCase().includes(librarySearch.toLowerCase()))
+              )
+              .map((ex) => (
+                <button
+                  key={ex.id}
+                  type="button"
+                  onClick={() => importFromLibrary(libraryPicker, ex)}
+                  className="w-full text-left px-4 py-3 rounded-xl flex items-center justify-between gap-3 transition-colors hover:bg-white/[0.05] active:scale-[0.98]"
+                >
+                  <div className="min-w-0">
+                    <p className="text-white text-sm font-semibold truncate">{ex.name}</p>
+                    <p className="text-zinc-500 text-xs truncate">{ex.muscle_groups.join(", ")}</p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {ex.video_url && (
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(201,168,76,0.12)", color: "#C9A84C" }}>
+                        vídeo
+                      </span>
+                    )}
+                    <svg viewBox="0 0 20 20" className="w-4 h-4 fill-zinc-600"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"/></svg>
+                  </div>
+                </button>
+              ))
+            }
+            {libraryItems.filter((ex) =>
+              ex.name.toLowerCase().includes(librarySearch.toLowerCase()) ||
+              ex.muscle_groups.some((mg) => mg.toLowerCase().includes(librarySearch.toLowerCase()))
+            ).length === 0 && (
+              <p className="text-center text-zinc-500 text-sm py-8">Nenhum exercício encontrado.</p>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

@@ -12,12 +12,10 @@ export default async function EditPlanPage({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: plan } = await supabase
-    .from("workout_plans")
-    .select(`*, workout_days(*, exercises(*))`)
-    .eq("id", planId)
-    .eq("coach_id", user!.id)
-    .single();
+  const [{ data: plan }, { data: libraryItems }] = await Promise.all([
+    supabase.from("workout_plans").select(`*, workout_days(*, exercises(*))`).eq("id", planId).eq("coach_id", user!.id).single(),
+    supabase.from("exercise_library").select("id,name,muscle_groups,description,video_url").eq("coach_id", user!.id).order("name"),
+  ]);
 
   if (!plan) notFound();
 
@@ -32,6 +30,7 @@ export default async function EditPlanPage({
         coachId={user!.id}
         clients={[]}
         existingPlan={plan as unknown as WorkoutPlan}
+        libraryItems={libraryItems ?? []}
       />
     </div>
   );

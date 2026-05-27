@@ -13,9 +13,10 @@ export default async function NewPlanPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [{ data: clients }, { data: templates }] = await Promise.all([
+  const [{ data: clients }, { data: templates }, { data: libraryItems }] = await Promise.all([
     supabase.from("profiles").select("*").eq("role", "client").order("full_name"),
     supabase.from("plan_templates").select("*").eq("coach_id", user!.id).order("created_at", { ascending: false }),
+    supabase.from("exercise_library").select("id,name,muscle_groups,description,video_url").eq("coach_id", user!.id).order("name"),
   ]);
 
   return (
@@ -33,6 +34,7 @@ export default async function NewPlanPage({
         preselectedClientId={preselectedClientId}
         templates={templates ?? []}
         suggestMode={suggest === "true"}
+        libraryItems={libraryItems ?? []}
       />
     </div>
   );
