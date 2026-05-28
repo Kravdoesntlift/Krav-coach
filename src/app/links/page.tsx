@@ -2,121 +2,149 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 
-/* ─── Card data ─────────────────────────────────────────────────────────────── */
-const CARDS = [
+/* ─── Types ─────────────────────────────────────────────────────────────────── */
+interface CardData {
+  id: string;
+  label: string;
+  title: string;
+  sub: string;
+  cta: string;
+  href: string;
+  disabled?: boolean;
+  gradient: string;
+  modal?: {
+    title: string;
+    desc: string;
+    cta: string;
+    href: string;
+  };
+}
+
+const CARDS: CardData[] = [
   {
     id: "coaching",
-    badge: "COACHING ONLINE",
-    badgeColor: "#C9A84C",
-    title: "Coaching Personalizado",
-    sub: "Treino e nutrição adaptados a ti",
-    cta: "Quero saber mais →",
-    ctaColor: "#C9A84C",
-    ctaText: "#000",
+    label: "COACHING ONLINE",
+    title: "Transforma o teu corpo",
+    sub: "Plano personalizado + acompanhamento real",
+    cta: "Saber mais",
     href: "https://www.kravcoaching.com",
+    gradient: "linear-gradient(135deg, #1c1200 0%, #2a1d00 50%, #0d0d0d 100%)",
     modal: {
-      badge: "COACHING ONLINE",
-      badgeColor: "#C9A84C",
-      title: "Coaching Personalizado",
-      desc: "Plano de treino 100% feito para ti, acompanhamento semanal, app exclusiva no teu telemóvel e suporte direto comigo. Sem planos genéricos — só resultados reais.",
-      cta: "Começar agora →",
+      title: "Coaching Online Personalizado",
+      desc: "Treino e nutrição 100% feitos para ti. Plano semanal na app, check-ins de evolução, ajustes constantes e contacto direto comigo — sem planos genéricos.",
+      cta: "Quero começar",
       href: "https://www.kravcoaching.com",
     },
-    bg: "linear-gradient(160deg, #1a1200 0%, #0d0d0d 60%)",
-    icon: "🏋️",
   },
   {
-    id: "app",
-    badge: "APP EXCLUSIVA",
-    badgeColor: "#6366f1",
-    title: "Já és cliente?",
-    sub: "Acede à tua área pessoal",
-    cta: "Entrar na app →",
-    ctaColor: "#6366f1",
-    ctaText: "#fff",
-    href: "https://www.kravcoaching.com/auth/login",
-    modal: null,
-    bg: "linear-gradient(160deg, #0d0d1a 0%, #0d0d0d 60%)",
-    icon: "📱",
-  },
-  {
-    id: "instagram",
-    badge: "INSTAGRAM",
-    badgeColor: "#e1306c",
-    title: "@kravdoesntlift",
-    sub: "Treino, nutrição e lifestyle diário",
-    cta: "Seguir →",
-    ctaColor: "#e1306c",
-    ctaText: "#fff",
-    href: "https://instagram.com/kravdoesntlift",
-    modal: null,
-    bg: "linear-gradient(160deg, #1a000d 0%, #0d0d0d 60%)",
-    icon: "📸",
+    id: "transformations",
+    label: "RESULTADOS",
+    title: "Antes & Depois",
+    sub: "Clientes reais, transformações reais",
+    cta: "Ver resultados",
+    href: "https://www.kravcoaching.com#resultados",
+    gradient: "linear-gradient(135deg, #0d0d0d 0%, #111 100%)",
   },
   {
     id: "community",
-    badge: "EM BREVE",
-    badgeColor: "#52525b",
+    label: "EM BREVE",
     title: "Comunidade KRAV",
-    sub: "Grupo privado — a chegar em breve",
-    cta: "Entrar na lista →",
-    ctaColor: "#52525b",
-    ctaText: "#fff",
+    sub: "Grupo privado exclusivo — entra na lista",
+    cta: "Entrar na lista",
     href: "#",
-    modal: null,
-    bg: "linear-gradient(160deg, #111 0%, #0d0d0d 60%)",
-    icon: "🔒",
+    disabled: true,
+    gradient: "linear-gradient(135deg, #0d0d0d 0%, #111 100%)",
   },
 ];
 
+/* ─── Icons ─────────────────────────────────────────────────────────────────── */
+function ChevronRight() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 18l6-6-6-6" />
+    </svg>
+  );
+}
+function CloseIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 6L6 18M6 6l12 12" />
+    </svg>
+  );
+}
+
 /* ─── Modal ─────────────────────────────────────────────────────────────────── */
-function Modal({ card, onClose }: { card: typeof CARDS[0]; onClose: () => void }) {
+function Modal({ card, onClose }: { card: CardData; onClose: () => void }) {
   const m = card.modal!;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(12px)" }}
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+      style={{ background: "rgba(0,0,0,0.88)", backdropFilter: "blur(16px)" }}
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-3xl overflow-hidden animate-fade-in"
-        style={{ background: "#141414", border: "1px solid rgba(201,168,76,0.2)" }}
+        className="w-full max-w-sm mx-4 mb-4 sm:mb-0 rounded-3xl overflow-hidden"
+        style={{
+          background: "#0f0f0f",
+          border: "1px solid rgba(201,168,76,0.15)",
+          boxShadow: "0 0 60px rgba(201,168,76,0.06)",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Image area */}
+        {/* Top bar with gradient */}
         <div
-          className="relative h-44 flex items-center justify-center"
-          style={{ background: card.bg }}
+          className="relative h-40"
+          style={{ background: card.gradient }}
         >
-          <span className="text-6xl">{card.icon}</span>
-          <span
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs font-black tracking-widest px-4 py-1.5 rounded-full"
-            style={{ background: m.badgeColor, color: "#000" }}
-          >
-            ✓ {m.badge}
-          </span>
+          {/* Gold line */}
+          <div
+            className="absolute bottom-0 left-0 right-0 h-px"
+            style={{ background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent)" }}
+          />
+          {/* Label */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span
+              className="text-xs font-black tracking-[0.2em] uppercase px-4 py-2 rounded-full"
+              style={{
+                background: "rgba(201,168,76,0.12)",
+                border: "1px solid rgba(201,168,76,0.3)",
+                color: "#C9A84C",
+              }}
+            >
+              {card.label}
+            </span>
+          </div>
+          {/* Close */}
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full text-white font-bold text-sm"
-            style={{ background: "rgba(0,0,0,0.5)" }}
+            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-zinc-400 hover:text-white transition-colors"
+            style={{ background: "rgba(0,0,0,0.4)" }}
           >
-            ✕
+            <CloseIcon />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6 space-y-4 text-center">
-          <h2 className="text-2xl font-black text-white">{m.title}</h2>
-          <p className="text-zinc-400 text-sm leading-relaxed">{m.desc}</p>
+        <div className="p-7 space-y-5">
+          <div className="space-y-2 text-center">
+            <h2 className="text-2xl font-black text-white tracking-tight">{m.title}</h2>
+            <p className="text-zinc-400 text-sm leading-relaxed">{m.desc}</p>
+          </div>
+
           <a
             href={m.href}
-            className="block w-full py-4 rounded-2xl text-center font-black text-base transition-all active:scale-95"
-            style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C)", color: "#000" }}
+            className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl font-black text-base tracking-tight transition-all active:scale-[0.98]"
+            style={{
+              background: "linear-gradient(135deg, #E8C96B 0%, #C9A84C 50%, #A8893A 100%)",
+              color: "#000",
+              boxShadow: "0 4px 24px rgba(201,168,76,0.25)",
+            }}
           >
             {m.cta}
+            <ChevronRight />
           </a>
+
+          <p className="text-center text-xs text-zinc-600">Sem contratos. Cancela quando quiseres.</p>
         </div>
       </div>
     </div>
@@ -124,115 +152,115 @@ function Modal({ card, onClose }: { card: typeof CARDS[0]; onClose: () => void }
 }
 
 /* ─── Card ──────────────────────────────────────────────────────────────────── */
-function Card({ card, onClick }: { card: typeof CARDS[0]; onClick?: () => void }) {
-  const isDisabled = card.href === "#";
-  const Inner = (
+function Card({ card, onOpen }: { card: CardData; onOpen?: () => void }) {
+  const content = (
     <div
-      className="rounded-2xl overflow-hidden transition-all duration-200 active:scale-[0.98] cursor-pointer"
-      style={{ border: "1px solid rgba(255,255,255,0.07)", background: "#111" }}
+      className="relative rounded-2xl overflow-hidden transition-all duration-200"
+      style={{
+        background: "#0f0f0f",
+        border: "1px solid rgba(255,255,255,0.06)",
+      }}
     >
-      {/* Top image strip */}
-      <div
-        className="relative h-28 flex items-center justify-center"
-        style={{ background: card.bg }}
-      >
-        <span className="text-5xl">{card.icon}</span>
-        <span
-          className="absolute top-3 left-3 text-[10px] font-black tracking-widest px-3 py-1 rounded-full uppercase"
-          style={{
-            background: `${card.badgeColor}22`,
-            border: `1px solid ${card.badgeColor}55`,
-            color: card.badgeColor,
-          }}
-        >
-          {card.badge}
-        </span>
-      </div>
+      {/* Gradient strip */}
+      <div className="h-[3px] w-full" style={{ background: card.disabled ? "rgba(255,255,255,0.05)" : "linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent)" }} />
 
-      {/* Bottom content */}
-      <div className="px-4 py-3 flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-white font-bold text-sm truncate">{card.title}</p>
-          <p className="text-zinc-500 text-xs truncate">{card.sub}</p>
+      <div className="px-5 py-4 flex items-center justify-between gap-4">
+        <div className="space-y-0.5 min-w-0">
+          <p
+            className="text-[10px] font-black tracking-[0.18em] uppercase"
+            style={{ color: card.disabled ? "#52525b" : "rgba(201,168,76,0.6)" }}
+          >
+            {card.label}
+          </p>
+          <p className={`font-bold text-base leading-tight ${card.disabled ? "text-zinc-600" : "text-white"}`}>
+            {card.title}
+          </p>
+          <p className="text-xs text-zinc-600 truncate">{card.sub}</p>
         </div>
-        <span
-          className="shrink-0 text-xs font-black px-4 py-2 rounded-xl whitespace-nowrap"
-          style={{ background: isDisabled ? "#27272a" : card.ctaColor, color: isDisabled ? "#52525b" : card.ctaText }}
+
+        <div
+          className="shrink-0 flex items-center gap-1.5 text-xs font-black px-4 py-2.5 rounded-xl whitespace-nowrap"
+          style={
+            card.disabled
+              ? { background: "rgba(255,255,255,0.04)", color: "#52525b", border: "1px solid rgba(255,255,255,0.06)" }
+              : { background: "rgba(201,168,76,0.1)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }
+          }
         >
           {card.cta}
-        </span>
+          {!card.disabled && <ChevronRight />}
+        </div>
       </div>
     </div>
   );
 
-  if (onClick) return <div onClick={onClick}>{Inner}</div>;
-  if (isDisabled) return <div className="opacity-60 cursor-not-allowed">{Inner}</div>;
-  return <a href={card.href} target="_blank" rel="noopener noreferrer">{Inner}</a>;
+  if (card.disabled) return <div className="opacity-50 cursor-not-allowed select-none">{content}</div>;
+  if (onOpen) return <button className="w-full text-left active:scale-[0.98] transition-transform" onClick={onOpen}>{content}</button>;
+  return <a href={card.href} target="_blank" rel="noopener noreferrer" className="block active:scale-[0.98] transition-transform">{content}</a>;
 }
 
 /* ─── Page ──────────────────────────────────────────────────────────────────── */
 export default function LinksPage() {
-  const [openCard, setOpenCard] = useState<typeof CARDS[0] | null>(null);
+  const [openCard, setOpenCard] = useState<CardData | null>(null);
   const [imgError, setImgError] = useState(false);
 
   return (
     <main
-      className="min-h-screen flex flex-col items-center py-12 px-4"
-      style={{ background: "#0a0a0a" }}
+      className="min-h-screen flex flex-col items-center justify-start py-14 px-5"
+      style={{ background: "#080808" }}
     >
-      <div className="w-full max-w-sm space-y-6">
+      <div className="w-full max-w-sm flex flex-col gap-8">
 
-        {/* Profile */}
-        <div className="flex flex-col items-center gap-3 text-center">
+        {/* ── Profile ──────────────────────────────────────────── */}
+        <div className="flex flex-col items-center gap-4 text-center">
+
           {/* Avatar */}
           <div className="relative">
             <div
-              className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center font-black text-2xl"
+              className="w-[88px] h-[88px] rounded-full overflow-hidden flex items-center justify-center font-black text-2xl shrink-0"
               style={{
                 background: "linear-gradient(135deg,#E8C96B,#A8893A)",
                 color: "#000",
-                boxShadow: "0 0 0 3px #C9A84C44, 0 0 0 6px #C9A84C11",
+                boxShadow: "0 0 0 2px #080808, 0 0 0 4px rgba(201,168,76,0.35), 0 8px 32px rgba(201,168,76,0.12)",
               }}
             >
               {!imgError ? (
                 <Image
                   src="/andre.jpg"
                   alt="André Kravchuk"
-                  width={96}
-                  height={96}
+                  width={88}
+                  height={88}
                   className="object-cover w-full h-full"
                   onError={() => setImgError(true)}
                 />
-              ) : (
-                "AK"
-              )}
+              ) : "AK"}
             </div>
-            {/* Online dot */}
             <span
-              className="absolute bottom-1 right-1 w-4 h-4 rounded-full border-2"
-              style={{ background: "#22c55e", borderColor: "#0a0a0a" }}
+              className="absolute bottom-0.5 right-0.5 w-[14px] h-[14px] rounded-full"
+              style={{ background: "#22c55e", boxShadow: "0 0 0 2px #080808" }}
             />
           </div>
 
-          <div>
+          {/* Name */}
+          <div className="space-y-1">
             <h1 className="text-xl font-black text-white tracking-tight">André Kravchuk</h1>
-            <p className="text-sm font-medium" style={{ color: "#C9A84C" }}>@kravdoesntlift</p>
+            <p className="text-sm font-semibold" style={{ color: "#C9A84C" }}>@kravdoesntlift</p>
           </div>
 
-          <p className="text-zinc-400 text-sm leading-relaxed max-w-xs">
-            Personal Trainer certificado. Treino e nutrição adaptados a ti — resultados reais, sem atalhos.
+          {/* Bio */}
+          <p className="text-sm text-zinc-400 leading-relaxed max-w-[260px]">
+            Personal Trainer certificado. Transformações reais, sem atalhos.
           </p>
 
           {/* Tags */}
-          <div className="flex gap-2 flex-wrap justify-center">
-            {["Treino", "Nutrição", "Lifestyle"].map((tag) => (
+          <div className="flex gap-2">
+            {["Treino", "Nutrição", "Resultados"].map((tag) => (
               <span
                 key={tag}
-                className="text-xs px-3 py-1 rounded-full"
+                className="text-[11px] font-semibold px-3 py-1 rounded-full"
                 style={{
-                  background: "rgba(201,168,76,0.08)",
-                  border: "1px solid rgba(201,168,76,0.2)",
-                  color: "rgba(201,168,76,0.8)",
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  color: "rgba(255,255,255,0.4)",
                 }}
               >
                 {tag}
@@ -241,27 +269,25 @@ export default function LinksPage() {
           </div>
         </div>
 
-        {/* Divider */}
-        <div style={{ height: "1px", background: "rgba(255,255,255,0.06)" }} />
+        {/* ── Gold divider ─────────────────────────────────────── */}
+        <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent)" }} />
 
-        {/* Cards */}
-        <div className="space-y-3">
+        {/* ── Cards ────────────────────────────────────────────── */}
+        <div className="flex flex-col gap-3">
           {CARDS.map((card) => (
             <Card
               key={card.id}
               card={card}
-              onClick={card.modal ? () => setOpenCard(card) : undefined}
+              onOpen={card.modal ? () => setOpenCard(card) : undefined}
             />
           ))}
         </div>
 
-        {/* Footer */}
-        <p className="text-center text-[11px] text-zinc-700 pb-4">
-          powered by{" "}
-          <Link href="https://www.kravcoaching.com" className="font-bold" style={{ color: "#C9A84C88" }}>
-            KRAV
-          </Link>
+        {/* ── Footer ───────────────────────────────────────────── */}
+        <p className="text-center text-[11px] pb-2" style={{ color: "rgba(201,168,76,0.2)" }}>
+          powered by <span className="font-black" style={{ color: "rgba(201,168,76,0.4)" }}>KRAV</span>
         </p>
+
       </div>
 
       {/* Modal */}
