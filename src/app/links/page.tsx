@@ -57,13 +57,31 @@ function CoachingVisual() {
 
 function MyProteinVisual() {
   return (
-    <div className="absolute inset-0 overflow-hidden flex items-center justify-center" style={{ background: "linear-gradient(135deg, #0d0d0d 0%, #111 100%)" }}>
-      {/* Dotted border suggestion (coupon style) */}
-      <div className="absolute inset-3 rounded-xl" style={{ border: "1px dashed rgba(201,168,76,0.12)" }} />
-      {/* The code as hero element */}
-      <div className="text-center select-none">
-        <p className="text-[10px] font-bold tracking-[0.25em] uppercase mb-1" style={{ color: "rgba(201,168,76,0.4)" }}>Código de desconto</p>
-        <p className="font-black tracking-[0.18em]" style={{ fontSize: 32, color: "rgba(201,168,76,0.15)", letterSpacing: "0.2em" }}>MPKRAV</p>
+    <div className="absolute inset-0 overflow-hidden" style={{ background: "linear-gradient(135deg, #0d0d0d 0%, #0f0f0f 100%)" }}>
+      {/* Subtle dot grid */}
+      <div className="absolute inset-0" style={{
+        backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)",
+        backgroundSize: "18px 18px",
+      }} />
+      {/* Centered coupon chip */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 select-none">
+        <p className="text-[9px] font-bold tracking-[0.3em] uppercase" style={{ color: "rgba(255,255,255,0.25)" }}>
+          código de desconto
+        </p>
+        <div
+          className="px-5 py-2 rounded-lg"
+          style={{
+            background: "rgba(201,168,76,0.08)",
+            border: "1px dashed rgba(201,168,76,0.35)",
+          }}
+        >
+          <p className="font-black tracking-[0.22em] text-xl" style={{ color: "#C9A84C" }}>
+            MPKRAV
+          </p>
+        </div>
+        <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.18)" }}>
+          usar no checkout · myprotein.com
+        </p>
       </div>
     </div>
   );

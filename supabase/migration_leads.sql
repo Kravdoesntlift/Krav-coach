@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS leads (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   name text NOT NULL,
-  email text NOT NULL,
+  email text NOT NULL UNIQUE,
   source text DEFAULT 'guia',
   created_at timestamptz DEFAULT now()
 );
@@ -24,3 +24,14 @@ CREATE POLICY "Coaches can read leads" ON leads
       AND profiles.role = 'coach'
     )
   );
+
+-- If table already exists, add the unique constraint on email
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'leads_email_key'
+  ) THEN
+    ALTER TABLE leads ADD CONSTRAINT leads_email_key UNIQUE (email);
+  END IF;
+END $$;
