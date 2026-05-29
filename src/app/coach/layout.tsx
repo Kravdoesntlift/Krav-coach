@@ -45,6 +45,7 @@ export default async function CoachLayout({
         { href: "/coach/challenges",     label: "🏆 Desafio Mensal" },
         { href: "/coach/manage-clients", label: "⚙️ Gerir Clientes" },
         { href: "/coach/library",        label: "📚 Biblioteca" },
+        { href: "/coach/leads",          label: "📧 Leads" },
         { href: "/coach/setup",          label: "🚀 Configuração" },
         { href: "/coach/billing",        label: "💳 Faturação" },
       ],
