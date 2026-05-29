@@ -161,10 +161,10 @@ const CARDS: CardData[] = [
   },
   {
     id: "coaching",
-    badge: "COACHING ONLINE",
+    badge: "COACHING 1:1",
     badgeColor: "gold",
     title: "Transforma o teu corpo",
-    sub: "Plano personalizado + acompanhamento real",
+    sub: "App exclusiva · acompanhamento direto comigo",
     cta: "Saber mais",
     ctaStyle: "gold",
     href: "https://www.kravcoaching.com",
@@ -172,8 +172,8 @@ const CARDS: CardData[] = [
     photoPosition: "center center",
     bgStyle: { background: "#1a1200" },
     modal: {
-      title: "Coaching Online Personalizado",
-      desc: "Treino e nutrição 100% feitos para ti. Plano semanal na app, check-ins de evolução, ajustes constantes e contacto direto comigo — sem planos genéricos.",
+      title: "Coaching Online 1:1",
+      desc: "Treino e nutrição 100% feitos para ti — tudo na tua app exclusiva. Plano semanal, check-ins de evolução, ajustes constantes e acesso direto a mim. Sem planos genéricos. Sem desculpas.",
       cta: "Quero começar",
       href: "https://www.kravcoaching.com",
     },
