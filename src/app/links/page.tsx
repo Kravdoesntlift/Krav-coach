@@ -16,6 +16,7 @@ interface CardData {
   disabled?: boolean;
   featured?: boolean;
   bgGradient: string;
+  photo?: string;
   modal?: {
     title: string;
     desc: string;
@@ -38,13 +39,14 @@ const CARDS: CardData[] = [
     id: "pdf",
     badge: "GRÁTIS",
     title: "Guia de Treino",
-    sub: "Download gratuito — sem email",
+    sub: "Recebe no teu email — sem spam",
     desc: "O essencial para começares a treinar certo.",
-    cta: "Download",
+    cta: "Quero o guia",
     ctaColor: "gold",
-    href: "https://drive.google.com/file/d/1j0sW0sdZ3p4Mo859x6haPW-yb2TBB81g/view?usp=sharing",
+    href: "/guia",
     featured: true,
     bgGradient: "linear-gradient(160deg, #0d1a00 0%, #1a2e00 45%, #0d0d0d 100%)",
+    photo: "/andre-bg.jpg",
   },
   {
     id: "coaching",
@@ -200,11 +202,22 @@ function Card({ card, onOpen }: { card: CardData; onOpen?: () => void }) {
       }}
     >
       {/* Image strip */}
-      <div className="relative h-[136px]" style={{ background: card.bgGradient }}>
+      <div className="relative h-[148px]" style={{ background: card.bgGradient }}>
+        {card.photo && (
+          <Image
+            src={card.photo}
+            alt={card.title}
+            fill
+            className="object-cover object-top"
+          />
+        )}
+        {/* Overlay — darker when photo present */}
         <div className="absolute inset-0" style={{
-          background: "radial-gradient(ellipse at 20% 60%, rgba(201,168,76,0.06) 0%, transparent 55%)"
+          background: card.photo
+            ? "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.55) 50%, #0f0f0f 100%)"
+            : "radial-gradient(ellipse at 20% 60%, rgba(201,168,76,0.06) 0%, transparent 55%)"
         }} />
-        <div className="absolute bottom-0 left-0 right-0 h-16" style={{
+        <div className="absolute bottom-0 left-0 right-0 h-10" style={{
           background: "linear-gradient(to top, #0f0f0f, transparent)"
         }} />
         <div className="absolute top-4 left-4">
@@ -252,9 +265,14 @@ function Card({ card, onOpen }: { card: CardData; onOpen?: () => void }) {
 
   if (card.modal && onOpen)
     return <button className="w-full text-left active:scale-[0.99] transition-transform duration-150" onClick={onOpen}>{inner}</button>;
+
+  const isInternal = card.href.startsWith("/");
   return (
-    <a href={card.href} target="_blank" rel="noopener noreferrer"
-      className="block active:scale-[0.99] transition-transform duration-150">
+    <a
+      href={card.href}
+      {...(!isInternal && { target: "_blank", rel: "noopener noreferrer" })}
+      className="block active:scale-[0.99] transition-transform duration-150"
+    >
       {inner}
     </a>
   );
