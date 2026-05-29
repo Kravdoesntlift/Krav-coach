@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState } from "react";
-import Image from "next/image";
 import { submitGuiaForm } from "./actions";
 
 const initialState = { error: "" };
@@ -18,88 +17,89 @@ export default function GuiaPage() {
   return (
     <main className="min-h-screen flex flex-col" style={{ background: "#080808" }}>
 
-      {/* ── Full-bleed photo hero ── */}
-      <div className="relative w-full" style={{ height: "100svh", maxHeight: 680, minHeight: 500 }}>
-
-        {/* Photo */}
-        <Image
-          src="/andre-bg.jpg"
-          alt="André Kravchuk"
-          fill
-          className="object-cover"
-          style={{ objectPosition: "center 15%" }}
-          priority
-        />
-
-        {/* Gradient overlays */}
+      {/* ── Hero tipográfico ── */}
+      <div
+        className="relative w-full flex flex-col justify-end overflow-hidden"
+        style={{ minHeight: 340, paddingBottom: 40 }}
+      >
+        {/* Fundo com glow dourado */}
         <div className="absolute inset-0" style={{
-          background: "linear-gradient(to bottom, rgba(8,8,8,0.25) 0%, rgba(8,8,8,0.1) 30%, rgba(8,8,8,0.6) 65%, #080808 100%)"
-        }} />
-        {/* Side vignette */}
-        <div className="absolute inset-0" style={{
-          background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.5) 100%)"
+          background: "radial-gradient(ellipse at 50% 80%, rgba(201,168,76,0.07) 0%, transparent 65%), #080808"
         }} />
 
-        {/* Badge top */}
-        <div className="absolute top-8 left-0 right-0 flex justify-center">
-          <span
-            className="text-[10px] font-black tracking-[0.28em] uppercase px-4 py-2 rounded-full"
-            style={{
-              background: "rgba(8,8,8,0.7)",
-              border: "1px solid rgba(201,168,76,0.35)",
-              color: "#C9A84C",
-              backdropFilter: "blur(8px)",
-            }}
-          >
-            KRAV COACH
-          </span>
+        {/* Linhas decorativas */}
+        <div className="absolute inset-0 overflow-hidden" aria-hidden>
+          {/* Linha horizontal topo */}
+          <div className="absolute top-12 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg,transparent,rgba(201,168,76,0.12),transparent)" }} />
+          {/* Linha vertical esquerda */}
+          <div className="absolute top-0 bottom-0 left-8 w-px" style={{ background: "linear-gradient(180deg,transparent,rgba(201,168,76,0.07),transparent)" }} />
+          {/* Linha vertical direita */}
+          <div className="absolute top-0 bottom-0 right-8 w-px" style={{ background: "linear-gradient(180deg,transparent,rgba(201,168,76,0.07),transparent)" }} />
+          {/* Círculo decorativo */}
+          <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full" style={{
+            border: "1px solid rgba(201,168,76,0.05)",
+          }} />
+          <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full" style={{
+            border: "1px solid rgba(201,168,76,0.04)",
+          }} />
         </div>
 
-        {/* Headline at bottom of photo */}
-        <div className="absolute bottom-0 left-0 right-0 px-6 pb-10 text-center">
-          <p className="text-xs font-bold tracking-[0.25em] uppercase mb-3" style={{ color: "rgba(201,168,76,0.7)" }}>
-            Download gratuito
-          </p>
-          <h1 className="text-[2.6rem] font-black text-white leading-[1.0] tracking-tight">
-            Guia de<br />
+        {/* Conteúdo */}
+        <div className="relative z-10 px-6 pt-14">
+          {/* Badge */}
+          <div className="mb-5">
+            <span
+              className="text-[10px] font-black tracking-[0.28em] uppercase px-3.5 py-1.5 rounded-full"
+              style={{
+                background: "rgba(201,168,76,0.1)",
+                border: "1px solid rgba(201,168,76,0.25)",
+                color: "#C9A84C",
+              }}
+            >
+              Download gratuito
+            </span>
+          </div>
+
+          {/* Headline grande */}
+          <h1 className="font-black text-white leading-[0.92] tracking-tighter" style={{ fontSize: "clamp(3rem, 14vw, 5rem)" }}>
+            GUIA<br />
             <span style={{
-              background: "linear-gradient(135deg, #E8C96B, #C9A84C)",
+              background: "linear-gradient(135deg, #E8C96B 0%, #C9A84C 50%, #A8893A 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}>
-              Treino
+              DE<br />TREINO
             </span>
           </h1>
-          <p className="mt-3 text-sm text-zinc-400 leading-relaxed">
-            O essencial para treinares certo — enviado<br />diretamente para o teu email.
+
+          {/* Linha dourada */}
+          <div className="mt-5 mb-4 h-[2px] w-10 rounded-full" style={{ background: "linear-gradient(90deg,#E8C96B,#A8893A)" }} />
+
+          <p className="text-sm text-zinc-500 leading-relaxed max-w-[280px]">
+            O essencial para treinares certo — sem planos genéricos, sem perder tempo.
           </p>
         </div>
+
+        {/* Gradient de fade para a form card */}
+        <div className="absolute bottom-0 left-0 right-0 h-24" style={{
+          background: "linear-gradient(to top, #080808 40%, transparent)"
+        }} />
       </div>
 
       {/* ── Form card ── */}
-      <div className="relative z-10 flex flex-col items-center px-5 -mt-4 pb-14">
+      <div className="flex flex-col items-center px-5 pb-14 -mt-2">
         <div
           className="w-full max-w-sm rounded-3xl p-6 flex flex-col gap-5"
           style={{
             background: "#0f0f0f",
-            border: "1px solid rgba(201,168,76,0.18)",
-            boxShadow: "0 -20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,0,0,0.3)",
+            border: "1px solid rgba(201,168,76,0.15)",
+            boxShadow: "0 0 60px rgba(0,0,0,0.5)",
           }}
         >
-          {/* Gold top line */}
-          <div className="h-[2px] w-12 rounded-full mx-auto" style={{
-            background: "linear-gradient(90deg, #E8C96B, #A8893A)"
-          }} />
-
           <form action={formAction} className="flex flex-col gap-4">
 
-            {/* Name */}
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="name"
-                className="text-[10px] font-black tracking-[0.2em] uppercase"
-                style={{ color: "rgba(201,168,76,0.55)" }}
-              >
+              <label htmlFor="name" className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: "rgba(201,168,76,0.5)" }}>
                 Nome
               </label>
               <input
@@ -110,22 +110,14 @@ export default function GuiaPage() {
                 placeholder="O teu nome"
                 autoComplete="given-name"
                 className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-zinc-700 outline-none transition-all"
-                style={{
-                  background: "#141414",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                }}
-                onFocus={(e) => (e.currentTarget.style.border = "1px solid rgba(201,168,76,0.45)")}
+                style={{ background: "#141414", border: "1px solid rgba(255,255,255,0.07)" }}
+                onFocus={(e) => (e.currentTarget.style.border = "1px solid rgba(201,168,76,0.4)")}
                 onBlur={(e) => (e.currentTarget.style.border = "1px solid rgba(255,255,255,0.07)")}
               />
             </div>
 
-            {/* Email */}
             <div className="flex flex-col gap-1.5">
-              <label
-                htmlFor="email"
-                className="text-[10px] font-black tracking-[0.2em] uppercase"
-                style={{ color: "rgba(201,168,76,0.55)" }}
-              >
+              <label htmlFor="email" className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: "rgba(201,168,76,0.5)" }}>
                 Email
               </label>
               <input
@@ -136,39 +128,33 @@ export default function GuiaPage() {
                 placeholder="O teu email"
                 autoComplete="email"
                 className="w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-zinc-700 outline-none transition-all"
-                style={{
-                  background: "#141414",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                }}
-                onFocus={(e) => (e.currentTarget.style.border = "1px solid rgba(201,168,76,0.45)")}
+                style={{ background: "#141414", border: "1px solid rgba(255,255,255,0.07)" }}
+                onFocus={(e) => (e.currentTarget.style.border = "1px solid rgba(201,168,76,0.4)")}
                 onBlur={(e) => (e.currentTarget.style.border = "1px solid rgba(255,255,255,0.07)")}
               />
             </div>
 
-            {/* Error */}
             {state?.error && (
               <p className="text-red-400 text-xs text-center -mt-1">{state.error}</p>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={pending}
               className="w-full py-4 rounded-2xl font-black text-sm tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 mt-1"
               style={{
                 background: pending
-                  ? "rgba(201,168,76,0.3)"
-                  : "linear-gradient(135deg, #E8C96B 0%, #C9A84C 55%, #A8893A 100%)",
+                  ? "rgba(201,168,76,0.25)"
+                  : "linear-gradient(135deg,#E8C96B 0%,#C9A84C 55%,#A8893A 100%)",
                 color: "#000",
-                boxShadow: pending ? "none" : "0 6px 32px rgba(201,168,76,0.25)",
+                boxShadow: pending ? "none" : "0 6px 32px rgba(201,168,76,0.22)",
               }}
             >
               {pending ? "A enviar…" : "Quero o Guia Grátis →"}
             </button>
           </form>
 
-          {/* Trust line */}
-          <p className="text-center text-[11px]" style={{ color: "rgba(255,255,255,0.2)" }}>
+          <p className="text-center text-[11px]" style={{ color: "rgba(255,255,255,0.18)" }}>
             Sem spam. Podes cancelar a qualquer momento.
           </p>
         </div>
