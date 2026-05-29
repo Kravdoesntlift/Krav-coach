@@ -137,8 +137,8 @@ const CARDS: CardData[] = [
     cta: "Saber mais",
     ctaStyle: "gold",
     href: "https://www.kravcoaching.com",
-    photo: "/andre-bg.jpg",
-    photoPosition: "center 18%",
+    photo: "/pexels-tima-miroshnichenko-6389516.jpg",
+    photoPosition: "center center",
     bgStyle: { background: "#1a1200" },
     modal: {
       title: "Coaching Online Personalizado",
