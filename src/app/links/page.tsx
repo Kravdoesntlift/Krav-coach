@@ -70,28 +70,57 @@ function GuiaBg() {
 
 function MyProteinBg() {
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: "#080d08" }}>
-      {/* Subtle dots */}
+    <div className="absolute inset-0 overflow-hidden" style={{ background: "#06080a" }}>
+      {/* Radial gold glow — center */}
       <div className="absolute inset-0" style={{
-        backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px)",
-        backgroundSize: "22px 22px",
+        background: "radial-gradient(ellipse at 50% 60%, rgba(201,168,76,0.13) 0%, transparent 68%)"
       }}/>
-      {/* Code chip — main visual */}
-      <div className="relative flex flex-col items-center gap-1.5 z-10">
-        <p className="text-[9px] font-bold tracking-[0.3em] uppercase" style={{ color: "rgba(255,255,255,0.22)" }}>
-          código de desconto
-        </p>
-        <div className="flex items-center gap-2 px-5 py-2.5 rounded-lg" style={{
-          background: "rgba(201,168,76,0.07)",
-          border: "1.5px dashed rgba(201,168,76,0.3)",
-        }}>
-          <span className="font-black text-2xl tracking-[0.18em]" style={{ color: "#C9A84C" }}>
-            MPKRAV
-          </span>
+      {/* Top-left corner accent */}
+      <div className="absolute -top-6 -left-6 w-28 h-28 rounded-full" style={{
+        background: "radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%)"
+      }}/>
+      {/* Horizontal rule top */}
+      <div className="absolute top-5 left-5 right-5 h-px" style={{
+        background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent)"
+      }}/>
+      {/* Horizontal rule bottom */}
+      <div className="absolute bottom-5 left-5 right-5 h-px" style={{
+        background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent)"
+      }}/>
+
+      {/* Main content */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 select-none px-4">
+        {/* Tag label */}
+        <div className="flex items-center gap-1.5">
+          <div className="h-px w-6" style={{ background: "rgba(201,168,76,0.35)" }}/>
+          <p className="text-[9px] font-black tracking-[0.32em] uppercase" style={{ color: "rgba(201,168,76,0.55)" }}>
+            código exclusivo
+          </p>
+          <div className="h-px w-6" style={{ background: "rgba(201,168,76,0.35)" }}/>
         </div>
-        <p className="text-[9px]" style={{ color: "rgba(255,255,255,0.16)" }}>
-          myprotein.com · aplica no checkout
+
+        {/* THE CODE — hero element */}
+        <p
+          className="font-black tracking-[0.25em] leading-none"
+          style={{
+            fontSize: 38,
+            color: "#fff",
+            textShadow: "0 0 40px rgba(201,168,76,0.35), 0 0 80px rgba(201,168,76,0.15)",
+          }}
+        >
+          MPKRAV
         </p>
+
+        {/* Instruction */}
+        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
+          style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}>
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+          </svg>
+          <p className="text-[9px] font-bold tracking-wide" style={{ color: "rgba(201,168,76,0.7)" }}>
+            aplica no checkout
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -126,7 +155,9 @@ const CARDS: CardData[] = [
     ctaStyle: "gold",
     href: "/guia",
     featured: true,
-    bgStyle: {},
+    photo: "/pexels-hiral-chavda-1934832-8522509.jpg",
+    photoPosition: "center 30%",
+    bgStyle: { background: "#080a08" },
   },
   {
     id: "coaching",
@@ -269,7 +300,7 @@ function Card({ card, onOpen }: { card: CardData; onOpen?: () => void }) {
         <div className="absolute inset-0" style={card.bgStyle} />
 
         {/* Specific CSS backgrounds */}
-        {card.id === "pdf" && <GuiaBg />}
+        {card.id === "pdf" && !card.photo && <GuiaBg />}
         {card.id === "myprotein" && <MyProteinBg />}
         {card.id === "community" && <CommunityBg />}
 
