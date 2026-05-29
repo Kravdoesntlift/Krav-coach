@@ -34,107 +34,127 @@ export async function submitGuiaForm(formData: FormData) {
     subject: `${name.split(" ")[0]}, o teu Guia de Treino está aqui 💪`,
     html: `
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt" xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="color-scheme" content="dark"/>
+  <meta name="supported-color-schemes" content="dark"/>
   <title>Guia de Treino KRAV</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin:0!important; padding:0!important; background-color:#080808!important; }
+    .wrapper { background-color:#080808!important; }
+    .card { background-color:#131313!important; }
+    .header { background-color:#1c1400!important; }
+    .body-cell { background-color:#131313!important; }
+    .footer-cell { background-color:#0d0d0d!important; }
+    .gold-line { background-color:#131313!important; }
+  </style>
 </head>
-<body style="margin:0;padding:0;background:#080808;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#080808;">
-    <tr>
-      <td align="center" style="padding:48px 20px 48px;">
+<body style="margin:0;padding:0;background-color:#080808;" bgcolor="#080808">
 
-        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:460px;">
+<table class="wrapper" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#080808" style="background-color:#080808;min-height:100%;">
+  <tr>
+    <td align="center" style="padding:48px 16px;" bgcolor="#080808">
 
-          <!-- Brand mark -->
-          <tr>
-            <td align="center" style="padding-bottom:28px;">
-              <span style="font-size:10px;font-weight:900;letter-spacing:0.28em;text-transform:uppercase;color:#C9A84C;">KRAV COACH</span>
-            </td>
-          </tr>
+      <!-- Max width wrapper -->
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:460px;">
 
-          <!-- Card -->
-          <tr>
-            <td style="background:#0f0f0f;border-radius:24px;border:1px solid rgba(201,168,76,0.2);overflow:hidden;">
+        <!-- Logo -->
+        <tr>
+          <td align="center" style="padding-bottom:24px;" bgcolor="#080808">
+            <p style="margin:0;font-size:10px;font-weight:900;letter-spacing:0.28em;text-transform:uppercase;color:#C9A84C;font-family:Helvetica,Arial,sans-serif;">KRAV COACH</p>
+          </td>
+        </tr>
 
-              <!-- Header gradient -->
-              <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td style="background:linear-gradient(135deg,#1a1200 0%,#2e1f00 50%,#111 100%);padding:36px 36px 32px;text-align:center;">
-                    <p style="margin:0 0 10px 0;font-size:10px;font-weight:900;letter-spacing:0.22em;text-transform:uppercase;color:rgba(201,168,76,0.6);">Download pronto</p>
-                    <h1 style="margin:0;font-size:28px;font-weight:900;color:#ffffff;line-height:1.15;letter-spacing:-0.5px;">
-                      O teu Guia de Treino<br/>está pronto, ${name.split(" ")[0]}.
-                    </h1>
-                  </td>
-                </tr>
+        <!-- CARD outer -->
+        <tr>
+          <td class="card" bgcolor="#131313" style="background-color:#131313;border-radius:20px;border:1px solid #2a2008;overflow:hidden;">
 
-                <!-- Gold line -->
-                <tr>
-                  <td style="background:#0f0f0f;padding:0 36px;">
-                    <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.25),transparent);"></div>
-                  </td>
-                </tr>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
 
-                <!-- Body -->
-                <tr>
-                  <td style="background:#0f0f0f;padding:28px 36px 12px;">
-                    <p style="margin:0 0 28px 0;font-size:15px;color:#a1a1aa;line-height:1.7;">
-                      Obrigado por pedires. Dentro do guia encontras o essencial para treinares de forma inteligente — sem perder tempo, sem complicar.
-                    </p>
+              <!-- Header dark gold -->
+              <tr>
+                <td class="header" bgcolor="#1c1400" style="background-color:#1c1400;padding:36px 32px 30px;text-align:center;border-radius:20px 20px 0 0;">
+                  <p style="margin:0 0 8px 0;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#8a6f30;font-family:Helvetica,Arial,sans-serif;">Download pronto</p>
+                  <h1 style="margin:0;font-size:26px;font-weight:900;color:#ffffff;line-height:1.2;font-family:Helvetica,Arial,sans-serif;">
+                    O teu Guia de Treino<br/>está pronto, ${name.split(" ")[0]}.
+                  </h1>
+                </td>
+              </tr>
 
-                    <!-- CTA -->
-                    <table width="100%" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td align="center" style="padding-bottom:28px;">
-                          <a href="${PDF_LINK}" style="display:inline-block;background:linear-gradient(135deg,#E8C96B 0%,#C9A84C 55%,#A8893A 100%);color:#000000;font-size:15px;font-weight:900;text-decoration:none;padding:17px 44px;border-radius:14px;letter-spacing:0.02em;">
-                            Abrir Guia de Treino &rarr;
-                          </a>
-                        </td>
-                      </tr>
-                    </table>
+              <!-- Gold separator -->
+              <tr>
+                <td class="gold-line" bgcolor="#131313" style="background-color:#131313;padding:0 32px;">
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr><td bgcolor="#2e2006" style="background-color:#2e2006;height:1px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+                  </table>
+                </td>
+              </tr>
 
-                    <!-- Divider -->
-                    <div style="height:1px;background:rgba(255,255,255,0.05);margin-bottom:24px;"></div>
+              <!-- Body -->
+              <tr>
+                <td class="body-cell" bgcolor="#131313" style="background-color:#131313;padding:28px 32px 8px;">
+                  <p style="margin:0 0 24px 0;font-size:15px;color:#999999;line-height:1.7;font-family:Helvetica,Arial,sans-serif;">
+                    Obrigado por pedires. Dentro do guia encontras o essencial para treinares de forma inteligente &mdash; sem perder tempo, sem complicar.
+                  </p>
 
-                    <p style="margin:0 0 24px 0;font-size:13px;color:#52525b;line-height:1.6;">
-                      Se quiseres resultados ainda mais rápidos com um plano feito a 100% para ti, tenho vagas de coaching online.
-                    </p>
+                  <!-- Main CTA -->
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td align="center" style="padding-bottom:24px;">
+                        <a href="${PDF_LINK}" style="display:inline-block;background-color:#C9A84C;color:#000000;font-size:15px;font-weight:900;text-decoration:none;padding:16px 40px;border-radius:12px;font-family:Helvetica,Arial,sans-serif;letter-spacing:0.02em;">
+                          Abrir Guia de Treino &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
 
-                    <!-- Secondary CTA -->
-                    <table width="100%" cellpadding="0" cellspacing="0">
-                      <tr>
-                        <td align="center" style="padding-bottom:32px;">
-                          <a href="https://www.kravcoaching.com" style="display:inline-block;background:transparent;color:#C9A84C;font-size:13px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:10px;border:1px solid rgba(201,168,76,0.3);letter-spacing:0.04em;">
-                            Ver Coaching Online
-                          </a>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
+                  <!-- Separator -->
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:20px;">
+                    <tr><td bgcolor="#222222" style="background-color:#222222;height:1px;font-size:1px;line-height:1px;">&nbsp;</td></tr>
+                  </table>
 
-                <!-- Footer -->
-                <tr>
-                  <td style="background:#0a0a0a;padding:20px 36px;border-top:1px solid rgba(255,255,255,0.05);border-radius:0 0 24px 24px;">
-                    <p style="margin:0;font-size:11px;color:#3f3f46;text-align:center;">
-                      KRAV Coach &nbsp;·&nbsp;
-                      <a href="https://www.kravcoaching.com" style="color:rgba(201,168,76,0.5);text-decoration:none;">kravcoaching.com</a>
-                    </p>
-                    <p style="margin:6px 0 0;font-size:11px;color:#27272a;text-align:center;">
-                      Recebeste este email porque pediste o guia gratuito.
-                    </p>
-                  </td>
-                </tr>
+                  <p style="margin:0 0 20px 0;font-size:13px;color:#555555;line-height:1.6;font-family:Helvetica,Arial,sans-serif;">
+                    Se quiseres resultados ainda mais rápidos com um plano feito a 100% para ti, tenho vagas de coaching online.
+                  </p>
 
-              </table>
-            </td>
-          </tr>
+                  <!-- Secondary CTA -->
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                      <td align="center" style="padding-bottom:28px;">
+                        <a href="https://www.kravcoaching.com" style="display:inline-block;background-color:#1c1400;color:#C9A84C;font-size:13px;font-weight:700;text-decoration:none;padding:12px 28px;border-radius:10px;border:1px solid #3a2c08;font-family:Helvetica,Arial,sans-serif;">
+                          Ver Coaching Online
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
 
-        </table>
-      </td>
-    </tr>
-  </table>
+              <!-- Footer -->
+              <tr>
+                <td class="footer-cell" bgcolor="#0d0d0d" style="background-color:#0d0d0d;padding:18px 32px;border-top:1px solid #1f1f1f;border-radius:0 0 20px 20px;text-align:center;">
+                  <p style="margin:0;font-size:11px;color:#444444;font-family:Helvetica,Arial,sans-serif;">
+                    KRAV Coach &nbsp;&middot;&nbsp;
+                    <a href="https://www.kravcoaching.com" style="color:#8a6f30;text-decoration:none;">kravcoaching.com</a>
+                  </p>
+                  <p style="margin:5px 0 0;font-size:11px;color:#333333;font-family:Helvetica,Arial,sans-serif;">
+                    Recebeste este email porque pediste o guia gratuito.
+                  </p>
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+
 </body>
 </html>
     `.trim(),
