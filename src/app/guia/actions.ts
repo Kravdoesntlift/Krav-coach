@@ -1,6 +1,8 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { sendPushToUser } from "@/lib/push";
 import { Resend } from "resend";
 import { redirect } from "next/navigation";
 
@@ -24,6 +26,28 @@ export async function submitGuiaForm(formData: FormData) {
 
   if (dbError && !dbError.message?.includes("duplicate") && !dbError.code?.includes("23505")) {
     console.error("Lead DB error:", dbError.message, dbError.code);
+  }
+
+  // Notify all coaches via push (fire-and-forget)
+  if (!dbError) {
+    const admin = createAdminClient();
+    const { data: coaches } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("role", "coach");
+
+    if (coaches?.length) {
+      await Promise.all(
+        coaches.map((c) =>
+          sendPushToUser(
+            c.id,
+            "🔥 Novo lead!",
+            `${name} pediu o guia gratuito`,
+            "/coach/leads",
+          )
+        )
+      );
+    }
   }
 
   // Send PDF via Resend
