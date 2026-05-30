@@ -6,7 +6,7 @@ A full coaching platform I built from scratch using Claude Code. Live at [kravco
 
 ## What is it
 
-KRAV Coach is the platform I use to run my personal training business online. Clients sign up, get a weekly training plan, track workouts, message me directly, KRAV Coach is the platform I use to run my personal training business online. Clients sign up, get a weekly training plan built by me, track workouts, and message me directly. There's also an AI assistant available for quick questions, but the coaching is done by me — someone who went through the whole transformation process alone, learned from every mistake, and built this from scratch.
+KRAV Coach is the platform I use to run my personal training business online. Clients sign up, get a weekly training plan, track workouts, message me directly, KRAV Coach is the platform I use to run my personal training business online. Clients sign up, get a weekly training plan built by me, track workouts, and message me directly. There's also an AI assistant available for quick questions, but the coaching is done by me, someone who went through the whole transformation process alone, learned from every mistake, and built this from scratch.
 
 Not a side project. Real app, real clients, real payments.
 
