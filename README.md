@@ -17,7 +17,7 @@ Not a side project. Real app, real clients, real payments.
 ### Coach Dashboard
 ![Coach Dashboard](screenshots/dashboard.png)
 
-### AI Plan Generator
+### Plan Generator
 ![Plan Generator](screenshots/plan-generator.png)
 
 ### AI Coach
