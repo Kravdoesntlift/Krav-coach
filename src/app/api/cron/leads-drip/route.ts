@@ -141,8 +141,8 @@ function email2(firstName: string) {
   return wrap(`
     ${p(`Olá ${firstName},`)}
     ${p("já tiveste tempo de abrir o guia?")}
-    ${p("A maioria das pessoas descarrega, acha interessante, e depois a vida continua igual. Não é falta de vontade — é que ler sobre treino não é o mesmo que ter alguém a puxar por ti.")}
-    ${p(`Se quiseres falar sobre a tua situação, podes responder diretamente a este email ou encontrar-me no Instagram ${link("https://www.instagram.com/kravdoesntlift", "@kravdoesntlift")}.`)}
+    ${p("A maioria das pessoas descarrega, acha interessante e depois a vida continua igual. Não é falta de vontade. É que informação sozinha raramente muda alguma coisa.")}
+    ${p(`Se quiseres falar sobre a tua situação, responde aqui ou fala comigo no Instagram ${link("https://www.instagram.com/kravdoesntlift", "@kravdoesntlift")}.`)}
     ${p("André", "margin-bottom:0;")}
   `);
 }
@@ -151,9 +151,9 @@ function email2(firstName: string) {
 function email3(firstName: string) {
   return wrap(`
     ${p(`Olá ${firstName},`)}
-    ${p("o Guilherme chegou ao meu coaching com 67kg. Já treinava há dois anos, sabia o que estava a fazer — mas o corpo simplesmente não respondia.")}
+    ${p("o Guilherme chegou ao meu coaching com 67kg. Já treinava há dois anos e sabia o que estava a fazer. Mas o corpo não respondia.")}
     ${p("Ganhou 20kg. Com o físico que sempre quis.")}
-    ${p("Não mudou tudo de um dia para o outro. O que mudou foi ter alguém a olhar para os números todas as semanas e ajustar o que não estava a funcionar — especificamente para ele.")}
+    ${p("Não foi magia. Foi ter alguém a olhar para os números todas as semanas e ajustar o plano de acordo com o que estava a funcionar para ele.")}
     ${p(`Se quiseres ser o próximo: ${link("https://www.kravcoaching.com", "kravcoaching.com")}`)}
     ${p("André", "margin-bottom:0;")}
   `);
@@ -163,9 +163,9 @@ function email3(firstName: string) {
 function email4(firstName: string) {
   return wrap(`
     ${p(`Olá ${firstName},`)}
-    ${p("não te vou mandar mais emails sobre coaching depois deste.")}
-    ${p("Se ainda não avançaste, é porque o momento não é o certo — e não há problema nenhum nisso.")}
-    ${p(`Mas se tens pensado nisso e só precisavas de um empurrão: as vagas que tenho disponíveis são poucas e enchem rápido. Podes falar comigo diretamente em ${link("mailto:kravdoesntlift@gmail.com", "kravdoesntlift@gmail.com")} ou no ${link("https://www.instagram.com/kravdoesntlift", "Instagram")}.`)}
+    ${p("não te mando mais emails sobre coaching depois deste.")}
+    ${p("Se ainda não avançaste é porque o momento não é o certo e não há problema nenhum nisso.")}
+    ${p(`Mas se tens pensado nisso e só precisavas de um empurrão, as vagas que tenho são poucas e enchem depressa. Podes falar comigo aqui ou no ${link("https://www.instagram.com/kravdoesntlift", "Instagram")}.`)}
     ${p("André", "margin-bottom:0;")}
   `);
 }
