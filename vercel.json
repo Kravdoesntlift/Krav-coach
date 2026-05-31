@@ -1,6 +1,10 @@
 {
   "crons": [
     {
+      "path": "/api/cron/leads-drip",
+      "schedule": "0 10 * * *"
+    },
+    {
       "path": "/api/cron/workout-reminder",
       "schedule": "0 8 * * 1-6"
     },
