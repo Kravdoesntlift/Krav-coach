@@ -1209,6 +1209,65 @@ export const PT_FOODS: LocalFood[] = [
   { id: "barra_myprotein",             name: "Barra Myprotein Protein Bar",        per100g: { calories: 360, protein: 32.0, carbs: 30.0, fat: 12.0 } },
   { id: "gel_energia_carb",            name: "Gel de energia (carboidratos)",      per100g: { calories: 285, protein: 0.0, carbs: 72.0, fat: 0.0 } },
 
+  // ── MYPROTEIN — PROTEÍNAS EM PÓ ──────────────────────────────────────────────
+  // Valores baseados no rótulo EU variante natural/sem sabor. Podem variar ±5% por sabor.
+  { id: "mp_impact_whey",              name: "MyProtein Impact Whey Protein",       servingSize: 25, per100g: { calories: 400, protein: 83.0, carbs: 5.5, fat: 7.5 } },
+  { id: "mp_whey_isolate",             name: "MyProtein Impact Whey Isolate",       servingSize: 25, per100g: { calories: 375, protein: 90.0, carbs: 3.5, fat: 1.0 } },
+  { id: "mp_clear_whey_isolate",       name: "MyProtein Clear Whey Isolate",        servingSize: 25, per100g: { calories: 358, protein: 82.0, carbs: 8.0, fat: 0.5 } },
+  { id: "mp_the_whey",                 name: "MyProtein THE Whey",                  servingSize: 30, per100g: { calories: 377, protein: 83.0, carbs: 5.0, fat: 5.0 } },
+  { id: "mp_casein",                   name: "MyProtein Micellar Casein",           servingSize: 40, per100g: { calories: 370, protein: 78.0, carbs: 10.0, fat: 2.5 } },
+  { id: "mp_diet_whey",                name: "MyProtein Diet Whey",                 servingSize: 25, per100g: { calories: 365, protein: 68.0, carbs: 20.0, fat: 5.0 } },
+  { id: "mp_plant_protein",            name: "MyProtein Impact Plant Protein",      servingSize: 25, per100g: { calories: 360, protein: 72.0, carbs: 10.0, fat: 5.5 } },
+  { id: "mp_soy_isolate",              name: "MyProtein Soy Protein Isolate",       servingSize: 30, per100g: { calories: 355, protein: 90.0, carbs: 0.5, fat: 1.5 } },
+
+  // ── MYPROTEIN — GAINERS E OUTROS PÓS ─────────────────────────────────────────
+  { id: "mp_hard_gainer",              name: "MyProtein Hard Gainer Extreme",       servingSize: 150, per100g: { calories: 378, protein: 28.0, carbs: 58.0, fat: 4.0 } },
+  { id: "mp_oat_powder",               name: "MyProtein Oat Powder",                per100g: { calories: 373, protein: 11.0, carbs: 60.0, fat: 7.5 } },
+  { id: "mp_creatine",                 name: "MyProtein Creatine Monohydrate",      servingSize: 5,  per100g: { calories: 0, protein: 0.0, carbs: 0.0, fat: 0.0 } },
+  { id: "mp_glutamine",                name: "MyProtein Glutamine",                 servingSize: 5,  per100g: { calories: 380, protein: 95.0, carbs: 0.0, fat: 0.0 } },
+
+  // ── MYPROTEIN — BARRAS ────────────────────────────────────────────────────────
+  { id: "mp_layered_bar",              name: "MyProtein Layered Protein Bar",       servingSize: 64, per100g: { calories: 389, protein: 31.0, carbs: 34.0, fat: 14.0 } },
+  { id: "mp_crisp_bar",                name: "MyProtein Protein Crisp Bar",         servingSize: 65, per100g: { calories: 362, protein: 33.0, carbs: 30.0, fat: 11.0 } },
+  { id: "mp_brownie",                  name: "MyProtein Protein Brownie",           servingSize: 75, per100g: { calories: 367, protein: 29.0, carbs: 40.0, fat: 11.0 } },
+  { id: "mp_milk_tea_bar",             name: "MyProtein Milk Tea Bar",              servingSize: 50, per100g: { calories: 370, protein: 30.0, carbs: 37.0, fat: 11.0 } },
+
+  // ── PROZIS — PROTEÍNAS EM PÓ ─────────────────────────────────────────────────
+  { id: "prozis_whey",                 name: "Prozis 100% Whey Protein",            servingSize: 30, per100g: { calories: 383, protein: 78.0, carbs: 10.0, fat: 5.0 } },
+  { id: "prozis_whey_isolate",         name: "Prozis Whey Isolate 90",              servingSize: 30, per100g: { calories: 363, protein: 86.0, carbs: 4.5, fat: 1.5 } },
+  { id: "prozis_casein",               name: "Prozis Casein Pro",                   servingSize: 40, per100g: { calories: 358, protein: 71.0, carbs: 16.0, fat: 2.5 } },
+  { id: "prozis_vegan",                name: "Prozis Vegan Protein",                servingSize: 30, per100g: { calories: 375, protein: 72.0, carbs: 14.0, fat: 5.0 } },
+  { id: "prozis_creatine",             name: "Prozis Creatine Monohydrate",         servingSize: 5,  per100g: { calories: 0, protein: 0.0, carbs: 0.0, fat: 0.0 } },
+
+  // ── PROZIS — BARRAS ───────────────────────────────────────────────────────────
+  { id: "prozis_nitrobar",             name: "Prozis NitroBar",                     servingSize: 46, per100g: { calories: 402, protein: 43.0, carbs: 33.0, fat: 11.0 } },
+  { id: "prozis_zero_bar",             name: "Prozis Zero Bar",                     servingSize: 35, per100g: { calories: 406, protein: 43.0, carbs: 38.0, fat: 9.0 } },
+  { id: "prozis_wafer_bar",            name: "Prozis Protein Wafer Bar",            servingSize: 40, per100g: { calories: 423, protein: 33.0, carbs: 33.0, fat: 18.0 } },
+
+  // ── ZUMUB ─────────────────────────────────────────────────────────────────────
+  { id: "zumub_whey",                  name: "Zumub Whey Protein Concentrate",      servingSize: 30, per100g: { calories: 383, protein: 74.0, carbs: 13.0, fat: 6.5 } },
+  { id: "zumub_whey_isolate",          name: "Zumub Whey Protein Isolate",          servingSize: 30, per100g: { calories: 360, protein: 85.0, carbs: 5.0, fat: 1.5 } },
+  { id: "zumub_casein",                name: "Zumub Casein Protein",                servingSize: 40, per100g: { calories: 365, protein: 74.0, carbs: 12.0, fat: 3.0 } },
+  { id: "zumub_vegan",                 name: "Zumub Vegan Protein",                 servingSize: 30, per100g: { calories: 370, protein: 70.0, carbs: 15.0, fat: 5.5 } },
+  { id: "zumub_creatine",              name: "Zumub Creatine Monohydrate",          servingSize: 5,  per100g: { calories: 0, protein: 0.0, carbs: 0.0, fat: 0.0 } },
+  { id: "zumub_mass_gainer",           name: "Zumub Mass Gainer",                   servingSize: 150, per100g: { calories: 375, protein: 25.0, carbs: 60.0, fat: 3.5 } },
+
+  // ── OPTIMUM NUTRITION ─────────────────────────────────────────────────────────
+  { id: "on_gold_standard_whey",       name: "ON Gold Standard 100% Whey",          servingSize: 30, per100g: { calories: 400, protein: 80.0, carbs: 10.0, fat: 5.0 } },
+  { id: "on_casein",                   name: "ON Gold Standard 100% Casein",        servingSize: 33, per100g: { calories: 364, protein: 73.0, carbs: 9.0, fat: 3.0 } },
+  { id: "on_serious_mass",             name: "ON Serious Mass",                     servingSize: 334, per100g: { calories: 378, protein: 15.0, carbs: 75.7, fat: 1.5 } },
+  { id: "on_iso_whey",                 name: "ON Platinum Hydrowhey",               servingSize: 39, per100g: { calories: 359, protein: 85.0, carbs: 5.0, fat: 1.5 } },
+
+  // ── SCITEC NUTRITION ──────────────────────────────────────────────────────────
+  { id: "scitec_whey",                 name: "Scitec 100% Whey Protein",            servingSize: 30, per100g: { calories: 375, protein: 75.0, carbs: 10.5, fat: 5.0 } },
+  { id: "scitec_whey_isolate",         name: "Scitec 100% Whey Isolate",            servingSize: 30, per100g: { calories: 350, protein: 80.0, carbs: 5.0, fat: 1.0 } },
+  { id: "scitec_jumbo",                name: "Scitec Jumbo (mass gainer)",          servingSize: 100, per100g: { calories: 370, protein: 27.0, carbs: 56.0, fat: 3.5 } },
+  { id: "scitec_protein_bar",          name: "Scitec Protein Bar",                  servingSize: 70, per100g: { calories: 380, protein: 32.0, carbs: 32.0, fat: 13.0 } },
+
+  // ── DYMATIZE ──────────────────────────────────────────────────────────────────
+  { id: "dymatize_iso100",             name: "Dymatize ISO100 Whey Isolate",        servingSize: 30, per100g: { calories: 367, protein: 86.0, carbs: 3.0, fat: 1.0 } },
+  { id: "dymatize_super_mass",         name: "Dymatize Super Mass Gainer",          servingSize: 334, per100g: { calories: 388, protein: 15.0, carbs: 74.0, fat: 3.0 } },
+
   // ── VEGANO E VEGETARIANO ──────────────────────────────────
   { id: "tofu_firme_cru",              name: "Tofu firme (cru)",                   per100g: { calories: 144, protein: 17.0, carbs: 2.8, fat: 8.7 } },
   { id: "tofu_sedoso",                 name: "Tofu sedoso (silken)",               per100g: { calories: 55, protein: 5.5, carbs: 2.0, fat: 3.0 } },
