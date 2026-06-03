@@ -23,13 +23,20 @@ export default async function CoachLayout({
     .eq("id", user.id)
     .single();
 
-  const { count: unreadCount } = await supabase
-    .from("messages")
-    .select("*", { count: "exact", head: true })
-    .eq("receiver_id", user.id)
-    .is("read_at", null);
+  const [{ count: unreadCount }, { count: newLeadsCount }] = await Promise.all([
+    supabase
+      .from("messages")
+      .select("*", { count: "exact", head: true })
+      .eq("receiver_id", user.id)
+      .is("read_at", null),
+    supabase
+      .from("leads")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "new"),
+  ]);
 
-  const unread = unreadCount ?? 0;
+  const unread    = unreadCount ?? 0;
+  const newLeads  = newLeadsCount ?? 0;
 
   // Desktop navbar — clean grouped structure
   const coachNav = [
@@ -58,7 +65,7 @@ export default async function CoachLayout({
     { href: "/coach/messages",  label: "Chat",      icon: <ChatIcon size={22} />,  badge: unread },
     { href: "/coach/plans/new", label: "Novo Plano",icon: "➕",                    badge: 0      },
     { href: "/coach/analytics", label: "Analytics", icon: <ChartIcon size={22} />, badge: 0      },
-    { href: "/coach/profile",   label: "Perfil",    icon: <UserIcon size={22} />,  badge: 0      },
+    { href: "/coach/profile",   label: "Perfil",    icon: <UserIcon size={22} />,  badge: newLeads },
   ];
 
   return (

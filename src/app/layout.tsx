@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import AppRefresh from "@/components/AppRefresh";
+import { Analytics } from "@vercel/analytics/next";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
       <body className="bg-black text-white antialiased font-sans">
         <AppRefresh />
         {children}
+        <Analytics />
       </body>
     </html>
   );
