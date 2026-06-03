@@ -83,12 +83,14 @@ export default async function AnalyticsPage() {
     { data: completions },
     { data: subscriptions },
     { data: allPlans },
+    { data: leads },
   ] = await Promise.all([
     supabase.from("coach_clients").select("client_id, profiles!coach_clients_client_id_fkey(status, created_at)").eq("coach_id", user.id).eq("assigned_role", "coach"),
     supabase.from("weekly_checkins").select("client_id, week_start").gte("week_start", since).order("week_start"),
     supabase.from("workout_completions").select("client_id, created_at").gte("created_at", since + "T00:00:00"),
     supabase.from("stripe_subscriptions").select("status, amount_cents, current_period_end").eq("coach_id", user.id),
     supabase.from("workout_plans").select("client_id, week_start").eq("coach_id", user.id).gte("week_start", since),
+    supabase.from("leads").select("id, status, created_at").order("created_at"),
   ]);
 
   type ProfileRef = { status: string | null; created_at: string } | null;
@@ -159,6 +161,23 @@ export default async function AnalyticsPage() {
   const monthlyRevenue = (totalRevenue / 100).toFixed(2).replace(".", ",");
   const yearlyProjection = ((totalRevenue * 12) / 100).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 
+  // ── Leads funnel ──────────────────────────────────────────────────────────
+  const allLeads = leads ?? [];
+  const leadsTotal     = allLeads.length;
+  const leadsNew       = allLeads.filter((l) => (l.status ?? "new") === "new").length;
+  const leadsContacted = allLeads.filter((l) => l.status === "contacted").length;
+  const leadsConverted = allLeads.filter((l) => l.status === "converted").length;
+  const conversionRate = leadsTotal > 0 ? Math.round((leadsConverted / leadsTotal) * 100) : 0;
+
+  // Leads per week (last 8 weeks)
+  const leadsPerWeek = weekKeys.map((w) => ({
+    x: fmtWeek(w),
+    y: allLeads.filter((l) => {
+      const diff = (new Date(l.created_at.slice(0, 10)).getTime() - new Date(w).getTime()) / 86400000;
+      return diff >= 0 && diff < 7;
+    }).length,
+  }));
+
   return (
     <div className="space-y-8 page-enter">
       <div>
@@ -172,6 +191,74 @@ export default async function AnalyticsPage() {
         <StatCard label="Receita mensal" value={`€${monthlyRevenue}`} sub="subscriptions ativas" />
         <StatCard label="Taxa check-in" value={`${avgCheckinRate}%`} sub="média 8 sem." />
         <StatCard label="Projeção anual" value={`€${yearlyProjection}`} sub="baseado na receita atual" />
+      </div>
+
+      {/* ── Funil /links ── */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="text-base font-black text-white">Funil kravcoaching.com/links</h2>
+            <p className="text-zinc-500 text-xs mt-0.5">Leads do guia gratuito · todos os tempos</p>
+          </div>
+          <a href="/coach/leads"
+            className="text-[11px] font-bold px-3 py-1.5 rounded-xl"
+            style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", color: "#C9A84C" }}>
+            Ver leads →
+          </a>
+        </div>
+
+        {/* Funnel stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+          <div className="rounded-2xl p-4" style={{ background: "rgba(18,18,20,0.8)", border: "1px solid rgba(201,168,76,0.25)" }}>
+            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Total leads</p>
+            <p className="text-3xl font-black text-brand-gold">{leadsTotal}</p>
+            <p className="text-zinc-600 text-[10px] mt-0.5">pediram o guia</p>
+          </div>
+          <div className="rounded-2xl p-4" style={{ background: "rgba(18,18,20,0.8)", border: "1px solid rgba(59,130,246,0.2)" }}>
+            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Por contactar</p>
+            <p className="text-3xl font-black" style={{ color: "#60a5fa" }}>{leadsNew}</p>
+            <p className="text-zinc-600 text-[10px] mt-0.5">novos</p>
+          </div>
+          <div className="rounded-2xl p-4" style={{ background: "rgba(18,18,20,0.8)", border: "1px solid rgba(234,179,8,0.2)" }}>
+            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Contactados</p>
+            <p className="text-3xl font-black" style={{ color: "#facc15" }}>{leadsContacted}</p>
+            <p className="text-zinc-600 text-[10px] mt-0.5">em progresso</p>
+          </div>
+          <div className="rounded-2xl p-4" style={{ background: "rgba(18,18,20,0.8)", border: "1px solid rgba(34,197,94,0.2)" }}>
+            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Convertidos</p>
+            <p className="text-3xl font-black" style={{ color: "#4ade80" }}>{leadsConverted}</p>
+            <p className="text-zinc-600 text-[10px] mt-0.5">{conversionRate}% conversão</p>
+          </div>
+        </div>
+
+        {/* Funnel bar */}
+        {leadsTotal > 0 && (
+          <div className="rounded-2xl p-4 mb-4" style={{ background: "rgba(18,18,20,0.8)", border: "1px solid rgba(39,39,42,0.5)" }}>
+            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-3">Funil de conversão</p>
+            <div className="space-y-2.5">
+              {[
+                { label: "Pediram o guia", value: leadsTotal,     pct: 100,                                              color: "#C9A84C" },
+                { label: "Contactados",    value: leadsTotal - leadsNew, pct: Math.round(((leadsTotal - leadsNew) / leadsTotal) * 100), color: "#facc15" },
+                { label: "Clientes",       value: leadsConverted, pct: conversionRate,                                   color: "#4ade80" },
+              ].map(({ label, value, pct, color }) => (
+                <div key={label}>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-zinc-400">{label}</span>
+                    <span className="font-bold text-white">{value} <span className="text-zinc-600 font-normal">({pct}%)</span></span>
+                  </div>
+                  <div className="h-2 rounded-full" style={{ background: "rgba(255,255,255,0.05)" }}>
+                    <div className="h-2 rounded-full transition-all" style={{ width: `${pct}%`, background: color, opacity: 0.8 }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Leads per week chart */}
+        <div className="rounded-2xl p-5" style={{ background: "rgba(18,18,20,0.8)", border: "1px solid rgba(39,39,42,0.5)" }}>
+          <MiniLineChart data={leadsPerWeek} color="#C9A84C" label="Leads por semana" unit=" leads" />
+        </div>
       </div>
 
       {/* Charts */}
