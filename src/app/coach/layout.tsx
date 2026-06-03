@@ -61,11 +61,11 @@ export default async function CoachLayout({
 
   // Bottom nav — 5 clean items, no more drawer
   const coachBottomNav = [
-    { href: "/coach/dashboard", label: "Clientes",  icon: "👥",                   badge: 0      },
-    { href: "/coach/messages",  label: "Chat",      icon: <ChatIcon size={22} />,  badge: unread },
-    { href: "/coach/plans/new", label: "Novo Plano",icon: "➕",                    badge: 0      },
-    { href: "/coach/analytics", label: "Analytics", icon: <ChartIcon size={22} />, badge: 0      },
-    { href: "/coach/profile",   label: "Perfil",    icon: <UserIcon size={22} />,  badge: newLeads },
+    { href: "/coach/dashboard", label: "Clientes",  icon: "👥",                   badge: 0        },
+    { href: "/coach/messages",  label: "Chat",      icon: <ChatIcon size={22} />,  badge: unread   },
+    { href: "/coach/leads",     label: "Leads",     icon: "📧",                    badge: newLeads },
+    { href: "/coach/analytics", label: "Analytics", icon: <ChartIcon size={22} />, badge: 0        },
+    { href: "/coach/profile",   label: "Perfil",    icon: <UserIcon size={22} />,  badge: 0        },
   ];
 
   return (
