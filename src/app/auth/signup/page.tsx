@@ -223,7 +223,7 @@ export default function SignupPage() {
                     <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                     A criar conta...
                   </span>
-                ) : "Criar conta"}
+                ) : "Começar trial gratuito de 7 dias"}
               </button>
             </form>
           </div>

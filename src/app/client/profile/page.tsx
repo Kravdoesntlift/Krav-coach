@@ -74,6 +74,33 @@ export default async function ClientProfilePage() {
 
       <ProfileForm profile={profile} email={user!.email ?? ""} />
 
+      {/* Trial info — only shown when on trial and no paid subscription yet */}
+      {profile?.trial_ends_at && !subscription && (() => {
+        const msLeft = new Date(profile.trial_ends_at!).getTime() - Date.now();
+        const daysLeft = Math.ceil(msLeft / 86_400_000);
+        const trialEnd = new Date(profile.trial_ends_at!).toLocaleDateString("pt-PT", { day: "numeric", month: "long" });
+        return (
+          <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(18,18,22,0.8)", border: "1px solid rgba(201,168,76,0.2)" }}>
+            <h2 className="text-white font-bold text-base">Subscrição</h2>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-zinc-500">Estado</span>
+                <span className={`font-semibold ${daysLeft > 0 ? "text-[#C9A84C]" : "text-red-400"}`}>
+                  {daysLeft > 0 ? `Trial · ${daysLeft} dia${daysLeft !== 1 ? "s" : ""} restante${daysLeft !== 1 ? "s" : ""}` : "Trial expirado"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-zinc-500">{daysLeft > 0 ? "Termina em" : "Terminou em"}</span>
+                <span className="text-zinc-300">{trialEnd}</span>
+              </div>
+            </div>
+            {daysLeft > 0 && (
+              <p className="text-zinc-600 text-xs text-center">Subscreve antes que o trial termine para não perder acesso.</p>
+            )}
+          </div>
+        );
+      })()}
+
       <SubscriptionManager
         hasSubscription={!!subscription && !!profile?.stripe_customer_id}
         status={subscription?.status ?? null}

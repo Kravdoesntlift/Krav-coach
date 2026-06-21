@@ -107,6 +107,13 @@ export default async function ClientDetailPage({
   const lastCheckin = checkins?.[0];
   const needsAttention = !lastCheckin || new Date(lastCheckin.week_start) < twoWeeksAgo;
 
+  // Trial badge
+  let trialDaysLeft: number | null = null;
+  if (client.trial_ends_at) {
+    const msLeft = new Date(client.trial_ends_at).getTime() - Date.now();
+    trialDaysLeft = Math.ceil(msLeft / 86_400_000);
+  }
+
   // Group PRs by exercise
   const prMap = new Map<string, { weight_kg: number | null; reps: number | null }>();
   for (const pr of clientPRs ?? []) {
@@ -148,6 +155,11 @@ export default async function ClientDetailPage({
             </div>
           )}
           <h1 className="text-xl font-bold text-white">{client.full_name}</h1>
+          {trialDaysLeft !== null && (
+            trialDaysLeft > 0
+              ? <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#C9A84C]/15 text-[#C9A84C] border border-[#C9A84C]/30">Trial · {trialDaysLeft}d</span>
+              : <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">Trial expirado</span>
+          )}
         </div>
         <div className="ml-auto flex gap-2">
           <Link
