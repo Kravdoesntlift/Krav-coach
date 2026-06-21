@@ -109,10 +109,11 @@ export async function signup(formData: FormData) {
           assigned_role: "coach",
         });
 
-        // 2. Set status to pending — coach must activate after payment
+        // 2. Set active with 7-day trial — client gets immediate access
+        const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
         await admin
           .from("profiles")
-          .update({ status: "pending" })
+          .update({ status: "active", trial_ends_at: trialEndsAt })
           .eq("id", data.user.id);
 
         // 3. Send welcome message from coach
@@ -124,7 +125,7 @@ export async function signup(formData: FormData) {
         await admin.from("messages").insert({
           sender_id:   coachId,
           receiver_id: data.user.id,
-          content: `Olá ${clientFirstName}! 👋 Sou o ${coachFirstName}, o teu coach na KRAV. Bem-vindo ao teu programa personalizado! Assim que a tua conta for ativada tens acesso total à app. Qualquer dúvida fala comigo por aqui. Vamos a isso! 💪`,
+          content: `Olá ${clientFirstName}! 👋 Sou o ${coachFirstName}. Bem-vindo ao teu trial de 7 dias! Tens acesso completo à app durante esta semana. Explora os treinos, regista os teus check-ins e fala comigo por aqui se tiveres alguma dúvida. Vamos a isso! 💪`,
         });
 
         // 4. Record referral if signup came via referral link
@@ -148,8 +149,8 @@ export async function signup(formData: FormData) {
         const { sendPushToUser } = await import("@/lib/push");
         sendPushToUser(
           coachId,
-          "🆕 Novo cliente registado",
-          `${fullName} acabou de criar conta. Ativa-o em Gerir Clientes.`,
+          "🆕 Novo cliente em trial!",
+          `${fullName} acabou de criar conta. Trial de 7 dias ativo.`,
           "/coach/manage-clients",
         ).then((r) => {
           if (!r.ok) console.warn("[signup] Push to coach failed:", r.error);

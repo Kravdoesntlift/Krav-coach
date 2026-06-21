@@ -247,5 +247,45 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // ── Trial expiry warnings (2 days left = day 5, 1 day left = day 6) ────────
+  const trialWarningDays = [2, 1]; // days remaining to trigger warning
+  for (const daysLeft of trialWarningDays) {
+    const windowStart = new Date(today.getTime() + daysLeft * 86_400_000);
+    const windowEnd   = new Date(today.getTime() + (daysLeft + 1) * 86_400_000);
+
+    const { data: expiringClients } = await admin
+      .from("profiles")
+      .select("id, full_name")
+      .eq("role", "client")
+      .eq("status", "active")
+      .gt("trial_ends_at", windowStart.toISOString())
+      .lt("trial_ends_at", windowEnd.toISOString());
+
+    if (!expiringClients?.length) continue;
+
+    // Filter out clients with active subscriptions
+    const { data: activeSubs } = await admin
+      .from("stripe_subscriptions")
+      .select("client_id")
+      .in("client_id", expiringClients.map((c) => c.id))
+      .in("status", ["active", "trialing"]);
+    const subSet = new Set((activeSubs ?? []).map((s) => s.client_id));
+
+    await Promise.allSettled(
+      expiringClients
+        .filter((c) => !subSet.has(c.id))
+        .map((c) =>
+          sendPushToUser(
+            c.id,
+            daysLeft === 1 ? "⏰ Último dia de trial!" : "⚠️ O teu trial termina em 2 dias",
+            daysLeft === 1
+              ? "Não percas o acesso à app. Fala com o teu coach para continuar."
+              : "Ainda tens 2 dias para decidir. Ativa a tua subscrição e continua.",
+            "/client/dashboard",
+          )
+        )
+    );
+  }
+
   return NextResponse.json({ processed, sent, skipped });
 }
