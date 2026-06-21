@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPushToUser } from "@/lib/push";
+import { sendTrialReminderEmail, sendRenewalReminderEmail } from "@/lib/email";
 
 /**
  * GET /api/cron/automations
@@ -248,7 +249,7 @@ export async function GET(req: NextRequest) {
   }
 
   // ── Trial expiry warnings (2 days left = day 5, 1 day left = day 6) ────────
-  const trialWarningDays = [2, 1]; // days remaining to trigger warning
+  const trialWarningDays = [2, 1];
   for (const daysLeft of trialWarningDays) {
     const windowStart = new Date(today.getTime() + daysLeft * 86_400_000);
     const windowEnd   = new Date(today.getTime() + (daysLeft + 1) * 86_400_000);
@@ -263,27 +264,79 @@ export async function GET(req: NextRequest) {
 
     if (!expiringClients?.length) continue;
 
-    // Filter out clients with active subscriptions
+    // Skip clients already subscribed
     const { data: activeSubs } = await admin
       .from("stripe_subscriptions")
       .select("client_id")
       .in("client_id", expiringClients.map((c) => c.id))
       .in("status", ["active", "trialing"]);
     const subSet = new Set((activeSubs ?? []).map((s) => s.client_id));
+    const toWarn = expiringClients.filter((c) => !subSet.has(c.id));
+
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kravcoaching.com";
 
     await Promise.allSettled(
-      expiringClients
-        .filter((c) => !subSet.has(c.id))
-        .map((c) =>
+      toWarn.flatMap((c) => [
+        // Push notification
+        sendPushToUser(
+          c.id,
+          daysLeft === 1 ? "⏰ Último dia de trial!" : "⚠️ O teu trial termina em 2 dias",
+          daysLeft === 1
+            ? "Não percas o acesso. Subscreve agora."
+            : "Ainda tens 2 dias. Activa a tua subscrição e continua.",
+          "/client/dashboard",
+        ),
+        // Email
+        admin.auth.admin.getUserById(c.id).then(({ data }) => {
+          const email = data?.user?.email;
+          if (!email) return;
+          return sendTrialReminderEmail({
+            to: email,
+            clientName: c.full_name ?? "",
+            daysLeft,
+            siteUrl,
+          });
+        }),
+      ])
+    );
+  }
+
+  // ── Subscription renewal reminder (3 days before period end) ────────────────
+  const renewalWindow = new Date(today.getTime() + 3 * 86_400_000);
+  const renewalWindowEnd = new Date(today.getTime() + 4 * 86_400_000);
+
+  const { data: renewingSubs } = await admin
+    .from("stripe_subscriptions")
+    .select("client_id, current_period_end")
+    .in("status", ["active", "trialing"])
+    .gt("current_period_end", renewalWindow.toISOString())
+    .lt("current_period_end", renewalWindowEnd.toISOString());
+
+  if (renewingSubs?.length) {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kravcoaching.com";
+    await Promise.allSettled(
+      renewingSubs.map(async (sub) => {
+        const clientId = sub.client_id;
+        const [{ data: prof }, { data: authUser }] = await Promise.all([
+          admin.from("profiles").select("full_name").eq("id", clientId).single(),
+          admin.auth.admin.getUserById(clientId),
+        ]);
+        const email = authUser?.user?.email;
+        const clientName = prof?.full_name ?? "";
+        const renewalDate = new Date(sub.current_period_end!).toLocaleDateString("pt-PT", {
+          day: "numeric", month: "long",
+        });
+
+        await Promise.allSettled([
           sendPushToUser(
-            c.id,
-            daysLeft === 1 ? "⏰ Último dia de trial!" : "⚠️ O teu trial termina em 2 dias",
-            daysLeft === 1
-              ? "Não percas o acesso à app. Fala com o teu coach para continuar."
-              : "Ainda tens 2 dias para decidir. Ativa a tua subscrição e continua.",
-            "/client/dashboard",
-          )
-        )
+            clientId,
+            "💳 O teu plano renova em 3 dias",
+            `Renova a ${renewalDate}. Confirma que o teu cartão está actualizado.`,
+            "/client/profile",
+          ),
+          email && sendRenewalReminderEmail({ to: email, clientName, renewalDate, siteUrl }),
+        ]);
+      })
     );
   }
 

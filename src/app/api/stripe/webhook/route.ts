@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPushToUser } from "@/lib/push";
-import { sendInvoiceEmail, sendPaymentFailedEmail } from "@/lib/email";
+import { sendInvoiceEmail, sendPaymentFailedEmail, sendSubscriptionCancelledEmail } from "@/lib/email";
 import Stripe from "stripe";
 
 export const runtime = "nodejs";
@@ -168,10 +168,32 @@ export async function POST(req: NextRequest) {
           .eq("id", subscription.id);
 
         if (sub?.client_id) {
-          await admin
-            .from("profiles")
-            .update({ status: "cancelled" })
-            .eq("id", sub.client_id);
+          const clientId = sub.client_id;
+
+          // Update profile status so layout blocks access
+          await admin.from("profiles").update({ status: "cancelled" }).eq("id", clientId);
+
+          // Notify client via push + email
+          const [{ data: prof }, { data: authUser }] = await Promise.all([
+            admin.from("profiles").select("full_name").eq("id", clientId).single(),
+            admin.auth.admin.getUserById(clientId),
+          ]);
+          const email = authUser?.user?.email;
+          const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kravcoaching.com";
+
+          await Promise.allSettled([
+            sendPushToUser(
+              clientId,
+              "⚠️ Subscrição cancelada",
+              "O teu acesso foi suspenso. Abre a app para reactivar.",
+              "/client/dashboard",
+            ),
+            email && sendSubscriptionCancelledEmail({
+              to: email,
+              clientName: prof?.full_name ?? "",
+              siteUrl,
+            }),
+          ]);
         }
 
         break;
@@ -257,14 +279,22 @@ export async function POST(req: NextRequest) {
           if (profile) {
             const { data: authUser } = await admin.auth.admin.getUserById(profile.id);
             const email = authUser?.user?.email;
-            if (email) {
-              const amountCents = invoice.amount_due ?? 0;
-              await sendPaymentFailedEmail({
+            const amountCents = invoice.amount_due ?? 0;
+            const amountEur = `€ ${(amountCents / 100).toFixed(2).replace(".", ",")}`;
+
+            await Promise.allSettled([
+              email && sendPaymentFailedEmail({
                 to: email,
                 clientName: (profile.full_name ?? "").split(" ")[0] || "Cliente",
-                amountEur: `€ ${(amountCents / 100).toFixed(2).replace(".", ",")}`,
-              }).catch((e: unknown) => console.error("[webhook] failure email failed:", e));
-            }
+                amountEur,
+              }),
+              sendPushToUser(
+                profile.id,
+                "❌ Pagamento falhado",
+                `Não foi possível cobrar ${amountEur}. Actualiza o teu cartão.`,
+                "/client/profile",
+              ),
+            ]);
           }
         }
 

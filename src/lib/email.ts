@@ -223,6 +223,188 @@ export async function sendWelcomeEmail({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Trial reminder email — sent day 5 and day 6 of trial
+// ─────────────────────────────────────────────────────────────────────────────
+export async function sendTrialReminderEmail({
+  to,
+  clientName,
+  daysLeft,
+  siteUrl,
+}: {
+  to: string;
+  clientName: string;
+  daysLeft: number;
+  siteUrl: string;
+}) {
+  if (!process.env.RESEND_API_KEY) return;
+  const firstName = clientName.split(" ")[0];
+  const isLast = daysLeft === 1;
+
+  await getResend().emails.send({
+    from: FROM,
+    to,
+    subject: isLast
+      ? `${firstName}, o teu trial termina amanhã`
+      : `${firstName}, faltam ${daysLeft} dias do teu trial`,
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0a0c;font-family:system-ui,-apple-system,sans-serif;color:#e4e4e7">
+  <div style="max-width:520px;margin:40px auto;padding:0 16px">
+
+    <div style="text-align:center;margin-bottom:28px">
+      <p style="font-size:24px;font-weight:900;letter-spacing:-0.5px;color:#fff;margin:0">KRAV<span style="color:#C9A84C">.</span></p>
+    </div>
+
+    <div style="background:#111113;border:1px solid #27272a;border-radius:20px;padding:32px;margin-bottom:16px">
+      <p style="color:#C9A84C;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin:0 0 12px">
+        ${isLast ? "Último dia de trial" : `${daysLeft} dias restantes`}
+      </p>
+      <h1 style="color:#fff;font-size:22px;font-weight:900;margin:0 0 16px">Olá ${firstName},</h1>
+      <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0 0 20px">
+        ${isLast
+          ? `O teu trial termina amanhã. Tudo o que registaste fica guardado. Se quiseres continuar a ter acesso ao teu plano de treino, às mensagens do coach e ao histórico de progresso, activa a subscrição agora.`
+          : `O teu trial termina em ${daysLeft} dias. Até agora já tens acesso ao teu plano de treino, ao coach e a todo o registo de progresso. Não percas esse acesso.`}
+      </p>
+
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0c;border:1px solid #27272a;border-radius:12px;margin-bottom:24px">
+        <tr><td style="padding:16px 20px">
+          <table width="100%" cellpadding="0" cellspacing="0">
+            ${[
+              ["Planos de treino semanais personalizados", "✓"],
+              ["Check-ins de evolução e progresso", "✓"],
+              ["Nutrição e macros adaptados", "✓"],
+              ["Acesso direto ao coach via chat", "✓"],
+            ].map(([label, check]) => `
+            <tr>
+              <td style="color:#a1a1aa;font-size:14px;padding:7px 0">${label}</td>
+              <td style="color:#C9A84C;font-weight:900;font-size:14px;text-align:right;padding:7px 0">${check}</td>
+            </tr>`).join("")}
+            <tr style="border-top:1px solid #27272a">
+              <td style="color:#fff;font-weight:700;font-size:15px;padding:12px 0 0">Total por mês</td>
+              <td style="color:#C9A84C;font-weight:900;font-size:20px;text-align:right;padding-top:12px">€127</td>
+            </tr>
+          </table>
+        </td></tr>
+      </table>
+
+      <a href="${siteUrl}/client/dashboard"
+         style="display:block;background:linear-gradient(135deg,#E8C96B,#C9A84C);color:#000;font-weight:800;font-size:15px;padding:15px 24px;border-radius:14px;text-decoration:none;text-align:center">
+        Activar subscrição →
+      </a>
+    </div>
+
+    <p style="text-align:center;color:#3f3f46;font-size:11px;margin:0">
+      KRAV Coaching · <a href="${siteUrl}/client/dashboard" style="color:#52525b">Aceder à app</a>
+    </p>
+  </div>
+</body>
+</html>`,
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Subscription cancellation email — sent when subscription is cancelled
+// ─────────────────────────────────────────────────────────────────────────────
+export async function sendSubscriptionCancelledEmail({
+  to,
+  clientName,
+  siteUrl,
+}: {
+  to: string;
+  clientName: string;
+  siteUrl: string;
+}) {
+  if (!process.env.RESEND_API_KEY) return;
+  const firstName = clientName.split(" ")[0];
+
+  await getResend().emails.send({
+    from: FROM,
+    to,
+    subject: `${firstName}, o teu acesso ao KRAV foi suspenso`,
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0a0c;font-family:system-ui,-apple-system,sans-serif;color:#e4e4e7">
+  <div style="max-width:520px;margin:40px auto;padding:0 16px">
+    <div style="text-align:center;margin-bottom:28px">
+      <p style="font-size:24px;font-weight:900;color:#fff;margin:0">KRAV<span style="color:#C9A84C">.</span></p>
+    </div>
+    <div style="background:#111113;border:1px solid #27272a;border-radius:20px;padding:32px">
+      <h1 style="color:#fff;font-size:22px;font-weight:900;margin:0 0 14px">Olá ${firstName},</h1>
+      <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0 0 20px">
+        A tua subscrição foi cancelada e o acesso à app está suspenso. O teu histórico fica guardado na íntegra.
+      </p>
+      <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0 0 24px">
+        Se quiseres retomar o coaching, basta reactivar a subscrição abaixo. Retomas exactamente onde paraste.
+      </p>
+      <a href="${siteUrl}/client/dashboard"
+         style="display:block;background:linear-gradient(135deg,#E8C96B,#C9A84C);color:#000;font-weight:800;font-size:15px;padding:15px 24px;border-radius:14px;text-decoration:none;text-align:center">
+        Reactivar subscrição →
+      </a>
+    </div>
+    <p style="text-align:center;color:#3f3f46;font-size:11px;margin:20px 0 0">
+      KRAV Coaching · <a href="${siteUrl}/client/dashboard" style="color:#52525b">Aceder à app</a>
+    </p>
+  </div>
+</body>
+</html>`,
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Renewal reminder email — sent 3 days before subscription renews
+// ─────────────────────────────────────────────────────────────────────────────
+export async function sendRenewalReminderEmail({
+  to,
+  clientName,
+  renewalDate,
+  siteUrl,
+}: {
+  to: string;
+  clientName: string;
+  renewalDate: string;
+  siteUrl: string;
+}) {
+  if (!process.env.RESEND_API_KEY) return;
+  const firstName = clientName.split(" ")[0];
+
+  await getResend().emails.send({
+    from: FROM,
+    to,
+    subject: `${firstName}, o teu plano renova a ${renewalDate}`,
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0a0c;font-family:system-ui,-apple-system,sans-serif;color:#e4e4e7">
+  <div style="max-width:520px;margin:40px auto;padding:0 16px">
+    <div style="text-align:center;margin-bottom:28px">
+      <p style="font-size:24px;font-weight:900;color:#fff;margin:0">KRAV<span style="color:#C9A84C">.</span></p>
+    </div>
+    <div style="background:#111113;border:1px solid #27272a;border-radius:20px;padding:32px">
+      <h1 style="color:#fff;font-size:20px;font-weight:900;margin:0 0 14px">Olá ${firstName},</h1>
+      <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0 0 20px">
+        O teu plano KRAV Premium Coaching renova automaticamente a <strong style="color:#fff">${renewalDate}</strong>.
+        Confirma que o teu método de pagamento está actualizado para não perderes o acesso.
+      </p>
+      <a href="${siteUrl}/client/profile"
+         style="display:block;background:linear-gradient(135deg,#E8C96B,#C9A84C);color:#000;font-weight:800;font-size:15px;padding:14px;border-radius:14px;text-decoration:none;text-align:center">
+        Gerir método de pagamento →
+      </a>
+    </div>
+    <p style="text-align:center;color:#3f3f46;font-size:11px;margin:20px 0 0">
+      KRAV Coaching · <a href="${siteUrl}/client/dashboard" style="color:#52525b">Aceder à app</a>
+    </p>
+  </div>
+</body>
+</html>`,
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Weekly summary email — sent Sunday evenings alongside push notification
 // ─────────────────────────────────────────────────────────────────────────────
 export async function sendWeeklySummaryEmail({
