@@ -165,17 +165,17 @@ const CARDS: CardData[] = [
     badgeColor: "gold",
     title: "Transforma o teu corpo",
     sub: "App exclusiva · acompanhamento direto comigo",
-    cta: "Saber mais",
+    cta: "Trial grátis",
     ctaStyle: "gold",
-    href: "https://www.kravcoaching.com",
+    href: "/start",
     photo: "/pexels-tima-miroshnichenko-6389516.jpg",
     photoPosition: "center center",
     bgStyle: { background: "#1a1200" },
     modal: {
       title: "Coaching Online 1:1",
-      desc: "Treino e nutrição 100% feitos para ti — tudo na tua app exclusiva. Plano semanal, check-ins de evolução, ajustes constantes e acesso direto a mim. Sem planos genéricos. Sem desculpas.",
-      cta: "Quero começar",
-      href: "https://www.kravcoaching.com",
+      desc: "Treino e nutrição 100% feitos para ti — plano semanal personalizado, check-ins de evolução, nutrição adaptada ao teu objetivo e acesso direto a mim via chat. Um cliente ganhou +20kg de massa. Sem planos genéricos. Sem desculpas.",
+      cta: "Começar trial grátis de 7 dias",
+      href: "/start",
     },
   },
   {
@@ -432,9 +432,20 @@ export default function LinksPage() {
           </div>
 
           {/* Bio */}
-          <p className="text-xs leading-relaxed max-w-[230px]" style={{ color: "rgba(255,255,255,0.38)" }}>
-            Personal Trainer certificado.<br />Transformações reais, sem atalhos.
+          <p className="text-xs leading-relaxed max-w-[240px] text-center" style={{ color: "rgba(255,255,255,0.38)" }}>
+            De 59kg a estético — sem genética.<br />
+            <span style={{ color: "rgba(201,168,76,0.7)" }}>Cliente ganhou +20kg de massa.</span>
           </p>
+
+          {/* Trial pill */}
+          <a href="/start"
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-black active:scale-95 transition-transform"
+            style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C)", color: "#000", boxShadow: "0 2px 20px rgba(201,168,76,0.25)" }}>
+            <span>7 dias grátis</span>
+            <span style={{ opacity: 0.6 }}>·</span>
+            <span>sem cartão</span>
+            <ArrowRight />
+          </a>
 
           {/* Tags */}
           <div className="flex gap-2">
