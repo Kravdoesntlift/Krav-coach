@@ -12,9 +12,10 @@ const t = {
     login:        "Entrar →",
     hero_title:   <>O teu treino.<br /><span style={{ background: "linear-gradient(90deg,#E8C96B,#C9A84C,#A8893A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Personalizado.</span></>,
     hero_tagline: "Coaching fitness premium com acompanhamento real — no teu telemóvel, 24/7.",
-    cta_primary:  "Começar agora — €127/mês",
+    cta_primary:  "Trial grátis de 7 dias →",
+    cta_secondary: "Depois €127/mês · Sem contratos",
     cta_login:    "Já tenho conta",
-    no_contract:  "Sem contratos. Cancela quando quiseres.",
+    no_contract:  "7 dias grátis, sem cartão de crédito.",
     section_features: "Tudo o que está incluído",
     section_how:  "Como funciona",
     section_install: "Instala a app no teu telemóvel",
@@ -85,9 +86,10 @@ const t = {
     login:        "Log in →",
     hero_title:   <>Your training.<br /><span style={{ background: "linear-gradient(90deg,#E8C96B,#C9A84C,#A8893A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Personalised.</span></>,
     hero_tagline: "Premium fitness coaching with real accountability — on your phone, 24/7.",
-    cta_primary:  "Get started — €127/month",
+    cta_primary:  "Start free 7-day trial →",
+    cta_secondary: "Then €127/month · No contracts",
     cta_login:    "I already have an account",
-    no_contract:  "No contracts. Cancel anytime.",
+    no_contract:  "7 days free, no credit card required.",
     section_features: "Everything that's included",
     section_how:  "How it works",
     section_install: "Install the app on your phone",
@@ -194,7 +196,36 @@ export default async function LandingPage({
     ? coach.full_name.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()
     : "K";
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "KRAV Coach",
+    "description": isEN
+      ? "Premium online fitness coaching with personalised weekly training plans, nutrition tracking and direct coach access via app."
+      : "Coaching fitness online com planos de treino semanais personalizados, acompanhamento nutricional e acesso direto ao coach via app.",
+    "url": "https://kravcoaching.com",
+    "image": "https://kravcoaching.com/andre-bg.jpg",
+    "priceRange": "€127/mês",
+    "founder": {
+      "@type": "Person",
+      "name": coach?.full_name ?? "André Kravchuk",
+      "jobTitle": "Personal Trainer & Fitness Coach",
+    },
+    "offers": {
+      "@type": "Offer",
+      "name": isEN ? "Online Coaching 1:1" : "Coaching Online 1:1",
+      "price": "127",
+      "priceCurrency": "EUR",
+      "description": isEN ? "7-day free trial included" : "Trial grátis de 7 dias incluído",
+    },
+  };
+
   return (
+    <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
       {/* Ambient glow */}
       <div
@@ -265,23 +296,23 @@ export default async function LandingPage({
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <div className="flex flex-col items-center gap-2">
                 <Link
                   href={signupUrlWithLang}
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110 w-full sm:w-auto"
                   style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
                 >
                   {c.cta_primary}
                 </Link>
-                <Link
-                  href="/auth/login"
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-2xl font-semibold text-zinc-400 text-base border border-zinc-800 hover:border-zinc-600 hover:text-white transition-all"
-                >
-                  {c.cta_login}
-                </Link>
+                <p className="text-zinc-500 text-xs">{c.cta_secondary}</p>
               </div>
 
-              <p className="text-zinc-600 text-xs">{c.no_contract}</p>
+              <Link
+                href="/auth/login"
+                className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-semibold text-zinc-500 text-sm border border-zinc-800 hover:border-zinc-600 hover:text-white transition-all"
+              >
+                {c.cta_login}
+              </Link>
             </div>
           </ScrollReveal>
         </section>
@@ -566,118 +597,59 @@ export default async function LandingPage({
           <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }} />
         </div>
 
-        {/* ── TESTIMONIALS ─────────────────────────────────────── */}
+        {/* ── RESULT ───────────────────────────────────────────── */}
         <section className="max-w-2xl mx-auto px-5 pb-16 space-y-6">
           <ScrollReveal direction="up">
             <p className="text-zinc-500 text-xs font-bold tracking-[0.18em] uppercase text-center">
-              {isEN ? "What clients say" : "O que os clientes dizem"}
+              {isEN ? "Real result" : "Resultado real"}
             </p>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {(isEN ? [
-              {
-                name: "Miguel S.",
-                role: "Intermediate · 3 months",
-                text: "Honestly wasn't expecting much from an online coach. But the plan actually fits my schedule — I only have 3 days and he worked with that. Down 7 kg so far.",
-                stars: 5,
-              },
-              {
-                name: "Ana R.",
-                role: "Beginner · 5 months",
-                text: "I've tried gyms, YouTube videos, everything. Always gave up after 2 weeks. This is the first time I've kept going for months. Having someone to answer to makes a difference.",
-                stars: 4,
-              },
-              {
-                name: "Tiago M.",
-                role: "Advanced · 2 months",
-                text: "I'd been training for years but stopped making progress. The coach spotted issues with my programming straight away. Bench went up 12 kg in 2 months which is mad.",
-                stars: 5,
-              },
-              {
-                name: "Carolina F.",
-                role: "Intermediate · 4 months",
-                text: "The nutrition side surprised me. I thought I was eating well but was way off on protein. Now I actually track it and it's not as annoying as I expected.",
-                stars: 5,
-              },
-            ] : [
-              {
-                name: "Miguel S.",
-                role: "Intermédio · 3 meses",
-                text: "Sinceramente não esperava muito de um coach online. Mas o plano encaixa mesmo na minha semana — só tenho 3 dias e ele trabalhou com isso. Já perdi 7 kg.",
-                stars: 5,
-              },
-              {
-                name: "Ana R.",
-                role: "Iniciante · 5 meses",
-                text: "Já tentei ginásio, vídeos no YouTube, tudo. Desistia sempre ao fim de 2 semanas. É a primeira vez que continuo meses depois. Ter alguém a acompanhar faz mesmo diferença.",
-                stars: 4,
-              },
-              {
-                name: "Tiago M.",
-                role: "Avançado · 2 meses",
-                text: "Já treinava há anos mas tinha parado de evoluir. O coach identificou logo problemas na minha programação. O supino subiu 12 kg em 2 meses, é loucura.",
-                stars: 5,
-              },
-              {
-                name: "Carolina F.",
-                role: "Intermédio · 4 meses",
-                text: "A parte da nutrição surpreendeu-me. Achava que comia bem mas estava muito abaixo na proteína. Agora registo tudo e não é tão chato como pensava.",
-                stars: 5,
-              },
-            ]).map((t, i) => (
-              <ScrollReveal key={i} direction="up" delay={i * 80}>
-                <div
-                  className="rounded-2xl p-5 space-y-3 h-full"
-                  style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)" }}
-                >
-                  {/* Stars */}
-                  <div className="flex gap-0.5">
-                    {Array.from({ length: t.stars }).map((_, j) => (
-                      <span key={j} className="text-brand-gold text-sm">★</span>
-                    ))}
-                  </div>
-                  {/* Quote */}
-                  <p className="text-zinc-300 text-sm leading-relaxed">&ldquo;{t.text}&rdquo;</p>
-                  {/* Author */}
-                  <div className="flex items-center gap-2.5 pt-1">
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-black shrink-0"
-                      style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
-                    >
-                      {t.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="text-white text-xs font-bold">{t.name}</p>
-                      <p className="text-zinc-600 text-[11px]">{t.role}</p>
-                    </div>
-                  </div>
+          <ScrollReveal direction="up" delay={80}>
+            <div
+              className="rounded-3xl p-6 space-y-5"
+              style={{
+                background: "linear-gradient(160deg, rgba(201,168,76,0.07) 0%, rgba(10,10,12,0.95) 100%)",
+                border: "1px solid rgba(201,168,76,0.2)",
+              }}
+            >
+              {/* Stat */}
+              <div className="flex items-center gap-5">
+                <div className="text-center shrink-0">
+                  <p className="text-5xl font-black" style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                    +20kg
+                  </p>
+                  <p className="text-zinc-500 text-xs mt-1">{isEN ? "muscle mass" : "de massa muscular"}</p>
                 </div>
-              </ScrollReveal>
-            ))}
-          </div>
+                <div className="h-14 w-px shrink-0" style={{ background: "rgba(201,168,76,0.2)" }} />
+                <p className="text-zinc-300 text-sm leading-relaxed">
+                  {isEN
+                    ? "Client started from scratch and built 20 kg of muscle mass with personalised weekly plans, nutrition tracking and direct coaching."
+                    : "Cliente começou do zero e ganhou 20 kg de massa muscular com planos semanais personalizados, acompanhamento nutricional e coaching direto."}
+                </p>
+              </div>
 
-          {/* Trust badges */}
-          <ScrollReveal direction="up">
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-              {(isEN ? [
-                "⭐ 4.9/5 average rating",
-                "💬 24/7 support",
-                "🔒 Cancel anytime",
-                "🎯 Personalised plan in 24h",
-              ] : [
-                "⭐ 4.9/5 avaliação média",
-                "💬 Suporte 24/7",
-                "🔒 Cancela quando quiseres",
-                "🎯 Plano em 24h",
-              ]).map((badge, i) => (
-                <span
-                  key={i}
-                  className="text-zinc-500 text-[11px] font-medium bg-white/[0.03] border border-white/[0.06] rounded-full px-3 py-1.5"
-                >
-                  {badge}
-                </span>
-              ))}
+              {/* Trust badges */}
+              <div className="flex flex-wrap gap-2 pt-1">
+                {(isEN ? [
+                  "💬 24/7 support",
+                  "🔒 Cancel anytime",
+                  "🎯 Plan in 24h",
+                  "📱 App included",
+                ] : [
+                  "💬 Suporte 24/7",
+                  "🔒 Cancela quando quiseres",
+                  "🎯 Plano em 24h",
+                  "📱 App incluída",
+                ]).map((badge, i) => (
+                  <span
+                    key={i}
+                    className="text-zinc-500 text-[11px] font-medium bg-white/[0.03] border border-white/[0.06] rounded-full px-3 py-1.5"
+                  >
+                    {badge}
+                  </span>
+                ))}
+              </div>
             </div>
           </ScrollReveal>
         </section>
@@ -731,5 +703,6 @@ export default async function LandingPage({
 
       </div>
     </div>
+    </>
   );
 }

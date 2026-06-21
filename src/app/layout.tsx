@@ -12,9 +12,18 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "KRAV Coach",
-  description: "A tua plataforma de coaching fitness premium",
+  title: "KRAV Coach — Personal Trainer Online | Trial Grátis 7 Dias",
+  description: "Coaching fitness personalizado com acompanhamento real. Plano de treino semanal, nutrição e chat direto com o coach — tudo na tua app. Trial grátis de 7 dias, sem cartão.",
+  keywords: ["personal trainer online", "coach fitness online", "coaching fitness portugal", "plano treino personalizado", "personal trainer portugal", "krav coach"],
   manifest: "/manifest.json",
+  openGraph: {
+    title: "KRAV Coach — Personal Trainer Online",
+    description: "Trial grátis de 7 dias. Plano personalizado, nutrição e coaching direto — tudo na tua app.",
+    url: "https://kravcoaching.com",
+    siteName: "KRAV Coach",
+    locale: "pt_PT",
+    type: "website",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
