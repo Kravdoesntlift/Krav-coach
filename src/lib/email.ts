@@ -170,8 +170,11 @@ export async function sendWelcomeEmail({
       <h1 style="color:#fff;font-size:26px;font-weight:900;text-align:center;margin:0 0 12px">
         Bem-vindo(a), ${firstName}!
       </h1>
+      <p style="color:#a1a1aa;font-size:15px;line-height:1.7;text-align:center;margin:0 0 8px">
+        Bem-vindo ao teu <strong style="color:#C9A84C">trial gratuito de 7 dias</strong>. Tens acesso completo à app durante esta semana.
+      </p>
       <p style="color:#a1a1aa;font-size:15px;line-height:1.7;text-align:center;margin:0 0 28px">
-        A tua conta foi criada com sucesso. O teu coach <strong style="color:#fff">${coachFirst}</strong> irá preparar o teu plano personalizado nas próximas 24 horas úteis.
+        O teu coach <strong style="color:#fff">${coachFirst}</strong> vai preparar o teu plano de treino em breve. Qualquer dúvida, fala directamente por chat.
       </p>
 
       <a href="${siteUrl}/client/dashboard"
@@ -185,9 +188,9 @@ export async function sendWelcomeEmail({
       <p style="color:#71717a;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0 0 16px">Os próximos passos</p>
 
       ${[
-        ["1", "Completa o teu perfil", "Preenche os teus dados (peso, altura, objectivos) para que o coach possa criar o plano perfeito."],
-        ["2", "Aguarda o teu plano", "Nas próximas 24 horas o coach cria e disponibiliza o teu plano de treino personalizado."],
-        ["3", "Instala a app", "Abre o site no telemóvel e adiciona ao ecrã de início para uma experiência nativa."],
+        ["1", "Completa o teu perfil", "Preenche os teus dados (peso, altura, objetivo) para o coach personalizar o teu plano."],
+        ["2", "Explora a app", "Vê os treinos, regista check-ins e usa o chat para falar directamente com o teu coach."],
+        ["3", "Instala no telemóvel", "Abre o site no Safari/Chrome e usa 'Adicionar ao ecrã de início' para acesso nativo."],
       ].map(([n, title, desc]) => `
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:18px">
           <tr>

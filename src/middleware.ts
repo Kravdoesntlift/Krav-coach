@@ -137,7 +137,8 @@ export async function middleware(request: NextRequest) {
     if (profile?.status === "pending") {
       return NextResponse.redirect(new URL("/client/pending", request.url));
     }
-    if (profile?.status === "archived" || profile?.status === "cancelled" || profile?.status === "paused") {
+    // "cancelled" is handled by the client layout (shows Stripe paywall)
+    if (profile?.status === "archived" || profile?.status === "paused") {
       return NextResponse.redirect(new URL("/client/suspended", request.url));
     }
   }
