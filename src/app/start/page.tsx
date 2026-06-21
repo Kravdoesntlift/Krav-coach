@@ -259,7 +259,7 @@ export default function StartPage() {
             <StepWrapper title="Quantos dias por semana podes treinar?">
               <div className="space-y-4">
                 <div className="flex items-center justify-center gap-0">
-                  {[2, 3, 4, 5, 6].map((d) => (
+                  {[2, 3, 4, 5, 6, 7].map((d) => (
                     <button
                       key={d}
                       type="button"
@@ -273,7 +273,7 @@ export default function StartPage() {
                         border: "1px solid rgba(255,255,255,0.07)",
                         color: quiz.availableDays === d ? "#000" : "#71717a",
                         borderRadius:
-                          d === 2 ? "1rem 0 0 1rem" : d === 6 ? "0 1rem 1rem 0" : "0",
+                          d === 2 ? "1rem 0 0 1rem" : d === 7 ? "0 1rem 1rem 0" : "0",
                         borderLeft: d === 2 ? undefined : "none",
                       }}
                     >
@@ -287,6 +287,7 @@ export default function StartPage() {
                   {quiz.availableDays === 4 && "4 dias — ótimo equilíbrio treino/recuperação"}
                   {quiz.availableDays === 5 && "5 dias — ritmo avançado, exige boa recuperação"}
                   {quiz.availableDays === 6 && "6 dias — máxima intensidade, para avançados"}
+                  {quiz.availableDays === 7 && "7 dias — todos os dias, sem dias de descanso programados"}
                 </p>
               </div>
             </StepWrapper>

@@ -28,6 +28,7 @@ export interface ClientData {
   unread: number;
   needsAttention: boolean;
   renewsSoon: boolean;
+  trialDaysLeft?: number | null;
 }
 
 interface Props {
@@ -120,6 +121,16 @@ export default function CoachClientList({ clients, coachId, coachName }: Props) 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <p className="text-white font-medium text-sm truncate">{client.full_name}</p>
+                      {client.trialDaysLeft !== null && client.trialDaysLeft !== undefined && client.trialDaysLeft > 0 && (
+                        <span className="text-[9px] bg-[#C9A84C]/15 text-[#C9A84C] border border-[#C9A84C]/30 px-1.5 py-0.5 rounded-full shrink-0 font-bold">
+                          Trial · {client.trialDaysLeft}d
+                        </span>
+                      )}
+                      {client.trialDaysLeft !== null && client.trialDaysLeft !== undefined && client.trialDaysLeft <= 0 && (
+                        <span className="text-[9px] bg-red-900/30 text-red-400 border border-red-700/30 px-1.5 py-0.5 rounded-full shrink-0 font-bold">
+                          Trial expirado
+                        </span>
+                      )}
                       {client.needsAttention && client.status !== "cancelled" && (
                         <span className="text-[9px] bg-yellow-900/40 text-yellow-400 border border-yellow-700/40 px-1.5 py-0.5 rounded-full shrink-0">
                           Sem check-in

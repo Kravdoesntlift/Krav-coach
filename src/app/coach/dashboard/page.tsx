@@ -71,7 +71,7 @@ export default async function CoachDashboard() {
   // Also clients explicitly assigned via coach_clients (may not have plans yet)
   const { data: assignedRows } = await supabase
     .from("coach_clients")
-    .select("client_id, profiles!coach_clients_client_id_fkey(id, full_name, status, subscription_renews_at, avatar_url, created_at)")
+    .select("client_id, profiles!coach_clients_client_id_fkey(id, full_name, status, subscription_renews_at, avatar_url, created_at, trial_ends_at)")
     .eq("coach_id", user!.id)
     .eq("assigned_role", "coach");
 
@@ -158,7 +158,7 @@ export default async function CoachDashboard() {
   }
 
   // All clients deduplicated — union of plan clients + explicitly assigned clients
-  type AllClientEntry = { id: string; full_name: string; status: string; subscription_renews_at: string | null; avatar_url?: string | null };
+  type AllClientEntry = { id: string; full_name: string; status: string; subscription_renews_at: string | null; avatar_url?: string | null; trial_ends_at?: string | null };
   const allClientMap = new Map<string, AllClientEntry>();
   for (const p of allPlans ?? []) {
     const c = p.client as unknown as AllClientEntry | null;
@@ -368,6 +368,10 @@ export default async function CoachDashboard() {
               const needsAttention = !lastCheckinStr || new Date(lastCheckinStr + "T00:00:00") < twoWeeksAgo;
               const renewsAt = client.subscription_renews_at;
               const renewsSoon = !!(renewsAt && new Date(renewsAt + "T00:00:00") <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+              const trialEndsAt = client.trial_ends_at;
+              const trialDaysLeft = trialEndsAt
+                ? Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / 86_400_000)
+                : null;
               return {
                 id: client.id,
                 full_name: client.full_name,
@@ -380,6 +384,7 @@ export default async function CoachDashboard() {
                 unread,
                 needsAttention,
                 renewsSoon,
+                trialDaysLeft,
               };
             })}
         />

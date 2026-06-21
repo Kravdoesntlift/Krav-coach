@@ -165,7 +165,7 @@ export async function sendWelcomeEmail({
     <!-- Hero card -->
     <div style="background:#111113;border:1px solid #27272a;border-radius:20px;padding:36px;margin-bottom:20px">
       <div style="text-align:center;margin-bottom:28px">
-        <div style="width:64px;height:64px;background:linear-gradient(135deg,#E8C96B,#A8893A);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:28px">🏆</div>
+        <div style="width:64px;height:64px;background:linear-gradient(135deg,#E8C96B,#A8893A);border-radius:50%;display:inline-block;line-height:64px;text-align:center;font-size:28px">🏆</div>
       </div>
       <h1 style="color:#fff;font-size:26px;font-weight:900;text-align:center;margin:0 0 12px">
         Bem-vindo(a), ${firstName}!
@@ -189,13 +189,17 @@ export async function sendWelcomeEmail({
         ["2", "Aguarda o teu plano", "Nas próximas 24 horas o coach cria e disponibiliza o teu plano de treino personalizado."],
         ["3", "Instala a app", "Abre o site no telemóvel e adiciona ao ecrã de início para uma experiência nativa."],
       ].map(([n, title, desc]) => `
-        <div style="display:flex;gap:14px;margin-bottom:18px">
-          <div style="min-width:32px;height:32px;background:linear-gradient(135deg,#E8C96B22,#C9A84C22);border:1px solid #C9A84C44;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#C9A84C;font-weight:900;font-size:13px">${n}</div>
-          <div>
-            <p style="color:#fff;font-weight:700;font-size:14px;margin:0 0 3px">${title}</p>
-            <p style="color:#71717a;font-size:13px;line-height:1.5;margin:0">${desc}</p>
-          </div>
-        </div>
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:18px">
+          <tr>
+            <td width="46" style="vertical-align:top;padding-right:14px">
+              <div style="width:32px;height:32px;background:#1a1207;border:1.5px solid #C9A84C;border-radius:50%;display:inline-block;line-height:29px;text-align:center;color:#C9A84C;font-weight:900;font-size:13px">${n}</div>
+            </td>
+            <td style="vertical-align:top">
+              <p style="color:#fff;font-weight:700;font-size:14px;margin:0 0 3px">${title}</p>
+              <p style="color:#71717a;font-size:13px;line-height:1.5;margin:0">${desc}</p>
+            </td>
+          </tr>
+        </table>
       `).join("")}
     </div>
 
