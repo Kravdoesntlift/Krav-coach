@@ -162,8 +162,8 @@ export default function StartPage() {
       if (result.error) {
         setError(result.error);
         setLoading(false);
-      } else if (result.checkoutUrl) {
-        window.location.href = result.checkoutUrl;
+      } else if (result.redirectTo) {
+        window.location.href = result.redirectTo;
       } else {
         setError("Erro inesperado. Tenta novamente.");
         setLoading(false);
@@ -439,7 +439,7 @@ export default function StartPage() {
 
                 <p className="text-zinc-600 text-xs text-center pt-1">
                   Ao criar conta aceitas os nossos termos de serviço.
-                  Após o registo serás redirecionado para o pagamento.
+                  7 dias grátis, sem cartão de crédito.
                 </p>
               </div>
             </StepWrapper>
@@ -499,7 +499,7 @@ export default function StartPage() {
                 A processar...
               </span>
             ) : step === TOTAL_STEPS ? (
-              "Criar conta e continuar para pagamento"
+              "Começar trial gratuito de 7 dias"
             ) : (
               "Continuar"
             )}
