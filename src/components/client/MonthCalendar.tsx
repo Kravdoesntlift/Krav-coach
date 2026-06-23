@@ -5,17 +5,27 @@ const MONTH_NAMES_PT = [
   "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
   "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro",
 ];
-// Segunda a Domingo — padrão europeu
-const DOW_HEADERS = ["S","T","Q","Q","S","S","D"];
+const MONTH_NAMES_EN = [
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December",
+];
+// Monday-based, PT: S T Q Q S S D | EN: M T W T F S S
+const DOW_HEADERS_PT = ["S","T","Q","Q","S","S","D"];
+const DOW_HEADERS_EN = ["M","T","W","T","F","S","S"];
 
 interface Props {
   year: number;
   month: number; // 0-indexed
   dayStatuses: Record<string, DayStatus>;
   todayStr: string;
+  lang?: "pt" | "en";
 }
 
-export default function MonthCalendar({ year, month, dayStatuses, todayStr }: Props) {
+export default function MonthCalendar({ year, month, dayStatuses, todayStr, lang = "pt" }: Props) {
+  const isEN = lang === "en";
+  const MONTH_NAMES = isEN ? MONTH_NAMES_EN : MONTH_NAMES_PT;
+  const DOW_HEADERS = isEN ? DOW_HEADERS_EN : DOW_HEADERS_PT;
+
   const firstDay  = new Date(Date.UTC(year, month, 1));
   const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
 
@@ -41,6 +51,18 @@ export default function MonthCalendar({ year, month, dayStatuses, todayStr }: Pr
   const scheduledDone  = monthStatuses.filter(s => s !== "rest" && s !== "future" && s !== "none").length;
   const pct = scheduledDone > 0 ? Math.round((completedCount / scheduledDone) * 100) : 0;
 
+  const legend = isEN
+    ? [
+        { color: "#C9A84C",              label: "Completed" },
+        { color: "rgba(239,68,68,0.55)", label: "Missed"    },
+        { color: "rgba(63,63,70,0.5)",   label: "Rest"      },
+      ]
+    : [
+        { color: "#C9A84C",              label: "Completo" },
+        { color: "rgba(239,68,68,0.55)", label: "Falhado"  },
+        { color: "rgba(63,63,70,0.5)",   label: "Descanso" },
+      ];
+
   return (
     <div
       className="rounded-3xl overflow-hidden"
@@ -50,10 +72,10 @@ export default function MonthCalendar({ year, month, dayStatuses, todayStr }: Pr
       <div className="px-4 pt-4 pb-2 flex items-start justify-between">
         <div>
           <p className="text-[10px] font-semibold tracking-widest uppercase text-zinc-600">
-            Calendário de treinos
+            {isEN ? "Training calendar" : "Calendário de treinos"}
           </p>
           <h3 className="mt-0.5 text-base font-bold text-white">
-            {MONTH_NAMES_PT[month]}{" "}
+            {MONTH_NAMES[month]}{" "}
             <span className="text-zinc-600 font-normal text-sm">{year}</span>
           </h3>
         </div>
@@ -62,12 +84,12 @@ export default function MonthCalendar({ year, month, dayStatuses, todayStr }: Pr
             <p className="text-xl font-black" style={{ color: "#C9A84C" }}>
               {completedCount}
             </p>
-            <p className="text-[10px] text-zinc-600 mt-0.5">treinos</p>
+            <p className="text-[10px] text-zinc-600 mt-0.5">{isEN ? "workouts" : "treinos"}</p>
           </div>
           {missedCount > 0 && (
             <div className="text-right">
               <p className="text-xl font-black text-red-400">{missedCount}</p>
-              <p className="text-[10px] text-zinc-600 mt-0.5">falhados</p>
+              <p className="text-[10px] text-zinc-600 mt-0.5">{isEN ? "missed" : "falhados"}</p>
             </div>
           )}
         </div>
@@ -78,7 +100,9 @@ export default function MonthCalendar({ year, month, dayStatuses, todayStr }: Pr
         <div className="px-4 mb-3">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[10px] text-zinc-600">
-              {completedCount} de {scheduledDone} treinos concluídos
+              {isEN
+                ? `${completedCount} of ${scheduledDone} workouts completed`
+                : `${completedCount} de ${scheduledDone} treinos concluídos`}
             </span>
             <span className="text-[10px] font-bold" style={{ color: "#C9A84C" }}>
               {pct}%
@@ -116,16 +140,14 @@ export default function MonthCalendar({ year, month, dayStatuses, todayStr }: Pr
           const status  = dayStatuses[dateStr] ?? "none";
           const isToday = dateStr === todayStr;
 
-          // Number colour
           const numColor =
-            isToday          ? "text-black"        :
-            status === "completed" ? "text-white"  :
-            status === "missed"    ? "text-red-400/70" :
-            status === "rest"      ? "text-zinc-700"   :
-            status === "future"    ? "text-zinc-600"   :
+            isToday                ? "text-black"          :
+            status === "completed" ? "text-white"          :
+            status === "missed"    ? "text-red-400/70"     :
+            status === "rest"      ? "text-zinc-700"       :
+            status === "future"    ? "text-zinc-600"       :
             "text-zinc-800";
 
-          // Dot color
           const dotBg =
             status === "completed" ? "#C9A84C"              :
             status === "missed"    ? "rgba(239,68,68,0.55)" :
@@ -140,10 +162,7 @@ export default function MonthCalendar({ year, month, dayStatuses, todayStr }: Pr
               >
                 {day}
               </span>
-              <div
-                className="w-1 h-1 rounded-full"
-                style={{ background: dotBg }}
-              />
+              <div className="w-1 h-1 rounded-full" style={{ background: dotBg }} />
             </div>
           );
         })}
@@ -151,11 +170,7 @@ export default function MonthCalendar({ year, month, dayStatuses, todayStr }: Pr
 
       {/* ── Legend ── */}
       <div className="px-4 pb-4 flex items-center gap-4 flex-wrap">
-        {[
-          { color: "#C9A84C",              label: "Completo" },
-          { color: "rgba(239,68,68,0.55)", label: "Falhado"  },
-          { color: "rgba(63,63,70,0.5)",   label: "Descanso" },
-        ].map(({ color, label }) => (
+        {legend.map(({ color, label }) => (
           <div key={label} className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full" style={{ background: color }} />
             <span className="text-[9px] text-zinc-600 font-medium">{label}</span>

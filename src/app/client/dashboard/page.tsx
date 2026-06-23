@@ -437,6 +437,7 @@ export default async function ClientDashboard() {
         month={today.getUTCMonth()}
         dayStatuses={dayStatuses}
         todayStr={todayStr}
+        lang={lang}
       />
 
       {/* Coach feedback banner */}

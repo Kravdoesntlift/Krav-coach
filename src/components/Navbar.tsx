@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { logout } from "@/app/auth/actions";
 import type { Profile } from "@/lib/supabase/types";
+import { useLang } from "@/lib/i18n/useLang";
 
 export interface NavItem {
   href?: string;
@@ -20,6 +21,7 @@ interface NavbarProps {
 
 export default function Navbar({ profile, navItems }: NavbarProps) {
   const pathname = usePathname();
+  const { lang } = useLang();
 
   return (
     <header
@@ -80,7 +82,7 @@ export default function Navbar({ profile, navItems }: NavbarProps) {
               type="submit"
               className="text-xs text-zinc-600 hover:text-zinc-300 transition-colors font-medium"
             >
-              Sair
+              {lang === "en" ? "Sign out" : "Sair"}
             </button>
           </form>
         </div>
