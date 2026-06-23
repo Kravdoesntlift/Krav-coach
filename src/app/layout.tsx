@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import AppRefresh from "@/components/AppRefresh";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 
 const outfit = Outfit({
@@ -51,6 +52,7 @@ export default function RootLayout({
         <AppRefresh />
         {children}
         <Analytics />
+        <SpeedInsights />
       </body>
       <GoogleAnalytics gaId="G-CLY4DR251T" />
     </html>
