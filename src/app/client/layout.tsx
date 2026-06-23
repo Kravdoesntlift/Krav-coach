@@ -1,15 +1,13 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import Navbar from "@/components/Navbar";
-import BottomNav from "@/components/BottomNav";
 import { logout } from "@/app/auth/actions";
-import type { NavItem } from "@/components/Navbar";
-import { DumbbellIcon, ChatIcon, ChartIcon, UserIcon, ForkKnifeIcon } from "@/components/ui/Icons";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import PushPrompt from "@/components/PushPrompt";
 import GlobalBadgeSync from "@/components/GlobalBadgeSync";
 import { PaywallSubscribeButton } from "@/components/client/PaywallSubscribeButton";
+import { LangProvider } from "@/components/LangProvider";
+import { ClientShell } from "@/components/client/ClientShell";
 
 async function subscribeAction() {
   "use server";
@@ -169,75 +167,23 @@ export default async function ClientLayout({
 
   const unread = unreadCount ?? 0;
 
-  const clientNav: NavItem[] = [
-    { href: "/client/dashboard", label: "Treino" },
-    { href: "/client/nutrition", label: "Nutrição" },
-    { href: "/client/chat",      label: "Chat",  badge: unread },
-    {
-      label: "Progresso",
-      children: [
-        { href: "/client/progress",      label: "📈 Análise" },
-        { href: "/client/checkin",       label: "📋 Check-in" },
-        { href: "/client/daily-log",     label: "🔥 Registo Diário" },
-        { href: "/client/history",       label: "📅 Histórico" },
-        { href: "/client/records",       label: "🏆 PRs" },
-        { href: "/client/achievements",  label: "⭐ Conquistas" },
-        { href: "/client/photos",        label: "📸 Fotos" },
-        { href: "/client/report",        label: "📊 Relatório Mensal" },
-        { href: "/client/weekly-report", label: "📄 Relatório Semanal" },
-        { href: "/client/leaderboard",   label: "🥇 Leaderboard" },
-      ],
-    },
-    {
-      label: "Perfil",
-      children: [
-        { href: "/client/profile",       label: "👤 A minha conta" },
-        { href: "/client/ai-coach",      label: "🤖 AI Coach" },
-        { href: "/client/sessions",      label: "📅 Sessões" },
-        { href: "/client/integrations",  label: "⌚ Integrações" },
-        { href: "/client/referral",      label: "👥 Referências" },
-      ],
-    },
-  ];
-
-  const clientBottomNav = [
-    { href: "/client/dashboard", label: "Treino",    icon: <DumbbellIcon size={22} />,  badge: 0 },
-    { href: "/client/nutrition", label: "Nutrição",  icon: <ForkKnifeIcon size={22} />, badge: 0 },
-    { href: "/client/chat",      label: "Chat",      icon: <ChatIcon size={22} />,      badge: unread },
-    { href: "/client/progress",  label: "Progresso", icon: <ChartIcon size={22} />,     badge: 0 },
-    { href: "/client/profile",   label: "Perfil",    icon: <UserIcon size={22} />,      badge: 0 },
-  ];
-
   return (
-    <div className="min-h-screen bg-black">
-      <ServiceWorkerRegister />
-      <GlobalBadgeSync userId={user.id} />
-      <Navbar profile={profile} navItems={clientNav} />
-      <main className="max-w-2xl mx-auto px-4 pt-6 md:pt-20 pb-24 md:pb-12">
-        {/* Trial warning banner — shows last 2 days to match email reminders */}
-        {trialDaysLeft !== null && trialDaysLeft > 0 && trialDaysLeft <= 2 && (
-          <div className="mb-4 rounded-xl border border-[#C9A84C]/40 bg-[#C9A84C]/10 px-4 py-3 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">⏳</span>
-              <p className="text-sm text-[#C9A84C] font-medium">
-                O teu trial termina {trialDaysLeft === 1 ? "amanhã" : "em 2 dias"}.
-              </p>
-            </div>
-            <form action={subscribeAction} className="shrink-0">
-              <button
-                type="submit"
-                className="text-xs font-bold text-black bg-[#C9A84C] rounded-lg px-3 py-1.5 hover:bg-[#A8893A] transition-colors"
-              >
-                Subscrever
-              </button>
-            </form>
-          </div>
-        )}
-        {children}
-      </main>
-      <BottomNav items={clientBottomNav} userId={user.id} />
-      <PushPrompt />
-    </div>
+    <LangProvider>
+      <div className="min-h-screen bg-black">
+        <ServiceWorkerRegister />
+        <GlobalBadgeSync userId={user.id} />
+        <ClientShell
+          profile={profile}
+          unread={unread}
+          trialDaysLeft={trialDaysLeft}
+          subscribeAction={subscribeAction}
+          userId={user.id}
+        >
+          {children}
+        </ClientShell>
+        <PushPrompt />
+      </div>
+    </LangProvider>
   );
 }
 

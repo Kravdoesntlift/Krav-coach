@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { markWelcomed } from "@/app/client/actions_persistence";
+import { useLang } from "@/lib/i18n/useLang";
 
 interface Props {
   clientName: string;
@@ -13,6 +14,15 @@ interface Props {
 }
 
 export default function WelcomeBanner({ clientName, coachName, coachTagline, coachId, welcomed, onClose }: Props) {
+  const { lang } = useLang();
+
+  const extra = {
+    welcome_to_program: { pt: "Bem-vindo ao teu programa,",      en: "Welcome to your programme," },
+    your_coach:         { pt: "O teu coach",                     en: "Your coach" },
+    programme_body:     { pt: "Estás a entrar num programa de treino personalizado.\nDá o teu melhor esta semana. 🔥", en: "You're entering a personalised training programme.\nGive it your best this week. 🔥" },
+    lets_go:            { pt: "Vamos lá 💪",                     en: "Let's go 💪" },
+  } as const;
+
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -47,7 +57,7 @@ export default function WelcomeBanner({ clientName, coachName, coachTagline, coa
 
         {/* Welcome */}
         <div className="mb-5">
-          <p className="text-zinc-500 text-sm mb-1">Bem-vindo ao teu programa,</p>
+          <p className="text-zinc-500 text-sm mb-1">{extra.welcome_to_program[lang]}</p>
           <h2 className="text-3xl font-black text-white tracking-tight">{firstName}</h2>
         </div>
 
@@ -59,23 +69,22 @@ export default function WelcomeBanner({ clientName, coachName, coachTagline, coa
             border: "1px solid rgba(201,168,76,0.2)",
           }}
         >
-          <p className="text-zinc-500 text-xs mb-1 uppercase tracking-widest font-semibold">O teu coach</p>
+          <p className="text-zinc-500 text-xs mb-1 uppercase tracking-widest font-semibold">{extra.your_coach[lang]}</p>
           <p className="text-white font-bold text-lg">{coachName}</p>
           {coachTagline && (
             <p className="text-zinc-400 text-xs mt-1 italic">"{coachTagline}"</p>
           )}
         </div>
 
-        <p className="text-zinc-400 text-sm mb-6 leading-relaxed">
-          Estás a entrar num programa de treino personalizado.<br />
-          Dá o teu melhor esta semana. 🔥
+        <p className="text-zinc-400 text-sm mb-6 leading-relaxed" style={{ whiteSpace: "pre-line" }}>
+          {extra.programme_body[lang]}
         </p>
 
         <button
           onClick={() => { setVisible(false); onClose?.(); }}
           className="btn-primary w-full py-3 text-base"
         >
-          Vamos lá 💪
+          {extra.lets_go[lang]}
         </button>
       </div>
     </div>

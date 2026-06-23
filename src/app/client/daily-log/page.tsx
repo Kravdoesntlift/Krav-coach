@@ -2,14 +2,46 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useLang } from "@/lib/i18n/useLang";
 
-const ENERGY_OPTIONS = [
-  { value: 1, emoji: "😴", label: "Esgotado" },
-  { value: 2, emoji: "😓", label: "Cansado" },
-  { value: 3, emoji: "😐", label: "Normal" },
-  { value: 4, emoji: "😊", label: "Bem" },
-  { value: 5, emoji: "🔥", label: "Excelente" },
-] as const;
+const extra = {
+  energy_options: {
+    pt: [
+      { value: 1, emoji: "😴", label: "Esgotado" },
+      { value: 2, emoji: "😓", label: "Cansado" },
+      { value: 3, emoji: "😐", label: "Normal" },
+      { value: 4, emoji: "😊", label: "Bem" },
+      { value: 5, emoji: "🔥", label: "Excelente" },
+    ],
+    en: [
+      { value: 1, emoji: "😴", label: "Exhausted" },
+      { value: 2, emoji: "😓", label: "Tired" },
+      { value: 3, emoji: "😐", label: "Normal" },
+      { value: 4, emoji: "😊", label: "Good" },
+      { value: 5, emoji: "🔥", label: "Excellent" },
+    ],
+  },
+  steps_today:        { pt: "Passos hoje", en: "Steps today" },
+  goal_reached:       { pt: "Meta atingida! 🎉", en: "Goal reached! 🎉" },
+  steps_to_goal:      { pt: "para a meta", en: "to go" },
+  steps_unit:         { pt: "passos", en: "steps" },
+  water:              { pt: "Água", en: "Water" },
+  glasses_unit:       { pt: "copos", en: "glasses" },
+  daily_log_title:    { pt: "Registo Diário", en: "Daily Log" },
+  today_log:          { pt: "Registo de hoje", en: "Today's log" },
+  edit:               { pt: "Editar", en: "Edit" },
+  energy_label:       { pt: "Energia:", en: "Energy:" },
+  how_feel:           { pt: "Como te sentes hoje?", en: "How do you feel today?" },
+  note_optional:      { pt: "Nota (opcional)", en: "Note (optional)" },
+  note_placeholder:   { pt: "Como foi o teu dia? Alguma dor, stresse ou conquista?", en: "How was your day? Any pain, stress, or achievement?" },
+  cancel:             { pt: "Cancelar", en: "Cancel" },
+  saving:             { pt: "A guardar…", en: "Saving…" },
+  saved:              { pt: "Guardado ✓", en: "Saved ✓" },
+  save:               { pt: "Guardar", en: "Save" },
+  last7:              { pt: "Últimos 7 dias", en: "Last 7 days" },
+  goal_badge:         { pt: "META ✓", en: "GOAL ✓" },
+  locale:             { pt: "pt-PT", en: "en-US" },
+} as const;
 
 interface DailyLog {
   id: string;
@@ -38,16 +70,18 @@ const GLASS_ML = 250;
 const GOAL_GLASSES = 8;
 const GOAL_STEPS = 10000;
 
-function StepsInput({ steps, onChange }: { steps: number; onChange: (v: number) => void }) {
+function StepsInput({ steps, onChange, lang }: { steps: number; onChange: (v: number) => void; lang: "pt" | "en" }) {
   const pct = Math.min((steps / GOAL_STEPS) * 100, 100);
   const color = steps >= GOAL_STEPS ? "#22c55e" : steps >= 7000 ? "#C9A84C" : "#71717a";
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="label">Passos hoje</label>
+        <label className="label">{extra.steps_today[lang]}</label>
         <span className={`text-sm font-bold ${steps >= GOAL_STEPS ? "text-green-400" : "text-brand-gold"}`}>
-          {steps >= GOAL_STEPS ? "Meta atingida! 🎉" : `${(GOAL_STEPS - steps).toLocaleString()} para a meta`}
+          {steps >= GOAL_STEPS
+            ? extra.goal_reached[lang]
+            : `${(GOAL_STEPS - steps).toLocaleString()} ${extra.steps_to_goal[lang]}`}
         </span>
       </div>
 
@@ -69,7 +103,7 @@ function StepsInput({ steps, onChange }: { steps: number; onChange: (v: number) 
           onChange={(e) => onChange(Math.max(0, Math.min(99999, parseInt(e.target.value) || 0)))}
           className="input flex-1 text-center text-xl font-bold tabular-nums"
         />
-        <span className="text-gray-500 text-sm">passos</span>
+        <span className="text-gray-500 text-sm">{extra.steps_unit[lang]}</span>
       </div>
 
       {/* Quick add buttons */}
@@ -88,11 +122,11 @@ function StepsInput({ steps, onChange }: { steps: number; onChange: (v: number) 
   );
 }
 
-function WaterTracker({ glasses, onChange }: { glasses: number; onChange: (v: number) => void }) {
+function WaterTracker({ glasses, onChange, lang }: { glasses: number; onChange: (v: number) => void; lang: "pt" | "en" }) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="label">Água</label>
+        <label className="label">{extra.water[lang]}</label>
         <span className={`text-sm font-bold ${glasses >= GOAL_GLASSES ? "text-green-400" : "text-brand-gold"}`}>
           {glasses * GLASS_ML} ml / {GOAL_GLASSES * GLASS_ML} ml
         </span>
@@ -132,7 +166,7 @@ function WaterTracker({ glasses, onChange }: { glasses: number; onChange: (v: nu
         </button>
         <div className="flex-1 text-center">
           <span className="text-2xl font-black text-white">{glasses}</span>
-          <span className="text-gray-500 text-sm"> / {GOAL_GLASSES} copos</span>
+          <span className="text-gray-500 text-sm"> / {GOAL_GLASSES} {extra.glasses_unit[lang]}</span>
         </div>
         <button
           onClick={() => onChange(glasses + 1)}
@@ -146,6 +180,7 @@ function WaterTracker({ glasses, onChange }: { glasses: number; onChange: (v: nu
 }
 
 export default function DailyLogPage() {
+  const { t, lang } = useLang();
   const supabase = createClient();
   const today = toLocalDateString(new Date());
 
@@ -163,6 +198,8 @@ export default function DailyLogPage() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const ENERGY_OPTIONS = extra.energy_options[lang];
 
   useEffect(() => {
     async function load() {
@@ -250,7 +287,8 @@ export default function DailyLogPage() {
     });
   }
 
-  const todayLabel = new Date().toLocaleDateString("pt-PT", {
+  const locale = extra.locale[lang];
+  const todayLabel = new Date().toLocaleDateString(locale, {
     weekday: "long", day: "numeric", month: "long",
   });
 
@@ -260,7 +298,7 @@ export default function DailyLogPage() {
     <div className="space-y-6 page-enter pb-24">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Registo Diário</h1>
+        <h1 className="text-2xl font-bold text-white">{t("daily_log")}</h1>
         <p className="text-gray-400 text-sm mt-1 capitalize">{todayLabel}</p>
       </div>
 
@@ -268,9 +306,9 @@ export default function DailyLogPage() {
       {todayLog && !editing ? (
         <div className="card p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-gray-400 text-sm">Registo de hoje</p>
+            <p className="text-gray-400 text-sm">{extra.today_log[lang]}</p>
             <button onClick={() => setEditing(true)} className="text-brand-gold text-sm font-semibold hover:underline">
-              Editar
+              {extra.edit[lang]}
             </button>
           </div>
 
@@ -279,7 +317,7 @@ export default function DailyLogPage() {
             <span className="text-5xl">{ENERGY_OPTIONS.find((e) => e.value === todayLog.energy)?.emoji}</span>
             <div>
               <p className="text-white font-semibold text-lg">{ENERGY_OPTIONS.find((e) => e.value === todayLog.energy)?.label}</p>
-              <p className="text-gray-500 text-xs">Energia: {todayLog.energy}/5</p>
+              <p className="text-gray-500 text-xs">{extra.energy_label[lang]} {todayLog.energy}/5</p>
             </div>
           </div>
 
@@ -288,13 +326,13 @@ export default function DailyLogPage() {
             <div className="flex gap-3">
               <div className="flex-1 bg-zinc-800/60 rounded-xl p-3 text-center">
                 <p className="text-2xl font-black text-white">{healthLog.steps.toLocaleString()}</p>
-                <p className="text-gray-500 text-xs mt-0.5">passos</p>
-                {healthLog.steps >= GOAL_STEPS && <p className="text-green-400 text-[10px] font-bold mt-1">META ✓</p>}
+                <p className="text-gray-500 text-xs mt-0.5">{extra.steps_unit[lang]}</p>
+                {healthLog.steps >= GOAL_STEPS && <p className="text-green-400 text-[10px] font-bold mt-1">{extra.goal_badge[lang]}</p>}
               </div>
               <div className="flex-1 bg-zinc-800/60 rounded-xl p-3 text-center">
                 <p className="text-2xl font-black text-white">{healthLog.water_ml >= 1000 ? `${(healthLog.water_ml / 1000).toFixed(1)}L` : `${healthLog.water_ml}ml`}</p>
-                <p className="text-gray-500 text-xs mt-0.5">água</p>
-                {healthLog.water_ml >= GOAL_GLASSES * GLASS_ML && <p className="text-blue-400 text-[10px] font-bold mt-1">META ✓</p>}
+                <p className="text-gray-500 text-xs mt-0.5">{extra.water[lang].toLowerCase()}</p>
+                {healthLog.water_ml >= GOAL_GLASSES * GLASS_ML && <p className="text-blue-400 text-[10px] font-bold mt-1">{extra.goal_badge[lang]}</p>}
               </div>
             </div>
           )}
@@ -302,14 +340,14 @@ export default function DailyLogPage() {
           {todayLog.note && (
             <p className="text-gray-300 text-sm bg-zinc-800 rounded-xl px-4 py-3 leading-relaxed">{todayLog.note}</p>
           )}
-          {saved && <p className="text-green-400 text-sm font-semibold text-center">Guardado ✓</p>}
+          {saved && <p className="text-green-400 text-sm font-semibold text-center">{extra.saved[lang]}</p>}
         </div>
       ) : (
         /* Edit / Create form */
         <div className="space-y-4">
           {/* Energy */}
           <div className="card p-5 space-y-4">
-            <p className="text-gray-400 text-sm font-semibold">Como te sentes hoje?</p>
+            <p className="text-gray-400 text-sm font-semibold">{extra.how_feel[lang]}</p>
             <div className="flex gap-2 justify-between">
               {ENERGY_OPTIONS.map((opt) => {
                 const selected = energy === opt.value;
@@ -333,21 +371,21 @@ export default function DailyLogPage() {
 
           {/* Steps */}
           <div className="card p-5">
-            <StepsInput steps={steps} onChange={setSteps} />
+            <StepsInput steps={steps} onChange={setSteps} lang={lang} />
           </div>
 
           {/* Water */}
           <div className="card p-5">
-            <WaterTracker glasses={glasses} onChange={setGlasses} />
+            <WaterTracker glasses={glasses} onChange={setGlasses} lang={lang} />
           </div>
 
           {/* Note */}
           <div className="card p-5 space-y-2">
-            <label className="label">Nota (opcional)</label>
+            <label className="label">{extra.note_optional[lang]}</label>
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value.slice(0, 200))}
-              placeholder="Como foi o teu dia? Alguma dor, stresse ou conquista?"
+              placeholder={extra.note_placeholder[lang]}
               rows={3}
               className="input w-full resize-none"
             />
@@ -367,7 +405,7 @@ export default function DailyLogPage() {
                 }}
                 className="flex-1 py-3 rounded-xl text-sm font-semibold text-gray-400 bg-zinc-800 hover:bg-zinc-700 transition-colors"
               >
-                Cancelar
+                {t("cancel")}
               </button>
             )}
             <button
@@ -375,7 +413,7 @@ export default function DailyLogPage() {
               disabled={!energy || saving}
               className="flex-1 btn-primary py-3 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {saving ? "A guardar…" : saved ? "Guardado ✓" : "Guardar"}
+              {saving ? extra.saving[lang] : saved ? extra.saved[lang] : t("save")}
             </button>
           </div>
         </div>
@@ -383,12 +421,12 @@ export default function DailyLogPage() {
 
       {/* Last 7 days strip */}
       <div className="space-y-3">
-        <p className="text-gray-400 text-sm font-semibold">Últimos 7 dias</p>
+        <p className="text-gray-400 text-sm font-semibold">{extra.last7[lang]}</p>
         <div className="flex gap-1.5">
           {last7.map(({ date, log, health }) => {
             const d = new Date(date + "T00:00:00");
             const isToday = date === today;
-            const dayLabel = d.toLocaleDateString("pt-PT", { weekday: "short" });
+            const dayLabel = d.toLocaleDateString(locale, { weekday: "short" });
             const dayNum = d.getDate();
             const emoji = log ? ENERGY_OPTIONS.find((e) => e.value === log.energy)?.emoji ?? "—" : null;
 

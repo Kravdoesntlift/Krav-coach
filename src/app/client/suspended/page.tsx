@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/auth/actions";
+import { getLang } from "@/lib/i18n/getLang";
 
 export default async function SuspendedPage() {
   const supabase = await createClient();
@@ -11,9 +12,19 @@ export default async function SuspendedPage() {
     .eq("id", user!.id)
     .single();
 
+  const lang = await getLang();
+
   // Cancelled is now handled by the client layout (Stripe paywall)
   // This page only handles paused / archived
   const isPaused = profile?.status === "paused";
+
+  const extra = {
+    paused_title:    { pt: "Conta temporariamente pausada", en: "Account temporarily paused" },
+    suspended_title: { pt: "Conta suspensa", en: "Account suspended" },
+    paused_sub:      { pt: "O acesso está suspenso temporariamente. Contacta o teu coach para reactivar.", en: "Access is temporarily suspended. Contact your coach to reactivate." },
+    suspended_sub:   { pt: "O acesso à tua conta foi suspenso. Contacta o teu coach para mais informações.", en: "Access to your account has been suspended. Contact your coach for more information." },
+    logout:          { pt: "Terminar sessão", en: "Log out" },
+  } as const;
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4">
@@ -30,19 +41,17 @@ export default async function SuspendedPage() {
 
         <div className="space-y-2">
           <h2 className="text-white text-xl font-bold">
-            {isPaused ? "Conta temporariamente pausada" : "Conta suspensa"}
+            {isPaused ? extra.paused_title[lang] : extra.suspended_title[lang]}
           </h2>
           <p className="text-gray-400 text-sm leading-relaxed">
-            {isPaused
-              ? "O acesso está suspenso temporariamente. Contacta o teu coach para reactivar."
-              : "O acesso à tua conta foi suspenso. Contacta o teu coach para mais informações."}
+            {isPaused ? extra.paused_sub[lang] : extra.suspended_sub[lang]}
           </p>
         </div>
 
         <div className="h-px bg-zinc-800" />
         <form action={logout}>
           <button type="submit" className="text-sm text-gray-500 hover:text-white transition-colors">
-            Terminar sessão
+            {extra.logout[lang]}
           </button>
         </form>
       </div>

@@ -37,7 +37,9 @@ export async function GET(req: NextRequest) {
   if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
   const barcode = req.nextUrl.searchParams.get("code")?.trim();
-  if (!barcode) return NextResponse.json({ error: "Código em falta" }, { status: 400 });
+  if (!barcode) return NextResponse.json({ error: "Missing code" }, { status: 400 });
+
+  const lang = req.nextUrl.searchParams.get("lang") === "en" ? "en" : "pt";
 
   try {
     const controller = new AbortController();
@@ -70,7 +72,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Produto encontrado mas sem informação nutricional" }, { status: 422 });
     }
 
-    const name = p.product_name_pt || p.product_name || p.product_name_en || "Produto";
+    const name = lang === "en"
+      ? (p.product_name_en || p.product_name || p.product_name_pt || "Unknown product")
+      : (p.product_name_pt || p.product_name || p.product_name_en || "Produto");
     const brand = p.brands ? p.brands.split(",")[0].trim() : null;
     const displayName = brand ? `${name} (${brand})` : name;
 

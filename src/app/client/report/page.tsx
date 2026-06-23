@@ -1,17 +1,21 @@
 import { createClient } from "@/lib/supabase/server";
 import PrintReport from "@/components/client/PrintReport";
 import MonthPicker from "@/components/client/MonthPicker";
+import { getLang } from "@/lib/i18n/getLang";
 
-const MONTH_NAMES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const MONTH_NAMES_PT = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const MONTH_NAMES_EN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
 export default async function ReportPage({
   searchParams,
 }: {
   searchParams: Promise<{ m?: string }>;
 }) {
-  const supabase = await createClient();
+  const [supabase, lang] = await Promise.all([createClient(), getLang()]);
   const { data: { user } } = await supabase.auth.getUser();
   const { m } = await searchParams;
+
+  const MONTH_NAMES = lang === "en" ? MONTH_NAMES_EN : MONTH_NAMES_PT;
 
   // Parse month param (YYYY-MM) or default to last month
   const now = new Date();

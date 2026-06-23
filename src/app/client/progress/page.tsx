@@ -1,9 +1,32 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import ProgressTabs, { TimelineEvent } from "./ProgressTabs";
+import { t } from "@/lib/i18n";
+import { getLang } from "@/lib/i18n/getLang";
+
+const extra = {
+  consecutive_days:  { pt: "dias seguidos 🔥",  en: "consecutive days 🔥" },
+  total_workouts:    { pt: "treinos totais",     en: "total workouts" },
+  best_streak:       { pt: "melhor série",       en: "best streak" },
+  workout_done_tl:   { pt: "Treino concluído",   en: "Workout done" },
+  weekly_checkin_tl: { pt: "Check-in semanal",   en: "Weekly check-in" },
+  energy_tl:         { pt: "Energia",            en: "Energy" },
+  weight_logged:     { pt: "Peso registado",     en: "Weight logged" },
+  vs_prev_week:      { pt: "vs semana anterior", en: "vs previous week" },
+  hub_checkin_sub:   { pt: "Semanal",            en: "Weekly" },
+  hub_log_label:     { pt: "Registo",            en: "Log" },
+  hub_log_sub:       { pt: "Passos & Água",      en: "Steps & Water" },
+  hub_history_sub:   { pt: "Treinos",            en: "Workouts" },
+  hub_prs_sub:       { pt: "Records",            en: "Records" },
+  hub_badges_sub:    { pt: "Badges",             en: "Badges" },
+  hub_photos_sub:    { pt: "Progresso",          en: "Progress" },
+  hub_report_label:  { pt: "Relatórios",         en: "Reports" },
+  hub_report_sub:    { pt: "Mensal",             en: "Monthly" },
+  hub_ranking_label: { pt: "Ranking",            en: "Ranking" },
+} as const;
 
 export default async function ProgressPage() {
-  const supabase = await createClient();
+  const [supabase, lang] = await Promise.all([createClient(), getLang()]);
   const { data: { user } } = await supabase.auth.getUser();
 
   const [{ data: logs }, { data: checkins }, { data: completions }, { data: prs }, { data: completionDays }] = await Promise.all([
@@ -107,7 +130,7 @@ export default async function ProgressPage() {
     timelineEvents.push({
       type: "workout",
       date,
-      label: "Treino concluído",
+      label: extra.workout_done_tl[lang],
       sub: dayLabel ?? undefined,
     });
   }
@@ -134,8 +157,8 @@ export default async function ProgressPage() {
     timelineEvents.push({
       type: "checkin",
       date: c.week_start as string,
-      label: "Check-in semanal",
-      sub: energyLevel != null ? `Energia: ${energyLevel}/5` : undefined,
+      label: extra.weekly_checkin_tl[lang],
+      sub: energyLevel != null ? `${extra.energy_tl[lang]}: ${energyLevel}/5` : undefined,
     });
 
     if (c.weight_kg != null) {
@@ -145,9 +168,9 @@ export default async function ProgressPage() {
       timelineEvents.push({
         type: "weight",
         date: c.week_start as string,
-        label: "Peso registado",
+        label: extra.weight_logged[lang],
         value: `${c.weight_kg}kg`,
-        sub: diff != null && diff !== 0 ? `${diff > 0 ? "+" : ""}${diff}kg vs semana anterior` : undefined,
+        sub: diff != null && diff !== 0 ? `${diff > 0 ? "+" : ""}${diff}kg ${extra.vs_prev_week[lang]}` : undefined,
         positive,
       });
     }
@@ -157,14 +180,14 @@ export default async function ProgressPage() {
   timelineEvents.sort((a, b) => b.date.localeCompare(a.date));
 
   const hubLinks = [
-    { href: "/client/checkin",    emoji: "📋", label: "Check-in",    sub: "Semanal" },
-    { href: "/client/daily-log",  emoji: "🔥", label: "Registo",     sub: "Passos & Água" },
-    { href: "/client/history",    emoji: "📅", label: "Histórico",   sub: "Treinos" },
-    { href: "/client/records",    emoji: "🏆", label: "PRs",         sub: "Records" },
-    { href: "/client/achievements",emoji: "⭐", label: "Conquistas",  sub: "Badges" },
-    { href: "/client/photos",     emoji: "📸", label: "Fotos",       sub: "Progresso" },
-    { href: "/client/report",     emoji: "📊", label: "Relatórios",  sub: "Mensal" },
-    { href: "/client/leaderboard",emoji: "🥇", label: "Ranking",     sub: "Leaderboard" },
+    { href: "/client/checkin",      emoji: "📋", label: t("nav_checkin", lang).replace("📋 ", ""),    sub: extra.hub_checkin_sub[lang] },
+    { href: "/client/daily-log",    emoji: "🔥", label: extra.hub_log_label[lang],                    sub: extra.hub_log_sub[lang] },
+    { href: "/client/history",      emoji: "📅", label: t("history", lang),                           sub: extra.hub_history_sub[lang] },
+    { href: "/client/records",      emoji: "🏆", label: "PRs",                                        sub: extra.hub_prs_sub[lang] },
+    { href: "/client/achievements", emoji: "⭐", label: t("achievements", lang),                      sub: extra.hub_badges_sub[lang] },
+    { href: "/client/photos",       emoji: "📸", label: t("nav_photos", lang).replace("📸 ", ""),     sub: extra.hub_photos_sub[lang] },
+    { href: "/client/report",       emoji: "📊", label: extra.hub_report_label[lang],                 sub: extra.hub_report_sub[lang] },
+    { href: "/client/leaderboard",  emoji: "🥇", label: extra.hub_ranking_label[lang],                sub: "Leaderboard" },
   ];
 
   return (
@@ -188,15 +211,15 @@ export default async function ProgressPage() {
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-zinc-900 rounded-2xl p-3 text-center border border-zinc-800">
           <p className="text-2xl font-black text-white">{currentStreak}</p>
-          <p className="text-zinc-500 text-[11px] mt-0.5">dias seguidos 🔥</p>
+          <p className="text-zinc-500 text-[11px] mt-0.5">{extra.consecutive_days[lang]}</p>
         </div>
         <div className="bg-zinc-900 rounded-2xl p-3 text-center border border-zinc-800">
           <p className="text-2xl font-black text-white">{completedDates.length}</p>
-          <p className="text-zinc-500 text-[11px] mt-0.5">treinos totais</p>
+          <p className="text-zinc-500 text-[11px] mt-0.5">{extra.total_workouts[lang]}</p>
         </div>
         <div className="bg-zinc-900 rounded-2xl p-3 text-center border border-zinc-800">
           <p className="text-2xl font-black text-white">{longestStreak}</p>
-          <p className="text-zinc-500 text-[11px] mt-0.5">melhor série</p>
+          <p className="text-zinc-500 text-[11px] mt-0.5">{extra.best_streak[lang]}</p>
         </div>
       </div>
 

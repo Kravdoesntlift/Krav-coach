@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useLang } from "@/lib/i18n/useLang";
 
 interface Props {
   message: string;
@@ -8,6 +9,13 @@ interface Props {
 }
 
 export default function CoachFeedbackBanner({ message, weekStart }: Props) {
+  const { lang } = useLang();
+
+  const extra = {
+    coach_message: { pt: "Mensagem do teu coach", en: "Message from your coach" },
+    close:         { pt: "Fechar",                en: "Close" },
+  } as const;
+
   const key = `krav_feedback_dismissed_${weekStart}`;
   const [visible, setVisible] = useState(false);
 
@@ -30,12 +38,12 @@ export default function CoachFeedbackBanner({ message, weekStart }: Props) {
       <button
         onClick={dismiss}
         className="absolute top-3 right-3 text-gray-600 hover:text-white text-sm transition-colors leading-none"
-        aria-label="Fechar"
+        aria-label={extra.close[lang]}
       >
         ✕
       </button>
       <p className="text-xs text-brand-gold font-semibold mb-1.5 uppercase tracking-wide pr-6">
-        Mensagem do teu coach
+        {extra.coach_message[lang]}
       </p>
       <p className="text-gray-200 text-sm leading-relaxed">{message}</p>
     </div>

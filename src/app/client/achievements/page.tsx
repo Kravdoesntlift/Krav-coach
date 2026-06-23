@@ -2,9 +2,14 @@ import { createClient } from "@/lib/supabase/server";
 import { computeAchievements, CATEGORY_META, type AchievementCategory } from "@/lib/achievements";
 import AchievementCategorySection from "@/components/client/AchievementCategory";
 import AchievementUnlockModal from "@/components/client/AchievementUnlockModal";
+import { getLang } from "@/lib/i18n/getLang";
+
+const extra = {
+  your_achievements: { pt: "As tuas conquistas", en: "Your achievements" },
+} as const;
 
 export default async function AchievementsPage() {
-  const supabase = await createClient();
+  const [supabase, lang] = await Promise.all([createClient(), getLang()]);
   const { data: { user } } = await supabase.auth.getUser();
 
   const [
@@ -82,7 +87,9 @@ export default async function AchievementsPage() {
 
       {/* ── Hero header ── */}
       <div className="space-y-3">
-        <p className="text-zinc-600 text-xs font-semibold tracking-[0.15em] uppercase">As tuas conquistas</p>
+        <p className="text-zinc-600 text-xs font-semibold tracking-[0.15em] uppercase">
+          {extra.your_achievements[lang]}
+        </p>
         <h1 className="text-3xl font-black tracking-tight text-white">
           {totalUnlocked} <span className="text-zinc-600">/ {achievements.length}</span>
         </h1>

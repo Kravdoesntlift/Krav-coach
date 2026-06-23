@@ -2,11 +2,26 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import ChatWindow from "@/components/ChatWindow";
 import type { Message } from "@/lib/supabase/types";
+import { t } from "@/lib/i18n";
+import { getLang } from "@/lib/i18n/getLang";
 
 export default async function ClientChatPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
+
+  const lang = await getLang();
+
+  const extra = {
+    messages_title: { pt: "Mensagens", en: "Messages" },
+    chat_sub:       { pt: "Chat com o teu coach", en: "Chat with your coach" },
+    no_coach_title: { pt: "Ainda sem coach atribuído", en: "No coach assigned yet" },
+    no_coach_sub:   {
+      pt: "O teu coach ainda não te adicionou à plataforma.\nFala com ele para que te envie o link de convite.",
+      en: "Your coach hasn't added you to the platform yet.\nContact them to send you an invite link.",
+    },
+    client_fallback: { pt: "Cliente", en: "Client" },
+  } as const;
 
   // 1. Look up coach via explicit assignment (preferred)
   const { data: assignment } = await supabase
@@ -34,7 +49,7 @@ export default async function ClientChatPage() {
   if (!coach) {
     return (
       <div className="space-y-6 page-enter">
-        <h1 className="text-2xl font-bold text-white">Mensagens</h1>
+        <h1 className="text-2xl font-bold text-white">{extra.messages_title[lang]}</h1>
         <div
           className="rounded-3xl p-12 text-center space-y-5"
           style={{ background: "linear-gradient(160deg,#141414,#0d0d0d)" }}
@@ -46,10 +61,11 @@ export default async function ClientChatPage() {
             <span className="text-4xl">💬</span>
           </div>
           <div>
-            <p className="text-white font-bold text-base">Ainda sem coach atribuído</p>
+            <p className="text-white font-bold text-base">{extra.no_coach_title[lang]}</p>
             <p className="text-zinc-500 text-sm mt-1.5 leading-relaxed">
-              O teu coach ainda não te adicionou à plataforma.<br />
-              Fala com ele para que te envie o link de convite.
+              {extra.no_coach_sub[lang].split("\n").map((line, i) => (
+                <span key={i}>{line}{i === 0 && <br />}</span>
+              ))}
             </p>
           </div>
         </div>
@@ -74,13 +90,13 @@ export default async function ClientChatPage() {
   return (
     <div className="space-y-4 page-enter">
       <div>
-        <h1 className="text-2xl font-bold text-white">Mensagens</h1>
-        <p className="text-gray-400 text-sm mt-1">Chat com o teu coach</p>
+        <h1 className="text-2xl font-bold text-white">{extra.messages_title[lang]}</h1>
+        <p className="text-gray-400 text-sm mt-1">{extra.chat_sub[lang]}</p>
       </div>
       <div className="card overflow-hidden">
         <ChatWindow
           currentUserId={user.id}
-          currentUserName={clientProfile?.full_name ?? "Cliente"}
+          currentUserName={clientProfile?.full_name ?? extra.client_fallback[lang]}
           otherUser={coach}
           initialMessages={(messages ?? []) as Message[]}
         />

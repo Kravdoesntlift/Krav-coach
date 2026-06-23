@@ -4,6 +4,14 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Message, Profile } from "@/lib/supabase/types";
+import { useLang } from "@/lib/i18n/useLang";
+
+const extra = {
+  load_more:    { pt: "Carregar mais",                   en: "Load more" },
+  loading_more: { pt: "A carregar...",                   en: "Loading..." },
+  start_conv:   { pt: "Inicia a conversa com",           en: "Start a conversation with" },
+  send_label:   { pt: "Enviar mensagem",                 en: "Send message" },
+} as const;
 
 const PAGE_SIZE = 50;
 
@@ -16,6 +24,7 @@ interface Props {
 
 export default function ChatWindow({ currentUserId, currentUserName, otherUser, initialMessages }: Props) {
   const router  = useRouter();
+  const { lang, t } = useLang();
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [text, setText]         = useState("");
   const [sending, setSending]   = useState(false);
@@ -143,11 +152,12 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
   }
 
   // ── Formatting ────────────────────────────────────────────────────────────
+  const locale = lang === "en" ? "en-GB" : "pt-PT";
   function formatTime(iso: string) {
-    return new Date(iso).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+    return new Date(iso).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
   }
   function formatDate(iso: string) {
-    return new Date(iso).toLocaleDateString("pt-PT", { weekday: "short", day: "numeric", month: "short" });
+    return new Date(iso).toLocaleDateString(locale, { weekday: "short", day: "numeric", month: "short" });
   }
 
   // Group by date
@@ -187,13 +197,13 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
               disabled={loadingMore}
               className="text-xs px-4 py-1.5 rounded-full border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors disabled:opacity-50"
             >
-              {loadingMore ? "A carregar..." : "Carregar mais"}
+              {loadingMore ? extra.loading_more[lang] : extra.load_more[lang]}
             </button>
           </div>
         )}
         {grouped.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-zinc-700 text-sm">Inicia a conversa com {otherUser.full_name}.</p>
+            <p className="text-zinc-700 text-sm">{extra.start_conv[lang]} {otherUser.full_name}.</p>
           </div>
         )}
         {grouped.map(({ date, msgs }) => (
@@ -255,7 +265,7 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
             e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px";
           }}
           onKeyDown={handleKey}
-          placeholder="Escreve uma mensagem..."
+          placeholder={t("message_placeholder")}
           rows={1}
           maxLength={2000}
           className="flex-1 bg-zinc-800/60 border border-zinc-700/60 rounded-2xl px-4 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-brand-gold/50 resize-none transition-colors overflow-hidden"
@@ -264,7 +274,7 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
         <button
           onClick={send}
           disabled={!text.trim() || sending}
-          aria-label="Enviar mensagem"
+          aria-label={extra.send_label[lang]}
           className="w-10 h-10 rounded-2xl flex items-center justify-center text-black font-bold transition-all active:scale-95 disabled:opacity-30 shrink-0"
           style={{ background: "linear-gradient(135deg,#E2C060,#A8893A)" }}
         >

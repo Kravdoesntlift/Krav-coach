@@ -3,6 +3,36 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Exercise } from "@/lib/supabase/types";
+import { useLang } from "@/lib/i18n/useLang";
+
+// Strings not in the shared dictionary
+const extra = {
+  exercises_count:    { pt: "exercícios",               en: "exercises" },
+  rest_remaining:     { pt: "restante",                  en: "remaining" },
+  rest_time:          { pt: "Tempo de descanso",         en: "Rest time" },
+  superset_no_rest:   { pt: "Superset — sem descanso",  en: "Superset — no rest" },
+  active_marker:      { pt: "ativo ▸",                  en: "active ▸" },
+  sets_x_reps:        { pt: (s: number, r: number | string) => `${s} séries × ${r} reps`,
+                        en: (s: number, r: number | string) => `${s} sets × ${r} reps` },
+  series_done:        { pt: (d: number, t: number) => `${d}/${t} séries`,
+                        en: (d: number, t: number) => `${d}/${t} sets` },
+  summary:            { pt: "Resumo",                    en: "Summary" },
+  how_was:            { pt: "Como correu?",              en: "How did it go?" },
+  note_placeholder:   { pt: "Nota rápida... (opcional)", en: "Quick note... (optional)" },
+  save_workout:       { pt: "Guardar treino",            en: "Save workout" },
+  saving:             { pt: "A guardar...",              en: "Saving..." },
+  finish_btn:         { pt: "Terminar",                  en: "Finish" },
+  prev_btn:           { pt: "← Anterior",               en: "← Previous" },
+  next_btn:           { pt: "Próximo →",                en: "Next →" },
+  finish_workout_btn: { pt: "Concluir treino 🏆",       en: "Finish workout 🏆" },
+  workout_done_title: { pt: "Treino concluído!",        en: "Workout done!" },
+  see_demo:           { pt: "Ver demonstração",          en: "Watch demo" },
+  feeling_heavy:      { pt: "Pesado",                    en: "Heavy" },
+  feeling_ok:         { pt: "Ok",                        en: "Ok" },
+  feeling_good:       { pt: "Bem",                       en: "Good" },
+  feeling_top:        { pt: "Top",                       en: "Top" },
+  rest_bottom_bar:    { pt: (fmt: string) => `⏱ ${fmt} descanso`, en: (fmt: string) => `⏱ ${fmt} rest` },
+} as const;
 
 function beep(freq = 880, duration = 0.15, vol = 0.4) {
   try {
@@ -33,6 +63,7 @@ interface SetLog {
 }
 
 export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onComplete, onClose }: Props) {
+  const { t, lang } = useLang();
   const sorted = [...exercises].sort((a, b) => a.order_index - b.order_index);
   const [step, setStep] = useState(0);          // current exercise index
   const [setLogs, setSetLogs] = useState<SetLog[][]>(
@@ -183,7 +214,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
         </button>
         <div className="text-center">
           <p className="text-white font-bold text-sm">{dayLabel}</p>
-          <p className="text-gray-500 text-xs">{step + 1} / {totalSteps} exercícios</p>
+          <p className="text-gray-500 text-xs">{step + 1} / {totalSteps} {extra.exercises_count[lang]}</p>
         </div>
         <div className="w-9 text-right">
           <span className="text-xs text-zinc-500 tabular-nums font-mono">{fmtElapsed(elapsed)}</span>
@@ -201,7 +232,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
       {/* Rest timer overlay */}
       {restActive && (
         <div className="absolute inset-0 z-10 bg-zinc-950/95 flex flex-col items-center justify-center gap-6">
-          <p className="text-gray-400 text-sm uppercase tracking-widest font-medium">Tempo de descanso</p>
+          <p className="text-gray-400 text-sm uppercase tracking-widest font-medium">{extra.rest_time[lang]}</p>
 
           {/* Circle timer */}
           <div className="relative w-48 h-48">
@@ -217,7 +248,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-white text-5xl font-bold tabular-nums">{fmt(restLeft)}</span>
-              <span className="text-gray-500 text-xs mt-1">restante</span>
+              <span className="text-gray-500 text-xs mt-1">{extra.rest_remaining[lang]}</span>
             </div>
           </div>
 
@@ -238,7 +269,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
             onClick={skipRest}
             className="px-8 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium transition-colors"
           >
-            Saltar descanso →
+            {t("skip_rest")} →
           </button>
         </div>
       )}
@@ -248,21 +279,26 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
         <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6">
           <div className="text-center pt-6">
             <p className="text-5xl mb-3">🏆</p>
-            <h2 className="text-white text-2xl font-bold">Treino concluído!</h2>
-            <p className="text-brand-gold font-bold text-sm mt-1">⏱ {fmtElapsed(elapsed)} de treino</p>
-            <p className="text-gray-400 text-xs mt-0.5">Como correu?</p>
+            <h2 className="text-white text-2xl font-bold">{extra.workout_done_title[lang]}</h2>
+            <p className="text-brand-gold font-bold text-sm mt-1">⏱ {fmtElapsed(elapsed)} {lang === "en" ? "of training" : "de treino"}</p>
+            <p className="text-gray-400 text-xs mt-0.5">{extra.how_was[lang]}</p>
           </div>
 
           {/* Feeling */}
           <div className="grid grid-cols-4 gap-2">
-            {[{ emoji: "😓", label: "Pesado" }, { emoji: "😐", label: "Ok" }, { emoji: "💪", label: "Bem" }, { emoji: "🔥", label: "Top" }].map(({ emoji, label }) => (
+            {[
+              { emoji: "😓", labelKey: "feeling_heavy" as const },
+              { emoji: "😐", labelKey: "feeling_ok" as const },
+              { emoji: "💪", labelKey: "feeling_good" as const },
+              { emoji: "🔥", labelKey: "feeling_top" as const },
+            ].map(({ emoji, labelKey }) => (
               <button
                 key={emoji}
                 onClick={() => setFeeling(emoji)}
                 className={`flex flex-col items-center py-3 rounded-xl text-2xl transition-all ${feeling === emoji ? "bg-brand-gold/20 ring-2 ring-brand-gold scale-105" : "bg-zinc-800 hover:bg-zinc-700"}`}
               >
                 {emoji}
-                <span className="text-xs text-gray-400 mt-1">{label}</span>
+                <span className="text-xs text-gray-400 mt-1">{extra[labelKey][lang]}</span>
               </button>
             ))}
           </div>
@@ -270,7 +306,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Nota rápida... (opcional)"
+            placeholder={extra.note_placeholder[lang]}
             rows={2}
             maxLength={200}
             className="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-gold resize-none"
@@ -278,7 +314,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
 
           {/* Summary */}
           <div className="bg-zinc-900 rounded-xl p-4 space-y-2">
-            <p className="text-gray-400 text-xs uppercase tracking-wider mb-3">Resumo</p>
+            <p className="text-gray-400 text-xs uppercase tracking-wider mb-3">{extra.summary[lang]}</p>
             {sorted.map((ex, i) => {
               const done = setLogs[i].filter((s) => s.done).length;
               const totalSets = setLogs[i].length;
@@ -287,7 +323,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                 <div key={ex.id} className="flex items-center justify-between">
                   <span className="text-white text-sm truncate max-w-[60%]">{ex.name}</span>
                   <div className="flex items-center gap-3">
-                    <span className="text-gray-400 text-xs">{done}/{totalSets} séries</span>
+                    <span className="text-gray-400 text-xs">{extra.series_done[lang](done, totalSets)}</span>
                     {vol > 0 && <span className="text-brand-gold text-xs">{vol.toFixed(0)}kg</span>}
                   </div>
                 </div>
@@ -300,7 +336,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
             disabled={saving}
             className="w-full py-4 bg-brand-gold hover:bg-brand-gold-dark text-black font-bold rounded-2xl text-lg transition-colors disabled:opacity-50"
           >
-            {saving ? "A guardar..." : "Guardar treino"}
+            {saving ? extra.saving[lang] : extra.save_workout[lang]}
           </button>
         </div>
       ) : (
@@ -314,13 +350,13 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                   {ex.video_url && (
                     <a href={ex.video_url} target="_blank" rel="noopener noreferrer"
                       className="flex items-center gap-2 text-brand-gold text-xs hover:underline">
-                      <span>▶</span> Ver demonstração
+                      <span>▶</span> {extra.see_demo[lang]}
                     </a>
                   )}
                   {ex.notes && <p className="text-gray-500 text-xs italic">{ex.notes}</p>}
                   <div className="space-y-2">
                     <div className="grid grid-cols-[2rem_1fr_1fr_2.5rem] gap-2 text-xs text-gray-500 px-1">
-                      <span>#</span><span>Peso (kg)</span><span>Reps</span><span></span>
+                      <span>#</span><span>{t("weight_kg")}</span><span>{t("reps_done")}</span><span></span>
                     </div>
                     {setLogs[exIdx].map((s, si) => (
                       <div key={si} className={`grid grid-cols-[2rem_1fr_1fr_2.5rem] gap-2 items-center p-2 rounded-xl transition-colors ${s.done && checkPR(exIdx, si) ? "bg-yellow-500/10 border border-yellow-500/30" : s.done ? "bg-green-500/10 border border-green-500/20" : "bg-zinc-800"}`}>
@@ -345,18 +381,18 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                     {exIdx > 0 && (
                       <button onClick={() => setStep((s) => s - 1)}
                         className="flex-1 py-2.5 rounded-xl bg-zinc-800 text-gray-400 text-sm hover:bg-zinc-700 transition-colors">
-                        ← Anterior
+                        {extra.prev_btn[lang]}
                       </button>
                     )}
                     {exIdx < totalSteps - 1 ? (
                       <button onClick={() => setStep((s) => s + 1)}
                         className="flex-1 py-3 rounded-xl bg-brand-gold text-black text-sm font-bold hover:bg-brand-gold-dark transition-colors">
-                        Próximo →
+                        {extra.next_btn[lang]}
                       </button>
                     ) : (
                       <button onClick={() => setFinishing(true)}
                         className="flex-1 py-3 rounded-xl bg-green-500 text-white text-sm font-bold hover:bg-green-600 transition-colors">
-                        Concluir treino 🏆
+                        {extra.finish_workout_btn[lang]}
                       </button>
                     )}
                   </div>
@@ -386,7 +422,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                     <div key={`ss-${group}-${i}`} className={`border-l-2 border-orange-500/60 transition-opacity ${!isGroupActive ? "opacity-40" : ""}`}>
                       <div className="px-5 pt-2 pb-1 flex items-center gap-2">
                         <span className="text-[10px] bg-orange-500 text-black font-bold px-2 py-0.5 rounded-full">SS {group}</span>
-                        <span className="text-orange-400 text-xs font-semibold uppercase tracking-wide">Superset — sem descanso</span>
+                        <span className="text-orange-400 text-xs font-semibold uppercase tracking-wide">{extra.superset_no_rest[lang]}</span>
                       </div>
                       {groupItems.map(({ ex: gex, idx: gIdx }) => (
                         <div key={gex.id} className={`border-b border-zinc-800/50 transition-colors ${gIdx === step ? "bg-zinc-900/80" : ""}`}>
@@ -399,10 +435,10 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                               </div>
                               <div>
                                 <p className={`font-semibold text-sm ${gIdx === step ? "text-white" : "text-gray-400"}`}>{gex.name}</p>
-                                <p className="text-gray-500 text-xs">{gex.sets} séries × {gex.reps} reps</p>
+                                <p className="text-gray-500 text-xs">{extra.sets_x_reps[lang](gex.sets, gex.reps)}</p>
                               </div>
                             </div>
-                            {gIdx === step && <span className="text-orange-400 text-xs">ativo ▸</span>}
+                            {gIdx === step && <span className="text-orange-400 text-xs">{extra.active_marker[lang]}</span>}
                           </button>
                           {gIdx === step && renderExpanded(gIdx, gex)}
                         </div>
@@ -424,10 +460,10 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                           </div>
                           <div>
                             <p className={`font-semibold text-sm ${exIdx === step ? "text-white" : "text-gray-400"}`}>{ex.name}</p>
-                            <p className="text-gray-500 text-xs">{ex.sets} séries × {ex.reps} reps</p>
+                            <p className="text-gray-500 text-xs">{extra.sets_x_reps[lang](ex.sets, ex.reps)}</p>
                           </div>
                         </div>
-                        {exIdx === step && <span className="text-brand-gold text-xs">ativo ▸</span>}
+                        {exIdx === step && <span className="text-brand-gold text-xs">{extra.active_marker[lang]}</span>}
                       </button>
                       {exIdx === step && renderExpanded(exIdx, ex)}
                     </div>
@@ -445,13 +481,13 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
               onClick={() => { if (timerRef.current) clearInterval(timerRef.current); startRest(restSeconds); }}
               className="flex-1 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm font-medium transition-colors"
             >
-              ⏱ {fmt(restSeconds)} descanso
+              {extra.rest_bottom_bar[lang](fmt(restSeconds))}
             </button>
             <button
               onClick={() => setFinishing(true)}
               className="flex-1 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm font-medium transition-colors"
             >
-              Terminar
+              {extra.finish_btn[lang]}
             </button>
           </div>
         </>

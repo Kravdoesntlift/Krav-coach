@@ -1,5 +1,29 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { getLang } from "@/lib/i18n/getLang";
+
+const extra = {
+  title_week:    { pt: "Semanal",                   en: "Weekly" },
+  title_report:  { pt: "Relatório",                 en: "Report" },
+  no_report:     { pt: "Ainda sem relatório",        en: "No report yet" },
+  no_report_sub: { pt: "O teu relatório de domingo ainda não foi gerado. Volta mais tarde.", en: "Your Sunday report hasn't been generated yet. Check back later." },
+  workouts:      { pt: "Treinos",                   en: "Workouts" },
+  of:            { pt: "de",                        en: "of" },
+  metrics:       { pt: "Métricas",                  en: "Metrics" },
+  weight:        { pt: "Peso",                      en: "Weight" },
+  waist:         { pt: "Cintura",                   en: "Waist" },
+  avg_energy:    { pt: "Energia média",              en: "Avg energy" },
+  week_msg:      { pt: "Mensagem da semana",         en: "Message of the week" },
+  your_coach:    { pt: "O teu Coach",               en: "Your Coach" },
+  your_progress: { pt: "A tua evolução",             en: "Your progress" },
+  before:        { pt: "Antes",                     en: "Before" },
+  now:           { pt: "Agora",                     en: "Now" },
+  photo_before:  { pt: "Foto anterior",             en: "Before photo" },
+  photo_recent:  { pt: "Foto recente",              en: "Recent photo" },
+} as const;
+
+const MONTHS_PT = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+const MONTHS_EN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 interface WeeklyReport {
   id: string;
@@ -17,22 +41,16 @@ interface WeeklyReport {
   coach_id: string;
 }
 
-function formatWeekRange(weekStart: string): string {
+function formatWeekRange(weekStart: string, lang: "pt" | "en"): string {
   const start = new Date(weekStart + "T00:00:00Z");
   const end = new Date(start);
   end.setUTCDate(start.getUTCDate() + 6);
-
-  const MONTHS = [
-    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
-    "Jul", "Ago", "Set", "Out", "Nov", "Dez",
-  ];
-
+  const MONTHS = lang === "en" ? MONTHS_EN : MONTHS_PT;
   const startDay = start.getUTCDate();
   const endDay = end.getUTCDate();
   const startMonth = MONTHS[start.getUTCMonth()];
   const endMonth = MONTHS[end.getUTCMonth()];
   const year = end.getUTCFullYear();
-
   if (start.getUTCMonth() === end.getUTCMonth()) {
     return `${startDay} – ${endDay} ${endMonth} ${year}`;
   }
@@ -40,7 +58,6 @@ function formatWeekRange(weekStart: string): string {
 }
 
 function ChangeTag({ value, unit }: { value: number; unit: string }) {
-  // Negative = good for body measurements (weight loss, waist reduction)
   const isGood = value < 0;
   const isNeutral = value === 0;
   const color = isNeutral
@@ -73,7 +90,7 @@ function EnergyBar({ value }: { value: number }) {
 }
 
 export default async function WeeklyReportPage() {
-  const supabase = await createClient();
+  const [supabase, lang] = await Promise.all([createClient(), getLang()]);
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
 
@@ -101,15 +118,15 @@ export default async function WeeklyReportPage() {
       {/* Header */}
       <div className="space-y-1 pt-1">
         <p className="text-zinc-600 text-xs font-semibold tracking-[0.15em] uppercase">
-          {typedReport ? formatWeekRange(typedReport.week_start) : "—"}
+          {typedReport ? formatWeekRange(typedReport.week_start, lang) : "—"}
         </p>
         <h1 className="text-[1.75rem] font-black tracking-tight leading-[1.1]">
-          Relatório{" "}
+          {extra.title_report[lang]}{" "}
           <span
             className="text-transparent bg-clip-text"
             style={{ backgroundImage: "linear-gradient(135deg, #E8C96B, #C9A84C)" }}
           >
-            Semanal
+            {extra.title_week[lang]}
           </span>
         </h1>
       </div>
@@ -121,10 +138,8 @@ export default async function WeeklyReportPage() {
           style={{ background: "rgba(18,18,20,0.85)" }}
         >
           <span className="text-4xl">📊</span>
-          <p className="text-white font-semibold">Ainda sem relatório</p>
-          <p className="text-zinc-500 text-sm">
-            O teu relatório de domingo ainda não foi gerado. Volta mais tarde.
-          </p>
+          <p className="text-white font-semibold">{extra.no_report[lang]}</p>
+          <p className="text-zinc-500 text-sm">{extra.no_report_sub[lang]}</p>
         </div>
       )}
 
@@ -138,14 +153,12 @@ export default async function WeeklyReportPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-xl">💪</span>
-                <span className="text-white font-bold text-sm">Treinos</span>
+                <span className="text-white font-bold text-sm">{extra.workouts[lang]}</span>
               </div>
               <span className="text-zinc-400 text-sm font-medium">
-                {typedReport.workouts_completed} de {typedReport.workouts_total}
+                {typedReport.workouts_completed} {extra.of[lang]} {typedReport.workouts_total}
               </span>
             </div>
-
-            {/* Progress bar */}
             <div className="space-y-1.5">
               <div className="h-2.5 bg-zinc-800 rounded-full overflow-hidden">
                 <div
@@ -170,14 +183,14 @@ export default async function WeeklyReportPage() {
             >
               <div className="flex items-center gap-2">
                 <span className="text-xl">📈</span>
-                <span className="text-white font-bold text-sm">Métricas</span>
+                <span className="text-white font-bold text-sm">{extra.metrics[lang]}</span>
               </div>
 
               <div className="divide-y divide-zinc-800/60">
                 {typedReport.weight_kg != null && (
                   <div className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                     <div>
-                      <p className="text-zinc-400 text-xs uppercase tracking-wider font-medium">Peso</p>
+                      <p className="text-zinc-400 text-xs uppercase tracking-wider font-medium">{extra.weight[lang]}</p>
                       <p className="text-white font-bold text-lg mt-0.5">{typedReport.weight_kg} kg</p>
                     </div>
                     {typedReport.weight_change != null && (
@@ -189,7 +202,7 @@ export default async function WeeklyReportPage() {
                 {typedReport.waist_cm != null && (
                   <div className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                     <div>
-                      <p className="text-zinc-400 text-xs uppercase tracking-wider font-medium">Cintura</p>
+                      <p className="text-zinc-400 text-xs uppercase tracking-wider font-medium">{extra.waist[lang]}</p>
                       <p className="text-white font-bold text-lg mt-0.5">{typedReport.waist_cm} cm</p>
                     </div>
                     {typedReport.waist_change != null && (
@@ -202,7 +215,7 @@ export default async function WeeklyReportPage() {
                   <div className="py-3 first:pt-0 last:pb-0 space-y-2">
                     <div className="flex items-center justify-between">
                       <p className="text-zinc-400 text-xs uppercase tracking-wider font-medium">
-                        Energia média
+                        {extra.avg_energy[lang]}
                       </p>
                       <p className="text-white font-bold">{typedReport.energy_avg}/5</p>
                     </div>
@@ -223,7 +236,6 @@ export default async function WeeklyReportPage() {
               }}
             >
               <div className="flex items-center gap-3">
-                {/* Coach avatar placeholder */}
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-black text-black shrink-0"
                   style={{ background: "linear-gradient(135deg, #E8C96B, #C9A84C)" }}
@@ -232,9 +244,9 @@ export default async function WeeklyReportPage() {
                 </div>
                 <div>
                   <p className="text-white font-bold text-sm">
-                    {coachProfile?.full_name ?? "O teu Coach"}
+                    {coachProfile?.full_name ?? extra.your_coach[lang]}
                   </p>
-                  <p className="text-zinc-500 text-xs">Mensagem da semana</p>
+                  <p className="text-zinc-500 text-xs">{extra.week_msg[lang]}</p>
                 </div>
               </div>
 
@@ -257,29 +269,29 @@ export default async function WeeklyReportPage() {
             >
               <div className="flex items-center gap-2">
                 <span className="text-xl">📷</span>
-                <span className="text-white font-bold text-sm">A tua evolução</span>
+                <span className="text-white font-bold text-sm">{extra.your_progress[lang]}</span>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <p className="text-zinc-500 text-xs font-medium text-center uppercase tracking-wider">
-                    Antes
+                    {extra.before[lang]}
                   </p>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={typedReport.photo_before_url}
-                    alt="Foto anterior"
+                    alt={extra.photo_before[lang]}
                     className="w-full aspect-[3/4] object-cover rounded-xl"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <p className="text-zinc-500 text-xs font-medium text-center uppercase tracking-wider">
-                    Agora
+                    {extra.now[lang]}
                   </p>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={typedReport.photo_latest_url}
-                    alt="Foto recente"
+                    alt={extra.photo_recent[lang]}
                     className="w-full aspect-[3/4] object-cover rounded-xl"
                   />
                 </div>

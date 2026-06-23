@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { WeeklyCheckin } from "@/lib/supabase/types";
 import { haptic, HAPTIC } from "@/lib/haptic";
+import { useLang } from "@/lib/i18n/useLang";
 
 interface Props {
   clientId: string;
@@ -12,7 +13,7 @@ interface Props {
 }
 
 // ─── Scale configs ────────────────────────────────────────────────────────────
-const ENERGY_OPTS = [
+const ENERGY_OPTS_PT = [
   { v: 1, emoji: "😴", label: "Esgotado"  },
   { v: 2, emoji: "😪", label: "Cansado"   },
   { v: 3, emoji: "😐", label: "Normal"    },
@@ -20,7 +21,15 @@ const ENERGY_OPTS = [
   { v: 5, emoji: "⚡", label: "Excelente" },
 ];
 
-const SLEEP_OPTS = [
+const ENERGY_OPTS_EN = [
+  { v: 1, emoji: "😴", label: "Exhausted" },
+  { v: 2, emoji: "😪", label: "Tired"     },
+  { v: 3, emoji: "😐", label: "Normal"    },
+  { v: 4, emoji: "💪", label: "Good"      },
+  { v: 5, emoji: "⚡", label: "Excellent" },
+];
+
+const SLEEP_OPTS_PT = [
   { v: 1, emoji: "😵", label: "Péssimo"  },
   { v: 2, emoji: "😞", label: "Mau"      },
   { v: 3, emoji: "😐", label: "Regular"  },
@@ -28,12 +37,28 @@ const SLEEP_OPTS = [
   { v: 5, emoji: "🌙", label: "Ótimo"    },
 ];
 
-const STRESS_OPTS = [
+const SLEEP_OPTS_EN = [
+  { v: 1, emoji: "😵", label: "Terrible" },
+  { v: 2, emoji: "😞", label: "Bad"      },
+  { v: 3, emoji: "😐", label: "Fair"     },
+  { v: 4, emoji: "😊", label: "Good"     },
+  { v: 5, emoji: "🌙", label: "Great"    },
+];
+
+const STRESS_OPTS_PT = [
   { v: 1, emoji: "🧘", label: "Relaxado" },
   { v: 2, emoji: "😌", label: "Calmo"    },
   { v: 3, emoji: "😐", label: "Normal"   },
   { v: 4, emoji: "😤", label: "Tenso"    },
   { v: 5, emoji: "🤯", label: "Esgotado" },
+];
+
+const STRESS_OPTS_EN = [
+  { v: 1, emoji: "🧘", label: "Relaxed"  },
+  { v: 2, emoji: "😌", label: "Calm"     },
+  { v: 3, emoji: "😐", label: "Normal"   },
+  { v: 4, emoji: "😤", label: "Tense"    },
+  { v: 5, emoji: "🤯", label: "Stressed" },
 ];
 
 // ─── Emoji scale row ──────────────────────────────────────────────────────────
@@ -93,6 +118,28 @@ function Section({ label, children }: { label: string; children: React.ReactNode
 
 // ─── Main form ────────────────────────────────────────────────────────────────
 export default function CheckinForm({ clientId, weekStart, existing }: Props) {
+  const { t, lang } = useLang();
+
+  const extra = {
+    current_weight:   { pt: "Peso atual",          en: "Current weight" },
+    sleep_quality:    { pt: "Qualidade do sono",   en: "Sleep quality" },
+    stress_level:     { pt: "Nível de stress",     en: "Stress level" },
+    body_measures:    { pt: "Medidas corporais",   en: "Body measurements" },
+    notes_for_coach:  { pt: "Notas para o coach",  en: "Notes for coach" },
+    checkin_sent:     { pt: "Check-in enviado!",   en: "Check-in sent!" },
+    coach_sees:       { pt: "O teu coach vai ver o teu progresso esta semana.", en: "Your coach will see your progress this week." },
+    edit_answer:      { pt: "Editar resposta",     en: "Edit answer" },
+    select_energy:    { pt: "Seleciona o teu nível de energia.", en: "Please select your energy level." },
+    save_error:       { pt: "Erro ao guardar. Tenta novamente.", en: "Error saving. Please try again." },
+    saving:           { pt: "A guardar...",        en: "Saving..." },
+    update_checkin:   { pt: "Atualizar check-in",  en: "Update check-in" },
+    send_checkin:     { pt: "Enviar check-in",     en: "Send check-in" },
+  } as const;
+
+  const ENERGY_OPTS = lang === "pt" ? ENERGY_OPTS_PT : ENERGY_OPTS_EN;
+  const SLEEP_OPTS  = lang === "pt" ? SLEEP_OPTS_PT  : SLEEP_OPTS_EN;
+  const STRESS_OPTS = lang === "pt" ? STRESS_OPTS_PT : STRESS_OPTS_EN;
+
   const [weight,  setWeight]  = useState(existing?.weight_kg?.toString() ?? "");
   const [energy,  setEnergy]  = useState(existing?.energy_level ?? 0);
   const [sleep,   setSleep]   = useState(existing?.sleep_quality ?? 0);
@@ -110,7 +157,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (energy === 0) { setError("Seleciona o teu nível de energia."); return; }
+    if (energy === 0) { setError(extra.select_energy[lang]); return; }
     setLoading(true);
     setError(null);
 
@@ -138,7 +185,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
       : await supabase.from("weekly_checkins").insert(payload);
 
     setLoading(false);
-    if (dbError) { haptic(HAPTIC.error); setError("Erro ao guardar. Tenta novamente."); }
+    if (dbError) { haptic(HAPTIC.error); setError(extra.save_error[lang]); }
     else {
       haptic(HAPTIC.success);
       setSuccess(true);
@@ -162,17 +209,23 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
         >
           <span className="text-green-400 text-2xl">✓</span>
         </div>
-        <h2 className="text-white font-black text-xl mb-2">Check-in enviado!</h2>
-        <p className="text-zinc-500 text-sm mb-8">O teu coach vai ver o teu progresso esta semana.</p>
+        <h2 className="text-white font-black text-xl mb-2">{extra.checkin_sent[lang]}</h2>
+        <p className="text-zinc-500 text-sm mb-8">{extra.coach_sees[lang]}</p>
         <button
           onClick={() => setSuccess(false)}
           className="text-sm text-zinc-600 hover:text-white transition-colors"
         >
-          Editar resposta
+          {extra.edit_answer[lang]}
         </button>
       </div>
     );
   }
+
+  const measureLabels = [
+    { label: t("waist"), value: waist, set: setWaist, ph: "80" },
+    { label: t("chest"), value: chest, set: setChest, ph: "100" },
+    { label: t("arm"),   value: arm,   set: setArm,   ph: "38" },
+  ];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -182,7 +235,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
         className="rounded-3xl p-5 space-y-3"
         style={{ background: "linear-gradient(160deg,#141414,#0d0d0d)" }}
       >
-        <Section label="Peso atual">
+        <Section label={extra.current_weight[lang]}>
           <div className="flex items-center gap-3">
             <input
               type="number" step="0.1" min="0" value={weight}
@@ -190,7 +243,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
               placeholder="ex: 75.5"
               className="flex-1 bg-zinc-800/60 border border-zinc-700/60 rounded-2xl px-4 py-3 text-white text-lg font-bold text-center placeholder-zinc-700 focus:outline-none focus:border-brand-gold/50 transition-colors"
             />
-            <span className="text-zinc-500 text-sm font-medium">kg</span>
+            <span className="text-zinc-500 text-sm font-medium">{t("kg")}</span>
           </div>
         </Section>
       </div>
@@ -200,7 +253,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
         className="rounded-3xl p-5 space-y-3"
         style={{ background: "linear-gradient(160deg,#141414,#0d0d0d)" }}
       >
-        <Section label="Nível de energia">
+        <Section label={t("energy_level")}>
           <EmojiScale opts={ENERGY_OPTS} value={energy} onChange={setEnergy} />
         </Section>
       </div>
@@ -210,7 +263,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
         className="rounded-3xl p-5 space-y-3"
         style={{ background: "linear-gradient(160deg,#141414,#0d0d0d)" }}
       >
-        <Section label="Qualidade do sono">
+        <Section label={extra.sleep_quality[lang]}>
           <EmojiScale opts={SLEEP_OPTS} value={sleep} onChange={setSleep} />
         </Section>
       </div>
@@ -220,7 +273,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
         className="rounded-3xl p-5 space-y-3"
         style={{ background: "linear-gradient(160deg,#141414,#0d0d0d)" }}
       >
-        <Section label="Nível de stress">
+        <Section label={extra.stress_level[lang]}>
           <EmojiScale opts={STRESS_OPTS} value={stress} onChange={setStress} />
         </Section>
       </div>
@@ -236,7 +289,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
           className="w-full flex items-center justify-between"
         >
           <p className="text-xs font-semibold tracking-widest uppercase text-zinc-500">
-            Medidas corporais
+            {extra.body_measures[lang]}
           </p>
           <span
             className="text-zinc-600 text-xs transition-transform duration-300"
@@ -248,13 +301,9 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
 
         {showMeasures && (
           <div className="grid grid-cols-3 gap-3 pt-1 animate-fade-in">
-            {[
-              { label: "Cintura", value: waist, set: setWaist, ph: "80" },
-              { label: "Peito",   value: chest, set: setChest, ph: "100" },
-              { label: "Braço",   value: arm,   set: setArm,   ph: "38" },
-            ].map(({ label, value, set, ph }) => (
+            {measureLabels.map(({ label, value, set, ph }) => (
               <div key={label} className="space-y-1.5">
-                <p className="text-[10px] text-zinc-600 text-center">{label} (cm)</p>
+                <p className="text-[10px] text-zinc-600 text-center">{label} ({t("cm")})</p>
                 <input
                   type="number" step="0.1" min="0"
                   value={value} onChange={(e) => set(e.target.value)}
@@ -272,11 +321,11 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
         className="rounded-3xl p-5 space-y-3"
         style={{ background: "linear-gradient(160deg,#141414,#0d0d0d)" }}
       >
-        <Section label="Notas para o coach">
+        <Section label={extra.notes_for_coach[lang]}>
           <textarea
             value={notes} onChange={(e) => setNotes(e.target.value)}
             rows={3}
-            placeholder="Como correu a semana? Dores, progressos, dificuldades..."
+            placeholder={t("notes_placeholder")}
             className="w-full bg-zinc-800/60 border border-zinc-700/60 rounded-2xl px-4 py-3 text-white text-sm placeholder-zinc-700 focus:outline-none focus:border-brand-gold/50 transition-colors resize-none"
           />
         </Section>
@@ -294,7 +343,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
         className="w-full py-4 rounded-2xl text-black font-bold text-sm transition-all active:scale-95 disabled:opacity-50"
         style={{ background: "linear-gradient(135deg,#E2C060,#A8893A)" }}
       >
-        {loading ? "A guardar..." : existing ? "Atualizar check-in" : "Enviar check-in"}
+        {loading ? extra.saving[lang] : existing ? extra.update_checkin[lang] : extra.send_checkin[lang]}
       </button>
     </form>
   );

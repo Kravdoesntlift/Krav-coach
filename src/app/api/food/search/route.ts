@@ -40,6 +40,8 @@ export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim();
   if (!q) return NextResponse.json({ foods: [] });
 
+  const lang = req.nextUrl.searchParams.get("lang") === "en" ? "en" : "pt";
+
   // 1. Search local Portuguese foods database first
   const localResults = searchLocalFoods(q);
 
@@ -82,7 +84,7 @@ export async function GET(req: NextRequest) {
   url.searchParams.set("action", "process");
   url.searchParams.set("json", "1");
   url.searchParams.set("page_size", "15");
-  url.searchParams.set("lc", "pt");
+  url.searchParams.set("lc", lang);
   url.searchParams.set("fields", fields);
 
   try {
@@ -108,7 +110,9 @@ export async function GET(req: NextRequest) {
       })
       .map((p) => {
         const n = p.nutriments ?? {};
-        const name = p.product_name_pt || p.product_name || p.product_name_en || "Produto desconhecido";
+        const name = lang === "en"
+          ? (p.product_name_en || p.product_name || p.product_name_pt || "Unknown product")
+          : (p.product_name_pt || p.product_name || p.product_name_en || "Produto desconhecido");
         const sodiumMg = n.sodium_100g != null ? Math.round(n.sodium_100g * 1000) : null;
         return {
           id: String(p.id),

@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
 import { sendPushToUser } from "@/lib/push";
+import { getLang } from "@/lib/i18n/getLang";
 
 // ─── Post-payment activation ──────────────────────────────────────────────────
 // Called when client lands here with ?session_id= from Stripe.
@@ -129,6 +130,8 @@ export default async function PendingPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
 
+  const lang = await getLang();
+
   const { welcome, session_id } = await searchParams;
 
   // If Stripe redirected here after payment — activate immediately
@@ -146,8 +149,23 @@ export default async function PendingPage({
   // Active clients go straight to dashboard
   if (profile?.status === "active") redirect("/client/dashboard");
 
-  const firstName = (profile?.full_name ?? "").split(" ")[0] || "Atleta";
+  const firstName = (profile?.full_name ?? "").split(" ")[0] || (lang === "en" ? "Athlete" : "Atleta");
   const isWelcome = welcome === "true";
+
+  const extra = {
+    greeting:         { pt: `Olá, ${firstName}!`, en: `Hi, ${firstName}!` },
+    payment_confirmed:{ pt: "Pagamento confirmado! O teu coach vai criar o teu plano personalizado. Receberás uma notificação assim que estiver pronto.", en: "Payment confirmed! Your coach will create your personalised plan. You'll receive a notification when it's ready." },
+    account_created:  { pt: "A tua conta foi criada. O teu coach irá ativá-la assim que confirmar o pagamento.", en: "Your account has been created. Your coach will activate it once payment is confirmed." },
+    step_account:     { pt: "Conta criada", en: "Account created" },
+    step_payment_ok:  { pt: "Pagamento confirmado", en: "Payment confirmed" },
+    step_plan:        { pt: "Plano personalizado em preparação", en: "Personalised plan being prepared" },
+    step_payment_pend:{ pt: "Pagamento a aguardar confirmação", en: "Payment awaiting confirmation" },
+    step_access:      { pt: "Acesso total à app", en: "Full app access" },
+    info_welcome:     { pt: "Podes já falar com o teu coach no chat enquanto o plano é preparado.", en: "You can already chat with your coach while the plan is being prepared." },
+    info_pending:     { pt: "Já tens acesso ao chat com o teu coach. Fala com ele se tiveres dúvidas.", en: "You already have access to chat with your coach. Contact them if you have any questions." },
+    chat_cta:         { pt: "💬 Falar com o coach", en: "💬 Chat with coach" },
+    auto_update:      { pt: "Esta página atualiza automaticamente quando o teu acesso for ativado.", en: "This page will update automatically when your access is activated." },
+  } as const;
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-5">
@@ -177,16 +195,15 @@ export default async function PendingPage({
 
           <div className="space-y-2">
             <h1 className="text-white text-xl font-black tracking-tight">
-              Olá, {firstName}!
+              {extra.greeting[lang]}
             </h1>
             {isWelcome ? (
               <p className="text-zinc-400 text-sm leading-relaxed">
-                Pagamento confirmado! O teu coach vai criar o teu plano personalizado.
-                Receberás uma notificação assim que estiver pronto.
+                {extra.payment_confirmed[lang]}
               </p>
             ) : (
               <p className="text-zinc-400 text-sm leading-relaxed">
-                A tua conta foi criada. O teu coach irá ativá-la assim que confirmar o pagamento.
+                {extra.account_created[lang]}
               </p>
             )}
           </div>
@@ -195,14 +212,14 @@ export default async function PendingPage({
           <div className="space-y-3 text-left">
             {(isWelcome
               ? [
-                  { icon: "✅", text: "Conta criada", done: true },
-                  { icon: "✅", text: "Pagamento confirmado", done: true },
-                  { icon: "⏳", text: "Plano personalizado em preparação", done: false },
+                  { icon: "✅", text: extra.step_account[lang], done: true },
+                  { icon: "✅", text: extra.step_payment_ok[lang], done: true },
+                  { icon: "⏳", text: extra.step_plan[lang], done: false },
                 ]
               : [
-                  { icon: "✅", text: "Conta criada", done: true },
-                  { icon: "💳", text: "Pagamento a aguardar confirmação", done: false },
-                  { icon: "🚀", text: "Acesso total à app", done: false },
+                  { icon: "✅", text: extra.step_account[lang], done: true },
+                  { icon: "💳", text: extra.step_payment_pend[lang], done: false },
+                  { icon: "🚀", text: extra.step_access[lang], done: false },
                 ]
             ).map((s, i) => (
               <div key={i} className="flex items-center gap-3">
@@ -219,9 +236,7 @@ export default async function PendingPage({
             style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
           >
             <p className="text-zinc-400 text-xs leading-relaxed">
-              {isWelcome
-                ? "Podes já falar com o teu coach no chat enquanto o plano é preparado."
-                : "Já tens acesso ao chat com o teu coach. Fala com ele se tiveres dúvidas."}
+              {isWelcome ? extra.info_welcome[lang] : extra.info_pending[lang]}
             </p>
           </div>
         </div>
@@ -232,11 +247,11 @@ export default async function PendingPage({
           className="inline-flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-bold text-black text-sm transition-all active:scale-95 hover:brightness-110"
           style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
         >
-          💬 Falar com o coach
+          {extra.chat_cta[lang]}
         </a>
 
         <p className="text-zinc-600 text-xs">
-          Esta página atualiza automaticamente quando o teu acesso for ativado.
+          {extra.auto_update[lang]}
         </p>
       </div>
     </div>

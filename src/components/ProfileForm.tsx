@@ -4,6 +4,40 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Profile } from "@/lib/supabase/types";
 import AvatarUpload from "@/components/AvatarUpload";
+import { useLang } from "@/lib/i18n/useLang";
+
+const extra = {
+  role_coach:       { pt: "Coach",          en: "Coach" },
+  role_client:      { pt: "Cliente",        en: "Client" },
+  name_label:       { pt: "Nome",           en: "Name" },
+  saving:           { pt: "A guardar...",   en: "Saving..." },
+  saved:            { pt: "Guardado!",      en: "Saved!" },
+  save_error:       { pt: "Erro ao guardar.", en: "Error saving." },
+  change_password:  { pt: "Alterar Password", en: "Change Password" },
+  new_password:     { pt: "Nova password",  en: "New password" },
+  new_pwd_ph:       { pt: "Mínimo 6 caracteres", en: "Minimum 6 characters" },
+  confirm_pwd:      { pt: "Confirmar password", en: "Confirm password" },
+  confirm_pwd_ph:   { pt: "Repete a nova password", en: "Repeat new password" },
+  changing:         { pt: "A alterar...",   en: "Changing..." },
+  change_btn:       { pt: "Alterar password", en: "Change password" },
+  pwd_short:        { pt: "A password deve ter pelo menos 6 caracteres.", en: "Password must be at least 6 characters." },
+  pwd_mismatch:     { pt: "As passwords não coincidem.", en: "Passwords do not match." },
+  pwd_ok:           { pt: "Password alterada com sucesso!", en: "Password changed successfully!" },
+  pwd_error:        { pt: "Erro ao alterar password.", en: "Error changing password." },
+  tagline_pt:       { pt: "Tagline", en: "Tagline" },
+  tagline_pt_hint:  { pt: "🇵🇹 Frase curta de impacto", en: "🇵🇹 Short impact phrase" },
+  tagline_en_label: { pt: "Tagline em inglês", en: "Tagline in English" },
+  about_section:    { pt: "Sobre ti — landing page", en: "About you — landing page" },
+  years_exp:        { pt: "Anos de experiência", en: "Years of experience" },
+  years_hint:       { pt: "Aparece como badge na landing", en: "Appears as badge on landing page" },
+  bio_pt:           { pt: "Bio 🇵🇹", en: "Bio 🇵🇹" },
+  bio_pt_hint:      { pt: "2–3 frases sobre a tua formação e abordagem", en: "2–3 sentences about your training and approach" },
+  bio_en_label:     { pt: "Bio 🇬🇧", en: "Bio 🇬🇧" },
+  bio_en_hint:      { pt: "Versão em inglês", en: "English version" },
+  credentials:      { pt: "Credenciais / Diplomas", en: "Credentials / Certifications" },
+  credentials_hint: { pt: "Uma por linha — aparecem como badges", en: "One per line — shown as badges" },
+  credentials_note: { pt: "Cada linha = 1 badge na landing page", en: "Each line = 1 badge on landing page" },
+} as const;
 
 interface Props {
   profile: Profile & {
@@ -19,6 +53,7 @@ interface Props {
 }
 
 export default function ProfileForm({ profile, email }: Props) {
+  const { lang, t } = useLang();
   const [fullName, setFullName] = useState(profile.full_name);
   const [tagline, setTagline] = useState(profile.tagline ?? "");
   const [taglineEn, setTaglineEn] = useState(profile.tagline_en ?? "");
@@ -52,18 +87,20 @@ export default function ProfileForm({ profile, email }: Props) {
         .filter(Boolean);
     }
     const { error } = await supabase.from("profiles").update(updates).eq("id", profile.id);
-    setNameMsg(error ? { type: "err", text: "Erro ao guardar." } : { type: "ok", text: "Guardado!" });
+    setNameMsg(error
+      ? { type: "err", text: extra.save_error[lang] }
+      : { type: "ok", text: extra.saved[lang] });
     setSavingName(false);
   }
 
   async function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (newPassword.length < 6) {
-      setPwdMsg({ type: "err", text: "A password deve ter pelo menos 6 caracteres." });
+      setPwdMsg({ type: "err", text: extra.pwd_short[lang] });
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPwdMsg({ type: "err", text: "As passwords não coincidem." });
+      setPwdMsg({ type: "err", text: extra.pwd_mismatch[lang] });
       return;
     }
     setSavingPwd(true);
@@ -71,9 +108,9 @@ export default function ProfileForm({ profile, email }: Props) {
     const supabase = createClient();
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) {
-      setPwdMsg({ type: "err", text: "Erro ao alterar password." });
+      setPwdMsg({ type: "err", text: extra.pwd_error[lang] });
     } else {
-      setPwdMsg({ type: "ok", text: "Password alterada com sucesso!" });
+      setPwdMsg({ type: "ok", text: extra.pwd_ok[lang] });
       setNewPassword("");
       setConfirmPassword("");
     }
@@ -92,7 +129,7 @@ export default function ProfileForm({ profile, email }: Props) {
 
         <div className="flex items-center gap-2 pt-1">
           <span className="text-xs bg-brand-gold/10 text-brand-gold px-2 py-0.5 rounded-full">
-            {profile.role === "coach" ? "Coach" : "Cliente"}
+            {profile.role === "coach" ? extra.role_coach[lang] : extra.role_client[lang]}
           </span>
           <span className="text-gray-600 text-xs">{email}</span>
         </div>
@@ -100,7 +137,7 @@ export default function ProfileForm({ profile, email }: Props) {
         {/* Change name */}
         <form onSubmit={handleNameSubmit} className="space-y-3 pt-2 border-t border-zinc-800">
           <div>
-            <label className="label">Nome</label>
+            <label className="label">{extra.name_label[lang]}</label>
             <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className="input" required />
           </div>
 
@@ -109,7 +146,7 @@ export default function ProfileForm({ profile, email }: Props) {
             <>
               <div>
                 <label className="label">
-                  Tagline <span className="text-gray-600 text-[11px]">🇵🇹 Frase curta de impacto</span>
+                  {extra.tagline_pt[lang]} <span className="text-gray-600 text-[11px]">{extra.tagline_pt_hint[lang]}</span>
                 </label>
                 <input
                   type="text" value={tagline} onChange={(e) => setTagline(e.target.value)}
@@ -119,7 +156,7 @@ export default function ProfileForm({ profile, email }: Props) {
               </div>
               <div>
                 <label className="label">
-                  Tagline em inglês <span className="text-gray-600 text-[11px]">🇬🇧</span>
+                  {extra.tagline_en_label[lang]} <span className="text-gray-600 text-[11px]">🇬🇧</span>
                 </label>
                 <input
                   type="text" value={taglineEn} onChange={(e) => setTaglineEn(e.target.value)}
@@ -129,10 +166,10 @@ export default function ProfileForm({ profile, email }: Props) {
               </div>
 
               <div className="pt-2 border-t border-zinc-800 space-y-3">
-                <p className="text-zinc-500 text-xs font-semibold uppercase tracking-wider">Sobre ti — landing page</p>
+                <p className="text-zinc-500 text-xs font-semibold uppercase tracking-wider">{extra.about_section[lang]}</p>
                 <div>
                   <label className="label">
-                    Anos de experiência <span className="text-gray-600 text-[11px]">Aparece como badge na landing</span>
+                    {extra.years_exp[lang]} <span className="text-gray-600 text-[11px]">{extra.years_hint[lang]}</span>
                   </label>
                   <input
                     type="number" min="0" max="50"
@@ -142,36 +179,36 @@ export default function ProfileForm({ profile, email }: Props) {
                 </div>
                 <div>
                   <label className="label">
-                    Bio 🇵🇹 <span className="text-gray-600 text-[11px]">2–3 frases sobre a tua formação e abordagem</span>
+                    {extra.bio_pt[lang]} <span className="text-gray-600 text-[11px]">{extra.bio_pt_hint[lang]}</span>
                   </label>
                   <textarea
                     value={bio} onChange={(e) => setBio(e.target.value)}
                     className="input resize-none" rows={4}
                     maxLength={600}
-                    placeholder="ex: Licenciado em Ciências do Desporto pela FMH. Especializado em treino de força e composição corporal. Já acompanhei mais de 100 clientes a transformar o seu corpo."
+                    placeholder="ex: Licenciado em Ciências do Desporto pela FMH. Especializado em treino de força e composição corporal."
                   />
                 </div>
                 <div>
                   <label className="label">
-                    Bio 🇬🇧 <span className="text-gray-600 text-[11px]">Versão em inglês</span>
+                    {extra.bio_en_label[lang]} <span className="text-gray-600 text-[11px]">{extra.bio_en_hint[lang]}</span>
                   </label>
                   <textarea
                     value={bioEn} onChange={(e) => setBioEn(e.target.value)}
                     className="input resize-none" rows={4}
                     maxLength={600}
-                    placeholder="ex: BSc in Sports Science. Specialised in strength training and body recomposition. Coached 100+ clients."
+                    placeholder="ex: BSc in Sports Science. Specialised in strength training and body recomposition."
                   />
                 </div>
                 <div>
                   <label className="label">
-                    Credenciais / Diplomas <span className="text-gray-600 text-[11px]">Uma por linha — aparecem como badges</span>
+                    {extra.credentials[lang]} <span className="text-gray-600 text-[11px]">{extra.credentials_hint[lang]}</span>
                   </label>
                   <textarea
                     value={credentials} onChange={(e) => setCredentials(e.target.value)}
                     className="input resize-none" rows={4}
-                    placeholder={"Licenciado em Ciências do Desporto\nCertificado NSCA-CPT\n5 anos de experiência clínica\nEspecialista em perda de gordura"}
+                    placeholder={"Licenciado em Ciências do Desporto\nCertificado NSCA-CPT\n5 anos de experiência clínica"}
                   />
-                  <p className="text-zinc-600 text-[11px] mt-1">Cada linha = 1 badge na landing page</p>
+                  <p className="text-zinc-600 text-[11px] mt-1">{extra.credentials_note[lang]}</p>
                 </div>
               </div>
             </>
@@ -179,7 +216,7 @@ export default function ProfileForm({ profile, email }: Props) {
 
           <div className="flex items-center gap-3">
             <button type="submit" disabled={savingName} className="btn-primary text-sm py-2">
-              {savingName ? "A guardar..." : "Guardar"}
+              {savingName ? extra.saving[lang] : t("save_changes")}
             </button>
             {nameMsg && (
               <span className={`text-xs ${nameMsg.type === "ok" ? "text-green-400" : "text-brand-gold"}`}>
@@ -192,20 +229,20 @@ export default function ProfileForm({ profile, email }: Props) {
 
       {/* Change password */}
       <div className="card p-5">
-        <h2 className="text-white font-semibold mb-4">Alterar Password</h2>
+        <h2 className="text-white font-semibold mb-4">{extra.change_password[lang]}</h2>
         <form onSubmit={handlePasswordSubmit} className="space-y-3">
           <div>
-            <label className="label">Nova password</label>
+            <label className="label">{extra.new_password[lang]}</label>
             <input
               type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
-              className="input" placeholder="Mínimo 6 caracteres" autoComplete="new-password"
+              className="input" placeholder={extra.new_pwd_ph[lang]} autoComplete="new-password"
             />
           </div>
           <div>
-            <label className="label">Confirmar password</label>
+            <label className="label">{extra.confirm_pwd[lang]}</label>
             <input
               type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-              className="input" placeholder="Repete a nova password" autoComplete="new-password"
+              className="input" placeholder={extra.confirm_pwd_ph[lang]} autoComplete="new-password"
             />
           </div>
           {pwdMsg && (
@@ -218,7 +255,7 @@ export default function ProfileForm({ profile, email }: Props) {
             </p>
           )}
           <button type="submit" disabled={savingPwd} className="btn-primary text-sm py-2">
-            {savingPwd ? "A alterar..." : "Alterar password"}
+            {savingPwd ? extra.changing[lang] : extra.change_btn[lang]}
           </button>
         </form>
       </div>

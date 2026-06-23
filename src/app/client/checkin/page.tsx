@@ -3,9 +3,15 @@ import CheckinForm from "@/components/client/CheckinForm";
 import CheckinHistory from "@/components/client/CheckinHistory";
 import WeightChart from "@/components/client/WeightChart";
 import MeasurementCharts from "@/components/client/MeasurementCharts";
+import { t } from "@/lib/i18n";
+import { getLang } from "@/lib/i18n/getLang";
+
+const extra = {
+  week_of: { pt: "Semana de", en: "Week of" },
+} as const;
 
 export default async function CheckinPage() {
-  const supabase = await createClient();
+  const [supabase, lang] = await Promise.all([createClient(), getLang()]);
   const { data: { user } } = await supabase.auth.getUser();
 
   // Current week start (Monday)
@@ -36,13 +42,13 @@ export default async function CheckinPage() {
       {/* Current week check-in */}
       <div>
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-white">Check-in Semanal</h1>
+          <h1 className="text-2xl font-bold text-white">{t("weekly_checkin", lang)}</h1>
           <p className="text-gray-400 text-sm mt-1">
-            Semana de{" "}
-            {new Date(weekStart + "T00:00:00").toLocaleDateString("pt-PT", {
-              day: "numeric",
-              month: "long",
-            })}
+            {extra.week_of[lang]}{" "}
+            {new Date(weekStart + "T00:00:00").toLocaleDateString(
+              lang === "en" ? "en-GB" : "pt-PT",
+              { day: "numeric", month: "long" }
+            )}
           </p>
         </div>
         <CheckinForm clientId={user!.id} weekStart={weekStart} existing={existing} />

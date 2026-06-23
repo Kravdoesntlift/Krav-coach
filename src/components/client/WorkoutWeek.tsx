@@ -8,6 +8,61 @@ import ProgressRing from "@/components/ui/ProgressRing";
 import Confetti from "@/components/ui/Confetti";
 import LiveWorkout from "@/components/client/LiveWorkout";
 import { haptic, HAPTIC } from "@/lib/haptic";
+import { useLang } from "@/lib/i18n/useLang";
+
+// Strings not in the shared dictionary
+const extra = {
+  this_week:          { pt: "Esta semana",                en: "This week" },
+  workouts_done:      { pt: "treinos concluídos",         en: "workouts done" },
+  perfect_week:       { pt: "Semana perfeita!",           en: "Perfect week!" },
+  rest_recover:       { pt: "recupera bem 💤",            en: "recover well 💤" },
+  no_exercises:       { pt: "Sem exercícios.",            en: "No exercises." },
+  exercise_singular:  { pt: "exercício",                  en: "exercise" },
+  exercise_plural:    { pt: "exercícios",                 en: "exercises" },
+  start_btn:          { pt: "▶ Iniciar",                  en: "▶ Start" },
+  rest_timer_lbl:     { pt: "⏱ Timer de descanso",       en: "⏱ Rest timer" },
+  how_was_workout:    { pt: "Como correu o treino?",      en: "How did the workout go?" },
+  feeling_heavy:      { pt: "Pesado",                     en: "Heavy" },
+  feeling_ok:         { pt: "Ok",                         en: "Ok" },
+  feeling_good:       { pt: "Bem",                        en: "Good" },
+  feeling_top:        { pt: "Top",                        en: "Top" },
+  quick_note:         { pt: "Nota rápida (opcional)...", en: "Quick note (optional)..." },
+  volume_today:       { pt: "volume hoje",                en: "today's volume" },
+  mark_complete:      { pt: "Marcar como concluído",      en: "Mark as complete" },
+  workout_done_check: { pt: "Treino concluído ✓",        en: "Workout done ✓" },
+  rest_day_label:     { pt: "Dia de descanso",            en: "Rest day" },
+  superset_lbl:       { pt: "Superset",                   en: "Superset" },
+  warmup_short:       { pt: "Aq.",                        en: "Wm." },
+  warmup_label:       { pt: "Aquecimento",                en: "Warm-up" },
+  working_label:      { pt: "Trabalho",                   en: "Working" },
+  working_short:      { pt: "Trab.",                      en: "Work." },
+  dropset_label:      { pt: "Dropset",                    en: "Dropset" },
+  dropset_short:      { pt: "Drop",                       en: "Drop" },
+  warmup_set:         { pt: "Aq.",                        en: "Wm." },
+  series_lbl:         { pt: "Série",                      en: "Set" },
+  drop_lbl:           { pt: "Drop",                       en: "Drop" },
+  add_set:            { pt: "+ Adicionar série",          en: "+ Add set" },
+  saving:             { pt: "A guardar...",               en: "Saving..." },
+  saved:              { pt: "Guardado!",                  en: "Saved!" },
+  save_log:           { pt: "Guardar registo",            en: "Save log" },
+  register_weights:   { pt: "Registar pesos",             en: "Log weights" },
+  watch_video_arrow:  { pt: "Ver vídeo →",               en: "Watch video →" },
+  dropset_hint:       { pt: "Adiciona séries com peso decrescente", en: "Add sets with decreasing weight" },
+  overload_tap:       { pt: "toca para aplicar",         en: "tap to apply" },
+  suggestion:         { pt: "Sugestão:",                  en: "Suggestion:" },
+  last_vol:           { pt: "Volume última sessão:",      en: "Last session volume:" },
+  recent_sessions:    { pt: "Últimas sessões",            en: "Recent sessions" },
+  vol_suffix:         { pt: "kg vol",                     en: "kg vol" },
+  rest_timer_title:   { pt: "Timer de descanso",         en: "Rest timer" },
+  close_btn:          { pt: "Fechar",                     en: "Close" },
+  rest_done:          { pt: "Pronto! Volta ao treino 💪", en: "Done! Back to workout 💪" },
+  pause_btn:          { pt: "Pausar",                     en: "Pause" },
+  continue_btn:       { pt: "Continuar",                  en: "Continue" },
+  reset_btn:          { pt: "Reset",                      en: "Reset" },
+  confirm_btn:        { pt: "Confirmar",                  en: "Confirm" },
+  coach_push_title:   { pt: "💪 Treino concluído!",      en: "💪 Workout done!" },
+  coach_push_body:    { pt: "O teu cliente completou o treino de hoje.", en: "Your client completed today's workout." },
+} as const;
 
 interface Props {
   plan: WorkoutPlan;
@@ -16,6 +71,7 @@ interface Props {
 }
 
 export default function WorkoutWeek({ plan, clientId, coachId }: Props) {
+  const { t, lang } = useLang();
   const days = plan.workout_days ?? [];
   const sortedDays = [...days].sort((a, b) => a.day_of_week - b.day_of_week);
   const today = new Date().getDay();
@@ -58,16 +114,16 @@ export default function WorkoutWeek({ plan, clientId, coachId }: Props) {
           >
             <ProgressRing value={pct} size={72} strokeWidth={6} />
             <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-base tracking-tight">Esta semana</p>
+              <p className="text-white font-bold text-base tracking-tight">{extra.this_week[lang]}</p>
               <p className="text-zinc-400 text-sm mt-0.5">
                 <span className="text-white font-bold">{completedCount}</span>
                 <span className="text-zinc-600"> / {trainDays.length}</span>
-                {" "}treinos concluídos
+                {" "}{extra.workouts_done[lang]}
               </p>
               {isPerfect ? (
                 <p className="text-green-400 text-xs font-semibold mt-1.5 pop flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400 glow-breathe" />
-                  Semana perfeita!
+                  {extra.perfect_week[lang]}
                 </p>
               ) : completedCount > 0 ? (
                 <div className="mt-2 flex gap-1">
@@ -137,6 +193,7 @@ function WorkoutDayCard({
   onComplete?: () => void;
   onUndo?: () => void;
 }) {
+  const { t, lang } = useLang();
   const completions = day.workout_completions ?? [];
   const isCompleted = completions.some((c) => c.client_id === clientId);
   const existingCompletion = completions.find((c) => c.client_id === clientId);
@@ -198,8 +255,8 @@ function WorkoutDayCard({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: coachId,
-          title: "💪 Treino concluído!",
-          body: "O teu cliente completou o treino de hoje.",
+          title: extra.coach_push_title[lang],
+          body: extra.coach_push_body[lang],
           url: `/coach/clients/${clientId}`,
         }),
       }).catch(() => {});
@@ -233,10 +290,10 @@ function WorkoutDayCard({
         <div>
           <p className="text-gray-400 font-medium text-sm">
             {DAY_NAMES_FULL[day.day_of_week]}
-            {isToday && <span className="ml-2 text-xs text-brand-gold">Hoje</span>}
+            {isToday && <span className="ml-2 text-xs text-brand-gold">{t("today")}</span>}
           </p>
           <p className="text-gray-600 text-xs mt-0.5">
-            {day.label || "Dia de descanso"} — recupera bem 💤
+            {day.label || extra.rest_day_label[lang]} — {extra.rest_recover[lang]}
           </p>
         </div>
       </div>
@@ -269,19 +326,21 @@ function WorkoutDayCard({
           <div>
             <p className="font-semibold text-white">
               {DAY_NAMES_FULL[day.day_of_week]}
-              {isToday && <span className="ml-2 text-xs text-brand-gold font-normal">Hoje</span>}
+              {isToday && <span className="ml-2 text-xs text-brand-gold font-normal">{t("today")}</span>}
             </p>
             {day.label && <p className="text-xs text-gray-500 mt-0.5">{day.label}</p>}
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-500">{exercises.length} exercício{exercises.length !== 1 ? "s" : ""}</span>
+          <span className="text-xs text-gray-500">
+            {exercises.length} {exercises.length !== 1 ? extra.exercise_plural[lang] : extra.exercise_singular[lang]}
+          </span>
           {!completed && exercises.length > 0 && (
             <button
               onClick={(e) => { e.stopPropagation(); setLiveMode(true); }}
               className="px-2.5 py-1 rounded-lg bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-semibold hover:bg-brand-gold/20 transition-colors"
             >
-              ▶ Iniciar
+              {extra.start_btn[lang]}
             </button>
           )}
           <span className="text-gray-600 text-xs">{open ? "▲" : "▼"}</span>
@@ -291,7 +350,7 @@ function WorkoutDayCard({
       {open && (
         <div className="border-t border-zinc-800">
           {exercises.length === 0 ? (
-            <p className="text-gray-500 text-sm px-5 py-4">Sem exercícios.</p>
+            <p className="text-gray-500 text-sm px-5 py-4">{extra.no_exercises[lang]}</p>
           ) : (
             <div className="divide-y divide-zinc-800/50">
               {(() => {
@@ -318,7 +377,7 @@ function WorkoutDayCard({
                         </div>
                         <div className="pl-3">
                           <div className="px-5 pt-2 pb-1">
-                            <span className="text-orange-400 text-xs font-semibold tracking-wide uppercase">Superset {group}</span>
+                            <span className="text-orange-400 text-xs font-semibold tracking-wide uppercase">{extra.superset_lbl[lang]} {group}</span>
                           </div>
                           <div className="divide-y divide-zinc-800/30">
                             {groupExercises.map((gex) => (
@@ -350,21 +409,21 @@ function WorkoutDayCard({
                 onClick={() => setShowTimer(true)}
                 className="w-full py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-gray-400 hover:text-white text-sm transition-colors"
               >
-                ⏱ Timer de descanso
+                {extra.rest_timer_lbl[lang]}
               </button>
             )}
 
             {/* Feedback panel */}
             {showFeedback && !completed && (
               <div className="bg-zinc-800 rounded-xl p-4 space-y-3">
-                <p className="text-sm text-white font-medium">Como correu o treino?</p>
+                <p className="text-sm text-white font-medium">{extra.how_was_workout[lang]}</p>
                 <div className="flex gap-2">
                   {[
-                    { emoji: "😓", label: "Pesado" },
-                    { emoji: "😐", label: "Ok" },
-                    { emoji: "💪", label: "Bem" },
-                    { emoji: "🔥", label: "Top" },
-                  ].map(({ emoji, label }) => (
+                    { emoji: "😓", labelKey: "feeling_heavy" as const },
+                    { emoji: "😐", labelKey: "feeling_ok" as const },
+                    { emoji: "💪", labelKey: "feeling_good" as const },
+                    { emoji: "🔥", labelKey: "feeling_top" as const },
+                  ].map(({ emoji, labelKey }) => (
                     <button
                       key={emoji}
                       type="button"
@@ -376,7 +435,7 @@ function WorkoutDayCard({
                       }`}
                     >
                       {emoji}
-                      <span className="text-xs text-gray-400 mt-0.5">{label}</span>
+                      <span className="text-xs text-gray-400 mt-0.5">{extra[labelKey][lang]}</span>
                     </button>
                   ))}
                 </div>
@@ -384,7 +443,7 @@ function WorkoutDayCard({
                   type="text"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  placeholder="Nota rápida (opcional)..."
+                  placeholder={extra.quick_note[lang]}
                   maxLength={120}
                   className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-gold transition-colors"
                 />
@@ -393,14 +452,14 @@ function WorkoutDayCard({
                     onClick={() => setShowFeedback(false)}
                     className="flex-1 py-2 rounded-lg bg-zinc-700 text-gray-400 text-sm transition-colors hover:bg-zinc-600"
                   >
-                    Cancelar
+                    {t("cancel")}
                   </button>
                   <button
                     onClick={() => feeling && saveComplete(feeling, note)}
                     disabled={!feeling || loading}
                     className="flex-1 py-2 rounded-lg bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-semibold transition-colors disabled:opacity-40"
                   >
-                    {loading ? "..." : "Confirmar"}
+                    {loading ? "..." : extra.confirm_btn[lang]}
                   </button>
                 </div>
               </div>
@@ -416,7 +475,7 @@ function WorkoutDayCard({
                 {sessionVolume && (
                   <div className="text-right">
                     <p className="text-brand-gold text-sm font-bold">{sessionVolume.toLocaleString("pt-PT")} kg</p>
-                    <p className="text-zinc-600 text-[10px]">volume hoje</p>
+                    <p className="text-zinc-600 text-[10px]">{extra.volume_today[lang]}</p>
                   </div>
                 )}
               </div>
@@ -433,7 +492,7 @@ function WorkoutDayCard({
                   : "bg-brand-gold hover:bg-brand-gold-dark text-black"
               }`}
             >
-              {loading ? "..." : completed ? "Treino concluído ✓" : "Marcar como concluído"}
+              {loading ? "..." : completed ? extra.workout_done_check[lang] : extra.mark_complete[lang]}
             </button>
           </div>
         </div>
@@ -448,11 +507,11 @@ type SetType = "warmup" | "working" | "dropset";
 interface SetEntry { weight_kg: string; reps: string; done: boolean; }
 type SetsMap = Record<SetType, SetEntry[]>;
 
-const SET_TABS: { type: SetType; label: string; shortLabel: string; color: string; dotColor: string; ringColor: string; doneColor: string }[] = [
+const SET_TABS_DEF: { type: SetType; labelKey: "warmup_label" | "working_label" | "dropset_label"; shortKey: "warmup_short" | "working_short" | "dropset_short"; color: string; dotColor: string; ringColor: string; doneColor: string }[] = [
   {
     type: "warmup",
-    label: "Aquecimento",
-    shortLabel: "Aq.",
+    labelKey: "warmup_label",
+    shortKey: "warmup_short",
     color: "text-sky-400",
     dotColor: "bg-sky-500",
     ringColor: "border-sky-500",
@@ -460,8 +519,8 @@ const SET_TABS: { type: SetType; label: string; shortLabel: string; color: strin
   },
   {
     type: "working",
-    label: "Trabalho",
-    shortLabel: "Trab.",
+    labelKey: "working_label",
+    shortKey: "working_short",
     color: "text-brand-gold",
     dotColor: "bg-brand-gold",
     ringColor: "border-brand-gold",
@@ -469,8 +528,8 @@ const SET_TABS: { type: SetType; label: string; shortLabel: string; color: strin
   },
   {
     type: "dropset",
-    label: "Dropset",
-    shortLabel: "Drop",
+    labelKey: "dropset_label",
+    shortKey: "dropset_short",
     color: "text-orange-400",
     dotColor: "bg-orange-500",
     ringColor: "border-orange-500",
@@ -517,6 +576,7 @@ function calcOverload(
 }
 
 function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId: string; clientId: string }) {
+  const { lang } = useLang();
   const [expanded, setExpanded] = useState(false);
   const [showLog, setShowLog] = useState(false);
   const [activeTab, setActiveTab] = useState<SetType>("working");
@@ -674,7 +734,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
   }
 
   const currentSets = setsMap[activeTab];
-  const activeTabMeta = SET_TABS.find((t) => t.type === activeTab)!;
+  const activeTabMeta = SET_TABS_DEF.find((t) => t.type === activeTab)!;
 
   // Badge counts (only show for non-empty tabs that aren't active)
   function tabBadge(type: SetType) {
@@ -701,7 +761,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
           <button
             onClick={() => setShowLog((v) => !v)}
             className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors text-xs font-bold ${showLog ? "bg-brand-gold text-black" : "bg-zinc-700 text-gray-400 hover:bg-zinc-600"}`}
-            title="Registar pesos"
+            title={extra.register_weights[lang]}
           >
             ✎
           </button>
@@ -709,7 +769,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
             <button
               onClick={() => setExpanded((e) => !e)}
               className="w-7 h-7 rounded-full bg-red-600 hover:bg-red-500 flex items-center justify-center transition-colors"
-              title="Ver vídeo"
+              title={extra.watch_video_arrow[lang]}
             >
               <span className="text-white text-xs">▶</span>
             </button>
@@ -722,7 +782,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
         <div className="mt-3 bg-zinc-800/60 rounded-xl overflow-hidden">
           {/* Tab bar */}
           <div className="flex border-b border-zinc-700/60">
-            {SET_TABS.map((tab) => {
+            {SET_TABS_DEF.map((tab) => {
               const badge = tabBadge(tab.type);
               const isActive = activeTab === tab.type;
               return (
@@ -738,7 +798,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
                   {isActive && (
                     <span className={`absolute bottom-0 left-0 right-0 h-0.5 ${tab.dotColor}`} />
                   )}
-                  {tab.label}
+                  {extra[tab.labelKey][lang]}
                   {badge && !isActive && (
                     <span className={`text-[10px] px-1 py-0.5 rounded-full bg-zinc-700 ${tab.color}`}>
                       {badge}
@@ -760,8 +820,8 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
                   <div className="flex items-center gap-2">
                     <span className="text-brand-gold text-sm">📈</span>
                     <div className="text-left">
-                      <p className="text-brand-gold text-xs font-semibold">Sugestão: {overload.weight_kg}kg × {overload.reps}</p>
-                      <p className="text-zinc-500 text-[10px]">{overload.reason} · toca para aplicar</p>
+                      <p className="text-brand-gold text-xs font-semibold">{extra.suggestion[lang]} {overload.weight_kg}kg × {overload.reps}</p>
+                      <p className="text-zinc-500 text-[10px]">{overload.reason} · {extra.overload_tap[lang]}</p>
                     </div>
                   </div>
                   <span className="text-zinc-600 group-hover:text-brand-gold text-xs transition-colors">↙</span>
@@ -769,7 +829,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
               )}
               {lastVolume && (
                 <p className="text-zinc-600 text-[10px] text-center">
-                  Volume última sessão: <span className="text-zinc-400 font-medium">{lastVolume.toLocaleString("pt-PT")} kg</span>
+                  {extra.last_vol[lang]} <span className="text-zinc-400 font-medium">{lastVolume.toLocaleString("pt-PT")} kg</span>
                 </p>
               )}
 
@@ -777,12 +837,12 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
               {sessionHistory.length > 0 && (
                 <div className="rounded-xl border border-zinc-700/50 overflow-hidden">
                   <div className="px-3 py-1.5 bg-zinc-800/60 border-b border-zinc-700/40">
-                    <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-wide">Últimas sessões</p>
+                    <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-wide">{extra.recent_sessions[lang]}</p>
                   </div>
                   <div className="divide-y divide-zinc-800/60">
                     {sessionHistory.map((h, i) => {
                       const date = new Date(h.date + "T00:00:00");
-                      const label = date.toLocaleDateString("pt-PT", { day: "numeric", month: "short" });
+                      const label = date.toLocaleDateString(lang === "en" ? "en-GB" : "pt-PT", { day: "numeric", month: "short" });
                       return (
                         <div key={i} className="flex items-center justify-between px-3 py-2">
                           <p className="text-zinc-500 text-[11px]">{label}</p>
@@ -794,7 +854,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
                             )}
                             {h.vol > 0 && (
                               <span className="text-zinc-600 text-[10px]">
-                                {h.vol.toLocaleString("pt-PT")} kg vol
+                                {h.vol.toLocaleString("pt-PT")} {extra.vol_suffix[lang]}
                               </span>
                             )}
                           </div>
@@ -812,7 +872,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
             {/* Empty state for dropset */}
             {currentSets.length === 0 && activeTab === "dropset" && (
               <p className="text-gray-600 text-xs text-center py-2">
-                Adiciona séries com peso decrescente
+                {extra.dropset_hint[lang]}
               </p>
             )}
 
@@ -825,9 +885,9 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
                   }`}
                 />
                 <span className="text-xs text-gray-500 shrink-0 w-12">
-                  {activeTab === "warmup" && `Aq. ${i + 1}`}
-                  {activeTab === "working" && `Série ${i + 1}`}
-                  {activeTab === "dropset" && `Drop ${i + 1}`}
+                  {activeTab === "warmup" && `${extra.warmup_set[lang]} ${i + 1}`}
+                  {activeTab === "working" && `${extra.series_lbl[lang]} ${i + 1}`}
+                  {activeTab === "dropset" && `${extra.drop_lbl[lang]} ${i + 1}`}
                 </span>
                 <input
                   type="number"
@@ -874,7 +934,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
                 "border-zinc-600 text-zinc-500 hover:border-zinc-400 hover:text-zinc-300"
               }`}
             >
-              + Adicionar série
+              {extra.add_set[lang]}
             </button>
 
             {/* Save */}
@@ -885,7 +945,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
                 saved ? "bg-green-600 text-white" : "bg-brand-gold hover:bg-brand-gold-dark text-black"
               }`}
             >
-              {saving ? "A guardar..." : saved ? "Guardado!" : "Guardar registo"}
+              {saving ? extra.saving[lang] : saved ? extra.saved[lang] : extra.save_log[lang]}
             </button>
           </div>
         </div>
@@ -894,14 +954,14 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
       {/* Video embed */}
       {hasVideo && expanded && (
         <div className="mt-3 rounded-xl overflow-hidden">
-          <VideoEmbed url={exercise.video_url!} />
+          <VideoEmbed url={exercise.video_url!} lang={lang} />
         </div>
       )}
     </div>
   );
 }
 
-function VideoEmbed({ url }: { url: string }) {
+function VideoEmbed({ url, lang }: { url: string; lang: "pt" | "en" }) {
   const youtubeId = extractYouTubeId(url);
 
   if (youtubeId) {
@@ -922,7 +982,7 @@ function VideoEmbed({ url }: { url: string }) {
       rel="noopener noreferrer"
       className="text-brand-gold text-sm hover:underline"
     >
-      Ver vídeo →
+      {extra.watch_video_arrow[lang]}
     </a>
   );
 }
@@ -943,6 +1003,7 @@ function extractYouTubeId(url: string): string | null {
 const PRESETS = [30, 60, 90, 120, 180];
 
 function RestTimer({ onClose }: { onClose: () => void }) {
+  const { lang } = useLang();
   const [seconds, setSeconds] = useState(60);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [running, setRunning] = useState(false);
@@ -981,8 +1042,8 @@ function RestTimer({ onClose }: { onClose: () => void }) {
   return (
     <div className="bg-zinc-800 rounded-xl p-4 space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Timer de descanso</p>
-        <button onClick={onClose} className="text-gray-600 hover:text-white text-xs transition-colors">Fechar</button>
+        <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">{extra.rest_timer_title[lang]}</p>
+        <button onClick={onClose} className="text-gray-600 hover:text-white text-xs transition-colors">{extra.close_btn[lang]}</button>
       </div>
 
       {/* Presets */}
@@ -1007,7 +1068,7 @@ function RestTimer({ onClose }: { onClose: () => void }) {
         <p className={`text-5xl font-black tabular-nums ${done ? "text-green-400" : running ? "text-white" : "text-gray-400"}`}>
           {mins}:{String(secs).padStart(2, "0")}
         </p>
-        {done && <p className="text-green-400 text-sm mt-1">Pronto! Volta ao treino 💪</p>}
+        {done && <p className="text-green-400 text-sm mt-1">{extra.rest_done[lang]}</p>}
       </div>
 
       {/* Controls */}
@@ -1017,7 +1078,7 @@ function RestTimer({ onClose }: { onClose: () => void }) {
             onClick={() => start(seconds)}
             className="flex-1 py-2 bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-semibold rounded-lg transition-colors"
           >
-            Iniciar
+            {extra.start_btn[lang].replace("▶ ", "")}
           </button>
         ) : (
           <>
@@ -1025,13 +1086,13 @@ function RestTimer({ onClose }: { onClose: () => void }) {
               onClick={() => setRunning((r) => !r)}
               className="flex-1 py-2 bg-zinc-700 hover:bg-zinc-600 text-white text-sm font-semibold rounded-lg transition-colors"
             >
-              {running ? "Pausar" : "Continuar"}
+              {running ? extra.pause_btn[lang] : extra.continue_btn[lang]}
             </button>
             <button
               onClick={reset}
               className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-gray-400 text-sm rounded-lg transition-colors"
             >
-              Reset
+              {extra.reset_btn[lang]}
             </button>
           </>
         )}

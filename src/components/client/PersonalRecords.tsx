@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { PersonalRecord } from "@/lib/supabase/types";
 import Confetti from "@/components/ui/Confetti";
 import { haptic, HAPTIC } from "@/lib/haptic";
+import { useLang } from "@/lib/i18n/useLang";
 
 interface Props {
   clientId: string;
@@ -12,6 +13,27 @@ interface Props {
 }
 
 export default function PersonalRecords({ clientId, initialRecords }: Props) {
+  const { t, lang } = useLang();
+
+  const extra = {
+    cancel:           { pt: "Cancelar",                     en: "Cancel" },
+    new_record_btn:   { pt: "+ Novo registo",               en: "+ New record" },
+    new_record_title: { pt: "Novo recorde",                 en: "New record" },
+    weight_kg_label:  { pt: "Peso (kg)",                    en: "Weight (kg)" },
+    notes_optional:   { pt: "Notas (opcional)",             en: "Notes (optional)" },
+    ex_bench:         { pt: "ex: Supino, Agachamento, Deadlift...", en: "e.g. Bench press, Squat, Deadlift..." },
+    ex_weight:        { pt: "ex: 100",                      en: "e.g. 100" },
+    ex_reps:          { pt: "ex: 5",                        en: "e.g. 5" },
+    ex_notes:         { pt: "ex: com pausa, máximo, RPE 9...", en: "e.g. with pause, max effort, RPE 9..." },
+    saving:           { pt: "A guardar...",                 en: "Saving..." },
+    save_record:      { pt: "Guardar recorde",              en: "Save record" },
+    no_records_title: { pt: "Sem recordes ainda",           en: "No records yet" },
+    no_records_sub:   { pt: "Regista o teu primeiro PR e começa a acompanhar a tua evolução de força.", en: "Log your first PR and start tracking your strength progress." },
+    add_first_pr:     { pt: "+ Registar primeiro PR",       en: "+ Log first PR" },
+  } as const;
+
+  const locale = lang === "pt" ? "pt-PT" : "en-GB";
+
   const [records, setRecords] = useState<PersonalRecord[]>(initialRecords);
   const [showForm, setShowForm] = useState(false);
   const [exercise, setExercise] = useState("");
@@ -78,51 +100,51 @@ export default function PersonalRecords({ clientId, initialRecords }: Props) {
         onClick={() => setShowForm((s) => !s)}
         className="btn-primary text-sm"
       >
-        {showForm ? "Cancelar" : "+ Novo registo"}
+        {showForm ? extra.cancel[lang] : extra.new_record_btn[lang]}
       </button>
 
       {/* Form */}
       {showForm && (
         <form onSubmit={handleAdd} className="card p-5 space-y-4 animate-fade-in">
-          <h2 className="text-white font-semibold">Novo recorde</h2>
+          <h2 className="text-white font-semibold">{extra.new_record_title[lang]}</h2>
 
           <div>
-            <label className="label">Exercício</label>
+            <label className="label">{t("exercise")}</label>
             <input
               type="text" value={exercise} onChange={(e) => setExercise(e.target.value)}
-              className="input" placeholder="ex: Supino, Agachamento, Deadlift..." required
+              className="input" placeholder={extra.ex_bench[lang]} required
             />
           </div>
 
           <div className="flex gap-3">
             <div className="flex-1">
-              <label className="label">Peso (kg)</label>
+              <label className="label">{extra.weight_kg_label[lang]}</label>
               <input
                 type="number" step="0.5" min="0" value={weight}
                 onChange={(e) => setWeight(e.target.value)}
-                className="input" placeholder="ex: 100"
+                className="input" placeholder={extra.ex_weight[lang]}
               />
             </div>
             <div className="flex-1">
-              <label className="label">Reps</label>
+              <label className="label">{t("reps")}</label>
               <input
                 type="number" min="1" value={reps}
                 onChange={(e) => setReps(e.target.value)}
-                className="input" placeholder="ex: 5"
+                className="input" placeholder={extra.ex_reps[lang]}
               />
             </div>
           </div>
 
           <div>
-            <label className="label">Notas (opcional)</label>
+            <label className="label">{extra.notes_optional[lang]}</label>
             <input
               type="text" value={notes} onChange={(e) => setNotes(e.target.value)}
-              className="input" placeholder="ex: com pausa, máximo, RPE 9..."
+              className="input" placeholder={extra.ex_notes[lang]}
             />
           </div>
 
           <button type="submit" disabled={loading} className="btn-primary text-sm py-2.5 w-full">
-            {loading ? "A guardar..." : "Guardar recorde"}
+            {loading ? extra.saving[lang] : extra.save_record[lang]}
           </button>
         </form>
       )}
@@ -140,16 +162,16 @@ export default function PersonalRecords({ clientId, initialRecords }: Props) {
             <span className="text-4xl">🏆</span>
           </div>
           <div>
-            <p className="text-white font-bold text-base">Sem recordes ainda</p>
+            <p className="text-white font-bold text-base">{extra.no_records_title[lang]}</p>
             <p className="text-zinc-500 text-sm mt-1.5 leading-relaxed">
-              Regista o teu primeiro PR e começa a acompanhar a tua evolução de força.
+              {extra.no_records_sub[lang]}
             </p>
           </div>
           <button
             onClick={() => setShowForm(true)}
             className="btn-primary text-sm mx-auto"
           >
-            + Registar primeiro PR
+            {extra.add_first_pr[lang]}
           </button>
         </div>
       ) : (
@@ -164,10 +186,10 @@ export default function PersonalRecords({ clientId, initialRecords }: Props) {
                   <h3 className="text-white font-semibold">{name}</h3>
                   <div className="flex items-center gap-2">
                     {best.weight_kg && (
-                      <span className="text-brand-gold font-bold">{best.weight_kg} kg</span>
+                      <span className="text-brand-gold font-bold">{best.weight_kg} {t("kg")}</span>
                     )}
                     {best.reps && (
-                      <span className="text-gray-400 text-sm">× {best.reps} reps</span>
+                      <span className="text-gray-400 text-sm">× {best.reps} {t("reps")}</span>
                     )}
                     <span className="text-xs bg-brand-gold/10 text-brand-gold px-2 py-0.5 rounded-full">PR</span>
                   </div>
@@ -178,14 +200,14 @@ export default function PersonalRecords({ clientId, initialRecords }: Props) {
                     <div key={r.id} className="flex items-center justify-between py-1.5 border-b border-zinc-800 last:border-0">
                       <div>
                         <span className="text-gray-300 text-sm">
-                          {r.weight_kg ? `${r.weight_kg} kg` : "—"}
+                          {r.weight_kg ? `${r.weight_kg} ${t("kg")}` : "—"}
                           {r.reps ? ` × ${r.reps}` : ""}
                         </span>
                         {r.notes && <span className="text-gray-600 text-xs ml-2">{r.notes}</span>}
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-gray-600 text-xs">
-                          {new Date(r.recorded_at).toLocaleDateString("pt-PT", { day: "numeric", month: "short" })}
+                          {new Date(r.recorded_at).toLocaleDateString(locale, { day: "numeric", month: "short" })}
                         </span>
                         <button
                           onClick={() => handleDelete(r.id)}

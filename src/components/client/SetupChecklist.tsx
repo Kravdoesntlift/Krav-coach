@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useLang } from "@/lib/i18n/useLang";
 
 interface CheckItem {
   id: string;
@@ -28,6 +29,21 @@ export default function SetupChecklist({
   hasCompletedWorkout,
   hasProfilePhoto,
 }: Props) {
+  const { lang } = useLang();
+
+  const extra = {
+    first_steps:      { pt: "Primeiros passos",                    en: "Getting started" },
+    completed_of:     { pt: "de",                                  en: "of" },
+    completed_suffix: { pt: "concluídos",                          en: "completed" },
+    hide_guide:       { pt: "Ocultar este guia",                   en: "Hide this guide" },
+    onboarding:       { pt: "Preencher o questionário inicial",    en: "Complete the initial questionnaire" },
+    first_checkin:    { pt: "Fazer o primeiro check-in semanal",   en: "Do your first weekly check-in" },
+    first_workout:    { pt: "Concluir o primeiro treino",          en: "Complete your first workout" },
+    first_meal:       { pt: "Registar a primeira refeição",        en: "Log your first meal" },
+    profile_photo:    { pt: "Adicionar foto de perfil",            en: "Add a profile photo" },
+    close:            { pt: "Fechar",                              en: "Close" },
+  } as const;
+
   const LS_KEY = `krav_setup_dismissed_${clientId}`;
   const [dismissed, setDismissed] = useState(true); // start hidden to prevent flash
   const [mounted, setMounted] = useState(false);
@@ -45,31 +61,31 @@ export default function SetupChecklist({
   const items: CheckItem[] = [
     {
       id: "onboarding",
-      label: "Preencher o questionário inicial",
+      label: extra.onboarding[lang],
       done: hasCompletedOnboarding,
       href: undefined, // OnboardingModal is triggered from dashboard
     },
     {
       id: "checkin",
-      label: "Fazer o primeiro check-in semanal",
+      label: extra.first_checkin[lang],
       done: hasLoggedCheckin,
       href: "/client/checkin",
     },
     {
       id: "workout",
-      label: "Concluir o primeiro treino",
+      label: extra.first_workout[lang],
       done: hasCompletedWorkout,
       href: "/client/dashboard",
     },
     {
       id: "nutrition",
-      label: "Registar a primeira refeição",
+      label: extra.first_meal[lang],
       done: hasLoggedNutrition,
       href: "/client/nutrition",
     },
     {
       id: "photo",
-      label: "Adicionar foto de perfil",
+      label: extra.profile_photo[lang],
       done: hasProfilePhoto,
       href: "/client/profile",
     },
@@ -103,14 +119,14 @@ export default function SetupChecklist({
         <div className="flex items-center gap-2">
           <span className="text-lg">🚀</span>
           <div>
-            <p className="text-white text-sm font-bold">Primeiros passos</p>
-            <p className="text-zinc-500 text-[11px]">{done} de {total} concluídos</p>
+            <p className="text-white text-sm font-bold">{extra.first_steps[lang]}</p>
+            <p className="text-zinc-500 text-[11px]">{done} {extra.completed_of[lang]} {total} {extra.completed_suffix[lang]}</p>
           </div>
         </div>
         <button
           onClick={dismiss}
           className="text-zinc-600 hover:text-zinc-400 transition-colors text-xs p-1"
-          aria-label="Fechar"
+          aria-label={extra.close[lang]}
         >
           ✕
         </button>
@@ -176,7 +192,7 @@ export default function SetupChecklist({
         onClick={dismiss}
         className="w-full text-center text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors pt-1"
       >
-        Ocultar este guia
+        {extra.hide_guide[lang]}
       </button>
     </div>
   );

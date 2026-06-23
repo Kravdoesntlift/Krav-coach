@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useLang } from "@/lib/i18n/useLang";
 
 interface Integration {
   provider: string;
@@ -11,6 +12,47 @@ interface Integration {
 }
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kravcoaching.com";
+
+const extra = {
+  title:           { pt: "Integrações",          en: "Integrations" },
+  sub:             { pt: "Liga os teus dispositivos de fitness para sincronizar passos e dados de saúde automaticamente.", en: "Connect your fitness devices to automatically sync steps and health data." },
+  coming_soon:     { pt: "Em breve",              en: "Coming soon" },
+  connected:       { pt: "Ligado",               en: "Connected" },
+  last_sync:       { pt: "Last synced:",          en: "Last synced:" },
+  sync:            { pt: "Sincronizar",           en: "Sync" },
+  disconnect:      { pt: "Desligar",              en: "Disconnect" },
+  connect:         { pt: "Ligar",                 en: "Connect" },
+  strava_ok:       { pt: "✓ Strava ligado com sucesso!", en: "✓ Strava connected successfully!" },
+  oauth_error:     { pt: "Erro ao ligar",         en: "Error connecting" },
+  try_again:       { pt: "Tenta novamente.",       en: "Please try again." },
+  synced_acts:     { pt: "atividades sincronizadas!", en: "activities synced!" },
+  sync_error:      { pt: "Erro ao sincronizar.",  en: "Error syncing." },
+  apple_via:       { pt: "Via Atalhos",           en: "Via Shortcuts" },
+  apple_desc:      { pt: "Apple Watch, iPhone. Sincroniza passos e dados de saúde automaticamente todos os dias.", en: "Apple Watch, iPhone. Syncs steps and health data automatically every day." },
+  apple_card_desc: { pt: "Apple Watch, iPhone. Liga via Atalhos iOS para enviar automaticamente os teus passos diários.", en: "Apple Watch, iPhone. Connect via iOS Shortcuts to automatically send your daily steps." },
+  strava_desc:     { pt: "Sincroniza automaticamente atividades do Strava (corridas, ciclismo, natação). Compatível com Garmin, Polar, Wahoo e mais.", en: "Automatically sync Strava activities (running, cycling, swimming). Compatible with Garmin, Polar, Wahoo and more." },
+  gfit_desc:       { pt: "Android, Google Pixel Watch, Fitbit. Sincroniza passos e atividades diretamente.", en: "Android, Google Pixel Watch, Fitbit. Sync steps and activities directly." },
+  garmin_desc:     { pt: "Garmin Forerunner, Fenix, Venu. Sincroniza passos, sono e dados de saúde detalhados.", en: "Garmin Forerunner, Fenix, Venu. Sync steps, sleep and detailed health data." },
+  fitbit_desc:     { pt: "Fitbit Charge, Sense, Versa. Passos, sono, frequência cardíaca em repouso.", en: "Fitbit Charge, Sense, Versa. Steps, sleep, resting heart rate." },
+  what_synced:     { pt: "O que é sincronizado",  en: "What gets synced" },
+  steps:           { pt: "Passos diários",        en: "Daily steps" },
+  activities:      { pt: "Atividades (Strava)",   en: "Activities (Strava)" },
+  hr_soon:         { pt: "Frequência cardíaca (em breve)", en: "Heart rate (coming soon)" },
+  sleep_soon:      { pt: "Qualidade do sono (em breve)",   en: "Sleep quality (coming soon)" },
+  data_note:       { pt: "Os dados são usados apenas para o leaderboard e registo diário. O teu coach pode ver os passos sincronizados.", en: "Data is only used for the leaderboard and daily log. Your coach can see synced steps." },
+
+  // Apple Shortcut steps
+  step1_title:     { pt: "Passo 1 — Copia o teu token único", en: "Step 1 — Copy your unique token" },
+  step1_desc:      { pt: "Este token identifica-te de forma segura. Não o partilhes com ninguém.", en: "This token identifies you securely. Don't share it with anyone." },
+  copied:          { pt: "✓ Copiado", en: "✓ Copied" },
+  copy:            { pt: "Copiar", en: "Copy" },
+  next:            { pt: "Próximo →", en: "Next →" },
+  back:            { pt: "← Voltar", en: "← Back" },
+  done:            { pt: "✓ Concluído", en: "✓ Done" },
+  step2_title:     { pt: "Passo 2 — Cria o Atalho no iPhone", en: "Step 2 — Create the Shortcut on iPhone" },
+  step3_title:     { pt: "Passo 3 — Automatiza a sincronização", en: "Step 3 — Automate the sync" },
+  step3_done_msg:  { pt: "✓ A partir de agora, os teus passos do Apple Health serão enviados automaticamente todos os dias às 23:30!", en: "✓ From now on, your Apple Health steps will be sent automatically every day at 23:30!" },
+} as const;
 
 function ProviderCard({
   icon,
@@ -23,6 +65,7 @@ function ProviderCard({
   onDisconnect,
   syncing,
   comingSoon,
+  lang,
 }: {
   icon: React.ReactNode;
   name: string;
@@ -34,7 +77,9 @@ function ProviderCard({
   onDisconnect?: () => void;
   syncing?: boolean;
   comingSoon?: boolean;
+  lang: "pt" | "en";
 }) {
+  const locale = lang === "en" ? "en-GB" : "pt-PT";
   return (
     <div className={`card p-4 flex items-start gap-4 ${comingSoon ? "opacity-50" : ""}`}>
       <div className="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center flex-shrink-0 text-2xl">
@@ -44,16 +89,16 @@ function ProviderCard({
         <div className="flex items-center gap-2">
           <p className="text-white font-semibold">{name}</p>
           {comingSoon && (
-            <span className="text-[10px] bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full font-semibold">Em breve</span>
+            <span className="text-[10px] bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full font-semibold">{extra.coming_soon[lang]}</span>
           )}
           {connected && !comingSoon && (
-            <span className="text-[10px] bg-green-500/15 text-green-400 px-2 py-0.5 rounded-full font-semibold">Ligado</span>
+            <span className="text-[10px] bg-green-500/15 text-green-400 px-2 py-0.5 rounded-full font-semibold">{extra.connected[lang]}</span>
           )}
         </div>
         <p className="text-gray-500 text-xs mt-0.5 leading-relaxed">{description}</p>
         {connected && lastSynced && (
           <p className="text-gray-600 text-[11px] mt-1">
-            Última sincronização: {new Date(lastSynced).toLocaleDateString("pt-PT", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+            {extra.last_sync[lang]} {new Date(lastSynced).toLocaleDateString(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
           </p>
         )}
       </div>
@@ -67,7 +112,7 @@ function ProviderCard({
                   disabled={syncing}
                   className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-brand-gold/10 text-brand-gold border border-brand-gold/20 hover:bg-brand-gold/20 transition-colors disabled:opacity-40"
                 >
-                  {syncing ? "…" : "Sincronizar"}
+                  {syncing ? "…" : extra.sync[lang]}
                 </button>
               )}
               {onDisconnect && (
@@ -75,7 +120,7 @@ function ProviderCard({
                   onClick={onDisconnect}
                   className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-800 text-gray-500 hover:text-red-400 transition-colors"
                 >
-                  Desligar
+                  {extra.disconnect[lang]}
                 </button>
               )}
             </>
@@ -85,7 +130,7 @@ function ProviderCard({
                 onClick={onConnect}
                 className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-800 text-gray-300 hover:bg-zinc-700 border border-zinc-700 transition-colors whitespace-nowrap"
               >
-                Ligar
+                {extra.connect[lang]}
               </button>
             )
           )}
@@ -95,7 +140,7 @@ function ProviderCard({
   );
 }
 
-function AppleShortcutSection({ token }: { token: string }) {
+function AppleShortcutSection({ token, lang }: { token: string; lang: "pt" | "en" }) {
   const [copied, setCopied] = useState(false);
   const [step, setStep] = useState(1);
 
@@ -107,6 +152,38 @@ function AppleShortcutSection({ token }: { token: string }) {
     setTimeout(() => setCopied(false), 2000);
   }
 
+  const steps2 = lang === "en" ? [
+    <>Open the <strong className="text-white">Shortcuts</strong> app on iPhone</>,
+    <>Tap <strong className="text-white">+</strong> to create a new Shortcut</>,
+    <>Add the action <strong className="text-white">"Health — Read Health Data"</strong> → choose <strong className="text-white">Steps</strong>, period <strong className="text-white">Today</strong></>,
+    <>Add <strong className="text-white">"URL"</strong> and paste: <code className="text-brand-gold bg-zinc-900 px-1 rounded">{webhookUrl}</code></>,
+    <>Add <strong className="text-white">"Get Contents of URL"</strong> → Method: <strong className="text-white">POST</strong>, Type: <strong className="text-white">JSON</strong></>,
+    <>In the JSON body add: <code className="text-brand-gold bg-zinc-900 px-1 rounded break-all">{`{"token":"YOUR_TOKEN","steps":"Health Data"}`}</code></>,
+    <>Replace <strong className="text-white">YOUR_TOKEN</strong> with the token you copied</>,
+  ] : [
+    <>Abre a app <strong className="text-white">Atalhos</strong> no iPhone</>,
+    <>Toca em <strong className="text-white">+</strong> para criar um novo Atalho</>,
+    <>Adiciona a ação <strong className="text-white">"Saúde — Ler Dados de Saúde"</strong> → escolhe <strong className="text-white">Passos</strong>, período <strong className="text-white">Hoje</strong></>,
+    <>Adiciona <strong className="text-white">"URL"</strong> e cola: <code className="text-brand-gold bg-zinc-900 px-1 rounded">{webhookUrl}</code></>,
+    <>Adiciona <strong className="text-white">"Conteúdos de URL"</strong> → Método: <strong className="text-white">POST</strong>, Tipo: <strong className="text-white">JSON</strong></>,
+    <>No corpo JSON adiciona: <code className="text-brand-gold bg-zinc-900 px-1 rounded break-all">{`{"token":"SEU_TOKEN","steps":"Dados de Saúde"}`}</code></>,
+    <>Substitui <strong className="text-white">SEU_TOKEN</strong> pelo token que copiaste</>,
+  ];
+
+  const steps3 = lang === "en" ? [
+    <>In the <strong className="text-white">Shortcuts</strong> app, go to the <strong className="text-white">Automation</strong> tab</>,
+    <>Tap <strong className="text-white">+</strong> → <strong className="text-white">Create Personal Automation</strong></>,
+    <>Choose <strong className="text-white">Time of Day</strong> → set <strong className="text-white">23:30</strong></>,
+    <>Add the action <strong className="text-white">"Run Shortcut"</strong> → select the shortcut you created</>,
+    <>Disable <strong className="text-white">"Ask Before Running"</strong> → Tap <strong className="text-white">Done</strong></>,
+  ] : [
+    <>Na app <strong className="text-white">Atalhos</strong>, vai ao separador <strong className="text-white">Automação</strong></>,
+    <>Toca em <strong className="text-white">+</strong> → <strong className="text-white">Criar Automação Pessoal</strong></>,
+    <>Escolhe <strong className="text-white">Hora do Dia</strong> → define <strong className="text-white">23:30</strong></>,
+    <>Adiciona a ação <strong className="text-white">"Executar Atalho"</strong> → seleciona o atalho que criaste</>,
+    <>Desativa <strong className="text-white">"Perguntar antes de executar"</strong> → Toca em <strong className="text-white">Concluído</strong></>,
+  ];
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
@@ -116,9 +193,9 @@ function AppleShortcutSection({ token }: { token: string }) {
         <div>
           <div className="flex items-center gap-2">
             <p className="text-white font-semibold">Apple Health</p>
-            <span className="text-[10px] bg-brand-gold/15 text-brand-gold px-2 py-0.5 rounded-full font-semibold">Via Atalhos</span>
+            <span className="text-[10px] bg-brand-gold/15 text-brand-gold px-2 py-0.5 rounded-full font-semibold">{extra.apple_via[lang]}</span>
           </div>
-          <p className="text-gray-500 text-xs mt-0.5">Apple Watch, iPhone. Sincroniza passos e dados de saúde automaticamente todos os dias.</p>
+          <p className="text-gray-500 text-xs mt-0.5">{extra.apple_desc[lang]}</p>
         </div>
       </div>
 
@@ -131,10 +208,8 @@ function AppleShortcutSection({ token }: { token: string }) {
 
       {step === 1 && (
         <div className="space-y-3">
-          <p className="text-white text-sm font-semibold">Passo 1 — Copia o teu token único</p>
-          <p className="text-gray-400 text-xs leading-relaxed">
-            Este token identifica-te de forma segura. Não o partilhes com ninguém.
-          </p>
+          <p className="text-white text-sm font-semibold">{extra.step1_title[lang]}</p>
+          <p className="text-gray-400 text-xs leading-relaxed">{extra.step1_desc[lang]}</p>
           <div className="flex gap-2">
             <div className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 font-mono text-xs text-gray-300 truncate">
               {token}
@@ -145,33 +220,32 @@ function AppleShortcutSection({ token }: { token: string }) {
                 copied ? "bg-green-500/20 text-green-400" : "bg-brand-gold/10 text-brand-gold border border-brand-gold/20 hover:bg-brand-gold/20"
               }`}
             >
-              {copied ? "✓ Copiado" : "Copiar"}
+              {copied ? extra.copied[lang] : extra.copy[lang]}
             </button>
           </div>
           <button onClick={() => setStep(2)} className="w-full btn-primary py-2.5 text-sm">
-            Próximo →
+            {extra.next[lang]}
           </button>
         </div>
       )}
 
       {step === 2 && (
         <div className="space-y-3">
-          <p className="text-white text-sm font-semibold">Passo 2 — Cria o Atalho no iPhone</p>
+          <p className="text-white text-sm font-semibold">{extra.step2_title[lang]}</p>
           <ol className="space-y-2 text-xs text-gray-400 leading-relaxed">
-            <li className="flex gap-2"><span className="text-brand-gold font-bold flex-shrink-0">1.</span>Abre a app <strong className="text-white">Atalhos</strong> no iPhone</li>
-            <li className="flex gap-2"><span className="text-brand-gold font-bold flex-shrink-0">2.</span>Toca em <strong className="text-white">+</strong> para criar um novo Atalho</li>
-            <li className="flex gap-2"><span className="text-brand-gold font-bold flex-shrink-0">3.</span>Adiciona a ação <strong className="text-white">"Saúde — Ler Dados de Saúde"</strong> → escolhe <strong className="text-white">Passos</strong>, período <strong className="text-white">Hoje</strong></li>
-            <li className="flex gap-2"><span className="text-brand-gold font-bold flex-shrink-0">4.</span>Adiciona <strong className="text-white">"URL"</strong> e cola: <code className="text-brand-gold bg-zinc-900 px-1 rounded">{webhookUrl}</code></li>
-            <li className="flex gap-2"><span className="text-brand-gold font-bold flex-shrink-0">5.</span>Adiciona <strong className="text-white">"Conteúdos de URL"</strong> → Método: <strong className="text-white">POST</strong>, Tipo: <strong className="text-white">JSON</strong></li>
-            <li className="flex gap-2"><span className="text-brand-gold font-bold flex-shrink-0">6.</span>No corpo JSON adiciona: <code className="text-brand-gold bg-zinc-900 px-1 rounded break-all">{`{"token":"SEU_TOKEN","steps":"Dados de Saúde"}`}</code></li>
-            <li className="flex gap-2"><span className="text-brand-gold font-bold flex-shrink-0">7.</span>Substitui <strong className="text-white">SEU_TOKEN</strong> pelo token que copiaste</li>
+            {steps2.map((step, idx) => (
+              <li key={idx} className="flex gap-2">
+                <span className="text-brand-gold font-bold flex-shrink-0">{idx + 1}.</span>
+                <span>{step}</span>
+              </li>
+            ))}
           </ol>
           <div className="flex gap-2">
             <button onClick={() => setStep(1)} className="flex-1 py-2.5 rounded-xl text-sm text-gray-400 bg-zinc-800 hover:bg-zinc-700 transition-colors">
-              ← Voltar
+              {extra.back[lang]}
             </button>
             <button onClick={() => setStep(3)} className="flex-1 btn-primary py-2.5 text-sm">
-              Próximo →
+              {extra.next[lang]}
             </button>
           </div>
         </div>
@@ -179,23 +253,24 @@ function AppleShortcutSection({ token }: { token: string }) {
 
       {step === 3 && (
         <div className="space-y-3">
-          <p className="text-white text-sm font-semibold">Passo 3 — Automatiza a sincronização</p>
+          <p className="text-white text-sm font-semibold">{extra.step3_title[lang]}</p>
           <ol className="space-y-2 text-xs text-gray-400 leading-relaxed">
-            <li className="flex gap-2"><span className="text-brand-gold font-bold flex-shrink-0">1.</span>Na app <strong className="text-white">Atalhos</strong>, vai ao separador <strong className="text-white">Automação</strong></li>
-            <li className="flex gap-2"><span className="text-brand-gold font-bold flex-shrink-0">2.</span>Toca em <strong className="text-white">+</strong> → <strong className="text-white">Criar Automação Pessoal</strong></li>
-            <li className="flex gap-2"><span className="text-brand-gold font-bold flex-shrink-0">3.</span>Escolhe <strong className="text-white">Hora do Dia</strong> → define <strong className="text-white">23:30</strong></li>
-            <li className="flex gap-2"><span className="text-brand-gold font-bold flex-shrink-0">4.</span>Adiciona a ação <strong className="text-white">"Executar Atalho"</strong> → seleciona o atalho que criaste</li>
-            <li className="flex gap-2"><span className="text-brand-gold font-bold flex-shrink-0">5.</span>Desativa <strong className="text-white">"Perguntar antes de executar"</strong> → Toca em <strong className="text-white">Concluído</strong></li>
+            {steps3.map((step, idx) => (
+              <li key={idx} className="flex gap-2">
+                <span className="text-brand-gold font-bold flex-shrink-0">{idx + 1}.</span>
+                <span>{step}</span>
+              </li>
+            ))}
           </ol>
           <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3 text-xs text-green-400">
-            ✓ A partir de agora, os teus passos do Apple Health serão enviados automaticamente todos os dias às 23:30!
+            {extra.step3_done_msg[lang]}
           </div>
           <div className="flex gap-2">
             <button onClick={() => setStep(2)} className="flex-1 py-2.5 rounded-xl text-sm text-gray-400 bg-zinc-800 hover:bg-zinc-700 transition-colors">
-              ← Voltar
+              {extra.back[lang]}
             </button>
             <button onClick={() => setStep(1)} className="flex-1 py-2.5 rounded-xl text-sm text-green-400 bg-green-500/10 border border-green-500/20 hover:bg-green-500/15 transition-colors font-semibold">
-              ✓ Concluído
+              {extra.done[lang]}
             </button>
           </div>
         </div>
@@ -205,6 +280,7 @@ function AppleShortcutSection({ token }: { token: string }) {
 }
 
 export default function IntegrationsPage() {
+  const { lang } = useLang();
   const searchParams = useSearchParams();
   const [token, setToken] = useState<string | null>(null);
   const [integrations, setIntegrations] = useState<Integration[]>([]);
@@ -242,8 +318,7 @@ export default function IntegrationsPage() {
     const res = await fetch("/api/strava/sync", { method: "POST" });
     const d = await res.json();
     if (res.ok) {
-      setSyncMsg({ type: "ok", text: `${d.activitiesSynced} atividades sincronizadas!` });
-      // Refresh integrations to update last_synced_at
+      setSyncMsg({ type: "ok", text: `${d.activitiesSynced} ${extra.synced_acts[lang]}` });
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -251,7 +326,7 @@ export default function IntegrationsPage() {
         setIntegrations((data ?? []) as Integration[]);
       }
     } else {
-      setSyncMsg({ type: "err", text: d.error ?? "Erro ao sincronizar." });
+      setSyncMsg({ type: "err", text: d.error ?? extra.sync_error[lang] });
     }
     setStravaSyncing(false);
     setTimeout(() => setSyncMsg(null), 4000);
@@ -274,19 +349,19 @@ export default function IntegrationsPage() {
     <div className="space-y-6 page-enter pb-24">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Integrações</h1>
-        <p className="text-gray-400 text-sm mt-1">Liga os teus dispositivos de fitness para sincronizar passos e dados de saúde automaticamente.</p>
+        <h1 className="text-2xl font-bold text-white">{extra.title[lang]}</h1>
+        <p className="text-gray-400 text-sm mt-1">{extra.sub[lang]}</p>
       </div>
 
       {/* OAuth result banners */}
       {connected === "strava" && (
         <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-4 text-green-400 text-sm font-semibold">
-          ✓ Strava ligado com sucesso!
+          {extra.strava_ok[lang]}
         </div>
       )}
       {oauthError && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 text-red-400 text-sm">
-          Erro ao ligar: {oauthError.replace(/_/g, " ")}. Tenta novamente.
+          {extra.oauth_error[lang]}: {oauthError.replace(/_/g, " ")}. {extra.try_again[lang]}
         </div>
       )}
       {syncMsg && (
@@ -301,12 +376,13 @@ export default function IntegrationsPage() {
           <ProviderCard
             icon="🍎"
             name="Apple Health"
-            description="Apple Watch, iPhone. Liga via Atalhos iOS para enviar automaticamente os teus passos diários."
+            description={extra.apple_card_desc[lang]}
             connected={false}
             onConnect={() => setShowApple(true)}
+            lang={lang}
           />
         ) : (
-          <AppleShortcutSection token={token ?? ""} />
+          <AppleShortcutSection token={token ?? ""} lang={lang} />
         )}
       </div>
 
@@ -318,48 +394,52 @@ export default function IntegrationsPage() {
           </svg>
         }
         name="Strava"
-        description="Sincroniza automaticamente atividades do Strava (corridas, ciclismo, natação). Compatível com Garmin, Polar, Wahoo e mais."
+        description={extra.strava_desc[lang]}
         connected={!!stravaInt}
         lastSynced={stravaInt?.last_synced_at}
         onConnect={() => { window.location.href = "/api/strava/connect"; }}
         onSync={handleStravaSync}
         onDisconnect={handleStravaDisconnect}
         syncing={stravaSyncing}
+        lang={lang}
       />
 
       {/* Coming soon */}
       <ProviderCard
         icon="🏃"
         name="Google Fit / Health Connect"
-        description="Android, Google Pixel Watch, Fitbit. Sincroniza passos e atividades diretamente."
+        description={extra.gfit_desc[lang]}
         connected={false}
         comingSoon
+        lang={lang}
       />
       <ProviderCard
         icon="⌚"
         name="Garmin Connect"
-        description="Garmin Forerunner, Fenix, Venu. Sincroniza passos, sono e dados de saúde detalhados."
+        description={extra.garmin_desc[lang]}
         connected={false}
         comingSoon
+        lang={lang}
       />
       <ProviderCard
         icon="💜"
         name="Fitbit"
-        description="Fitbit Charge, Sense, Versa. Passos, sono, frequência cardíaca em repouso."
+        description={extra.fitbit_desc[lang]}
         connected={false}
         comingSoon
+        lang={lang}
       />
 
       {/* Info box */}
       <div className="bg-zinc-900 rounded-2xl p-4 space-y-2">
-        <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">O que é sincronizado</p>
+        <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">{extra.what_synced[lang]}</p>
         <div className="space-y-1.5 text-xs text-gray-500">
-          <div className="flex items-center gap-2"><span className="text-green-400">✓</span> Passos diários</div>
-          <div className="flex items-center gap-2"><span className="text-green-400">✓</span> Atividades (Strava)</div>
-          <div className="flex items-center gap-2"><span className="text-zinc-600">–</span> Frequência cardíaca (em breve)</div>
-          <div className="flex items-center gap-2"><span className="text-zinc-600">–</span> Qualidade do sono (em breve)</div>
+          <div className="flex items-center gap-2"><span className="text-green-400">✓</span> {extra.steps[lang]}</div>
+          <div className="flex items-center gap-2"><span className="text-green-400">✓</span> {extra.activities[lang]}</div>
+          <div className="flex items-center gap-2"><span className="text-zinc-600">–</span> {extra.hr_soon[lang]}</div>
+          <div className="flex items-center gap-2"><span className="text-zinc-600">–</span> {extra.sleep_soon[lang]}</div>
         </div>
-        <p className="text-zinc-600 text-[11px] pt-1">Os dados são usados apenas para o leaderboard e registo diário. O teu coach pode ver os passos sincronizados.</p>
+        <p className="text-zinc-600 text-[11px] pt-1">{extra.data_note[lang]}</p>
       </div>
     </div>
   );

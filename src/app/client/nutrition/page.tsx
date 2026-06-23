@@ -4,24 +4,13 @@ import { useState, useEffect, useCallback, useRef, lazy, Suspense } from "react"
 import { createClient } from "@/lib/supabase/client";
 import type { NutritionLog, ClientNutritionGoals } from "@/lib/supabase/types";
 import { searchLocalFoods } from "@/lib/pt-foods";
+import { useLang } from "@/lib/i18n/useLang";
 
 const BarcodeScanner = lazy(() => import("@/components/client/BarcodeScanner"));
 
 // ─── TDEE calculation ─────────────────────────────────────────────────────────
-const ACTIVITY_LABELS: Record<string, string> = {
-  sedentary: "Sedentário (sem exercício)",
-  light:     "Ligeiro (1-3x/semana)",
-  moderate:  "Moderado (3-5x/semana)",
-  active:    "Activo (6-7x/semana)",
-  very_active: "Muito activo (2x/dia)",
-};
 const ACTIVITY_MULTIPLIERS: Record<string, number> = {
   sedentary: 1.2, light: 1.375, moderate: 1.55, active: 1.725, very_active: 1.9,
-};
-const GOAL_LABELS: Record<string, string> = {
-  cut: "Perder gordura",
-  maintenance: "Manutenção",
-  bulk: "Ganhar massa",
 };
 
 function calcTDEE(g: ClientNutritionGoals): { calories: number; protein: number; carbs: number; fat: number } | null {
@@ -86,15 +75,16 @@ interface RecipeIngredient {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const MEAL_PRESETS = ["Pequeno-almoço", "Lanche manhã", "Almoço", "Lanche tarde", "Jantar", "Ceia"];
+const MEAL_PRESETS_PT = ["Pequeno-almoço", "Lanche manhã", "Almoço", "Lanche tarde", "Jantar", "Ceia"];
+const MEAL_PRESETS_EN = ["Breakfast", "Morning snack", "Lunch", "Afternoon snack", "Dinner", "Evening snack"];
 
 function today() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function fmtDate(iso: string) {
-  return new Date(iso + "T00:00:00").toLocaleDateString("pt-PT", { weekday: "short", day: "numeric", month: "short" });
+function fmtDate(iso: string, lang: "pt" | "en") {
+  return new Date(iso + "T00:00:00").toLocaleDateString(lang === "pt" ? "pt-PT" : "en-GB", { weekday: "short", day: "numeric", month: "short" });
 }
 
 function scale(val: number | null, grams: number): number | null {
@@ -149,15 +139,93 @@ function FoodSearch({
   onAdd,
   onClose,
   onCustomFoodCreated,
+  lang,
 }: {
   mealName: string;
   customFoods: CustomFood[];
   onAdd: (data: Partial<NutritionLog>) => void;
   onClose: () => void;
   onCustomFoodCreated: (cf: CustomFood) => void;
+  lang: "pt" | "en";
 }) {
+  const { t } = useLang();
   const supabase = createClient();
   const [tab, setTab] = useState<"search" | "create" | "recipes">("search");
+
+  const extra = {
+    add_to_meal:         { pt: "Adicionar ao",                   en: "Add to" },
+    close:               { pt: "Fechar",                         en: "Close" },
+    tab_search:          { pt: "🔍 Pesquisar",                   en: "🔍 Search" },
+    tab_create:          { pt: "➕ Criar",                       en: "➕ Create" },
+    tab_recipes:         { pt: "🍽️ Receitas",                    en: "🍽️ Recipes" },
+    search_placeholder:  { pt: "Ex: frango, aveia, banana...",   en: "E.g. chicken, oats, banana..." },
+    scan_barcode_title:  { pt: "Scan código de barras",          en: "Scan barcode" },
+    back_to_search:      { pt: "← Voltar à pesquisa",           en: "← Back to search" },
+    my_label:            { pt: "MEU",                            en: "MINE" },
+    prot_abbr:           { pt: "prot",                           en: "prot" },
+    serving_abbr:        { pt: "porção",                         en: "serving" },
+    per_100g:            { pt: "por 100g",                       en: "per 100g" },
+    quantity_grams:      { pt: "Quantidade (gramas)",            en: "Quantity (grams)" },
+    reset_serving:       { pt: "Repor porção",                   en: "Reset serving" },
+    std_serving:         { pt: "porção padrão",                  en: "standard serving" },
+    micronutrients:      { pt: "Micronutrientes",                en: "Micronutrients" },
+    fiber_label:         { pt: "Fibra",                          en: "Fiber" },
+    sugar_label:         { pt: "Açúcar",                         en: "Sugar" },
+    sodium_label:        { pt: "Sódio",                          en: "Sodium" },
+    vit_c_label:         { pt: "Vitamina C",                     en: "Vitamin C" },
+    vit_d_label:         { pt: "Vitamina D",                     en: "Vitamin D" },
+    vit_b12_label:       { pt: "Vitamina B12",                   en: "Vitamin B12" },
+    calcium_label:       { pt: "Cálcio",                         en: "Calcium" },
+    iron_label:          { pt: "Ferro",                          en: "Iron" },
+    potassium_label:     { pt: "Potássio",                       en: "Potassium" },
+    magnesium_label:     { pt: "Magnésio",                       en: "Magnesium" },
+    no_results:          { pt: `Nenhum resultado para`,          en: "No results for" },
+    try_create:          { pt: `Tenta criar em "➕ Criar".`,     en: `Try creating in "➕ Create".` },
+    min_chars:           { pt: "Escreve pelo menos 2 letras para pesquisar", en: "Type at least 2 letters to search" },
+    create_food_title:   { pt: "Criar alimento personalizado",   en: "Create custom food" },
+    saved_for_future:    { pt: "Fica guardado na tua conta para uso futuro", en: "Saved to your account for future use" },
+    food_name_label:     { pt: "Nome do alimento *",             en: "Food name *" },
+    food_name_ph:        { pt: "Ex: Bolo de aveia caseiro",      en: "E.g. Homemade oat cake" },
+    brand_label:         { pt: "Marca (opcional)",               en: "Brand (optional)" },
+    brand_ph:            { pt: "Ex: Continente, caseiro...",     en: "E.g. Sainsbury's, homemade..." },
+    cal_per_100g:        { pt: "Calorias por 100g *",            en: "Calories per 100g *" },
+    protein_per_100g:    { pt: "Proteína (g/100g)",              en: "Protein (g/100g)" },
+    carbs_per_100g:      { pt: "Hidratos (g/100g)",              en: "Carbs (g/100g)" },
+    fat_per_100g:        { pt: "Gordura (g/100g)",               en: "Fat (g/100g)" },
+    fiber_per_100g:      { pt: "Fibra (g/100g)",                 en: "Fiber (g/100g)" },
+    saving:              { pt: "A guardar...",                    en: "Saving..." },
+    save_and_select:     { pt: "Guardar e selecionar",           en: "Save and select" },
+    name_required:       { pt: "Nome obrigatório.",              en: "Name required." },
+    cal_required:        { pt: "Calorias obrigatórias.",         en: "Calories required." },
+    save_error:          { pt: "Erro ao guardar. Tenta novamente.", en: "Save error. Please try again." },
+    saved_recipes:       { pt: "Receitas guardadas",             en: "Saved recipes" },
+    log_directly:        { pt: "Regista uma receita diretamente", en: "Log a recipe directly" },
+    new_recipe_btn:      { pt: "+ Nova",                         en: "+ New" },
+    no_recipes:          { pt: "Ainda não tens receitas guardadas", en: "You have no saved recipes yet" },
+    click_new:           { pt: `Clica em "+ Nova" para criar`,   en: `Click "+ New" to create one` },
+    per_portion:         { pt: "Por porção",                     en: "Per serving" },
+    per_portion_of:      { pt: "Por porção",                     en: "Per serving" },
+    total_portions:      { pt: "total",                          en: "total" },
+    log_btn:             { pt: "Registar",                       en: "Log" },
+    back:                { pt: "← Voltar",                       en: "← Back" },
+    new_recipe_title:    { pt: "Nova receita",                   en: "New recipe" },
+    recipe_name_label:   { pt: "Nome da receita *",              en: "Recipe name *" },
+    recipe_name_ph:      { pt: "Ex: Panquecas de aveia",         en: "E.g. Oat pancakes" },
+    portions_label:      { pt: "Número de porções",              en: "Number of servings" },
+    ingredients_label:   { pt: "Ingredientes",                   en: "Ingredients" },
+    search_ingredient_ph: { pt: "Pesquisar ingrediente...",      en: "Search ingredient..." },
+    no_ing_results:      { pt: "Sem resultados",                 en: "No results" },
+    quantity_g:          { pt: "Quantidade (g)",                 en: "Quantity (g)" },
+    add_ingredient_btn:  { pt: "+ Adicionar ingrediente",        en: "+ Add ingredient" },
+    recipe_total:        { pt: "Total receita",                  en: "Recipe total" },
+    recipe_name_required: { pt: "Nome da receita obrigatório.",  en: "Recipe name required." },
+    add_one_ingredient:  { pt: "Adiciona pelo menos um ingrediente.", en: "Add at least one ingredient." },
+    recipe_save_error:   { pt: "Erro ao guardar receita.",       en: "Error saving recipe." },
+    save_recipe:         { pt: "Guardar receita",                en: "Save recipe" },
+    portion_label:       { pt: "porção",                         en: "serving" },
+    hid_abbr:            { pt: "hid",                            en: "carbs" },
+    gord_abbr:           { pt: "gord",                           en: "fat" },
+  } as const;
 
   // ── Tab 1: Search state ──
   const [query, setQuery]       = useState("");
@@ -234,7 +302,7 @@ function FoodSearch({
         }
 
         // Otherwise call the API (which also does local search server-side + OFF fallback)
-        const res = await fetch(`/api/food/search?q=${encodeURIComponent(query)}`);
+        const res = await fetch(`/api/food/search?q=${encodeURIComponent(query)}&lang=${lang}`);
         const data = await res.json() as { foods?: FoodResult[]; error?: string };
         if (data.error) {
           setSearchErr(data.error);
@@ -349,8 +417,8 @@ function FoodSearch({
   }
 
   async function handleCreateFood() {
-    if (!cfName.trim()) { setCfError("Nome obrigatório."); return; }
-    if (!cfCal) { setCfError("Calorias obrigatórias."); return; }
+    if (!cfName.trim()) { setCfError(extra.name_required[lang]); return; }
+    if (!cfCal) { setCfError(extra.cal_required[lang]); return; }
     setCfSaving(true); setCfError(null);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setCfSaving(false); return; }
@@ -364,7 +432,7 @@ function FoodSearch({
       fat_100g:      parseFloat(cfFat) || 0,
       fiber_100g:    cfFiber ? parseFloat(cfFiber) : null,
     }).select().single();
-    if (error) { setCfError("Erro ao guardar. Tenta novamente."); setCfSaving(false); return; }
+    if (error) { setCfError(extra.save_error[lang]); setCfSaving(false); return; }
     const newCf = data as CustomFood;
     onCustomFoodCreated(newCf);
     // Select it immediately in search tab
@@ -410,8 +478,8 @@ function FoodSearch({
   }
 
   async function handleSaveRecipe() {
-    if (!recipeName.trim()) { setRecipeError("Nome da receita obrigatório."); return; }
-    if (ingredients.length === 0) { setRecipeError("Adiciona pelo menos um ingrediente."); return; }
+    if (!recipeName.trim()) { setRecipeError(extra.recipe_name_required[lang]); return; }
+    if (ingredients.length === 0) { setRecipeError(extra.add_one_ingredient[lang]); return; }
     setRecipeSaving(true); setRecipeError(null);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setRecipeSaving(false); return; }
@@ -424,7 +492,7 @@ function FoodSearch({
       carbs_g:   Math.round(recipeTotal.carbs),
       fat_g:     Math.round(recipeTotal.fat),
     }).select().single();
-    if (recipeErr || !recipeData) { setRecipeError("Erro ao guardar receita."); setRecipeSaving(false); return; }
+    if (recipeErr || !recipeData) { setRecipeError(extra.recipe_save_error[lang]); setRecipeSaving(false); return; }
     const recipeId = (recipeData as { id: string }).id;
     await supabase.from("custom_recipe_items").insert(
       ingredients.map((ing) => ({ recipe_id: recipeId, ...ing }))
@@ -450,7 +518,7 @@ function FoodSearch({
 
   async function handleLogRecipe(recipe: CustomRecipe) {
     const p = recipe.portions > 1
-      ? ` (1/${recipe.portions} porção)`
+      ? ` (1/${recipe.portions} ${extra.portion_label[lang]})`
       : "";
     onAdd({
       meal_name:   mealName,
@@ -464,9 +532,9 @@ function FoodSearch({
   }
 
   const TABS = [
-    { key: "search",  label: "🔍 Pesquisar" },
-    { key: "create",  label: "➕ Criar" },
-    { key: "recipes", label: "🍽️ Receitas" },
+    { key: "search",  label: extra.tab_search[lang] },
+    { key: "create",  label: extra.tab_create[lang] },
+    { key: "recipes", label: extra.tab_recipes[lang] },
   ] as const;
 
   return (
@@ -484,8 +552,8 @@ function FoodSearch({
         <div className="px-4 pb-8 space-y-4">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <p className="text-white font-semibold text-sm">Adicionar ao {mealName}</p>
-            <button onClick={onClose} className="text-zinc-600 hover:text-white text-sm transition-colors">Fechar</button>
+            <p className="text-white font-semibold text-sm">{extra.add_to_meal[lang]} {mealName}</p>
+            <button onClick={onClose} className="text-zinc-600 hover:text-white text-sm transition-colors">{extra.close[lang]}</button>
           </div>
 
           {/* Tabs */}
@@ -528,7 +596,7 @@ function FoodSearch({
                     autoFocus
                     value={query}
                     onChange={(e) => { setQuery(e.target.value); setSelected(null); }}
-                    placeholder="Ex: frango, aveia, banana..."
+                    placeholder={extra.search_placeholder[lang]}
                     className="input text-sm pr-10"
                   />
                   {searching && (
@@ -541,7 +609,7 @@ function FoodSearch({
                 <button
                   type="button"
                   onClick={() => setShowScanner(true)}
-                  title="Scan código de barras"
+                  title={extra.scan_barcode_title[lang]}
                   className="flex items-center justify-center w-11 h-11 rounded-xl bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-brand-gold hover:border-brand-gold/40 transition-colors shrink-0"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
@@ -568,14 +636,14 @@ function FoodSearch({
                     >
                       <div className="flex items-center gap-1.5">
                         {f.source === "custom" && (
-                          <span className="text-[9px] bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded font-semibold shrink-0">MEU</span>
+                          <span className="text-[9px] bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded font-semibold shrink-0">{extra.my_label[lang]}</span>
                         )}
                         <p className="text-white text-sm">{f.name}</p>
                       </div>
                       <p className="text-zinc-500 text-[10px] mt-0.5">
                         {f.per100g.calories != null ? `${f.per100g.calories} kcal` : ""}
-                        {f.per100g.protein != null ? ` · ${f.per100g.protein}g prot` : ""}
-                        {f.servingSize ? ` · porção: ${f.servingSize}g` : " · por 100g"}
+                        {f.per100g.protein != null ? ` · ${f.per100g.protein}g ${extra.prot_abbr[lang]}` : ""}
+                        {f.servingSize ? ` · ${extra.serving_abbr[lang]}: ${f.servingSize}g` : ` · ${extra.per_100g[lang]}`}
                       </p>
                     </button>
                   ))}
@@ -589,32 +657,32 @@ function FoodSearch({
                     onClick={() => setSelected(null)}
                     className="flex items-center gap-2 text-brand-gold text-xs"
                   >
-                    ← Voltar à pesquisa
+                    {extra.back_to_search[lang]}
                   </button>
 
                   <div className="rounded-xl p-3" style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}>
                     <div className="flex items-center gap-2">
                       {selected.source === "custom" && (
-                        <span className="text-[9px] bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded font-semibold">MEU</span>
+                        <span className="text-[9px] bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded font-semibold">{extra.my_label[lang]}</span>
                       )}
                       <p className="text-white text-sm font-semibold">{selected.name}</p>
                     </div>
                     <p className="text-zinc-500 text-[10px]">
-                      {selected.servingSize ? `porção padrão: ${selected.servingSize}g` : "por 100g"}
+                      {selected.servingSize ? `${extra.std_serving[lang]}: ${selected.servingSize}g` : extra.per_100g[lang]}
                     </p>
                   </div>
 
                   {/* Grams input */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="label">Quantidade (gramas)</label>
+                      <label className="label">{extra.quantity_grams[lang]}</label>
                       {selected.servingSize && (
                         <button
                           type="button"
                           onClick={() => setGrams(String(selected.servingSize))}
                           className="text-[11px] text-brand-gold hover:underline"
                         >
-                          Repor porção ({selected.servingSize}g)
+                          {extra.reset_serving[lang]} ({selected.servingSize}g)
                         </button>
                       )}
                     </div>
@@ -633,10 +701,10 @@ function FoodSearch({
                       {/* Macros */}
                       <div className="grid grid-cols-4 gap-2">
                         {[
-                          { label: "kcal",    val: scaled.calories,  color: "text-brand-gold" },
-                          { label: "Prot",    val: scaled.protein != null ? `${scaled.protein}g` : null,  color: "text-blue-400" },
-                          { label: "Hid",     val: scaled.carbs   != null ? `${scaled.carbs}g`   : null,  color: "text-orange-400" },
-                          { label: "Gord",    val: scaled.fat     != null ? `${scaled.fat}g`     : null,  color: "text-pink-400" },
+                          { label: "kcal",                    val: scaled.calories,  color: "text-brand-gold" },
+                          { label: t("protein").slice(0, 4),  val: scaled.protein != null ? `${scaled.protein}g` : null,  color: "text-blue-400" },
+                          { label: t("carbs").slice(0, 4),    val: scaled.carbs   != null ? `${scaled.carbs}g`   : null,  color: "text-orange-400" },
+                          { label: t("fat").slice(0, 4),      val: scaled.fat     != null ? `${scaled.fat}g`     : null,  color: "text-pink-400" },
                         ].map(({ label, val, color }) => (
                           <div key={label} className="text-center rounded-xl py-2" style={{ background: "rgba(255,255,255,0.03)" }}>
                             <p className={`text-sm font-bold ${color}`}>{val ?? "—"}</p>
@@ -648,18 +716,18 @@ function FoodSearch({
                       {/* Micronutrients */}
                       {[scaled.fiber, scaled.sugar, scaled.sodium, scaled.vit_c, scaled.vit_d, scaled.vit_b12, scaled.calcium, scaled.iron, scaled.potassium, scaled.magnesium].some((v) => v != null && v > 0) && (
                         <div className="rounded-xl p-3 space-y-1.5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
-                          <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest mb-2">Micronutrientes</p>
+                          <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest mb-2">{extra.micronutrients[lang]}</p>
                           {[
-                            { label: "Fibra",        val: scaled.fiber,     unit: "g" },
-                            { label: "Açúcar",       val: scaled.sugar,     unit: "g" },
-                            { label: "Sódio",        val: scaled.sodium,    unit: "mg" },
-                            { label: "Vitamina C",   val: scaled.vit_c,     unit: "mg" },
-                            { label: "Vitamina D",   val: scaled.vit_d,     unit: "mcg" },
-                            { label: "Vitamina B12", val: scaled.vit_b12,   unit: "mcg" },
-                            { label: "Cálcio",       val: scaled.calcium,   unit: "mg" },
-                            { label: "Ferro",        val: scaled.iron,      unit: "mg" },
-                            { label: "Potássio",     val: scaled.potassium, unit: "mg" },
-                            { label: "Magnésio",     val: scaled.magnesium, unit: "mg" },
+                            { label: extra.fiber_label[lang],     val: scaled.fiber,     unit: "g" },
+                            { label: extra.sugar_label[lang],     val: scaled.sugar,     unit: "g" },
+                            { label: extra.sodium_label[lang],    val: scaled.sodium,    unit: "mg" },
+                            { label: extra.vit_c_label[lang],     val: scaled.vit_c,     unit: "mg" },
+                            { label: extra.vit_d_label[lang],     val: scaled.vit_d,     unit: "mcg" },
+                            { label: extra.vit_b12_label[lang],   val: scaled.vit_b12,   unit: "mcg" },
+                            { label: extra.calcium_label[lang],   val: scaled.calcium,   unit: "mg" },
+                            { label: extra.iron_label[lang],      val: scaled.iron,      unit: "mg" },
+                            { label: extra.potassium_label[lang], val: scaled.potassium, unit: "mg" },
+                            { label: extra.magnesium_label[lang], val: scaled.magnesium, unit: "mg" },
                           ].filter((r) => r.val != null && r.val > 0).map(({ label, val, unit }) => (
                             <div key={label} className="flex justify-between">
                               <span className="text-zinc-500 text-xs">{label}</span>
@@ -675,7 +743,7 @@ function FoodSearch({
                     onClick={handleAdd}
                     className="w-full py-3.5 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors"
                   >
-                    Adicionar ao {mealName}
+                    {extra.add_to_meal[lang]} {mealName}
                   </button>
                 </div>
               )}
@@ -683,13 +751,13 @@ function FoodSearch({
               {/* Empty state */}
               {!searching && query.length >= 2 && results.length === 0 && !selected && (
                 <p className="text-zinc-600 text-sm text-center py-4">
-                  Nenhum resultado para &quot;{query}&quot;. Tenta criar em &quot;➕ Criar&quot;.
+                  {extra.no_results[lang]} &quot;{query}&quot;. {extra.try_create[lang]}
                 </p>
               )}
 
               {query.length < 2 && !selected && (
                 <p className="text-zinc-700 text-xs text-center py-2">
-                  Escreve pelo menos 2 letras para pesquisar
+                  {extra.min_chars[lang]}
                 </p>
               )}
             </div>
@@ -699,40 +767,40 @@ function FoodSearch({
           {tab === "create" && (
             <div className="space-y-4">
               <div>
-                <p className="text-white font-semibold text-sm">Criar alimento personalizado</p>
-                <p className="text-zinc-500 text-xs mt-0.5">Fica guardado na tua conta para uso futuro</p>
+                <p className="text-white font-semibold text-sm">{extra.create_food_title[lang]}</p>
+                <p className="text-zinc-500 text-xs mt-0.5">{extra.saved_for_future[lang]}</p>
               </div>
 
               <div>
-                <label className="label">Nome do alimento *</label>
-                <input value={cfName} onChange={(e) => setCfName(e.target.value)} className="input text-sm" placeholder="Ex: Bolo de aveia caseiro" />
+                <label className="label">{extra.food_name_label[lang]}</label>
+                <input value={cfName} onChange={(e) => setCfName(e.target.value)} className="input text-sm" placeholder={extra.food_name_ph[lang]} />
               </div>
 
               <div>
-                <label className="label">Marca (opcional)</label>
-                <input value={cfBrand} onChange={(e) => setCfBrand(e.target.value)} className="input text-sm" placeholder="Ex: Continente, caseiro..." />
+                <label className="label">{extra.brand_label[lang]}</label>
+                <input value={cfBrand} onChange={(e) => setCfBrand(e.target.value)} className="input text-sm" placeholder={extra.brand_ph[lang]} />
               </div>
 
               <div>
-                <label className="label text-brand-gold">Calorias por 100g *</label>
+                <label className="label text-brand-gold">{extra.cal_per_100g[lang]}</label>
                 <input type="number" min="0" value={cfCal} onChange={(e) => setCfCal(e.target.value)} className="input text-sm" placeholder="0" />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="label text-blue-400">Proteína (g/100g)</label>
+                  <label className="label text-blue-400">{extra.protein_per_100g[lang]}</label>
                   <input type="number" min="0" step="0.1" value={cfProt} onChange={(e) => setCfProt(e.target.value)} className="input text-sm" placeholder="0" />
                 </div>
                 <div>
-                  <label className="label text-orange-400">Hidratos (g/100g)</label>
+                  <label className="label text-orange-400">{extra.carbs_per_100g[lang]}</label>
                   <input type="number" min="0" step="0.1" value={cfCarbs} onChange={(e) => setCfCarbs(e.target.value)} className="input text-sm" placeholder="0" />
                 </div>
                 <div>
-                  <label className="label text-pink-400">Gordura (g/100g)</label>
+                  <label className="label text-pink-400">{extra.fat_per_100g[lang]}</label>
                   <input type="number" min="0" step="0.1" value={cfFat} onChange={(e) => setCfFat(e.target.value)} className="input text-sm" placeholder="0" />
                 </div>
                 <div>
-                  <label className="label text-green-400">Fibra (g/100g)</label>
+                  <label className="label text-green-400">{extra.fiber_per_100g[lang]}</label>
                   <input type="number" min="0" step="0.1" value={cfFiber} onChange={(e) => setCfFiber(e.target.value)} className="input text-sm" placeholder="0" />
                 </div>
               </div>
@@ -744,7 +812,7 @@ function FoodSearch({
                 disabled={cfSaving}
                 className="w-full py-3.5 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors disabled:opacity-40"
               >
-                {cfSaving ? "A guardar..." : "Guardar e selecionar"}
+                {cfSaving ? extra.saving[lang] : extra.save_and_select[lang]}
               </button>
             </div>
           )}
@@ -756,14 +824,14 @@ function FoodSearch({
                 <>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-white font-semibold text-sm">Receitas guardadas</p>
-                      <p className="text-zinc-500 text-xs mt-0.5">Regista uma receita diretamente</p>
+                      <p className="text-white font-semibold text-sm">{extra.saved_recipes[lang]}</p>
+                      <p className="text-zinc-500 text-xs mt-0.5">{extra.log_directly[lang]}</p>
                     </div>
                     <button
                       onClick={() => setShowNewRecipe(true)}
                       className="px-3 py-2 rounded-xl bg-brand-gold text-black text-xs font-bold"
                     >
-                      + Nova
+                      {extra.new_recipe_btn[lang]}
                     </button>
                   </div>
 
@@ -774,8 +842,8 @@ function FoodSearch({
                   ) : recipes.length === 0 ? (
                     <div className="rounded-2xl p-8 text-center space-y-2" style={{ background: "rgba(255,255,255,0.02)" }}>
                       <p className="text-2xl">🍽️</p>
-                      <p className="text-zinc-500 text-sm">Ainda não tens receitas guardadas</p>
-                      <p className="text-zinc-700 text-xs">Clica em &quot;+ Nova&quot; para criar</p>
+                      <p className="text-zinc-500 text-sm">{extra.no_recipes[lang]}</p>
+                      <p className="text-zinc-700 text-xs">{extra.click_new[lang]}</p>
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-80 overflow-y-auto">
@@ -792,20 +860,22 @@ function FoodSearch({
                               <div className="min-w-0">
                                 <p className="text-white text-sm font-semibold">{recipe.name}</p>
                                 <p className="text-zinc-600 text-[10px] mt-0.5">
-                                  {recipe.portions > 1 ? `Por porção (${recipe.portions} total)` : "Por porção"}
+                                  {recipe.portions > 1
+                                    ? `${extra.per_portion_of[lang]} (${recipe.portions} ${extra.total_portions[lang]})`
+                                    : extra.per_portion[lang]}
                                 </p>
                                 <div className="flex gap-3 mt-1 flex-wrap">
                                   {perPort.cal  != null && <span className="text-brand-gold  text-xs">{perPort.cal} kcal</span>}
-                                  {perPort.prot != null && <span className="text-blue-400   text-xs">{perPort.prot}g prot</span>}
-                                  {perPort.carbs != null && <span className="text-orange-400 text-xs">{perPort.carbs}g hid</span>}
-                                  {perPort.fat  != null && <span className="text-pink-400   text-xs">{perPort.fat}g gord</span>}
+                                  {perPort.prot != null && <span className="text-blue-400   text-xs">{perPort.prot}g {extra.prot_abbr[lang]}</span>}
+                                  {perPort.carbs != null && <span className="text-orange-400 text-xs">{perPort.carbs}g {extra.hid_abbr[lang]}</span>}
+                                  {perPort.fat  != null && <span className="text-pink-400   text-xs">{perPort.fat}g {extra.gord_abbr[lang]}</span>}
                                 </div>
                               </div>
                               <button
                                 onClick={() => handleLogRecipe(recipe)}
                                 className="shrink-0 px-3 py-1.5 rounded-lg bg-brand-gold text-black text-xs font-bold"
                               >
-                                Registar
+                                {extra.log_btn[lang]}
                               </button>
                             </div>
                           </div>
@@ -818,23 +888,23 @@ function FoodSearch({
                 /* ── New recipe builder ── */
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <button onClick={() => setShowNewRecipe(false)} className="text-brand-gold text-xs">← Voltar</button>
-                    <p className="text-white font-semibold text-sm">Nova receita</p>
+                    <button onClick={() => setShowNewRecipe(false)} className="text-brand-gold text-xs">{extra.back[lang]}</button>
+                    <p className="text-white font-semibold text-sm">{extra.new_recipe_title[lang]}</p>
                   </div>
 
                   <div>
-                    <label className="label">Nome da receita *</label>
-                    <input value={recipeName} onChange={(e) => setRecipeName(e.target.value)} className="input text-sm" placeholder="Ex: Panquecas de aveia" />
+                    <label className="label">{extra.recipe_name_label[lang]}</label>
+                    <input value={recipeName} onChange={(e) => setRecipeName(e.target.value)} className="input text-sm" placeholder={extra.recipe_name_ph[lang]} />
                   </div>
 
                   <div>
-                    <label className="label">Número de porções</label>
+                    <label className="label">{extra.portions_label[lang]}</label>
                     <input type="number" min="1" max="20" value={recipePortions} onChange={(e) => setRecipePortions(e.target.value)} className="input text-sm" />
                   </div>
 
                   {/* Ingredient search */}
                   <div>
-                    <p className="text-zinc-400 text-xs font-semibold uppercase tracking-widest mb-2">Ingredientes</p>
+                    <p className="text-zinc-400 text-xs font-semibold uppercase tracking-widest mb-2">{extra.ingredients_label[lang]}</p>
 
                     {!ingSelected ? (
                       <div className="space-y-2">
@@ -842,7 +912,7 @@ function FoodSearch({
                           value={ingQuery}
                           onChange={(e) => setIngQuery(e.target.value)}
                           className="input text-sm"
-                          placeholder="Pesquisar ingrediente..."
+                          placeholder={extra.search_ingredient_ph[lang]}
                         />
                         {ingResults.length > 0 && (
                           <div className="space-y-1 max-h-40 overflow-y-auto rounded-xl" style={{ background: "rgba(255,255,255,0.02)" }}>
@@ -853,13 +923,13 @@ function FoodSearch({
                                 className="w-full text-left px-3 py-2 hover:bg-zinc-800 transition-colors rounded-xl"
                               >
                                 <p className="text-white text-xs">{f.name}</p>
-                                <p className="text-zinc-600 text-[10px]">{f.per100g.calories} kcal · {f.per100g.protein}g prot /100g</p>
+                                <p className="text-zinc-600 text-[10px]">{f.per100g.calories} kcal · {f.per100g.protein}g {extra.prot_abbr[lang]} /100g</p>
                               </button>
                             ))}
                           </div>
                         )}
                         {ingQuery.length >= 2 && ingResults.length === 0 && (
-                          <p className="text-zinc-600 text-xs text-center py-2">Sem resultados</p>
+                          <p className="text-zinc-600 text-xs text-center py-2">{extra.no_ing_results[lang]}</p>
                         )}
                       </div>
                     ) : (
@@ -869,7 +939,7 @@ function FoodSearch({
                           <button onClick={() => setIngSelected(null)} className="text-zinc-600 text-xs">✕</button>
                         </div>
                         <div>
-                          <label className="label">Quantidade (g)</label>
+                          <label className="label">{extra.quantity_g[lang]}</label>
                           <input
                             type="number"
                             min="1"
@@ -882,7 +952,7 @@ function FoodSearch({
                           onClick={addIngredient}
                           className="w-full py-2 rounded-xl bg-zinc-700 hover:bg-zinc-600 text-white text-xs font-semibold"
                         >
-                          + Adicionar ingrediente
+                          {extra.add_ingredient_btn[lang]}
                         </button>
                       </div>
                     )}
@@ -898,7 +968,7 @@ function FoodSearch({
                             <div>
                               <p className="text-white text-xs">{ing.food_name}</p>
                               <p className="text-zinc-600 text-[10px]">
-                                {ing.grams}g · {Math.round(ing.calories_100g * factor)} kcal · {Math.round(ing.protein_100g * factor)}g prot
+                                {ing.grams}g · {Math.round(ing.calories_100g * factor)} kcal · {Math.round(ing.protein_100g * factor)}g {extra.prot_abbr[lang]}
                               </p>
                             </div>
                             <button
@@ -917,14 +987,14 @@ function FoodSearch({
                   {ingredients.length > 0 && (
                     <div className="rounded-xl p-3 space-y-2" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
                       <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest">
-                        Total receita{portions > 1 ? ` · Por porção (÷${portions})` : ""}
+                        {extra.recipe_total[lang]}{portions > 1 ? ` · ${extra.per_portion[lang]} (÷${portions})` : ""}
                       </p>
                       <div className="grid grid-cols-4 gap-2">
                         {[
                           { label: "kcal", total: Math.round(recipeTotal.calories), pp: perPortion.calories, color: "text-brand-gold" },
-                          { label: "Prot", total: Math.round(recipeTotal.protein),  pp: perPortion.protein,  color: "text-blue-400" },
-                          { label: "Hid",  total: Math.round(recipeTotal.carbs),    pp: perPortion.carbs,    color: "text-orange-400" },
-                          { label: "Gord", total: Math.round(recipeTotal.fat),      pp: perPortion.fat,      color: "text-pink-400" },
+                          { label: t("protein").slice(0, 4), total: Math.round(recipeTotal.protein),  pp: perPortion.protein,  color: "text-blue-400" },
+                          { label: t("carbs").slice(0, 4),   total: Math.round(recipeTotal.carbs),    pp: perPortion.carbs,    color: "text-orange-400" },
+                          { label: t("fat").slice(0, 4),     total: Math.round(recipeTotal.fat),      pp: perPortion.fat,      color: "text-pink-400" },
                         ].map(({ label, total, pp, color }) => (
                           <div key={label} className="text-center">
                             <p className={`text-xs font-bold ${color}`}>{portions > 1 ? pp : total}</p>
@@ -943,7 +1013,7 @@ function FoodSearch({
                     disabled={recipeSaving}
                     className="w-full py-3.5 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors disabled:opacity-40"
                   >
-                    {recipeSaving ? "A guardar..." : "Guardar receita"}
+                    {recipeSaving ? extra.saving[lang] : extra.save_recipe[lang]}
                   </button>
                 </div>
               )}
@@ -956,11 +1026,13 @@ function FoodSearch({
 }
 
 // ─── Goals setup modal ────────────────────────────────────────────────────────
-function GoalsSetup({ existing, onSave, onClose }: {
+function GoalsSetup({ existing, onSave, onClose, lang }: {
   existing: ClientNutritionGoals | null;
   onSave: (g: ClientNutritionGoals) => void;
   onClose: () => void;
+  lang: "pt" | "en";
 }) {
+  const { t } = useLang();
   const supabase = createClient();
   const [weight,   setWeight]   = useState(String(existing?.weight_kg   ?? ""));
   const [height,   setHeight]   = useState(String(existing?.height_cm   ?? ""));
@@ -969,6 +1041,35 @@ function GoalsSetup({ existing, onSave, onClose }: {
   const [activity, setActivity] = useState<ClientNutritionGoals["activity_level"]>(existing?.activity_level ?? "moderate");
   const [goal,     setGoal]     = useState<ClientNutritionGoals["goal"]>(existing?.goal ?? "maintenance");
   const [saving,   setSaving]   = useState(false);
+
+  const extra = {
+    configure_goals:     { pt: "Configurar objetivos",                        en: "Configure goals" },
+    goals_subtitle:      { pt: "Para calcular as tuas necessidades diárias",  en: "To calculate your daily needs" },
+    weight_label:        { pt: "Peso (kg)",                                   en: "Weight (kg)" },
+    height_label:        { pt: "Altura (cm)",                                 en: "Height (cm)" },
+    age_label:           { pt: "Idade",                                       en: "Age" },
+    sex_label:           { pt: "Sexo",                                        en: "Sex" },
+    sex_m:               { pt: "Masculino",                                   en: "Male" },
+    sex_f:               { pt: "Feminino",                                    en: "Female" },
+    activity_level:      { pt: "Nível de actividade",                         en: "Activity level" },
+    goal_label:          { pt: "Objetivo",                                    en: "Goal" },
+    saving:              { pt: "A guardar...",                                 en: "Saving..." },
+    save:                { pt: "Guardar",                                      en: "Save" },
+  } as const;
+
+  const ACTIVITY_LABELS: Record<string, { pt: string; en: string }> = {
+    sedentary:   { pt: "Sedentário (sem exercício)",  en: "Sedentary (no exercise)" },
+    light:       { pt: "Ligeiro (1-3x/semana)",       en: "Light (1-3x/week)" },
+    moderate:    { pt: "Moderado (3-5x/semana)",      en: "Moderate (3-5x/week)" },
+    active:      { pt: "Activo (6-7x/semana)",        en: "Active (6-7x/week)" },
+    very_active: { pt: "Muito activo (2x/dia)",       en: "Very active (2x/day)" },
+  };
+
+  const GOAL_LABELS: Record<string, { pt: string; en: string }> = {
+    cut:         { pt: "Perder gordura",  en: "Cut (lose fat)" },
+    maintenance: { pt: "Manutenção",      en: "Maintenance" },
+    bulk:        { pt: "Ganhar massa",    en: "Bulk (gain muscle)" },
+  };
 
   async function handleSave() {
     setSaving(true);
@@ -1016,32 +1117,32 @@ function GoalsSetup({ existing, onSave, onClose }: {
         <div className="px-4 pb-8 space-y-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-white font-bold text-base">Configurar objetivos</p>
-              <p className="text-zinc-500 text-xs mt-0.5">Para calcular as tuas necessidades diárias</p>
+              <p className="text-white font-bold text-base">{extra.configure_goals[lang]}</p>
+              <p className="text-zinc-500 text-xs mt-0.5">{extra.goals_subtitle[lang]}</p>
             </div>
             <button onClick={onClose} className="text-zinc-600 hover:text-white text-sm">✕</button>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="label">Peso (kg)</label>
+              <label className="label">{extra.weight_label[lang]}</label>
               <input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} className="input" placeholder="70" />
             </div>
             <div>
-              <label className="label">Altura (cm)</label>
+              <label className="label">{extra.height_label[lang]}</label>
               <input type="number" value={height} onChange={(e) => setHeight(e.target.value)} className="input" placeholder="175" />
             </div>
             <div>
-              <label className="label">Idade</label>
+              <label className="label">{extra.age_label[lang]}</label>
               <input type="number" value={age} onChange={(e) => setAge(e.target.value)} className="input" placeholder="28" />
             </div>
             <div>
-              <label className="label">Sexo</label>
+              <label className="label">{extra.sex_label[lang]}</label>
               <div className="flex gap-2 mt-1">
                 {(["M", "F"] as const).map((s) => (
                   <button key={s} type="button" onClick={() => setSex(s)}
                     className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${sex === s ? "bg-brand-gold text-black" : "bg-zinc-800 text-zinc-400"}`}>
-                    {s === "M" ? "Masculino" : "Feminino"}
+                    {s === "M" ? extra.sex_m[lang] : extra.sex_f[lang]}
                   </button>
                 ))}
               </div>
@@ -1049,24 +1150,24 @@ function GoalsSetup({ existing, onSave, onClose }: {
           </div>
 
           <div>
-            <label className="label">Nível de actividade</label>
+            <label className="label">{extra.activity_level[lang]}</label>
             <div className="space-y-1.5 mt-1">
               {Object.entries(ACTIVITY_LABELS).map(([k, v]) => (
                 <button key={k} type="button" onClick={() => setActivity(k as ClientNutritionGoals["activity_level"])}
                   className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition-colors ${activity === k ? "bg-brand-gold text-black font-semibold" : "bg-zinc-800/60 text-zinc-400 hover:text-white"}`}>
-                  {v}
+                  {v[lang]}
                 </button>
               ))}
             </div>
           </div>
 
           <div>
-            <label className="label">Objetivo</label>
+            <label className="label">{extra.goal_label[lang]}</label>
             <div className="grid grid-cols-3 gap-2 mt-1">
               {Object.entries(GOAL_LABELS).map(([k, v]) => (
                 <button key={k} type="button" onClick={() => setGoal(k as ClientNutritionGoals["goal"])}
                   className={`py-3 rounded-xl text-xs font-semibold transition-colors ${goal === k ? "bg-brand-gold text-black" : "bg-zinc-800/60 text-zinc-400 hover:text-white"}`}>
-                  {v}
+                  {v[lang]}
                 </button>
               ))}
             </div>
@@ -1077,7 +1178,7 @@ function GoalsSetup({ existing, onSave, onClose }: {
             disabled={saving}
             className="w-full py-3.5 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors disabled:opacity-40"
           >
-            {saving ? "A guardar..." : "Guardar"}
+            {saving ? extra.saving[lang] : extra.save[lang]}
           </button>
         </div>
       </div>
@@ -1087,6 +1188,7 @@ function GoalsSetup({ existing, onSave, onClose }: {
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 export default function NutritionPage() {
+  const { t, lang } = useLang();
   const supabase = createClient();
   const [logs,        setLogs]        = useState<NutritionLog[]>([]);
   const [goals,       setGoals]       = useState<ClientNutritionGoals | null>(null);
@@ -1108,6 +1210,49 @@ export default function NutritionPage() {
   const [carbs,        setCarbs]        = useState("");
   const [fat,          setFat]          = useState("");
   const [saving,       setSaving]       = useState(false);
+
+  const extra = {
+    nutrition_title:     { pt: "Nutrição",                                        en: "Nutrition" },
+    nutrition_subtitle:  { pt: "Regista as tuas refeições e macros diários",      en: "Log your meals and daily macros" },
+    goals_btn:           { pt: "⚙ Objetivos",                                     en: "⚙ Goals" },
+    today_label:         { pt: "Hoje",                                             en: "Today" },
+    daily_progress:      { pt: "Progresso diário",                                en: "Daily progress" },
+    protein_label:       { pt: "Proteína",                                        en: "Protein" },
+    carbs_label:         { pt: "Hidratos",                                        en: "Carbs" },
+    fat_label:           { pt: "Gordura",                                         en: "Fat" },
+    setup_goals_btn:     { pt: "+ Configurar objetivos de nutrição e TDEE",       en: "+ Set up nutrition goals and TDEE" },
+    add_meal:            { pt: "Adicionar refeição",                              en: "Add meal" },
+    manual_cancel:       { pt: "Cancelar",                                        en: "Cancel" },
+    manual_open:         { pt: "Inserir manualmente (sem pesquisa)",              en: "Enter manually (no search)" },
+    meal_name_ph:        { pt: "Nome da refeição",                                en: "Meal name" },
+    desc_ph:             { pt: "Descrição (opcional)",                            en: "Description (optional)" },
+    cal_label:           { pt: "Calorias (kcal)",                                 en: "Calories (kcal)" },
+    prot_label:          { pt: "Proteína (g)",                                    en: "Protein (g)" },
+    carbs_label2:        { pt: "Hidratos (g)",                                    en: "Carbs (g)" },
+    fat_label2:          { pt: "Gordura (g)",                                     en: "Fat (g)" },
+    saving:              { pt: "A guardar...",                                     en: "Saving..." },
+    save:                { pt: "Guardar",                                          en: "Save" },
+    choose_meal_err:     { pt: "Escolhe uma refeição.",                           en: "Choose a meal." },
+    delete_confirm:      { pt: "Apagar este registo?",                            en: "Delete this entry?" },
+    no_logs_title:       { pt: "Sem registos para este dia",                      en: "No entries for this day" },
+    no_logs_sub:         { pt: "Clica numa refeição acima para pesquisar alimentos", en: "Tap a meal above to search foods" },
+    day_total_micro:     { pt: "Total do dia — Micronutrientes",                  en: "Daily total — Micronutrients" },
+    fiber_label:         { pt: "Fibra",                                           en: "Fiber" },
+    sodium_label:        { pt: "Sódio",                                           en: "Sodium" },
+    vit_c_label:         { pt: "Vitamina C",                                      en: "Vitamin C" },
+    calcium_label:       { pt: "Cálcio",                                          en: "Calcium" },
+    iron_label:          { pt: "Ferro",                                           en: "Iron" },
+    sodium_inline:       { pt: "Sódio",                                           en: "Sodium" },
+    vit_c_inline:        { pt: "Vit C",                                           en: "Vit C" },
+    calcium_inline:      { pt: "Cálcio",                                          en: "Calcium" },
+    iron_inline:         { pt: "Ferro",                                           en: "Iron" },
+    prot_abbr:           { pt: "prot",                                            en: "prot" },
+    hid_abbr:            { pt: "hid",                                             en: "carbs" },
+    gord_abbr:           { pt: "gord",                                            en: "fat" },
+    fiber_abbr:          { pt: "fibra",                                           en: "fiber" },
+  } as const;
+
+  const MEAL_PRESETS = lang === "pt" ? MEAL_PRESETS_PT : MEAL_PRESETS_EN;
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -1161,7 +1306,7 @@ export default function NutritionPage() {
 
   async function addManual(e: React.FormEvent) {
     e.preventDefault();
-    if (!mealName.trim()) { setError("Escolhe uma refeição."); return; }
+    if (!mealName.trim()) { setError(extra.choose_meal_err[lang]); return; }
     setSaving(true); setError(null);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setSaving(false); return; }
@@ -1180,7 +1325,7 @@ export default function NutritionPage() {
   }
 
   async function deleteLog(id: string) {
-    if (!window.confirm("Apagar este registo?")) return;
+    if (!window.confirm(extra.delete_confirm[lang])) return;
     await supabase.from("nutrition_logs").delete().eq("id", id);
     setLogs((prev) => prev.filter((l) => l.id !== id));
   }
@@ -1203,6 +1348,7 @@ export default function NutritionPage() {
           onAdd={(data) => addFromSearch(activeMeal, data)}
           onClose={() => setActiveMeal(null)}
           onCustomFoodCreated={(cf) => setCustomFoods((prev) => [...prev, cf])}
+          lang={lang}
         />
       )}
       {showGoalsModal && (
@@ -1210,20 +1356,21 @@ export default function NutritionPage() {
           existing={goals}
           onSave={(g) => { setGoals(g); setShowGoalsModal(false); }}
           onClose={() => setShowGoalsModal(false)}
+          lang={lang}
         />
       )}
 
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Nutrição</h1>
-          <p className="text-gray-400 text-sm mt-0.5">Regista as tuas refeições e macros diários</p>
+          <h1 className="text-2xl font-bold text-white">{extra.nutrition_title[lang]}</h1>
+          <p className="text-gray-400 text-sm mt-0.5">{extra.nutrition_subtitle[lang]}</p>
         </div>
         <button
           onClick={() => setShowGoalsModal(true)}
           className="text-xs text-zinc-500 hover:text-brand-gold transition-colors mt-1"
         >
-          ⚙ Objetivos
+          {extra.goals_btn[lang]}
         </button>
       </div>
 
@@ -1231,8 +1378,8 @@ export default function NutritionPage() {
       <div className="flex items-center justify-between">
         <button onClick={() => changeDay(-1)} className="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center transition-colors text-lg leading-none">‹</button>
         <div className="text-center">
-          <p className="text-white text-sm font-semibold capitalize">{fmtDate(date)}</p>
-          {isToday && <p className="text-brand-gold text-[10px]">Hoje</p>}
+          <p className="text-white text-sm font-semibold capitalize">{fmtDate(date, lang)}</p>
+          {isToday && <p className="text-brand-gold text-[10px]">{extra.today_label[lang]}</p>}
         </div>
         <button onClick={() => changeDay(1)} disabled={isToday}
           className="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center transition-colors disabled:opacity-30 text-lg leading-none">›</button>
@@ -1242,12 +1389,12 @@ export default function NutritionPage() {
       {!loading && targets.calories > 0 && (
         <div className="card p-4 space-y-3">
           <div className="flex items-center justify-between mb-1">
-            <p className="text-white text-xs font-semibold">Progresso diário</p>
+            <p className="text-white text-xs font-semibold">{extra.daily_progress[lang]}</p>
             <p className="text-brand-gold text-xs font-bold">{totals.calories} / {targets.calories} kcal</p>
           </div>
-          <MacroBar label="Proteína" current={totals.protein} target={targets.protein} color="text-blue-400" />
-          <MacroBar label="Hidratos" current={totals.carbs}   target={targets.carbs}   color="text-orange-400" />
-          <MacroBar label="Gordura"  current={totals.fat}     target={targets.fat}     color="text-pink-400" />
+          <MacroBar label={extra.protein_label[lang]} current={totals.protein} target={targets.protein} color="text-blue-400" />
+          <MacroBar label={extra.carbs_label[lang]}   current={totals.carbs}   target={targets.carbs}   color="text-orange-400" />
+          <MacroBar label={extra.fat_label[lang]}     current={totals.fat}     target={targets.fat}     color="text-pink-400" />
         </div>
       )}
 
@@ -1258,13 +1405,13 @@ export default function NutritionPage() {
           className="w-full py-3 rounded-xl text-sm transition-colors text-zinc-400 hover:text-white"
           style={{ background: "rgba(201,168,76,0.06)", border: "1px dashed rgba(201,168,76,0.25)" }}
         >
-          + Configurar objetivos de nutrição e TDEE
+          {extra.setup_goals_btn[lang]}
         </button>
       )}
 
       {/* Add meal buttons */}
       <div className="space-y-2">
-        <p className="text-zinc-500 text-xs font-semibold uppercase tracking-widest">Adicionar refeição</p>
+        <p className="text-zinc-500 text-xs font-semibold uppercase tracking-widest">{extra.add_meal[lang]}</p>
         <div className="grid grid-cols-3 gap-2">
           {MEAL_PRESETS.map((m) => (
             <button
@@ -1281,7 +1428,7 @@ export default function NutritionPage() {
           onClick={() => setShowManual((v) => !v)}
           className="w-full py-2.5 rounded-xl text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
         >
-          {showManual ? "Cancelar" : "Inserir manualmente (sem pesquisa)"}
+          {showManual ? extra.manual_cancel[lang] : extra.manual_open[lang]}
         </button>
       </div>
 
@@ -1296,14 +1443,14 @@ export default function NutritionPage() {
               </button>
             ))}
           </div>
-          <input value={mealName} onChange={(e) => setMealName(e.target.value)} placeholder="Nome da refeição" className="input text-sm" />
-          <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descrição (opcional)" rows={2} className="input text-sm resize-none" />
+          <input value={mealName} onChange={(e) => setMealName(e.target.value)} placeholder={extra.meal_name_ph[lang]} className="input text-sm" />
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder={extra.desc_ph[lang]} rows={2} className="input text-sm resize-none" />
           <div className="grid grid-cols-2 gap-2">
             {[
-              { label: "Calorias (kcal)", val: calories, set: setCalories, color: "text-brand-gold" },
-              { label: "Proteína (g)",    val: protein,  set: setProtein,  color: "text-blue-400" },
-              { label: "Hidratos (g)",    val: carbs,    set: setCarbs,    color: "text-orange-400" },
-              { label: "Gordura (g)",     val: fat,      set: setFat,      color: "text-pink-400" },
+              { label: extra.cal_label[lang],   val: calories, set: setCalories, color: "text-brand-gold" },
+              { label: extra.prot_label[lang],  val: protein,  set: setProtein,  color: "text-blue-400" },
+              { label: extra.carbs_label2[lang], val: carbs,   set: setCarbs,    color: "text-orange-400" },
+              { label: extra.fat_label2[lang],  val: fat,      set: setFat,      color: "text-pink-400" },
             ].map(({ label, val, set, color }) => (
               <div key={label}>
                 <label className={`text-[10px] font-semibold uppercase tracking-widest ${color} block mb-1`}>{label}</label>
@@ -1313,7 +1460,7 @@ export default function NutritionPage() {
           </div>
           {error && <p className="text-red-400 text-xs">{error}</p>}
           <button type="submit" disabled={saving} className="w-full py-3 rounded-xl bg-brand-gold text-black text-sm font-bold disabled:opacity-40">
-            {saving ? "A guardar..." : "Guardar"}
+            {saving ? extra.saving[lang] : extra.save[lang]}
           </button>
         </form>
       )}
@@ -1327,8 +1474,8 @@ export default function NutritionPage() {
         <div className="rounded-2xl p-10 text-center space-y-3" style={{ background: "linear-gradient(160deg,#141414,#0d0d0d)" }}>
           <p className="text-4xl">🥗</p>
           <div>
-            <p className="text-white font-bold text-sm">Sem registos para este dia</p>
-            <p className="text-zinc-500 text-xs mt-1">Clica numa refeição acima para pesquisar alimentos</p>
+            <p className="text-white font-bold text-sm">{extra.no_logs_title[lang]}</p>
+            <p className="text-zinc-500 text-xs mt-1">{extra.no_logs_sub[lang]}</p>
           </div>
         </div>
       ) : (
@@ -1346,19 +1493,19 @@ export default function NutritionPage() {
               {(log.calories || log.protein_g || log.carbs_g || log.fat_g) && (
                 <div className="flex gap-3 pt-1 border-t border-zinc-800/60 flex-wrap">
                   {log.calories  != null && <span className="text-brand-gold  text-xs font-semibold">{log.calories} kcal</span>}
-                  {log.protein_g != null && <span className="text-blue-400   text-xs">{log.protein_g}g prot</span>}
-                  {log.carbs_g   != null && <span className="text-orange-400 text-xs">{log.carbs_g}g hid</span>}
-                  {log.fat_g     != null && <span className="text-pink-400   text-xs">{log.fat_g}g gord</span>}
-                  {log.fiber_g   != null && <span className="text-green-400  text-xs">{log.fiber_g}g fibra</span>}
+                  {log.protein_g != null && <span className="text-blue-400   text-xs">{log.protein_g}g {extra.prot_abbr[lang]}</span>}
+                  {log.carbs_g   != null && <span className="text-orange-400 text-xs">{log.carbs_g}g {extra.hid_abbr[lang]}</span>}
+                  {log.fat_g     != null && <span className="text-pink-400   text-xs">{log.fat_g}g {extra.gord_abbr[lang]}</span>}
+                  {log.fiber_g   != null && <span className="text-green-400  text-xs">{log.fiber_g}g {extra.fiber_abbr[lang]}</span>}
                 </div>
               )}
               {/* Micronutrients row */}
               {(log.vit_c_mg || log.calcium_mg || log.iron_mg || log.sodium_mg) && (
                 <div className="flex gap-3 flex-wrap">
-                  {log.sodium_mg   != null && <span className="text-zinc-500 text-[10px]">Sódio {log.sodium_mg}mg</span>}
-                  {log.vit_c_mg    != null && <span className="text-zinc-500 text-[10px]">Vit C {log.vit_c_mg}mg</span>}
-                  {log.calcium_mg  != null && <span className="text-zinc-500 text-[10px]">Cálcio {log.calcium_mg}mg</span>}
-                  {log.iron_mg     != null && <span className="text-zinc-500 text-[10px]">Ferro {log.iron_mg}mg</span>}
+                  {log.sodium_mg   != null && <span className="text-zinc-500 text-[10px]">{extra.sodium_inline[lang]} {log.sodium_mg}mg</span>}
+                  {log.vit_c_mg    != null && <span className="text-zinc-500 text-[10px]">{extra.vit_c_inline[lang]} {log.vit_c_mg}mg</span>}
+                  {log.calcium_mg  != null && <span className="text-zinc-500 text-[10px]">{extra.calcium_inline[lang]} {log.calcium_mg}mg</span>}
+                  {log.iron_mg     != null && <span className="text-zinc-500 text-[10px]">{extra.iron_inline[lang]} {log.iron_mg}mg</span>}
                 </div>
               )}
             </div>
@@ -1367,14 +1514,14 @@ export default function NutritionPage() {
           {/* Day totals at bottom */}
           {totals.sodium > 0 || totals.vit_c > 0 || totals.calcium > 0 ? (
             <div className="card p-3 space-y-1">
-              <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest mb-2">Total do dia — Micronutrientes</p>
+              <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest mb-2">{extra.day_total_micro[lang]}</p>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                 {[
-                  { label: "Fibra",      val: totals.fiber,   unit: "g" },
-                  { label: "Sódio",      val: totals.sodium,  unit: "mg" },
-                  { label: "Vitamina C", val: totals.vit_c,   unit: "mg" },
-                  { label: "Cálcio",     val: totals.calcium, unit: "mg" },
-                  { label: "Ferro",      val: totals.iron,    unit: "mg" },
+                  { label: extra.fiber_label[lang],   val: totals.fiber,   unit: "g" },
+                  { label: extra.sodium_label[lang],  val: totals.sodium,  unit: "mg" },
+                  { label: extra.vit_c_label[lang],   val: totals.vit_c,   unit: "mg" },
+                  { label: extra.calcium_label[lang], val: totals.calcium, unit: "mg" },
+                  { label: extra.iron_label[lang],    val: totals.iron,    unit: "mg" },
                 ].filter((r) => r.val > 0).map(({ label, val, unit }) => (
                   <div key={label} className="flex justify-between">
                     <span className="text-zinc-600 text-xs">{label}</span>

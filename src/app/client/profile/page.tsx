@@ -3,17 +3,34 @@ import { createClient } from "@/lib/supabase/server";
 import ProfileForm from "@/components/ProfileForm";
 import PushNotificationToggle from "@/components/PushNotificationToggle";
 import SubscriptionManager from "@/components/client/SubscriptionManager";
+import LanguageSelector from "@/components/client/LanguageSelector";
 import { logout } from "@/app/auth/actions";
+import { t } from "@/lib/i18n";
+import { getLang } from "@/lib/i18n/getLang";
 
-const tools = [
-  { href: "/client/ai-coach",     emoji: "🤖", label: "AI Coach",     sub: "Assistente inteligente" },
-  { href: "/client/sessions",     emoji: "📅", label: "Sessões",      sub: "Próximas sessões" },
-  { href: "/client/integrations", emoji: "⌚", label: "Integrações",  sub: "Apple Health · Strava" },
-  { href: "/client/referral",     emoji: "👥", label: "Referências",  sub: "Convida amigos" },
-];
+const extra = {
+  profile_title:   { pt: "Perfil",              en: "Profile" },
+  profile_sub:     { pt: "Conta & definições",  en: "Account & settings" },
+  logout_title:    { pt: "Terminar sessão",      en: "Log out" },
+  ai_coach_sub:    { pt: "Assistente inteligente", en: "Smart assistant" },
+  sessions_label:  { pt: "Sessões",             en: "Sessions" },
+  sessions_sub:    { pt: "Próximas sessões",     en: "Upcoming sessions" },
+  integrations_label: { pt: "Integrações",      en: "Integrations" },
+  referral_label:  { pt: "Referências",          en: "Referrals" },
+  referral_sub:    { pt: "Convida amigos",        en: "Invite friends" },
+  subscription:    { pt: "Subscrição",           en: "Subscription" },
+  status_label:    { pt: "Estado",               en: "Status" },
+  trial_active:    { pt: "Trial",                en: "Trial" },
+  days_left:       { pt: "dias restantes",       en: "days remaining" },
+  day_left:        { pt: "dia restante",         en: "day remaining" },
+  trial_expired:   { pt: "Trial expirado",       en: "Trial expired" },
+  ends_on:         { pt: "Termina em",           en: "Ends on" },
+  ended_on:        { pt: "Terminou em",          en: "Ended on" },
+  trial_warn:      { pt: "Subscreve antes que o trial termine para não perder acesso.", en: "Subscribe before the trial ends to keep access." },
+} as const;
 
 export default async function ClientProfilePage() {
-  const supabase = await createClient();
+  const [supabase, lang] = await Promise.all([createClient(), getLang()]);
   const { data: { user } } = await supabase.auth.getUser();
 
   const { data: profile } = await supabase
@@ -31,12 +48,19 @@ export default async function ClientProfilePage() {
     .limit(1)
     .maybeSingle();
 
+  const tools = [
+    { href: "/client/ai-coach",     emoji: "🤖", label: "AI Coach",                   sub: extra.ai_coach_sub[lang] },
+    { href: "/client/sessions",     emoji: "📅", label: extra.sessions_label[lang],    sub: extra.sessions_sub[lang] },
+    { href: "/client/integrations", emoji: "⌚", label: extra.integrations_label[lang], sub: "Apple Health · Strava" },
+    { href: "/client/referral",     emoji: "👥", label: extra.referral_label[lang],    sub: extra.referral_sub[lang] },
+  ];
+
   return (
     <div className="page-enter space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Perfil</h1>
-          <p className="text-gray-400 text-sm mt-1">Conta & definições</p>
+          <h1 className="text-2xl font-bold text-white">{extra.profile_title[lang]}</h1>
+          <p className="text-gray-400 text-sm mt-1">{extra.profile_sub[lang]}</p>
         </div>
         <div className="flex items-center gap-2">
           <PushNotificationToggle />
@@ -44,7 +68,7 @@ export default async function ClientProfilePage() {
           <form action={logout}>
             <button
               type="submit"
-              title="Terminar sessão"
+              title={extra.logout_title[lang]}
               className="flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-red-400 hover:bg-red-500/5 hover:border-red-500/20 transition-all duration-150"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -74,28 +98,36 @@ export default async function ClientProfilePage() {
 
       <ProfileForm profile={profile} email={user!.email ?? ""} />
 
+      {/* Language selector */}
+      <LanguageSelector />
+
       {/* Trial info — only shown when on trial and no paid subscription yet */}
       {profile?.trial_ends_at && !subscription && (() => {
         const msLeft = new Date(profile.trial_ends_at!).getTime() - Date.now();
         const daysLeft = Math.ceil(msLeft / 86_400_000);
-        const trialEnd = new Date(profile.trial_ends_at!).toLocaleDateString("pt-PT", { day: "numeric", month: "long" });
+        const trialEnd = new Date(profile.trial_ends_at!).toLocaleDateString(
+          lang === "en" ? "en-GB" : "pt-PT",
+          { day: "numeric", month: "long" }
+        );
         return (
           <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(18,18,22,0.8)", border: "1px solid rgba(201,168,76,0.2)" }}>
-            <h2 className="text-white font-bold text-base">Subscrição</h2>
+            <h2 className="text-white font-bold text-base">{extra.subscription[lang]}</h2>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-zinc-500">Estado</span>
+                <span className="text-zinc-500">{extra.status_label[lang]}</span>
                 <span className={`font-semibold ${daysLeft > 0 ? "text-[#C9A84C]" : "text-red-400"}`}>
-                  {daysLeft > 0 ? `Trial · ${daysLeft} dia${daysLeft !== 1 ? "s" : ""} restante${daysLeft !== 1 ? "s" : ""}` : "Trial expirado"}
+                  {daysLeft > 0
+                    ? `${extra.trial_active[lang]} · ${daysLeft} ${daysLeft !== 1 ? extra.days_left[lang] : extra.day_left[lang]}`
+                    : extra.trial_expired[lang]}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-zinc-500">{daysLeft > 0 ? "Termina em" : "Terminou em"}</span>
+                <span className="text-zinc-500">{daysLeft > 0 ? extra.ends_on[lang] : extra.ended_on[lang]}</span>
                 <span className="text-zinc-300">{trialEnd}</span>
               </div>
             </div>
             {daysLeft > 0 && (
-              <p className="text-zinc-600 text-xs text-center">Subscreve antes que o trial termine para não perder acesso.</p>
+              <p className="text-zinc-600 text-xs text-center">{extra.trial_warn[lang]}</p>
             )}
           </div>
         );
@@ -117,7 +149,7 @@ export default async function ClientProfilePage() {
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
-          Terminar sessão
+          {t("logout", lang)}
         </button>
       </form>
     </div>

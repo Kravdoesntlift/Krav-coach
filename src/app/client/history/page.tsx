@@ -1,9 +1,19 @@
 import { createClient } from "@/lib/supabase/server";
 import { DAY_NAMES_FULL } from "@/lib/supabase/types";
 import Link from "next/link";
+import { t } from "@/lib/i18n";
+import { getLang } from "@/lib/i18n/getLang";
+
+const extra = {
+  history_title:    { pt: "Histórico de Treinos", en: "Workout History" },
+  prev_weeks:       { pt: "Semanas anteriores",   en: "Previous weeks" },
+  week_of:          { pt: "Semana de",            en: "Week of" },
+  workouts_unit:    { pt: "treinos",              en: "workouts" },
+  no_history_link:  { pt: "Ver treino desta semana", en: "View this week's workout" },
+} as const;
 
 export default async function HistoryPage() {
-  const supabase = await createClient();
+  const [supabase, lang] = await Promise.all([createClient(), getLang()]);
   const { data: { user } } = await supabase.auth.getUser();
 
   // All past plans (excludes current week)
@@ -24,15 +34,15 @@ export default async function HistoryPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white">Histórico de Treinos</h1>
-        <p className="text-gray-400 text-sm mt-1">Semanas anteriores</p>
+        <h1 className="text-2xl font-bold text-white">{extra.history_title[lang]}</h1>
+        <p className="text-gray-400 text-sm mt-1">{extra.prev_weeks[lang]}</p>
       </div>
 
       {!plans?.length ? (
         <div className="card p-12 text-center">
-          <p className="text-gray-500">Ainda não tens histórico de treinos.</p>
+          <p className="text-gray-500">{t("no_history", lang)}</p>
           <Link href="/client/dashboard" className="text-brand-gold text-sm mt-3 inline-block hover:underline">
-            Ver treino desta semana
+            {extra.no_history_link[lang]}
           </Link>
         </div>
       ) : (
@@ -52,12 +62,11 @@ export default async function HistoryPage() {
                   <div>
                     <h3 className="text-white font-semibold">{plan.name}</h3>
                     <p className="text-gray-500 text-xs mt-0.5">
-                      Semana de{" "}
-                      {new Date(plan.week_start + "T00:00:00").toLocaleDateString("pt-PT", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
+                      {extra.week_of[lang]}{" "}
+                      {new Date(plan.week_start + "T00:00:00").toLocaleDateString(
+                        lang === "en" ? "en-GB" : "pt-PT",
+                        { day: "numeric", month: "long", year: "numeric" }
+                      )}
                     </p>
                   </div>
                   <div className="text-right shrink-0">
@@ -65,7 +74,7 @@ export default async function HistoryPage() {
                       {pct}%
                     </p>
                     <p className="text-gray-500 text-xs mt-0.5">
-                      {completedDays}/{totalDays} treinos
+                      {completedDays}/{totalDays} {extra.workouts_unit[lang]}
                     </p>
                   </div>
                 </div>

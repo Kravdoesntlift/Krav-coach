@@ -1,23 +1,23 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { getLang } from "@/lib/i18n/getLang";
 
-function formatDateTime(iso: string) {
-  return new Date(iso).toLocaleString("pt-PT", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+const extra = {
+  title:       { pt: "As minhas sessões",                        en: "My sessions" },
+  sub:         { pt: "Próximas sessões agendadas com o teu coach", en: "Upcoming sessions scheduled with your coach" },
+  no_sessions: { pt: "O teu coach ainda não agendou sessões.",   en: "Your coach hasn't scheduled any sessions yet." },
+  minutes:     { pt: "minutos",                                  en: "minutes" },
+  in_person:   { pt: "Presencial",                              en: "In-person" },
+  join_meeting:{ pt: "Join meeting",                            en: "Join meeting" },
+} as const;
 
 export default async function ClientSessionsPage() {
-  const supabase = await createClient();
+  const [supabase, lang] = await Promise.all([createClient(), getLang()]);
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
 
   const now = new Date().toISOString();
+  const locale = lang === "en" ? "en-GB" : "pt-PT";
 
   const { data: sessions } = await supabase
     .from("coaching_sessions")
@@ -27,23 +27,30 @@ export default async function ClientSessionsPage() {
     .gte("scheduled_at", now)
     .order("scheduled_at", { ascending: true });
 
+  function formatDateTime(iso: string) {
+    return new Date(iso).toLocaleString(locale, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
   return (
     <div className="space-y-6 page-enter">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">As minhas sessões</h1>
-        <p className="text-gray-400 text-sm mt-1">
-          Próximas sessões agendadas com o teu coach
-        </p>
+        <h1 className="text-2xl font-bold text-white">{extra.title[lang]}</h1>
+        <p className="text-gray-400 text-sm mt-1">{extra.sub[lang]}</p>
       </div>
 
       {/* Session list */}
       {!sessions || sessions.length === 0 ? (
         <div className="card p-12 text-center space-y-3">
           <div className="text-5xl">📅</div>
-          <p className="text-zinc-400 text-sm">
-            O teu coach ainda não agendou sessões.
-          </p>
+          <p className="text-zinc-400 text-sm">{extra.no_sessions[lang]}</p>
         </div>
       ) : (
         <div className="space-y-4 stagger">
@@ -58,7 +65,7 @@ export default async function ClientSessionsPage() {
                       {formatDateTime(session.scheduled_at)}
                     </p>
                     <p className="text-sm text-zinc-400 mt-0.5">
-                      {session.duration_min} minutos
+                      {session.duration_min} {extra.minutes[lang]}
                     </p>
                   </div>
                   <span
@@ -68,7 +75,7 @@ export default async function ClientSessionsPage() {
                         : "text-brand-gold bg-brand-gold/10"
                     }`}
                   >
-                    {isOnline ? "Online" : "Presencial"}
+                    {isOnline ? "Online" : extra.in_person[lang]}
                   </span>
                 </div>
 
@@ -86,7 +93,7 @@ export default async function ClientSessionsPage() {
                           <path d="M11 3a1 1 0 1 0 0 2h2.586l-6.293 6.293a1 1 0 1 0 1.414 1.414L15 6.414V9a1 1 0 1 0 2 0V4a1 1 0 0 0-1-1h-5z" />
                           <path d="M5 5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-3a1 1 0 1 0-2 0v3H5V7h3a1 1 0 0 0 0-2H5z" />
                         </svg>
-                        Entrar na reunião
+                        {extra.join_meeting[lang]}
                       </a>
                     ) : (
                       <p className="text-sm text-zinc-400">

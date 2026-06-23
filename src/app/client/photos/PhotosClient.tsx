@@ -4,16 +4,53 @@ import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { ProgressPhoto } from "@/lib/supabase/types";
+import { useLang } from "@/lib/i18n/useLang";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Angle = "front" | "side" | "back";
 type Session = { date: string; photos: Partial<Record<Angle, ProgressPhoto>> };
 
-const ANGLES: { key: Angle; label: string; icon: string }[] = [
-  { key: "front", label: "Frente",  icon: "🧍" },
-  { key: "side",  label: "Lado",    icon: "🧍" },
-  { key: "back",  label: "Costas",  icon: "🧍" },
-];
+const extra = {
+  angles: {
+    pt: [
+      { key: "front" as Angle, label: "Frente",  icon: "🧍" },
+      { key: "side"  as Angle, label: "Lado",    icon: "🧍" },
+      { key: "back"  as Angle, label: "Costas",  icon: "🧍" },
+    ],
+    en: [
+      { key: "front" as Angle, label: "Front",  icon: "🧍" },
+      { key: "side"  as Angle, label: "Side",   icon: "🧍" },
+      { key: "back"  as Angle, label: "Back",   icon: "🧍" },
+    ],
+  },
+  add:              { pt: "Adicionar", en: "Add" },
+  remove_photo:     { pt: "Remover foto", en: "Remove photo" },
+  drag_compare:     { pt: "Arrasta para comparar", en: "Drag to compare" },
+  before:           { pt: "Antes", en: "Before" },
+  after:            { pt: "Depois", en: "After" },
+  new_session:      { pt: "Nova sessão de fotos", en: "New photo session" },
+  clear:            { pt: "Limpar", en: "Clear" },
+  optional_angles:  { pt: "Podes adicionar 1, 2 ou as 3 vistas — não é obrigatório fazer todas", en: "You can add 1, 2, or all 3 angles — not all are required" },
+  upload_error:     { pt: (angle: string, msg: string) => `Erro ao enviar ${angle}: ${msg}`, en: (angle: string, msg: string) => `Error uploading ${angle}: ${msg}` },
+  try_again:        { pt: "tenta novamente", en: "please try again" },
+  saving:           { pt: "A guardar...", en: "Saving..." },
+  save_session:     { pt: "Guardar sessão", en: "Save session" },
+  close:            { pt: "Fechar", en: "Close" },
+  angle_front:      { pt: "Frente", en: "Front" },
+  angle_side:       { pt: "Lado", en: "Side" },
+  angle_back:       { pt: "Costas", en: "Back" },
+  delete_photo:     { pt: "Apagar foto", en: "Delete photo" },
+  no_photos_title:  { pt: "Sem fotos de progresso", en: "No progress photos" },
+  no_photos_sub:    { pt: "Regista a tua evolução com fotos de frente, lado e costas.", en: "Track your progress with front, side, and back photos." },
+  sessions_count:   { pt: (n: number) => `${n} sessão${n !== 1 ? "ões" : ""}`, en: (n: number) => `${n} session${n !== 1 ? "s" : ""}` },
+  compare:          { pt: "⇄ Comparar", en: "⇄ Compare" },
+  select_before:    { pt: '① Toca numa sessão para definir o "Antes"', en: '① Tap a session to set "Before"' },
+  select_after:     { pt: '② Agora seleciona o "Depois"', en: '② Now select "After"' },
+  choose_other:     { pt: "Escolher outras sessões", en: "Choose other sessions" },
+  selected_before:  { pt: "Antes", en: "Before" },
+  selected_after:   { pt: "Depois", en: "After" },
+  locale:           { pt: "pt-PT", en: "en-US" },
+} as const;
 
 // ─── Group photos into sessions by date ───────────────────────────────────────
 function groupBySessions(photos: ProgressPhoto[]): Session[] {
@@ -33,20 +70,22 @@ function groupBySessions(photos: ProgressPhoto[]): Session[] {
     .map(([date, photos]) => ({ date, photos }));
 }
 
-function fmtDate(iso: string) {
-  return new Date(iso + "T00:00:00").toLocaleDateString("pt-PT", {
+function fmtDate(iso: string, locale: string) {
+  return new Date(iso + "T00:00:00").toLocaleDateString(locale, {
     day: "numeric", month: "long", year: "numeric",
   });
 }
 
 // ─── Angle slot in upload card ────────────────────────────────────────────────
 function UploadSlot({
-  angle, preview, onSelect, onClear,
+  angle, preview, onSelect, onClear, addLabel, removeLabel,
 }: {
-  angle: typeof ANGLES[number];
+  angle: { key: Angle; label: string; icon: string };
   preview: string | null;
   onSelect: (file: File, preview: string) => void;
   onClear: () => void;
+  addLabel: string;
+  removeLabel: string;
 }) {
   const ref = useRef<HTMLInputElement>(null);
 
@@ -68,7 +107,7 @@ function UploadSlot({
           <button
             onClick={() => { onClear(); if (ref.current) ref.current.value = ""; }}
             className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/70 text-white text-xs flex items-center justify-center hover:bg-black transition-colors"
-            aria-label="Remover foto"
+            aria-label={removeLabel}
           >✕</button>
         </div>
       ) : (
@@ -78,7 +117,7 @@ function UploadSlot({
           style={{ aspectRatio: "3/4" }}
         >
           <span className="text-2xl">📸</span>
-          <span className="text-[10px]">Adicionar</span>
+          <span className="text-[10px]">{addLabel}</span>
         </button>
       )}
     </div>
@@ -90,10 +129,16 @@ function AngleSlider({
   beforeUrl,
   afterUrl,
   label,
+  beforeLabel,
+  afterLabel,
+  dragLabel,
 }: {
   beforeUrl: string | null;
   afterUrl: string | null;
   label: string;
+  beforeLabel: string;
+  afterLabel: string;
+  dragLabel: string;
 }) {
   const [pos, setPos] = useState(50); // 0–100 %
   const containerRef = useRef<HTMLDivElement>(null);
@@ -135,7 +180,7 @@ function AngleSlider({
 
   if (!beforeUrl || !afterUrl) {
     const url  = beforeUrl ?? afterUrl!;
-    const badge = beforeUrl ? "Antes" : "Depois";
+    const badge = beforeUrl ? beforeLabel : afterLabel;
     const goldBadge = !beforeUrl;
     return (
       <div className="rounded-xl overflow-hidden bg-zinc-950 relative" style={{ aspectRatio: "3/4" }}>
@@ -160,11 +205,11 @@ function AngleSlider({
       onTouchStart={onTouchStart}
     >
       {/* After (full) */}
-      <img src={afterUrl} alt={`${label} depois`} className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+      <img src={afterUrl} alt={`${label} ${afterLabel}`} className="absolute inset-0 w-full h-full object-cover" draggable={false} />
 
       {/* Before (clipped) */}
       <div className="absolute inset-0 overflow-hidden" style={{ width: `${pos}%` }}>
-        <img src={beforeUrl} alt={`${label} antes`} className="absolute inset-0 w-full h-full object-cover" style={{ width: `${10000 / pos}%`, maxWidth: "none" }} draggable={false} />
+        <img src={beforeUrl} alt={`${label} ${beforeLabel}`} className="absolute inset-0 w-full h-full object-cover" style={{ width: `${10000 / pos}%`, maxWidth: "none" }} draggable={false} />
       </div>
 
       {/* Divider */}
@@ -184,7 +229,7 @@ function AngleSlider({
       {/* Labels */}
       {pos > 15 && (
         <div className="absolute top-1.5 left-1.5 bg-black/70 text-white text-[9px] px-1.5 py-0.5 rounded-full font-semibold pointer-events-none">
-          Antes
+          {beforeLabel}
         </div>
       )}
       {pos < 85 && (
@@ -192,7 +237,7 @@ function AngleSlider({
           className="absolute top-1.5 right-1.5 text-black text-[9px] px-1.5 py-0.5 rounded-full font-bold pointer-events-none"
           style={{ background: "rgba(201,168,76,0.9)" }}
         >
-          Depois
+          {afterLabel}
         </div>
       )}
       <div className="absolute bottom-1 left-0 right-0 text-center pointer-events-none">
@@ -203,12 +248,22 @@ function AngleSlider({
 }
 
 // ─── Side-by-side session comparison with drag sliders ────────────────────────
-function SessionCompare({ before, after }: { before: Session; after: Session }) {
+function SessionCompare({
+  before, after, angles, beforeLabel, afterLabel, dragLabel, locale,
+}: {
+  before: Session;
+  after: Session;
+  angles: { key: Angle; label: string; icon: string }[];
+  beforeLabel: string;
+  afterLabel: string;
+  dragLabel: string;
+  locale: string;
+}) {
   return (
     <div className="space-y-3">
       {/* Labels row */}
       <div className="grid grid-cols-3 gap-2">
-        {ANGLES.map((a) => (
+        {angles.map((a) => (
           <p key={a.key} className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest text-center">
             {a.label}
           </p>
@@ -217,18 +272,21 @@ function SessionCompare({ before, after }: { before: Session; after: Session }) 
 
       {/* Sliders row */}
       <div className="grid grid-cols-3 gap-2">
-        {ANGLES.map((a) => (
+        {angles.map((a) => (
           <AngleSlider
             key={a.key}
             label={a.label}
             beforeUrl={before.photos[a.key]?.photo_url ?? null}
             afterUrl={after.photos[a.key]?.photo_url ?? null}
+            beforeLabel={beforeLabel}
+            afterLabel={afterLabel}
+            dragLabel={dragLabel}
           />
         ))}
       </div>
 
       <p className="text-zinc-700 text-[10px] text-center">
-        {fmtDate(before.date)} → {fmtDate(after.date)} · Arrasta para comparar
+        {fmtDate(before.date, locale)} → {fmtDate(after.date, locale)} · {dragLabel}
       </p>
     </div>
   );
@@ -236,15 +294,19 @@ function SessionCompare({ before, after }: { before: Session; after: Session }) 
 
 // ─── Session card ─────────────────────────────────────────────────────────────
 function SessionCard({
-  session, onLightbox, compareMode, isSelected, onSelect,
+  session, onLightbox, compareMode, isSelected, onSelect, angles, beforeLabel, afterLabel, locale,
 }: {
   session: Session;
   onLightbox: (p: ProgressPhoto) => void;
   compareMode: boolean;
   isSelected: "A" | "B" | null;
   onSelect: () => void;
+  angles: { key: Angle; label: string; icon: string }[];
+  beforeLabel: string;
+  afterLabel: string;
+  locale: string;
 }) {
-  const photoCount = ANGLES.filter((a) => session.photos[a.key]).length;
+  const photoCount = angles.filter((a) => session.photos[a.key]).length;
 
   return (
     <div
@@ -260,13 +322,13 @@ function SessionCard({
     >
       {/* Date header */}
       <div className="px-4 py-2.5 flex items-center justify-between border-b border-zinc-800/60">
-        <p className="text-white text-xs font-semibold">{fmtDate(session.date)}</p>
+        <p className="text-white text-xs font-semibold">{fmtDate(session.date, locale)}</p>
         <div className="flex items-center gap-2">
           {isSelected && (
             <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
               isSelected === "A" ? "bg-white text-black" : "bg-brand-gold text-black"
             }`}>
-              {isSelected === "A" ? "Antes" : "Depois"}
+              {isSelected === "A" ? beforeLabel : afterLabel}
             </span>
           )}
           <span className="text-zinc-600 text-[10px]">{photoCount}/3</span>
@@ -275,7 +337,7 @@ function SessionCard({
 
       {/* 3 angle slots */}
       <div className="grid grid-cols-3 gap-px bg-zinc-800/40">
-        {ANGLES.map((a) => {
+        {angles.map((a) => {
           const photo = session.photos[a.key];
           return (
             <div key={a.key} className="relative bg-zinc-950" style={{ aspectRatio: "3/4" }}>
@@ -316,6 +378,7 @@ interface Props {
 }
 
 export default function PhotosClient({ clientId, initialPhotos }: Props) {
+  const { t, lang } = useLang();
   const [photos, setPhotos]         = useState<ProgressPhoto[]>(initialPhotos);
   const [uploading, setUploading]   = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -328,6 +391,8 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
   const [files, setFiles]     = useState<Partial<Record<Angle, File>>>({});
   const [previews, setPreviews] = useState<Partial<Record<Angle, string>>>({});
 
+  const ANGLES = (extra.angles[lang] as unknown) as { key: Angle; label: string; icon: string }[];
+  const locale = extra.locale[lang];
   const sessions = groupBySessions(photos);
   const hasAnySlot = Object.keys(files).length > 0;
 
@@ -368,7 +433,7 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
       const json = await res.json();
 
       if (!res.ok || json.error) {
-        setUploadError(`Erro ao enviar ${angle}: ${json.error ?? "tenta novamente"}`);
+        setUploadError(extra.upload_error[lang](angle, json.error ?? extra.try_again[lang]));
         setUploading(false);
         return;
       }
@@ -400,16 +465,22 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
     return null;
   }
 
+  function getAngleLabel(angle: string | null): string {
+    if (!angle) return "";
+    const found = ANGLES.find((a) => a.key === angle);
+    return found?.label ?? "";
+  }
+
   return (
     <div className="space-y-6">
 
       {/* ── Upload card ──────────────────────────────────────────────────── */}
       <div className="card p-5 space-y-4">
         <div className="flex items-center justify-between">
-          <p className="text-white font-semibold text-sm">Nova sessão de fotos</p>
+          <p className="text-white font-semibold text-sm">{extra.new_session[lang]}</p>
           {hasAnySlot && (
             <button onClick={resetUpload} className="text-zinc-600 hover:text-zinc-400 text-xs transition-colors">
-              Limpar
+              {extra.clear[lang]}
             </button>
           )}
         </div>
@@ -423,12 +494,14 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
               preview={previews[a.key] ?? null}
               onSelect={(file, preview) => setAngleFile(a.key, file, preview)}
               onClear={() => clearAngle(a.key)}
+              addLabel={extra.add[lang]}
+              removeLabel={extra.remove_photo[lang]}
             />
           ))}
         </div>
 
         <p className="text-zinc-700 text-[10px] text-center">
-          Podes adicionar 1, 2 ou as 3 vistas — não é obrigatório fazer todas
+          {extra.optional_angles[lang]}
         </p>
 
         {uploadError && <p className="text-red-400 text-xs">{uploadError}</p>}
@@ -438,7 +511,7 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
           disabled={!hasAnySlot || uploading}
           className="w-full py-3 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors disabled:opacity-30"
         >
-          {uploading ? "A guardar..." : "Guardar sessão"}
+          {uploading ? extra.saving[lang] : extra.save_session[lang]}
         </button>
       </div>
 
@@ -452,15 +525,15 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white font-medium text-sm capitalize">
-                  {lightbox.angle === "front" ? "Frente" : lightbox.angle === "side" ? "Lado" : lightbox.angle === "back" ? "Costas" : ""}
+                  {getAngleLabel(lightbox.angle)}
                   {lightbox.caption ? ` · ${lightbox.caption}` : ""}
                 </p>
-                <p className="text-gray-500 text-xs">{fmtDate(lightbox.taken_at)}</p>
+                <p className="text-gray-500 text-xs">{fmtDate(lightbox.taken_at, locale)}</p>
               </div>
               <button
                 onClick={() => setLightbox(null)}
                 className="w-9 h-9 rounded-full bg-zinc-800 text-gray-400 hover:text-white flex items-center justify-center text-sm transition-colors"
-                aria-label="Fechar"
+                aria-label={t("close")}
               >✕</button>
             </div>
             <Image src={lightbox.photo_url} alt="" width={800} height={600} className="w-full rounded-2xl max-h-[70vh] object-contain" />
@@ -468,7 +541,7 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
               onClick={() => deletePhoto(lightbox.id, lightbox.photo_url)}
               className="w-full py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm hover:bg-red-500/20 transition-colors"
             >
-              Apagar foto
+              {extra.delete_photo[lang]}
             </button>
           </div>
         </div>
@@ -487,9 +560,9 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
             <span className="text-4xl">📸</span>
           </div>
           <div>
-            <p className="text-white font-bold text-base">Sem fotos de progresso</p>
+            <p className="text-white font-bold text-base">{extra.no_photos_title[lang]}</p>
             <p className="text-zinc-500 text-sm mt-1.5 leading-relaxed">
-              Regista a tua evolução com fotos de frente, lado e costas.
+              {extra.no_photos_sub[lang]}
             </p>
           </div>
         </div>
@@ -498,7 +571,7 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
           {/* Toolbar */}
           <div className="flex items-center justify-between">
             <p className="text-gray-500 text-xs">
-              {sessions.length} sessão{sessions.length !== 1 ? "ões" : ""}
+              {extra.sessions_count[lang](sessions.length)}
             </p>
             {sessions.length >= 2 && (
               <button
@@ -511,7 +584,7 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
                   compareMode ? "bg-brand-gold text-black" : "bg-zinc-800 text-zinc-400 hover:text-white"
                 }`}
               >
-                ⇄ Comparar
+                {extra.compare[lang]}
               </button>
             )}
           </div>
@@ -521,20 +594,28 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
             <div className="card p-4 space-y-3">
               {!sessionA ? (
                 <p className="text-brand-gold text-xs font-semibold text-center py-2">
-                  ① Toca numa sessão para definir o "Antes"
+                  {extra.select_before[lang]}
                 </p>
               ) : !sessionB ? (
                 <p className="text-brand-gold text-xs font-semibold text-center py-2">
-                  ② Agora seleciona o "Depois"
+                  {extra.select_after[lang]}
                 </p>
               ) : (
                 <div className="space-y-4">
-                  <SessionCompare before={sessionA} after={sessionB} />
+                  <SessionCompare
+                    before={sessionA}
+                    after={sessionB}
+                    angles={ANGLES}
+                    beforeLabel={extra.before[lang]}
+                    afterLabel={extra.after[lang]}
+                    dragLabel={extra.drag_compare[lang]}
+                    locale={locale}
+                  />
                   <button
                     onClick={() => { setSessionA(null); setSessionB(null); }}
                     className="w-full py-2.5 bg-zinc-800 text-gray-400 rounded-xl text-xs hover:bg-zinc-700 transition-colors"
                   >
-                    Escolher outras sessões
+                    {extra.choose_other[lang]}
                   </button>
                 </div>
               )}
@@ -551,6 +632,10 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
                 compareMode={compareMode}
                 isSelected={getSelectedLabel(session)}
                 onSelect={() => handleSessionSelect(session)}
+                angles={ANGLES}
+                beforeLabel={extra.before[lang]}
+                afterLabel={extra.after[lang]}
+                locale={locale}
               />
             ))}
           </div>

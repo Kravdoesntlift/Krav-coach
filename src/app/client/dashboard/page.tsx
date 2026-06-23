@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { DAY_NAMES_FULL } from "@/lib/supabase/types";
 import type { WorkoutPlan } from "@/lib/supabase/types";
+import { t } from "@/lib/i18n";
+import { getLang } from "@/lib/i18n/getLang";
 import WorkoutWeek from "@/components/client/WorkoutWeek";
 import TodayCard from "@/components/client/TodayCard";
 import CollapsibleMuscleMap from "@/components/client/CollapsibleMuscleMap";
@@ -26,6 +28,8 @@ export default async function ClientDashboard() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
+
+  const lang = await getLang();
 
   const today = new Date();
   const currentHour = today.getHours(); // capture before any mutation
@@ -145,7 +149,8 @@ export default async function ClientDashboard() {
     ? await supabase.from("profiles").select("id, full_name, tagline").eq("id", coachId).single()
     : { data: null };
 
-  const todayName = DAY_NAMES_FULL[today.getDay()];
+  const DAY_NAMES_EN = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const todayName = lang === "en" ? DAY_NAMES_EN[today.getDay()] : DAY_NAMES_FULL[today.getDay()];
 
   // All exercise names this week (for muscle map) — from plan
   const weekExerciseNames = plan
@@ -203,7 +208,9 @@ export default async function ClientDashboard() {
     const checkins = lmCheckins ?? [];
     const weights = checkins.map((c) => c.weight_kg).filter(Boolean) as number[];
     const weightChange = weights.length >= 2 ? weights[weights.length - 1] - weights[0] : null;
-    const MONTH_NAMES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+    const MONTH_NAMES = lang === "en"
+      ? ["January","February","March","April","May","June","July","August","September","October","November","December"]
+      : ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
     monthlyData = {
       month: MONTH_NAMES[lastMonth.getMonth()],
@@ -215,7 +222,7 @@ export default async function ClientDashboard() {
     };
   }
 
-  const greeting = currentHour < 5 ? "Boa noite" : currentHour < 12 ? "Bom dia" : currentHour < 18 ? "Boa tarde" : "Boa noite";
+  const greeting = currentHour < 5 ? t("good_evening", lang) : currentHour < 12 ? t("good_morning", lang) : currentHour < 18 ? t("good_afternoon", lang) : t("good_evening", lang);
   const firstName = (clientProfile?.full_name ?? "").split(" ")[0] || "Atleta";
 
   const isOnboardingComplete = !!onboardingRecord;
@@ -274,7 +281,7 @@ export default async function ClientDashboard() {
       {/* Hero header */}
       <div className="space-y-2 md:space-y-3 pt-1">
         <p className="text-zinc-600 text-xs font-semibold tracking-[0.15em] uppercase">
-          {todayName} · {today.toLocaleDateString("pt-PT", { day: "numeric", month: "long" })}
+          {todayName} · {today.toLocaleDateString(lang === "en" ? "en-GB" : "pt-PT", { day: "numeric", month: "long" })}
         </p>
         <h1 className="text-[1.75rem] md:text-[2.1rem] font-black tracking-tight leading-[1.1]">
           {greeting},{" "}
@@ -288,7 +295,7 @@ export default async function ClientDashboard() {
             >🔥</span>
             <span className="text-brand-gold font-black text-sm tabular-nums">{streak}</span>
             <span className="text-brand-gold/55 text-xs font-medium">
-              {streak === 1 ? "sessão seguida" : "sessões seguidas"}
+              {streak === 1 ? t("streak_singular", lang) : t("streak_plural", lang)}
             </span>
           </div>
         )}
@@ -321,13 +328,13 @@ export default async function ClientDashboard() {
               daysUntilRenewal <= 0 ? "text-red-400" : daysUntilRenewal <= 3 ? "text-yellow-400" : "text-gray-300"
             }`}>
               {daysUntilRenewal <= 0
-                ? "Renovação em atraso"
+                ? t("renewal_overdue", lang)
                 : daysUntilRenewal === 1
-                ? "Renovação amanhã"
-                : `Renovação em ${daysUntilRenewal} dias`}
+                ? t("renewal_tomorrow", lang)
+                : `${t("renewal_in_days", lang)} ${daysUntilRenewal} ${t("days", lang)}`}
             </p>
             <p className="text-gray-600 text-xs mt-0.5">
-              {new Date(renewsAt! + "T00:00:00").toLocaleDateString("pt-PT", { day: "numeric", month: "long" })}
+              {new Date(renewsAt! + "T00:00:00").toLocaleDateString(lang === "en" ? "en-GB" : "pt-PT", { day: "numeric", month: "long" })}
             </p>
           </div>
           <span className={`text-2xl font-black tabular-nums ${
@@ -358,9 +365,9 @@ export default async function ClientDashboard() {
               📊
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-sm">Ver relatório desta semana</p>
+              <p className="text-white font-bold text-sm">{t("see_weekly_report", lang)}</p>
               <p className="text-zinc-500 text-xs mt-0.5 truncate">
-                Treinos, métricas e mensagem do coach
+                {t("report_subtitle", lang)}
               </p>
             </div>
             <svg
@@ -398,9 +405,9 @@ export default async function ClientDashboard() {
             💤
           </div>
           <div>
-            <p className="text-white font-bold text-sm">Dia de descanso</p>
+            <p className="text-white font-bold text-sm">{t("rest_day", lang)}</p>
             <p className="text-zinc-500 text-xs mt-0.5">
-              {todayDay.label ? todayDay.label : "Recupera bem — o músculo cresce no descanso"}
+              {todayDay.label ? todayDay.label : t("rest_day_sub", lang)}
             </p>
           </div>
         </div>
@@ -416,9 +423,9 @@ export default async function ClientDashboard() {
             🏋
           </div>
           <div>
-            <p className="text-white font-bold text-sm">Sem plano esta semana</p>
+            <p className="text-white font-bold text-sm">{t("no_plan_title", lang)}</p>
             <p className="text-zinc-500 text-xs mt-0.5">
-              O teu coach ainda não criou o plano — fala com ele se tiveres dúvidas
+              {t("no_plan_coach_note", lang)}
             </p>
           </div>
         </div>
@@ -467,7 +474,7 @@ export default async function ClientDashboard() {
         <>
           {!isCurrentWeek && (
             <div className="text-xs text-gray-500 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5">
-              A mostrar o plano mais recente — o teu coach ainda não criou o plano desta semana.
+              {t("showing_recent", lang)}
             </div>
           )}
           <WorkoutWeek plan={plan as unknown as WorkoutPlan} clientId={user!.id} coachId={coachId ?? undefined} />

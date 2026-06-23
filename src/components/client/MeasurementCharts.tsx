@@ -1,19 +1,13 @@
 "use client";
 
 import type { WeeklyCheckin } from "@/lib/supabase/types";
+import { useLang } from "@/lib/i18n/useLang";
 
 interface Props {
   checkins: WeeklyCheckin[];
 }
 
 type Metric = "weight_kg" | "waist_cm" | "chest_cm" | "arm_cm";
-
-const METRICS: { key: Metric; label: string; unit: string; color: string }[] = [
-  { key: "weight_kg", label: "Peso", unit: "kg", color: "#C9A84C" },
-  { key: "waist_cm", label: "Cintura", unit: "cm", color: "#60a5fa" },
-  { key: "chest_cm", label: "Peito", unit: "cm", color: "#a78bfa" },
-  { key: "arm_cm", label: "Braço", unit: "cm", color: "#34d399" },
-];
 
 function MiniChart({
   data,
@@ -91,6 +85,21 @@ function MiniChart({
 }
 
 export default function MeasurementCharts({ checkins }: Props) {
+  const { t, lang } = useLang();
+
+  const extra = {
+    measurements_evolution: { pt: "Evolução das medidas", en: "Measurements evolution" },
+  } as const;
+
+  const METRICS: { key: Metric; label: string; unit: string; color: string }[] = [
+    { key: "weight_kg", label: t("weight_evolution"), unit: t("kg"), color: "#C9A84C" },
+    { key: "waist_cm",  label: t("waist"),            unit: t("cm"), color: "#60a5fa" },
+    { key: "chest_cm",  label: t("chest"),            unit: t("cm"), color: "#a78bfa" },
+    { key: "arm_cm",    label: t("arm"),              unit: t("cm"), color: "#34d399" },
+  ];
+
+  const locale = lang === "pt" ? "pt-PT" : "en-GB";
+
   const sorted = [...checkins]
     .filter((c) => c.weight_kg || c.waist_cm || c.chest_cm || c.arm_cm)
     .sort((a, b) => a.week_start.localeCompare(b.week_start))
@@ -101,13 +110,13 @@ export default function MeasurementCharts({ checkins }: Props) {
 
   return (
     <div>
-      <h2 className="text-white font-semibold mb-4">Evolução das medidas</h2>
+      <h2 className="text-white font-semibold mb-4">{extra.measurements_evolution[lang]}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {METRICS.map((m) => {
           const data = sorted
             .filter((c) => c[m.key] != null)
             .map((c) => ({
-              date: new Date(c.week_start + "T00:00:00").toLocaleDateString("pt-PT", { day: "numeric", month: "short" }),
+              date: new Date(c.week_start + "T00:00:00").toLocaleDateString(locale, { day: "numeric", month: "short" }),
               value: c[m.key] as number,
             }));
           return (
