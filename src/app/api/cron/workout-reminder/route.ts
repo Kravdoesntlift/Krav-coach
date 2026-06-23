@@ -44,6 +44,13 @@ export async function GET(req: NextRequest) {
 
   type WD = { day_of_week: number; is_rest: boolean | null; workout_completions: { client_id: string }[] };
 
+  // Fetch client lang preferences
+  const clientIds = [...new Set((plans ?? []).map((p) => p.client_id))];
+  const { data: clientProfiles } = await admin.from("profiles").select("id, lang").in("id", clientIds);
+  const clientLangMap = new Map<string, "pt" | "en">(
+    (clientProfiles ?? []).map((p) => [p.id, (p.lang === "en" ? "en" : "pt") as "pt" | "en"])
+  );
+
   let sent = 0;
   let skipped = 0;
   const log: string[] = [];
@@ -62,10 +69,11 @@ export async function GET(req: NextRequest) {
     );
     if (alreadyDone) { skipped++; continue; }
 
+    const cLang = clientLangMap.get(plan.client_id) ?? "pt";
     const result = await sendPushToUser(
       plan.client_id,
-      "💪 Hora de treinar!",
-      "O teu treino de hoje está à tua espera. Vamos a isso!",
+      cLang === "en" ? "💪 Time to train!" : "💪 Hora de treinar!",
+      cLang === "en" ? "Today's workout is waiting for you. Let's go!" : "O teu treino de hoje está à tua espera. Vamos a isso!",
       "/client/dashboard",
     );
 

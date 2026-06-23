@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useState, useEffect, type ReactNode } from "react";
+import { createClient } from "@/lib/supabase/client";
 import type { Lang } from "@/lib/i18n";
 
 const STORAGE_KEY = "krav_lang";
@@ -23,21 +24,34 @@ function detectLang(): Lang {
   return "pt";
 }
 
+async function persistLangToProfile(lang: Lang) {
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.from("profiles").update({ lang }).eq("id", user.id);
+    }
+  } catch {
+    // Non-critical — cookie/localStorage are the source of truth for the UI
+  }
+}
+
 export function LangProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("pt");
 
   useEffect(() => {
     const detected = detectLang();
     setLangState(detected);
-    // Sync cookie on first load so server components get the right value on next request
     document.cookie = `krav_lang=${detected}; path=/; max-age=31536000; SameSite=Lax`;
+    // Sync to DB so server-side email/push can read it
+    persistLangToProfile(detected);
   }, []);
 
   const setLang = (newLang: Lang) => {
     localStorage.setItem(STORAGE_KEY, newLang);
-    // Also set cookie so server components can read the preference
     document.cookie = `krav_lang=${newLang}; path=/; max-age=31536000; SameSite=Lax`;
     setLangState(newLang);
+    persistLangToProfile(newLang);
   };
 
   return (

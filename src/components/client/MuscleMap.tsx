@@ -52,10 +52,15 @@ const OVERLAYS: Record<string, Overlay> = {
                 back:  [{ cx:413, cy:578, rx:18, ry:42 }, { cx:500, cy:578, rx:18, ry:42 }] },
 };
 
-const MUSCLE_LABELS: Record<string, string> = {
+const MUSCLE_LABELS_PT: Record<string, string> = {
   chest:"Peito", back:"Costas", shoulders:"Ombros",
   biceps:"Bíceps", triceps:"Tríceps", core:"Core",
   quads:"Quadríceps", hamstrings:"Isquiotibiais", glutes:"Glúteos", calves:"Gémeos",
+};
+const MUSCLE_LABELS_EN: Record<string, string> = {
+  chest:"Chest", back:"Back", shoulders:"Shoulders",
+  biceps:"Biceps", triceps:"Triceps", core:"Core",
+  quads:"Quads", hamstrings:"Hamstrings", glutes:"Glutes", calves:"Calves",
 };
 
 const IMG_FILTER = "invert(1) grayscale(0.85) brightness(0.78) contrast(1.18)";
@@ -63,6 +68,7 @@ const IMG_FILTER = "invert(1) grayscale(0.85) brightness(0.78) contrast(1.18)";
 interface Props {
   exerciseNames: string[];
   loggedNames?:  string[];
+  lang?: "pt" | "en";
 }
 
 // ─── Shared SVG defs ──────────────────────────────────────────────────────────
@@ -109,8 +115,9 @@ function MuscleEllipses({ scheduled, logged }: { scheduled: Set<string>; logged:
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
-export default function MuscleMap({ exerciseNames, loggedNames = [] }: Props) {
+export default function MuscleMap({ exerciseNames, loggedNames = [], lang = "pt" }: Props) {
   const [view, setView] = useState<"front" | "back">("front");
+  const MUSCLE_LABELS = lang === "en" ? MUSCLE_LABELS_EN : MUSCLE_LABELS_PT;
 
   const scheduled = getMusclesFromExercises(exerciseNames);
   const logged    = getMusclesFromExercises(loggedNames);
@@ -125,13 +132,13 @@ export default function MuscleMap({ exerciseNames, loggedNames = [] }: Props) {
       {/* ── Header ── */}
       <div className="px-4 pt-4 pb-2 flex items-start justify-between">
         <div>
-          <p className="text-[10px] font-semibold tracking-widest uppercase text-zinc-500">Músculos ativos</p>
-          <h3 className="mt-0.5 text-base font-bold text-white leading-tight">Esta semana</h3>
+          <p className="text-[10px] font-semibold tracking-widest uppercase text-zinc-500">{lang === "en" ? "Active muscles" : "Músculos ativos"}</p>
+          <h3 className="mt-0.5 text-base font-bold text-white leading-tight">{lang === "en" ? "This week" : "Esta semana"}</h3>
         </div>
         {totalMuscles > 0 && (
           <div className="text-right">
             <span className="text-xl font-black" style={{ color:"#C9A84C" }}>{pct}%</span>
-            <p className="text-[10px] text-zinc-500 mt-0.5">{doneMuscles}/{totalMuscles} grupos</p>
+            <p className="text-[10px] text-zinc-500 mt-0.5">{doneMuscles}/{totalMuscles} {lang === "en" ? "groups" : "grupos"}</p>
           </div>
         )}
       </div>
@@ -146,7 +153,7 @@ export default function MuscleMap({ exerciseNames, loggedNames = [] }: Props) {
               view === v ? "bg-brand-gold text-black shadow-sm" : "text-zinc-500"
             }`}
           >
-            {v === "front" ? "Frente" : "Costas"}
+            {v === "front" ? (lang === "en" ? "Front" : "Frente") : (lang === "en" ? "Back" : "Costas")}
           </button>
         ))}
       </div>
@@ -207,13 +214,13 @@ export default function MuscleMap({ exerciseNames, loggedNames = [] }: Props) {
         </div>
         <div className="relative">
           <div className="absolute top-2 left-0 right-0 flex justify-around z-10 pointer-events-none">
-            <span className="text-[9px] font-bold tracking-widest uppercase text-zinc-600">Frente</span>
-            <span className="text-[9px] font-bold tracking-widest uppercase text-zinc-600">Costas</span>
+            <span className="text-[9px] font-bold tracking-widest uppercase text-zinc-600">{lang === "en" ? "Front" : "Frente"}</span>
+            <span className="text-[9px] font-bold tracking-widest uppercase text-zinc-600">{lang === "en" ? "Back" : "Costas"}</span>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/anatomy.svg"
-            alt="Anatomia muscular"
+            alt={lang === "en" ? "Muscle anatomy" : "Anatomia muscular"}
             className="w-full block"
             style={{ filter:IMG_FILTER }}
           />
@@ -268,7 +275,7 @@ export default function MuscleMap({ exerciseNames, loggedNames = [] }: Props) {
 
       {scheduled.size === 0 && logged.size === 0 && (
         <div className="px-4 pb-5 text-center">
-          <p className="text-zinc-600 text-sm">Nenhum grupo muscular detectado esta semana</p>
+          <p className="text-zinc-600 text-sm">{lang === "en" ? "No muscle groups detected this week" : "Nenhum grupo muscular detectado esta semana"}</p>
         </div>
       )}
     </div>

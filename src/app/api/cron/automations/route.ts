@@ -75,14 +75,17 @@ export async function GET(req: NextRequest) {
       continue;
     }
 
-    // Fetch client profiles (for first name)
+    // Fetch client profiles (for first name + lang)
     const { data: profiles } = await admin
       .from("profiles")
-      .select("id, full_name")
+      .select("id, full_name, lang")
       .in("id", clientIds);
 
     const profileMap = new Map<string, string>(
       (profiles ?? []).map((p) => [p.id, p.full_name])
+    );
+    const langMap = new Map<string, "pt" | "en">(
+      (profiles ?? []).map((p) => [p.id, (p.lang === "en" ? "en" : "pt") as "pt" | "en"])
     );
 
     for (const clientId of clientIds) {
@@ -225,25 +228,33 @@ export async function GET(req: NextRequest) {
     const lastMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - 1, 1));
     const monthParam = `${lastMonth.getUTCFullYear()}-${String(lastMonth.getUTCMonth() + 1).padStart(2, "0")}`;
     const MONTH_NAMES_PT = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-    const monthName = MONTH_NAMES_PT[lastMonth.getUTCMonth()];
+    const MONTH_NAMES_EN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const monthIdx = lastMonth.getUTCMonth();
 
     // Only notify clients that are actually assigned to a coach
-    const { data: assignments } = await admin
-      .from("coach_clients")
-      .select("client_id");
+    const { data: assignments } = await admin.from("coach_clients").select("client_id");
     const assignedIds = [...new Set((assignments ?? []).map((r) => r.client_id))];
-    const allClients = assignedIds.map((id) => ({ id }));
 
-    if (allClients && allClients.length > 0) {
+    // Fetch langs for these clients
+    const { data: clientProfiles } = await admin.from("profiles").select("id, lang").in("id", assignedIds);
+    const clientLangMap = new Map<string, "pt" | "en">(
+      (clientProfiles ?? []).map((p) => [p.id, (p.lang === "en" ? "en" : "pt") as "pt" | "en"])
+    );
+
+    if (assignedIds.length > 0) {
       await Promise.allSettled(
-        allClients.map((client) =>
-          sendPushToUser(
-            client.id,
-            "📊 O teu relatório mensal está pronto",
-            `O relatório de ${monthName} já está disponível. Vê como foi o teu mês!`,
+        assignedIds.map((id) => {
+          const cLang = clientLangMap.get(id) ?? "pt";
+          const monthName = cLang === "en" ? MONTH_NAMES_EN[monthIdx] : MONTH_NAMES_PT[monthIdx];
+          return sendPushToUser(
+            id,
+            cLang === "en" ? "📊 Your monthly report is ready" : "📊 O teu relatório mensal está pronto",
+            cLang === "en"
+              ? `The ${monthName} report is now available. See how your month went!`
+              : `O relatório de ${monthName} já está disponível. Vê como foi o teu mês!`,
             `/client/report?m=${monthParam}`,
-          )
-        )
+          );
+        })
       );
     }
   }
@@ -256,7 +267,7 @@ export async function GET(req: NextRequest) {
 
     const { data: expiringClients } = await admin
       .from("profiles")
-      .select("id, full_name")
+      .select("id, full_name, lang")
       .eq("role", "client")
       .eq("status", "active")
       .gt("trial_ends_at", windowStart.toISOString())
@@ -276,28 +287,34 @@ export async function GET(req: NextRequest) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kravcoaching.com";
 
     await Promise.allSettled(
-      toWarn.flatMap((c) => [
-        // Push notification
-        sendPushToUser(
-          c.id,
-          daysLeft === 1 ? "⏰ Último dia de trial!" : "⚠️ O teu trial termina em 2 dias",
-          daysLeft === 1
-            ? "Não percas o acesso. Subscreve agora."
-            : "Ainda tens 2 dias. Activa a tua subscrição e continua.",
-          "/client/dashboard",
-        ),
-        // Email
-        admin.auth.admin.getUserById(c.id).then(({ data }) => {
-          const email = data?.user?.email;
-          if (!email) return;
-          return sendTrialReminderEmail({
-            to: email,
-            clientName: c.full_name ?? "",
-            daysLeft,
-            siteUrl,
-          });
-        }),
-      ])
+      toWarn.flatMap((c) => {
+        const cLang: "pt" | "en" = (c as { lang?: string }).lang === "en" ? "en" : "pt";
+        return [
+          // Push notification (language-aware)
+          sendPushToUser(
+            c.id,
+            cLang === "en"
+              ? (daysLeft === 1 ? "⏰ Last day of trial!" : "⚠️ Your trial ends in 2 days")
+              : (daysLeft === 1 ? "⏰ Último dia de trial!" : "⚠️ O teu trial termina em 2 dias"),
+            cLang === "en"
+              ? (daysLeft === 1 ? "Don't lose access. Subscribe now." : "You still have 2 days. Activate your subscription and continue.")
+              : (daysLeft === 1 ? "Não percas o acesso. Subscreve agora." : "Ainda tens 2 dias. Activa a tua subscrição e continua."),
+            "/client/dashboard",
+          ),
+          // Email (language-aware)
+          admin.auth.admin.getUserById(c.id).then(({ data }) => {
+            const email = data?.user?.email;
+            if (!email) return;
+            return sendTrialReminderEmail({
+              to: email,
+              clientName: c.full_name ?? "",
+              daysLeft,
+              siteUrl,
+              lang: cLang,
+            });
+          }),
+        ];
+      })
     );
   }
 
@@ -318,23 +335,27 @@ export async function GET(req: NextRequest) {
       renewingSubs.map(async (sub) => {
         const clientId = sub.client_id;
         const [{ data: prof }, { data: authUser }] = await Promise.all([
-          admin.from("profiles").select("full_name").eq("id", clientId).single(),
+          admin.from("profiles").select("full_name, lang").eq("id", clientId).single(),
           admin.auth.admin.getUserById(clientId),
         ]);
         const email = authUser?.user?.email;
         const clientName = prof?.full_name ?? "";
-        const renewalDate = new Date(sub.current_period_end!).toLocaleDateString("pt-PT", {
+        const cLang: "pt" | "en" = prof?.lang === "en" ? "en" : "pt";
+        const locale = cLang === "en" ? "en-GB" : "pt-PT";
+        const renewalDate = new Date(sub.current_period_end!).toLocaleDateString(locale, {
           day: "numeric", month: "long",
         });
 
         await Promise.allSettled([
           sendPushToUser(
             clientId,
-            "💳 O teu plano renova em 3 dias",
-            `Renova a ${renewalDate}. Confirma que o teu cartão está actualizado.`,
+            cLang === "en" ? "💳 Your plan renews in 3 days" : "💳 O teu plano renova em 3 dias",
+            cLang === "en"
+              ? `Renews on ${renewalDate}. Confirm your card is up to date.`
+              : `Renova a ${renewalDate}. Confirma que o teu cartão está actualizado.`,
             "/client/profile",
           ),
-          email && sendRenewalReminderEmail({ to: email, clientName, renewalDate, siteUrl }),
+          email && sendRenewalReminderEmail({ to: email, clientName, renewalDate, siteUrl, lang: cLang }),
         ]);
       })
     );

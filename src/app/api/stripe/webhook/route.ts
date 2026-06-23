@@ -175,23 +175,25 @@ export async function POST(req: NextRequest) {
 
           // Notify client via push + email
           const [{ data: prof }, { data: authUser }] = await Promise.all([
-            admin.from("profiles").select("full_name").eq("id", clientId).single(),
+            admin.from("profiles").select("full_name, lang").eq("id", clientId).single(),
             admin.auth.admin.getUserById(clientId),
           ]);
           const email = authUser?.user?.email;
           const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kravcoaching.com";
+          const cLang: "pt" | "en" = prof?.lang === "en" ? "en" : "pt";
 
           await Promise.allSettled([
             sendPushToUser(
               clientId,
-              "⚠️ Subscrição cancelada",
-              "O teu acesso foi suspenso. Abre a app para reactivar.",
+              cLang === "en" ? "⚠️ Subscription cancelled" : "⚠️ Subscrição cancelada",
+              cLang === "en" ? "Your access has been suspended. Open the app to reactivate." : "O teu acesso foi suspenso. Abre a app para reactivar.",
               "/client/dashboard",
             ),
             email && sendSubscriptionCancelledEmail({
               to: email,
               clientName: prof?.full_name ?? "",
               siteUrl,
+              lang: cLang,
             }),
           ]);
         }
@@ -207,7 +209,7 @@ export async function POST(req: NextRequest) {
 
         const { data: profile } = await admin
           .from("profiles")
-          .select("id, full_name")
+          .select("id, full_name, lang")
           .eq("stripe_customer_id", customerId)
           .maybeSingle();
         if (!profile) break;
@@ -216,16 +218,11 @@ export async function POST(req: NextRequest) {
         const email = authUser?.user?.email;
         if (!email) break;
 
+        const invoiceLang: "pt" | "en" = profile.lang === "en" ? "en" : "pt";
         const amountCents = invoice.amount_paid ?? 0;
         const amountEur = `€ ${(amountCents / 100).toFixed(2).replace(".", ",")}`;
         const subRef = invoice.parent?.subscription_details?.subscription;
         const subscriptionId = typeof subRef === "string" ? subRef : subRef?.id ?? null;
-        const periodEnd = subscriptionId
-          ? (() => {
-              const { data: sub } = { data: null }; // will be fetched below via sync
-              return "";
-            })()
-          : "";
 
         // Fetch period end from DB
         let nextRenewal = "";
@@ -236,9 +233,10 @@ export async function POST(req: NextRequest) {
             .eq("id", subscriptionId)
             .maybeSingle();
           if (sub?.current_period_end) {
-            nextRenewal = new Date(sub.current_period_end).toLocaleDateString("pt-PT", {
-              day: "numeric", month: "long", year: "numeric",
-            });
+            nextRenewal = new Date(sub.current_period_end).toLocaleDateString(
+              invoiceLang === "en" ? "en-GB" : "pt-PT",
+              { day: "numeric", month: "long", year: "numeric" },
+            );
           }
         }
 
@@ -246,10 +244,11 @@ export async function POST(req: NextRequest) {
 
         await sendInvoiceEmail({
           to: email,
-          clientName: (profile.full_name ?? "").split(" ")[0] || "Cliente",
+          clientName: (profile.full_name ?? "").split(" ")[0] || "Client",
           amountEur,
           periodEnd: nextRenewal,
           invoiceNumber,
+          lang: invoiceLang,
         }).catch((e: unknown) => console.error("[webhook] invoice email failed:", e));
 
         break;
@@ -273,25 +272,29 @@ export async function POST(req: NextRequest) {
         if (customerId) {
           const { data: profile } = await admin
             .from("profiles")
-            .select("id, full_name")
+            .select("id, full_name, lang")
             .eq("stripe_customer_id", customerId)
             .maybeSingle();
           if (profile) {
             const { data: authUser } = await admin.auth.admin.getUserById(profile.id);
             const email = authUser?.user?.email;
+            const failLang: "pt" | "en" = profile.lang === "en" ? "en" : "pt";
             const amountCents = invoice.amount_due ?? 0;
             const amountEur = `€ ${(amountCents / 100).toFixed(2).replace(".", ",")}`;
 
             await Promise.allSettled([
               email && sendPaymentFailedEmail({
                 to: email,
-                clientName: (profile.full_name ?? "").split(" ")[0] || "Cliente",
+                clientName: (profile.full_name ?? "").split(" ")[0] || "Client",
                 amountEur,
+                lang: failLang,
               }),
               sendPushToUser(
                 profile.id,
-                "❌ Pagamento falhado",
-                `Não foi possível cobrar ${amountEur}. Actualiza o teu cartão.`,
+                failLang === "en" ? "❌ Payment failed" : "❌ Pagamento falhado",
+                failLang === "en"
+                  ? `Could not charge ${amountEur}. Update your card.`
+                  : `Não foi possível cobrar ${amountEur}. Actualiza o teu cartão.`,
                 "/client/profile",
               ),
             ]);

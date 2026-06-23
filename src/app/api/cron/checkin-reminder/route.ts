@@ -44,24 +44,26 @@ export async function GET(req: NextRequest) {
   // Only notify active clients (not pending/paused/cancelled)
   const { data: profiles } = await admin
     .from("profiles")
-    .select("id, status")
+    .select("id, status, lang")
     .in("id", clientIds)
     .eq("role", "client");
 
-  const toNotify = (profiles ?? [])
-    .filter((p) => (p.status === "active" || p.status === null) && !alreadyCheckedIn.has(p.id))
-    .map((p) => p.id);
+  const activeProfiles = (profiles ?? [])
+    .filter((p) => (p.status === "active" || p.status === null) && !alreadyCheckedIn.has(p.id));
 
   let sent = 0;
-  for (const clientId of toNotify) {
+  for (const profile of activeProfiles) {
+    const cLang: "pt" | "en" = profile.lang === "en" ? "en" : "pt";
     const result = await sendPushToUser(
-      clientId,
-      "📋 Check-in semanal",
-      "Ainda não fizeste o teu check-in desta semana. 2 minutos e está feito!",
+      profile.id,
+      cLang === "en" ? "📋 Weekly check-in" : "📋 Check-in semanal",
+      cLang === "en"
+        ? "You haven't done your check-in this week yet. 2 minutes and it's done!"
+        : "Ainda não fizeste o teu check-in desta semana. 2 minutos e está feito!",
       "/client/checkin",
     );
     if (result.ok) sent++;
   }
 
-  return NextResponse.json({ sent, skipped: clientIds.length - toNotify.length, weekStart });
+  return NextResponse.json({ sent, skipped: clientIds.length - activeProfiles.length, weekStart });
 }

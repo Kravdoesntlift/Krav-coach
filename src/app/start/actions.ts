@@ -12,6 +12,7 @@ export interface SignupPayload {
   availableDays: number;
   injuries: string;
   equipment: string;
+  lang?: "pt" | "en";
 }
 
 export interface SignupResult {
@@ -34,7 +35,7 @@ export async function signupAndStartCheckout(
 async function _signupAndTrial(
   payload: SignupPayload
 ): Promise<SignupResult> {
-  const { fullName, email, password, goal, level, availableDays, injuries, equipment } = payload;
+  const { fullName, email, password, goal, level, availableDays, injuries, equipment, lang = "pt" } = payload;
 
   const admin = createAdminClient();
 
@@ -68,9 +69,9 @@ async function _signupAndTrial(
   }
   const clientId = authData.user.id;
 
-  // 3. Set active + 7-day trial
+  // 3. Set active + 7-day trial + lang preference
   const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-  await admin.from("profiles").update({ status: "active", trial_ends_at: trialEndsAt }).eq("id", clientId);
+  await admin.from("profiles").update({ status: "active", trial_ends_at: trialEndsAt, lang }).eq("id", clientId);
 
   // 4. Save onboarding data
   const days = Array.from({ length: availableDays }, (_, i) => i);
@@ -103,13 +104,16 @@ async function _signupAndTrial(
     console.error("[signupAndTrial] signIn failed:", signInErr.message);
   }
 
-  // 7. Welcome message from coach
-  const clientFirstName = fullName.split(" ")[0] || "atleta";
+  // 7. Welcome message from coach (language-aware)
+  const clientFirstName = fullName.split(" ")[0] || (lang === "en" ? "athlete" : "atleta");
   const coachFirstName  = ((coachProfile.full_name as string | null) ?? "").split(" ")[0] || "Coach";
+  const welcomeMsg = lang === "en"
+    ? `Hi ${clientFirstName}! 👋 I'm ${coachFirstName}. Welcome to your 7-day trial! You have full access to the app this week. Explore the workouts, log your check-ins and message me here if you have any questions. Let's go! 💪`
+    : `Olá ${clientFirstName}! 👋 Sou o ${coachFirstName}. Bem-vindo ao teu trial de 7 dias! Tens acesso completo à app durante esta semana. Explora os treinos, regista os teus check-ins e fala comigo por aqui se tiveres alguma dúvida. Vamos a isso! 💪`;
   await admin.from("messages").insert({
     sender_id:   coachId,
     receiver_id: clientId,
-    content: `Olá ${clientFirstName}! 👋 Sou o ${coachFirstName}. Bem-vindo ao teu trial de 7 dias! Tens acesso completo à app durante esta semana. Explora os treinos, regista os teus check-ins e fala comigo por aqui se tiveres alguma dúvida. Vamos a isso! 💪`,
+    content: welcomeMsg,
   });
 
   // 8. Push notification to coach
@@ -136,6 +140,7 @@ async function _signupAndTrial(
       clientName: fullName,
       coachName:  coachProfile.full_name as string ?? "Coach",
       siteUrl,
+      lang,
     });
   } catch (e) {
     console.warn("[signupAndTrial] Welcome email failed:", e);

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import MuscleMap from "@/components/client/MuscleMap";
+import { useLang } from "@/lib/i18n/useLang";
 
 interface Props {
   exerciseNames: string[];
@@ -10,6 +11,13 @@ interface Props {
 
 export default function CollapsibleMuscleMap({ exerciseNames, loggedNames }: Props) {
   const [open, setOpen] = useState(false);
+  const { lang } = useLang();
+
+  const labelActive = lang === "en" ? "Active muscles" : "Músculos ativos";
+  const labelExercises = lang === "en"
+    ? `${exerciseNames.length} exercise${exerciseNames.length !== 1 ? "s" : ""} this week`
+    : `${exerciseNames.length} exercício${exerciseNames.length > 1 ? "s" : ""} esta semana`;
+  const labelNoPlan = lang === "en" ? "No active plan" : "Sem plano ativo";
 
   return (
     <div>
@@ -31,11 +39,9 @@ export default function CollapsibleMuscleMap({ exerciseNames, loggedNames }: Pro
         <div className="flex items-center gap-2.5">
           <span className="text-base">💪</span>
           <div className="text-left">
-            <p className="text-white font-semibold text-sm leading-tight">Músculos ativos</p>
+            <p className="text-white font-semibold text-sm leading-tight">{labelActive}</p>
             <p className="text-zinc-600 text-xs mt-0.5">
-              {exerciseNames.length > 0
-                ? `${exerciseNames.length} exercício${exerciseNames.length > 1 ? "s" : ""} esta semana`
-                : "Sem plano ativo"}
+              {exerciseNames.length > 0 ? labelExercises : labelNoPlan}
             </p>
           </div>
         </div>
@@ -59,7 +65,7 @@ export default function CollapsibleMuscleMap({ exerciseNames, loggedNames }: Pro
           borderRadius: "0 0 1rem 1rem",
         }}
       >
-        <MuscleMap exerciseNames={exerciseNames} loggedNames={loggedNames} />
+        <MuscleMap exerciseNames={exerciseNames} loggedNames={loggedNames} lang={lang} />
       </div>
     </div>
   );
