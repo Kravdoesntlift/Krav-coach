@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/personal-trainer-online", "/start", "/links", "/guia"],
+        allow: ["/", "/personal-trainer-online", "/online-personal-trainer", "/start", "/links", "/guia"],
         disallow: ["/coach/", "/client/", "/auth/", "/api/", "/offline"],
       },
     ],
