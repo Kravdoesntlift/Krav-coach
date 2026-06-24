@@ -83,7 +83,24 @@
       "Bash(python3 -c ' *)",
       "mcp__Claude_in_Chrome__tabs_create_mcp",
       "Bash(curl -s \"http://localhost:3000/api/food/search?q=mcdonalds\")",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(lsof -ti:3000)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(date -u -v-3d '+%Y-%m-%dT%H:%M:%SZ')",
+      "Bash(curl -s -X POST https://zdcsytcoxvxqxojrhnsi.supabase.co/rest/v1/leads -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkY3N5dGNveHZ4cXhvanJobnNpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzY1NjQwNywiZXhwIjoyMDkzMjMyNDA3fQ.jfMjL9m-XGeodElGXj5TMTNnSIklt6AzEYjJjg7Mfuo' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkY3N5dGNveHZ4cXhvanJobnNpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzY1NjQwNywiZXhwIjoyMDkzMjMyNDA3fQ.jfMjL9m-XGeodElGXj5TMTNnSIklt6AzEYjJjg7Mfuo' -H 'Content-Type: application/json' -d '{\"name\":\"André\",\"email\":\"andrekravchuk9@gmail.com\",\"source\":\"guia_test\",\"created_at\":\"__CMDSUB_OUTPUT__\",\"emails_sent\":0}')",
+      "Bash(date -u -v-7d '+%Y-%m-%dT%H:%M:%SZ')",
+      "Bash(curl -s -X POST https://zdcsytcoxvxqxojrhnsi.supabase.co/rest/v1/leads -H 'apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkY3N5dGNveHZ4cXhvanJobnNpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzY1NjQwNywiZXhwIjoyMDkzMjMyNDA3fQ.jfMjL9m-XGeodElGXj5TMTNnSIklt6AzEYjJjg7Mfuo' -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkY3N5dGNveHZ4cXhvanJobnNpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NzY1NjQwNywiZXhwIjoyMDkzMjMyNDA3fQ.jfMjL9m-XGeodElGXj5TMTNnSIklt6AzEYjJjg7Mfuo' -H 'Content-Type: application/json' -d '{\"name\":\"André\",\"email\":\"kravdoesntlift@gmail.com\",\"source\":\"guia_test\",\"created_at\":\"__CMDSUB_OUTPUT__\",\"emails_sent\":1}')",
+      "Bash(date -u -v-14d '+%Y-%m-%dT%H:%M:%SZ')",
+      "Read(//Users/kravchuk/Library/Application Support/Claude/local-agent-mode-sessions/skills-plugin/3ba1314e-f8ac-4d8a-a1cd-742fce8c240a/2c88a8fe-de4e-470d-b5f9-f523acf0f670/skills/docx/**)",
+      "Bash(node -e \"require\\('docx'\\); console.log\\('ok'\\)\")",
+      "Bash(node krav_plano.js)",
+      "mcp__82e11bf4-1a22-45ab-9290-c72ae48b88ae__list_calendars",
+      "mcp__82e11bf4-1a22-45ab-9290-c72ae48b88ae__create_event",
+      "mcp__82e11bf4-1a22-45ab-9290-c72ae48b88ae__update_event",
+      "WebFetch(domain:www.googleapis.com)",
+      "WebFetch(domain:pagespeed.web.dev)",
+      "Bash(npm i *)"
     ]
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLang } from "@/lib/i18n/useLang";
 
 type Platform = "ios" | "android" | null;
 
@@ -27,14 +28,15 @@ export default function InstallPrompt() {
   const [platform, setPlatform] = useState<Platform>(null);
   const [visible, setVisible] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null);
+  const { lang } = useLang();
+  const isEN = lang === "en";
 
   useEffect(() => {
-    if (isStandalone()) return; // already installed
+    if (isStandalone()) return;
 
     const p = detectPlatform();
-    if (!p) return; // desktop — skip
+    if (!p) return;
 
-    // Check if dismissed and still within window
     const until = localStorage.getItem(DISMISS_KEY);
     if (until && Date.now() < Number(until)) return;
 
@@ -68,6 +70,32 @@ export default function InstallPrompt() {
 
   if (!visible || !platform) return null;
 
+  const androidSteps = isEN
+    ? [
+        'Tap "⋮" (top-right of Chrome)',
+        '"Add to Home screen"',
+        'Confirm "Install"',
+      ]
+    : [
+        'Toca nos "⋮" (canto superior direito do Chrome)',
+        '"Adicionar ao ecrã inicial"',
+        'Confirma "Instalar"',
+      ];
+
+  const iosSteps = isEN
+    ? [
+        "Open this site in Safari (not another browser)",
+        'Tap the  icon (Safari bottom bar)',
+        '"Add to Home Screen"',
+        'Tap "Add" — it appears on your screen like an app!',
+      ]
+    : [
+        "Abre este site no Safari (não noutro browser)",
+        'Toca no ícone  (barra inferior do Safari)',
+        '"Adicionar ao ecrã de início"',
+        'Toca "Adicionar" — fica no teu ecrã como uma app!',
+      ];
+
   return (
     <div
       className="rounded-2xl p-4 space-y-3 border border-brand-gold/20"
@@ -83,11 +111,15 @@ export default function InstallPrompt() {
             📲
           </div>
           <div>
-            <p className="text-white text-sm font-bold leading-tight">Instala a app</p>
-            <p className="text-zinc-500 text-xs mt-0.5">Acede mais rápido, sem abrir o browser</p>
+            <p className="text-white text-sm font-bold leading-tight">
+              {isEN ? "Install the app" : "Instala a app"}
+            </p>
+            <p className="text-zinc-500 text-xs mt-0.5">
+              {isEN ? "Faster access, no browser needed" : "Acede mais rápido, sem abrir o browser"}
+            </p>
           </div>
         </div>
-        <button onClick={dismiss} className="text-zinc-600 hover:text-zinc-400 transition-colors p-1 -m-1 shrink-0" aria-label="Fechar">
+        <button onClick={dismiss} className="text-zinc-600 hover:text-zinc-400 transition-colors p-1 -m-1 shrink-0" aria-label={isEN ? "Close" : "Fechar"}>
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
           </svg>
@@ -103,15 +135,11 @@ export default function InstallPrompt() {
               className="w-full py-2.5 rounded-xl text-black text-sm font-bold transition-all active:scale-95 hover:brightness-110"
               style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
             >
-              Instalar agora
+              {isEN ? "Install now" : "Instalar agora"}
             </button>
           ) : (
             <ol className="space-y-1.5">
-              {[
-                'Toca nos "⋮" (canto superior direito do Chrome)',
-                '"Adicionar ao ecrã inicial"',
-                'Confirma "Instalar"',
-              ].map((label, i) => (
+              {androidSteps.map((label, i) => (
                 <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-400">
                   <span
                     className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
@@ -131,12 +159,7 @@ export default function InstallPrompt() {
       {platform === "ios" && (
         <div className="space-y-2">
           <ol className="space-y-1.5">
-            {[
-              "Abre este site no Safari (não noutro browser)",
-              'Toca no ícone  (barra inferior do Safari)',
-              '"Adicionar ao ecrã de início"',
-              'Toca "Adicionar" — fica no teu ecrã como uma app!',
-            ].map((label, i) => (
+            {iosSteps.map((label, i) => (
               <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-400">
                 <span
                   className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"

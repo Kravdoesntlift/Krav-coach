@@ -49,10 +49,12 @@ export default async function CoachLayout({
       children: [
         { href: "/coach/profile",        label: "👤 A minha conta" },
         { href: "/coach/sessions",       label: "📅 Sessões" },
+        { href: "/coach/meal-plans",     label: "🥗 Planos Alimentares" },
         { href: "/coach/challenges",     label: "🏆 Desafio Mensal" },
         { href: "/coach/manage-clients", label: "⚙️ Gerir Clientes" },
         { href: "/coach/library",        label: "📚 Biblioteca" },
         { href: "/coach/leads",          label: "📧 Leads" },
+        { href: "/coach/testimonials",   label: "⭐ Testemunhos" },
         { href: "/coach/setup",          label: "🚀 Configuração" },
         { href: "/coach/billing",        label: "💳 Faturação" },
       ],

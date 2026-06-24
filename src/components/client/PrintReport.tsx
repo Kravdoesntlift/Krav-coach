@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "@/lib/i18n/useLang";
+
 interface Checkin {
   week_start: string;
   weight_kg: number | null;
@@ -30,10 +32,15 @@ interface Props {
   totalVolumeKg: number;
 }
 
-const ENERGY_LABELS: Record<number, string> = { 1: "Mínima", 2: "Baixa", 3: "Normal", 4: "Alta", 5: "Máxima" };
+const ENERGY_LABELS_PT: Record<number, string> = { 1: "Mínima", 2: "Baixa", 3: "Normal", 4: "Alta", 5: "Máxima" };
+const ENERGY_LABELS_EN: Record<number, string> = { 1: "Minimal", 2: "Low", 3: "Normal", 4: "High", 5: "Maximum" };
 
 export default function PrintReport(props: Props) {
   const { clientName, month, year, totalWorkouts, totalPlannedDays, totalPRs, weightChange, avgEnergy, adherence, checkins, topExercises, prs, totalVolumeKg } = props;
+  const { lang } = useLang();
+  const isEN = lang === "en";
+  const locale = isEN ? "en-GB" : "pt-PT";
+  const ENERGY_LABELS = isEN ? ENERGY_LABELS_EN : ENERGY_LABELS_PT;
 
   const totalVolumeTons = totalVolumeKg >= 1000 ? `${(totalVolumeKg / 1000).toFixed(1)}t` : totalVolumeKg > 0 ? `${totalVolumeKg} kg` : null;
 
@@ -43,14 +50,18 @@ export default function PrintReport(props: Props) {
       <div className="no-print space-y-6 page-enter">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-white">Relatório Mensal</h1>
+            <h1 className="text-2xl font-bold text-white">{isEN ? "Monthly Report" : "Relatório Mensal"}</h1>
             <p className="text-gray-400 text-sm mt-1">{month} {year}</p>
           </div>
           <button onClick={() => window.print()} className="btn-primary text-sm flex items-center gap-2">
-            <span>⬇</span> Descarregar PDF
+            <span>⬇</span> {isEN ? "Download PDF" : "Descarregar PDF"}
           </button>
         </div>
-        <p className="text-gray-500 text-xs">O relatório é formatado para impressão/PDF ao clicar em "Descarregar".</p>
+        <p className="text-gray-500 text-xs">
+          {isEN
+            ? 'The report is formatted for print/PDF when you click "Download".'
+            : 'O relatório é formatado para impressão/PDF ao clicar em "Descarregar".'}
+        </p>
       </div>
 
       {/* Printable report */}
@@ -59,7 +70,7 @@ export default function PrintReport(props: Props) {
         <div className="report-cover">
           <div className="report-cover-left">
             <p className="report-brand">KRAV<span className="report-dot">.</span></p>
-            <p className="report-cover-label">Relatório de Progresso</p>
+            <p className="report-cover-label">{isEN ? "Progress Report" : "Relatório de Progresso"}</p>
           </div>
           <div className="report-cover-right">
             <p className="report-client-name">{clientName}</p>
@@ -71,40 +82,40 @@ export default function PrintReport(props: Props) {
         <div className="stats-row">
           <div className="stat-card">
             <p className="stat-num" style={{ color: "#C9A84C" }}>{totalWorkouts}</p>
-            <p className="stat-label">Treinos</p>
-            {adherence !== null && <p className="stat-sub">{totalWorkouts}/{totalPlannedDays} planeados</p>}
+            <p className="stat-label">{isEN ? "Workouts" : "Treinos"}</p>
+            {adherence !== null && <p className="stat-sub">{totalWorkouts}/{totalPlannedDays} {isEN ? "planned" : "planeados"}</p>}
           </div>
           <div className="stat-card">
             <p className="stat-num" style={{ color: adherence && adherence >= 80 ? "#4ade80" : adherence && adherence >= 50 ? "#C9A84C" : "#f87171" }}>
               {adherence !== null ? `${adherence}%` : "—"}
             </p>
-            <p className="stat-label">Adesão</p>
-            <p className="stat-sub">ao plano</p>
+            <p className="stat-label">{isEN ? "Adherence" : "Adesão"}</p>
+            <p className="stat-sub">{isEN ? "to plan" : "ao plano"}</p>
           </div>
           <div className="stat-card">
             <p className="stat-num" style={{ color: weightChange === null ? "#888" : weightChange < 0 ? "#4ade80" : weightChange > 0 ? "#f87171" : "#888" }}>
               {weightChange === null ? "—" : `${weightChange > 0 ? "+" : ""}${weightChange} kg`}
             </p>
-            <p className="stat-label">Peso</p>
+            <p className="stat-label">{isEN ? "Weight" : "Peso"}</p>
             <p className="stat-sub">{checkins.length} check-ins</p>
           </div>
           <div className="stat-card">
             <p className="stat-num" style={{ color: "#C9A84C" }}>{totalPRs > 0 ? totalPRs : "—"}</p>
-            <p className="stat-label">Recordes</p>
-            <p className="stat-sub">pessoais</p>
+            <p className="stat-label">{isEN ? "Records" : "Recordes"}</p>
+            <p className="stat-sub">{isEN ? "personal" : "pessoais"}</p>
           </div>
           {totalVolumeTons && (
             <div className="stat-card">
               <p className="stat-num" style={{ color: "#C9A84C" }}>{totalVolumeTons}</p>
-              <p className="stat-label">Volume</p>
-              <p className="stat-sub">levantado</p>
+              <p className="stat-label">{isEN ? "Volume" : "Volume"}</p>
+              <p className="stat-sub">{isEN ? "lifted" : "levantado"}</p>
             </div>
           )}
           {avgEnergy !== null && (
             <div className="stat-card">
               <p className="stat-num" style={{ color: "#C9A84C" }}>{avgEnergy}<span style={{ fontSize: "14px", color: "#888" }}>/5</span></p>
-              <p className="stat-label">Energia</p>
-              <p className="stat-sub">média</p>
+              <p className="stat-label">{isEN ? "Energy" : "Energia"}</p>
+              <p className="stat-sub">{isEN ? "average" : "média"}</p>
             </div>
           )}
         </div>
@@ -112,15 +123,15 @@ export default function PrintReport(props: Props) {
         {/* Weight chart */}
         {checkins.filter(c => c.weight_kg).length >= 2 && (
           <section className="report-section">
-            <h2 className="section-title">Evolução do Peso</h2>
-            <WeightMiniChart checkins={checkins} />
+            <h2 className="section-title">{isEN ? "Weight Evolution" : "Evolução do Peso"}</h2>
+            <WeightMiniChart checkins={checkins} locale={locale} />
           </section>
         )}
 
         {/* Top exercises */}
         {topExercises.length > 0 && (
           <section className="report-section">
-            <h2 className="section-title">Exercícios mais praticados</h2>
+            <h2 className="section-title">{isEN ? "Most practised exercises" : "Exercícios mais praticados"}</h2>
             <div className="exercises-list">
               {topExercises.map((e, i) => {
                 const maxSets = topExercises[0].sets;
@@ -131,7 +142,7 @@ export default function PrintReport(props: Props) {
                     <div className="ex-main">
                       <div className="ex-name-row">
                         <span className="ex-name">{e.name}</span>
-                        <span className="ex-sets">{e.sets} séries</span>
+                        <span className="ex-sets">{e.sets} {isEN ? "sets" : "séries"}</span>
                       </div>
                       <div className="ex-bar-bg">
                         <div className="ex-bar-fill" style={{ width: `${pct}%` }} />
@@ -147,25 +158,25 @@ export default function PrintReport(props: Props) {
         {/* Checkin table */}
         {checkins.length > 0 && (
           <section className="report-section">
-            <h2 className="section-title">Check-ins Semanais</h2>
+            <h2 className="section-title">{isEN ? "Weekly Check-ins" : "Check-ins Semanais"}</h2>
             <table className="report-table">
               <thead>
                 <tr>
-                  <th>Semana</th>
-                  <th>Peso</th>
-                  <th>Energia</th>
-                  <th>Medidas</th>
-                  <th>Notas</th>
+                  <th>{isEN ? "Week" : "Semana"}</th>
+                  <th>{isEN ? "Weight" : "Peso"}</th>
+                  <th>{isEN ? "Energy" : "Energia"}</th>
+                  <th>{isEN ? "Measures" : "Medidas"}</th>
+                  <th>{isEN ? "Notes" : "Notas"}</th>
                 </tr>
               </thead>
               <tbody>
                 {checkins.map((c) => (
                   <tr key={c.week_start}>
-                    <td>{new Date(c.week_start + "T00:00:00").toLocaleDateString("pt-PT", { day: "numeric", month: "short" })}</td>
+                    <td>{new Date(c.week_start + "T00:00:00").toLocaleDateString(locale, { day: "numeric", month: "short" })}</td>
                     <td className="td-bold">{c.weight_kg ? `${c.weight_kg} kg` : "—"}</td>
                     <td>{c.energy_level ? `${c.energy_level}/5 · ${ENERGY_LABELS[c.energy_level]}` : "—"}</td>
                     <td>
-                      {[(c as unknown as Record<string, unknown>).waist_cm ? `C: ${(c as unknown as Record<string, unknown>).waist_cm}cm` : null, (c as unknown as Record<string, unknown>).chest_cm ? `P: ${(c as unknown as Record<string, unknown>).chest_cm}cm` : null, (c as unknown as Record<string, unknown>).arm_cm ? `B: ${(c as unknown as Record<string, unknown>).arm_cm}cm` : null].filter(Boolean).join(" · ") || "—"}
+                      {[(c as unknown as Record<string, unknown>).waist_cm ? `${isEN ? "W" : "C"}: ${(c as unknown as Record<string, unknown>).waist_cm}cm` : null, (c as unknown as Record<string, unknown>).chest_cm ? `${isEN ? "Ch" : "P"}: ${(c as unknown as Record<string, unknown>).chest_cm}cm` : null, (c as unknown as Record<string, unknown>).arm_cm ? `${isEN ? "A" : "B"}: ${(c as unknown as Record<string, unknown>).arm_cm}cm` : null].filter(Boolean).join(" · ") || "—"}
                     </td>
                     <td className="td-notes">{c.notes || "—"}</td>
                   </tr>
@@ -178,13 +189,13 @@ export default function PrintReport(props: Props) {
         {/* PRs */}
         {prs.length > 0 && (
           <section className="report-section">
-            <h2 className="section-title">Novos Recordes Pessoais</h2>
+            <h2 className="section-title">{isEN ? "New Personal Records" : "Novos Recordes Pessoais"}</h2>
             <div className="prs-grid">
               {prs.map((pr) => (
                 <div key={pr.exercise_name + pr.recorded_at} className="pr-card">
                   <p className="pr-exercise">{pr.exercise_name}</p>
                   <p className="pr-value">{pr.weight_kg ? `${pr.weight_kg} kg` : "—"}{pr.reps ? <span className="pr-reps"> × {pr.reps}</span> : ""}</p>
-                  <p className="pr-date">{new Date(pr.recorded_at + "T00:00:00").toLocaleDateString("pt-PT", { day: "numeric", month: "short" })}</p>
+                  <p className="pr-date">{new Date(pr.recorded_at + "T00:00:00").toLocaleDateString(locale, { day: "numeric", month: "short" })}</p>
                 </div>
               ))}
             </div>
@@ -194,7 +205,10 @@ export default function PrintReport(props: Props) {
         {/* Footer */}
         <div className="report-footer">
           <div className="footer-brand">KRAV<span style={{ color: "#C9A84C" }}>.</span></div>
-          <p className="footer-text">Gerado a {new Date().toLocaleDateString("pt-PT", { day: "numeric", month: "long", year: "numeric" })}</p>
+          <p className="footer-text">
+            {isEN ? "Generated on " : "Gerado a "}
+            {new Date().toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" })}
+          </p>
         </div>
       </div>
 
@@ -295,7 +309,7 @@ export default function PrintReport(props: Props) {
   );
 }
 
-function WeightMiniChart({ checkins }: { checkins: { week_start: string; weight_kg: number | null }[] }) {
+function WeightMiniChart({ checkins, locale }: { checkins: { week_start: string; weight_kg: number | null }[]; locale: string }) {
   const pts = checkins.filter(c => c.weight_kg).map(c => ({ date: c.week_start, w: c.weight_kg! }));
   if (pts.length < 2) return null;
 
@@ -322,7 +336,7 @@ function WeightMiniChart({ checkins }: { checkins: { week_start: string; weight_
         <g key={i}>
           <circle cx={xScale(i)} cy={yScale(p.w)} r="3" fill="#C9A84C" />
           <text x={xScale(i)} y={H} textAnchor="middle" fontSize="9" fill="#bbb">
-            {new Date(p.date + "T00:00:00").toLocaleDateString("pt-PT", { day: "numeric", month: "numeric" })}
+            {new Date(p.date + "T00:00:00").toLocaleDateString(locale, { day: "numeric", month: "numeric" })}
           </text>
         </g>
       ))}

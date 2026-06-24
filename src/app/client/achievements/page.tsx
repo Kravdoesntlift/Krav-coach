@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { computeAchievements, CATEGORY_META, type AchievementCategory } from "@/lib/achievements";
+import { computeAchievements, getCategoryMeta, type AchievementCategory } from "@/lib/achievements";
 import AchievementCategorySection from "@/components/client/AchievementCategory";
 import AchievementUnlockModal from "@/components/client/AchievementUnlockModal";
 import { getLang } from "@/lib/i18n/getLang";
@@ -66,7 +66,8 @@ export default async function AchievementsPage() {
     totalPRs: uniquePRExercises,
     hasPerfectWeek, totalWorkouts, totalVolumeKg, perfectWeeks,
     totalPhotos: photos?.length ?? 0,
-  });
+  }, lang);
+  const categoryMeta = getCategoryMeta(lang);
 
   const totalUnlocked = achievements.filter((a) => a.unlocked).length;
   const totalPct = Math.round((totalUnlocked / achievements.length) * 100);
@@ -111,7 +112,7 @@ export default async function AchievementsPage() {
         <AchievementCategorySection
           key={cat}
           cat={cat}
-          meta={CATEGORY_META[cat]}
+          meta={categoryMeta[cat]}
           items={byCategory[cat]}
           clientName={profile?.full_name ?? ""}
         />

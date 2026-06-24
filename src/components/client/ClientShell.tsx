@@ -49,10 +49,12 @@ export function ClientShell({
       label: t("nav_profile"),
       children: [
         { href: "/client/profile",       label: t("nav_my_account") },
+        { href: "/client/meal-plan",     label: t("nav_meal_plan") },
         { href: "/client/ai-coach",      label: t("nav_ai_coach") },
         { href: "/client/sessions",      label: t("nav_sessions") },
         { href: "/client/integrations",  label: t("nav_integrations") },
         { href: "/client/referral",      label: t("nav_referral") },
+        { href: "/client/testimonial",   label: t("nav_testimonial") },
       ],
     },
   ];

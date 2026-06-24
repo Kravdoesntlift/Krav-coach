@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { WorkoutDay } from "@/lib/supabase/types";
 import LiveWorkout from "./LiveWorkout";
 import { haptic, HAPTIC } from "@/lib/haptic";
+import { useLang } from "@/lib/i18n/useLang";
 
 interface Props {
   day: WorkoutDay & { exercises?: { id: string; name: string; sets: number; reps: number; notes?: string | null; video_url?: string | null; order_index: number; superset_group?: string | null }[] };
@@ -16,6 +17,8 @@ interface Props {
 export default function TodayCard({ day, clientId, isCompleted, completedCount, totalCount }: Props) {
   const [liveMode, setLiveMode] = useState(false);
   const [done, setDone] = useState(isCompleted);
+  const { lang } = useLang();
+  const isEN = lang === "en";
 
   const exercises = day.exercises ?? [];
   const isRest = day.is_rest;
@@ -26,8 +29,8 @@ export default function TodayCard({ day, clientId, isCompleted, completedCount, 
       <div className="card p-5 flex items-center gap-4">
         <div className="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-2xl shrink-0">😴</div>
         <div>
-          <p className="text-white font-bold">Dia de descanso</p>
-          <p className="text-zinc-500 text-sm mt-0.5">{day.label || "Recupera bem — o teu corpo precisa"}</p>
+          <p className="text-white font-bold">{isEN ? "Rest day" : "Dia de descanso"}</p>
+          <p className="text-zinc-500 text-sm mt-0.5">{day.label || (isEN ? "Rest well — your body needs it" : "Recupera bem — o teu corpo precisa")}</p>
         </div>
       </div>
     );
@@ -40,7 +43,7 @@ export default function TodayCard({ day, clientId, isCompleted, completedCount, 
           exercises={exercises}
           dayId={day.id}
           clientId={clientId}
-          dayLabel={day.label || "Treino de hoje"}
+          dayLabel={day.label || (isEN ? "Today's workout" : "Treino de hoje")}
           onComplete={async () => { setDone(true); setLiveMode(false); }}
           onClose={() => setLiveMode(false)}
         />
@@ -63,9 +66,9 @@ export default function TodayCard({ day, clientId, isCompleted, completedCount, 
           {/* Header */}
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-zinc-500 text-xs font-semibold tracking-widest uppercase mb-1">Treino de hoje</p>
+              <p className="text-zinc-500 text-xs font-semibold tracking-widest uppercase mb-1">{isEN ? "Today's workout" : "Treino de hoje"}</p>
               <h2 className="text-white font-black text-xl leading-tight">
-                {day.label || `${exercises.length} exercícios`}
+                {day.label || `${exercises.length} ${isEN ? "exercises" : "exercícios"}`}
               </h2>
             </div>
             {done ? (
@@ -90,7 +93,7 @@ export default function TodayCard({ day, clientId, isCompleted, completedCount, 
                 style={{ width: `${pct}%`, background: pct === 100 ? "#4ade80" : "linear-gradient(90deg,#E8C96B,#C9A84C)" }}
               />
             </div>
-            <span className="text-xs text-zinc-500 shrink-0">{completedCount}/{totalCount} esta semana</span>
+            <span className="text-xs text-zinc-500 shrink-0">{completedCount}/{totalCount} {isEN ? "this week" : "esta semana"}</span>
           </div>
 
           {/* Exercises preview */}
@@ -107,7 +110,7 @@ export default function TodayCard({ day, clientId, isCompleted, completedCount, 
                   </div>
                 ))}
               {exercises.length > 4 && (
-                <p className="text-zinc-600 text-xs pl-4">+{exercises.length - 4} exercícios</p>
+                <p className="text-zinc-600 text-xs pl-4">+{exercises.length - 4} {isEN ? "exercises" : "exercícios"}</p>
               )}
             </div>
           )}
@@ -119,11 +122,11 @@ export default function TodayCard({ day, clientId, isCompleted, completedCount, 
               className="w-full py-3 rounded-2xl font-black text-black text-sm tracking-wide transition-all active:scale-95"
               style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
             >
-              ▶ Iniciar treino
+              {isEN ? "▶ Start workout" : "▶ Iniciar treino"}
             </button>
           ) : (
             <div className="w-full py-3 rounded-2xl bg-green-500/10 border border-green-500/30 text-center">
-              <p className="text-green-400 font-bold text-sm">Treino concluído hoje 🔥</p>
+              <p className="text-green-400 font-bold text-sm">{isEN ? "Workout done today 🔥" : "Treino concluído hoje 🔥"}</p>
             </div>
           )}
         </div>

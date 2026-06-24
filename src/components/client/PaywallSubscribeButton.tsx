@@ -1,9 +1,12 @@
 "use client";
 
 import { useFormStatus } from "react-dom";
+import { useLang } from "@/lib/i18n/useLang";
 
 export function PaywallSubscribeButton() {
   const { pending } = useFormStatus();
+  const { lang } = useLang();
+  const isEN = lang === "en";
 
   return (
     <button
@@ -18,10 +21,10 @@ export function PaywallSubscribeButton() {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
           </svg>
-          A redirecionar para pagamento...
+          {isEN ? "Redirecting to payment..." : "A redirecionar para pagamento..."}
         </span>
       ) : (
-        "Subscrever agora →"
+        isEN ? "Subscribe now →" : "Subscrever agora →"
       )}
     </button>
   );

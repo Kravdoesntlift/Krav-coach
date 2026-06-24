@@ -5,6 +5,7 @@ import PushNotificationToggle from "@/components/PushNotificationToggle";
 import PushDebugPanel from "@/components/PushDebugPanel";
 import PublicLinkCard from "@/components/coach/PublicLinkCard";
 import TransformationUpload from "@/components/coach/TransformationUpload";
+import TwoFactorSettings from "@/components/client/TwoFactorSettings";
 import { logout } from "@/app/auth/actions";
 
 const tools = [
@@ -82,6 +83,12 @@ export default async function CoachProfilePage() {
       )}
 
       <PushDebugPanel />
+
+      {/* Security */}
+      <div className="space-y-3">
+        <h2 className="text-white font-bold text-base">Segurança / Security</h2>
+        <TwoFactorSettings />
+      </div>
 
       {/* Logout */}
       <form action={logout}>

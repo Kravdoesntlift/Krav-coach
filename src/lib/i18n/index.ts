@@ -24,6 +24,7 @@ export const translations = {
   nav_sessions:    { pt: "📅 Sessões",         en: "📅 Sessions" },
   nav_integrations:{ pt: "⌚ Integrações",     en: "⌚ Integrations" },
   nav_referral:    { pt: "👥 Referências",     en: "👥 Referrals" },
+  nav_meal_plan:   { pt: "🥗 Plano Alimentar", en: "🥗 Meal Plan" },
 
   // ── Trial banner ───────────────────────────────────────────────────────────
   trial_ends_tomorrow: { pt: "O teu trial termina amanhã.", en: "Your trial ends tomorrow." },
@@ -270,6 +271,26 @@ export const translations = {
   rest_day_sub:        { pt: "Recupera bem — o músculo cresce no descanso", en: "Rest well — muscle grows during recovery" },
   no_plan_coach_note:  { pt: "O teu coach ainda não criou o plano — fala com ele se tiveres dúvidas", en: "Your coach hasn't created the plan yet — contact them if you have questions" },
   showing_recent:      { pt: "A mostrar o plano mais recente — o teu coach ainda não criou o plano desta semana.", en: "Showing the most recent plan — your coach hasn't created this week's plan yet." },
+
+  // ── Habits ────────────────────────────────────────────────────────────────
+  nav_habits:           { pt: "🎯 Hábitos",            en: "🎯 Habits" },
+  habits:               { pt: "Hábitos",               en: "Habits" },
+  add_habit:            { pt: "Adicionar hábito",      en: "Add habit" },
+  no_habits:            { pt: "Sem hábitos configurados", en: "No habits configured" },
+  no_habits_sub:        { pt: "Começa por adicionar o teu primeiro hábito diário.", en: "Start by adding your first daily habit." },
+  habit_streak:         { pt: "Sequência",             en: "Streak" },
+  habit_days:           { pt: "dias",                  en: "days" },
+  habit_name:           { pt: "Nome do hábito",        en: "Habit name" },
+  habit_saved:          { pt: "Hábito guardado!",      en: "Habit saved!" },
+  habit_deleted:        { pt: "Hábito eliminado.",     en: "Habit deleted." },
+  habit_add_cancel:     { pt: "Cancelar",              en: "Cancel" },
+  habit_popular:        { pt: "Sugestões populares",   en: "Popular suggestions" },
+  habit_last7:          { pt: "Últimos 7 dias",        en: "Last 7 days" },
+  habit_today:          { pt: "Hoje",                  en: "Today" },
+  habit_confirm_delete: { pt: "Tens a certeza?",       en: "Are you sure?" },
+
+  // ── Testimonials ──────────────────────────────────────────────────────────
+  nav_testimonial:   { pt: "⭐ Testemunho",          en: "⭐ Testimonial" },
 
   // ── General ───────────────────────────────────────────────────────────────
   error:             { pt: "Erro",                  en: "Error" },

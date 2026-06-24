@@ -323,15 +323,32 @@ function NewSessionForm({
 
         {/* Link / location */}
         <div>
-          <label className="label">
-            {form.session_type === "online" ? "Link da reunião" : "Localização"}
-          </label>
+          <div className="flex items-center justify-between mb-1">
+            <label className="label mb-0 transition-all">
+              {form.session_type === "online" ? "Link da videochamada" : "Localização"}
+            </label>
+            {form.session_type === "online" && (
+              <button
+                type="button"
+                onClick={() => {
+                  const roomId = Math.random().toString(36).slice(2, 8);
+                  setForm((f) => ({
+                    ...f,
+                    location_or_link: `https://meet.jit.si/krav-${roomId}`,
+                  }));
+                }}
+                className="text-[11px] px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20 transition-colors font-medium whitespace-nowrap"
+              >
+                🎥 Gerar sala Jitsi
+              </button>
+            )}
+          </div>
           <input
             type="text"
-            className="input w-full"
+            className="input w-full transition-all"
             placeholder={
               form.session_type === "online"
-                ? "https://meet.google.com/..."
+                ? "https://meet.google.com/... ou https://zoom.us/..."
                 : "Morada ou ginásio"
             }
             value={form.location_or_link}

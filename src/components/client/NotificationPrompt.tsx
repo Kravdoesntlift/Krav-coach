@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLang } from "@/lib/i18n/useLang";
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
 const DISMISS_KEY = "krav_notif_prompt_until";
@@ -17,19 +18,14 @@ export default function NotificationPrompt() {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const { lang } = useLang();
+  const isEN = lang === "en";
 
   useEffect(() => {
-    // Só mostra se o browser suporta notificações
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
-
-    // Já tem permissão ou bloqueou — não mostrar
     if (Notification.permission !== "default") return;
-
-    // Dispensado recentemente
     const until = localStorage.getItem(DISMISS_KEY);
     if (until && Date.now() < Number(until)) return;
-
-    // Mostra após 4 segundos — deixa o dashboard carregar primeiro
     const t = setTimeout(() => setVisible(true), 4000);
     return () => clearTimeout(t);
   }, []);
@@ -67,6 +63,18 @@ export default function NotificationPrompt() {
 
   if (!visible) return null;
 
+  const benefits = isEN
+    ? [
+        "💬 Coach messages in real time",
+        "🏋️ Reminders so you don't miss workouts",
+        "📊 Alert when your report is ready",
+      ]
+    : [
+        "💬 Mensagens do coach em tempo real",
+        "🏋️ Lembretes para não perderes treinos",
+        "📊 Aviso quando o teu relatório estiver pronto",
+      ];
+
   return (
     <>
       {/* Backdrop */}
@@ -92,8 +100,14 @@ export default function NotificationPrompt() {
             /* ── Success state ── */
             <div className="p-7 text-center space-y-2">
               <div className="text-4xl">🔔</div>
-              <p className="text-white font-bold text-lg">Notificações ativas!</p>
-              <p className="text-zinc-400 text-sm">Vais receber as mensagens do teu coach em tempo real.</p>
+              <p className="text-white font-bold text-lg">
+                {isEN ? "Notifications enabled!" : "Notificações ativas!"}
+              </p>
+              <p className="text-zinc-400 text-sm">
+                {isEN
+                  ? "You'll receive your coach's messages in real time."
+                  : "Vais receber as mensagens do teu coach em tempo real."}
+              </p>
             </div>
           ) : (
             /* ── Prompt state ── */
@@ -101,7 +115,7 @@ export default function NotificationPrompt() {
               {/* Handle */}
               <div className="w-10 h-1 bg-zinc-700 rounded-full mx-auto" />
 
-              {/* Icon + texto */}
+              {/* Icon + text */}
               <div className="flex gap-4 items-start">
                 <div
                   className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0"
@@ -111,21 +125,19 @@ export default function NotificationPrompt() {
                 </div>
                 <div className="space-y-1">
                   <p className="text-white font-bold text-base leading-tight">
-                    Ativa as notificações
+                    {isEN ? "Enable notifications" : "Ativa as notificações"}
                   </p>
                   <p className="text-zinc-400 text-sm leading-relaxed">
-                    Recebe mensagens do teu coach, lembretes de treino e avisos importantes — diretamente no teu telemóvel.
+                    {isEN
+                      ? "Get coach messages, workout reminders and important alerts — directly on your phone."
+                      : "Recebe mensagens do teu coach, lembretes de treino e avisos importantes — diretamente no teu telemóvel."}
                   </p>
                 </div>
               </div>
 
-              {/* Benefícios */}
+              {/* Benefits */}
               <ul className="space-y-2">
-                {[
-                  "💬 Mensagens do coach em tempo real",
-                  "🏋️ Lembretes para não perderes treinos",
-                  "📊 Aviso quando o teu relatório estiver pronto",
-                ].map((b) => (
+                {benefits.map((b) => (
                   <li key={b} className="flex items-center gap-2.5 text-xs text-zinc-400">
                     <span className="text-base leading-none">{b.split(" ")[0]}</span>
                     <span>{b.split(" ").slice(1).join(" ")}</span>
@@ -133,7 +145,7 @@ export default function NotificationPrompt() {
                 ))}
               </ul>
 
-              {/* Botões */}
+              {/* Buttons */}
               <div className="space-y-2.5 pt-1">
                 <button
                   onClick={enable}
@@ -141,13 +153,15 @@ export default function NotificationPrompt() {
                   className="w-full py-3.5 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110 disabled:opacity-60"
                   style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
                 >
-                  {loading ? "A ativar..." : "Ativar notificações"}
+                  {loading
+                    ? (isEN ? "Enabling..." : "A ativar...")
+                    : (isEN ? "Enable notifications" : "Ativar notificações")}
                 </button>
                 <button
                   onClick={dismiss}
                   className="w-full py-3 rounded-2xl text-zinc-500 text-sm hover:text-zinc-300 transition-colors"
                 >
-                  Talvez mais tarde
+                  {isEN ? "Maybe later" : "Talvez mais tarde"}
                 </button>
               </div>
             </div>

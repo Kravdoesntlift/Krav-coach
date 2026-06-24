@@ -10,6 +10,7 @@ export interface Profile {
   tagline?: string | null;
   status?: ClientStatus;
   subscription_renews_at?: string | null;
+  trial_ends_at?: string | null;
 }
 
 export interface WorkoutPlan {
@@ -256,6 +257,73 @@ export interface Referral {
   status: "pending" | "signed_up" | "active";
   bonus_granted: boolean;
   created_at: string;
+}
+
+// ── Feature types ─────────────────────────────────────────────────────────────
+
+export interface Testimonial {
+  id: string;
+  coach_id: string;
+  client_id: string | null;
+  display_name: string;
+  content: string;
+  result_highlight: string | null;
+  duration_weeks: number | null;
+  is_public: boolean;
+  requested_at: string | null;
+  submitted_at: string | null;
+  created_at: string;
+}
+
+export interface HabitDefinition {
+  id: string;
+  client_id: string;
+  name: string;
+  emoji: string;
+  created_at: string;
+}
+
+export interface HabitLog {
+  id: string;
+  client_id: string;
+  habit_id: string;
+  logged_date: string;
+  created_at: string;
+}
+
+export interface MealPlan {
+  id: string;
+  coach_id: string;
+  client_id: string;
+  name: string;
+  goal: string | null;
+  notes: string | null;
+  created_at: string;
+  // joined
+  meal_plan_meals?: MealPlanMeal[];
+}
+
+export interface MealPlanMeal {
+  id: string;
+  plan_id: string;
+  meal_type: string;
+  name: string;
+  order_index: number;
+  // joined
+  meal_plan_foods?: MealPlanFood[];
+}
+
+export interface MealPlanFood {
+  id: string;
+  meal_id: string;
+  food_name: string;
+  quantity: string;
+  calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fat_g: number | null;
+  notes: string | null;
+  order_index: number;
 }
 
 export const DAY_NAMES = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];

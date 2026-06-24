@@ -19,6 +19,7 @@ import SetupChecklist from "@/components/client/SetupChecklist";
 import InstallPrompt from "@/components/client/InstallPrompt";
 import NotificationPrompt from "@/components/client/NotificationPrompt";
 import AppBadge from "@/components/client/AppBadge";
+import RestDayCard from "@/components/client/RestDayCard";
 
 import type { WeeklyCheckin } from "@/lib/supabase/types";
 import MonthCalendar, { type DayStatus } from "@/components/client/MonthCalendar";
@@ -261,7 +262,7 @@ export default async function ClientDashboard() {
     totalVolumeKg: achVolumeKg,
     perfectWeeks: achPerfectWeeks,
     totalPhotos: allPhotos?.length ?? 0,
-  });
+  }, lang);
 
   return (
     <>
@@ -392,25 +393,26 @@ export default async function ClientDashboard() {
         />
       )}
 
-      {/* REST DAY CARD */}
+      {/* REST DAY CARD — active recovery */}
       {plan && todayDay?.is_rest && (
-        <div
-          className="rounded-2xl p-4 flex items-center gap-4 border border-zinc-800/60"
-          style={{ background: "rgba(18,18,20,0.85)" }}
-        >
-          <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0"
-            style={{ background: "rgba(39,39,42,0.8)" }}
-          >
-            💤
-          </div>
-          <div>
-            <p className="text-white font-bold text-sm">{t("rest_day", lang)}</p>
-            <p className="text-zinc-500 text-xs mt-0.5">
-              {todayDay.label ? todayDay.label : t("rest_day_sub", lang)}
-            </p>
-          </div>
-        </div>
+        <RestDayCard
+          label={todayDay.label}
+          nextTrainingDay={(() => {
+            const days = (plan.workout_days as WorkoutPlan["workout_days"]) ?? [];
+            const trainDow = days
+              .filter((d) => !d.is_rest)
+              .map((d) => d.day_of_week);
+            const todayDow2 = today.getDay();
+            const DAY_SHORT_PT = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+            const DAY_SHORT_EN = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+            const shortNames = lang === "en" ? DAY_SHORT_EN : DAY_SHORT_PT;
+            for (let i = 1; i <= 7; i++) {
+              const d = (todayDow2 + i) % 7;
+              if (trainDow.includes(d)) return shortNames[d];
+            }
+            return null;
+          })()}
+        />
       )}
 
       {/* NO PLAN STATE — hero */}

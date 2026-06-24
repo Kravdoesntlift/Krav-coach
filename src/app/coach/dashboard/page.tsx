@@ -260,6 +260,9 @@ export default async function CoachDashboard() {
             <PushNotificationToggle />
             <NotifyButton label="Notificar todos" />
             <BroadcastForm />
+            <Link href="/coach/testimonials" className="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm font-medium transition-colors">
+              ⭐ Testemunhos
+            </Link>
             <Link href="/coach/manage-clients" className="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm font-medium transition-colors">
               👥 Gerir Clientes
             </Link>
@@ -272,6 +275,9 @@ export default async function CoachDashboard() {
           <PushNotificationToggle />
           <NotifyButton label="Notificar" />
           <BroadcastForm />
+          <Link href="/coach/testimonials" className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-800 text-gray-300 text-sm font-medium whitespace-nowrap shrink-0">
+            ⭐ Testemunhos
+          </Link>
           <Link href="/coach/manage-clients" className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-800 text-gray-300 text-sm font-medium whitespace-nowrap shrink-0">
             👥 Gerir
           </Link>

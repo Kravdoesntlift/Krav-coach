@@ -1,5 +1,7 @@
 "use client";
 
+import { useLang } from "@/lib/i18n/useLang";
+
 interface Props {
   completedDates: string[]; // "YYYY-MM-DD"
   currentStreak: number;
@@ -8,6 +10,8 @@ interface Props {
 }
 
 export default function StreakCalendar({ completedDates, currentStreak, longestStreak, totalWorkouts }: Props) {
+  const { lang } = useLang();
+  const locale = lang === "en" ? "en-GB" : "pt-PT";
   const dateSet = new Set(completedDates);
 
   // Build last 84 days (12 weeks)
@@ -17,7 +21,7 @@ export default function StreakCalendar({ completedDates, currentStreak, longestS
     const d = new Date(today);
     d.setDate(d.getDate() - i);
     const iso = d.toISOString().slice(0, 10);
-    days.push({ date: iso, label: d.toLocaleDateString("pt-PT", { day: "numeric", month: "short" }), dayOfWeek: d.getDay() });
+    days.push({ date: iso, label: d.toLocaleDateString(locale, { day: "numeric", month: "short" }), dayOfWeek: d.getDay() });
   }
 
   // Pad start so first week starts on Monday
@@ -33,7 +37,9 @@ export default function StreakCalendar({ completedDates, currentStreak, longestS
     weeks.push(paddedDays.slice(i, i + 7));
   }
 
-  const DAY_LABELS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+  const DAY_LABELS = lang === "en"
+    ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    : ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 
   return (
     <div className="card p-5 space-y-5">
@@ -41,15 +47,15 @@ export default function StreakCalendar({ completedDates, currentStreak, longestS
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-zinc-800 rounded-xl p-3 text-center">
           <p className="text-brand-gold text-2xl font-bold">{currentStreak}</p>
-          <p className="text-gray-400 text-xs mt-0.5">Sequência atual</p>
+          <p className="text-gray-400 text-xs mt-0.5">{lang === "en" ? "Current streak" : "Sequência atual"}</p>
         </div>
         <div className="bg-zinc-800 rounded-xl p-3 text-center">
           <p className="text-white text-2xl font-bold">{longestStreak}</p>
-          <p className="text-gray-400 text-xs mt-0.5">Melhor sequência</p>
+          <p className="text-gray-400 text-xs mt-0.5">{lang === "en" ? "Best streak" : "Melhor sequência"}</p>
         </div>
         <div className="bg-zinc-800 rounded-xl p-3 text-center">
           <p className="text-white text-2xl font-bold">{totalWorkouts}</p>
-          <p className="text-gray-400 text-xs mt-0.5">Total treinos</p>
+          <p className="text-gray-400 text-xs mt-0.5">{lang === "en" ? "Total workouts" : "Total treinos"}</p>
         </div>
       </div>
 
@@ -104,7 +110,7 @@ export default function StreakCalendar({ completedDates, currentStreak, longestS
               const isFirstWeekOfMonth = d.getDate() <= 7;
               return (
                 <div key={wi} className="flex-1 text-[9px] text-gray-600 truncate">
-                  {isFirstWeekOfMonth ? d.toLocaleDateString("pt-PT", { month: "short" }) : ""}
+                  {isFirstWeekOfMonth ? d.toLocaleDateString(locale, { month: "short" }) : ""}
                 </div>
               );
             })}
@@ -114,7 +120,9 @@ export default function StreakCalendar({ completedDates, currentStreak, longestS
 
       {currentStreak >= 3 && (
         <p className="text-center text-brand-gold text-sm font-semibold">
-          🔥 {currentStreak} dias seguidos — continua assim!
+          🔥 {lang === "en"
+            ? `${currentStreak} days in a row — keep it up!`
+            : `${currentStreak} dias seguidos — continua assim!`}
         </p>
       )}
     </div>

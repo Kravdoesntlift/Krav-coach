@@ -4,6 +4,7 @@ import ProfileForm from "@/components/ProfileForm";
 import PushNotificationToggle from "@/components/PushNotificationToggle";
 import SubscriptionManager from "@/components/client/SubscriptionManager";
 import LanguageSelector from "@/components/client/LanguageSelector";
+import TwoFactorSettings from "@/components/client/TwoFactorSettings";
 import { logout } from "@/app/auth/actions";
 import { t } from "@/lib/i18n";
 import { getLang } from "@/lib/i18n/getLang";
@@ -139,6 +140,14 @@ export default async function ClientProfilePage() {
         renewsAt={subscription?.current_period_end ?? null}
         amountCents={subscription?.amount_cents ?? null}
       />
+
+      {/* Security */}
+      <div className="space-y-3">
+        <h2 className="text-white font-bold text-base">
+          {lang === "pt" ? "Segurança" : "Security"}
+        </h2>
+        <TwoFactorSettings />
+      </div>
 
       {/* Logout — also at bottom for discoverability */}
       <form action={logout}>

@@ -7,6 +7,8 @@ import { useLang } from "@/lib/i18n/useLang";
 
 // Strings not in the shared dictionary
 const extra = {
+  last_session:       { pt: (kg: number, reps: number, days: number) => `Última sessão: ${kg}kg × ${reps} (há ${days} dias)`,
+                        en: (kg: number, reps: number, days: number) => `Last session: ${kg}kg × ${reps} (${days} days ago)` },
   exercises_count:    { pt: "exercícios",               en: "exercises" },
   rest_remaining:     { pt: "restante",                  en: "remaining" },
   rest_time:          { pt: "Tempo de descanso",         en: "Rest time" },
@@ -78,6 +80,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
   const [saving, setSaving] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [prs, setPrs] = useState<Set<string>>(new Set());
+  const [prevLogs, setPrevLogs] = useState<Map<string, { topWeight: number; reps: number; date: string }>>(new Map());
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const elapsedRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startedAt = useRef(Date.now());
@@ -94,23 +97,48 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
     return () => { if (elapsedRef.current) clearInterval(elapsedRef.current); };
   }, []);
 
-  // Load previous PRs for these exercises
+  // Load previous PRs and last session data for these exercises
   useEffect(() => {
     (async () => {
       const supabase = createClient();
+      const exerciseNames = sorted.map((e) => e.name);
       const { data } = await supabase
         .from("workout_logs")
-        .select("exercise_name, sets")
+        .select("exercise_name, sets, logged_at")
         .eq("client_id", clientId)
-        .in("exercise_name", sorted.map((e) => e.name));
+        .in("exercise_name", exerciseNames)
+        .order("logged_at", { ascending: false })
+        .limit(exerciseNames.length * 3);
       if (!data) return;
+
       const best: Record<string, number> = {};
+      const lastSessionMap = new Map<string, { topWeight: number; reps: number; date: string }>();
+
       for (const log of data) {
-        const sets = log.sets as { weight_kg?: number }[];
-        const max = Math.max(...sets.map((s) => s.weight_kg ?? 0));
-        if (!best[log.exercise_name] || max > best[log.exercise_name]) best[log.exercise_name] = max;
+        const sets = log.sets as { weight_kg?: number; reps?: number; done?: boolean }[];
+        const doneSets = sets.filter((s) => s.done !== false);
+        const maxSet = doneSets.reduce<{ weight_kg: number; reps: number } | null>((top, s) => {
+          const w = s.weight_kg ?? 0;
+          if (!top || w > top.weight_kg) return { weight_kg: w, reps: s.reps ?? 0 };
+          return top;
+        }, null);
+
+        if (maxSet && maxSet.weight_kg > 0) {
+          if (!best[log.exercise_name] || maxSet.weight_kg > best[log.exercise_name]) {
+            best[log.exercise_name] = maxSet.weight_kg;
+          }
+          if (!lastSessionMap.has(log.exercise_name)) {
+            lastSessionMap.set(log.exercise_name, {
+              topWeight: maxSet.weight_kg,
+              reps: maxSet.reps,
+              date: log.logged_at as string,
+            });
+          }
+        }
       }
+
       setPrs(new Set(Object.keys(best)));
+      setPrevLogs(lastSessionMap);
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -436,6 +464,12 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                               <div>
                                 <p className={`font-semibold text-sm ${gIdx === step ? "text-white" : "text-gray-400"}`}>{gex.name}</p>
                                 <p className="text-gray-500 text-xs">{extra.sets_x_reps[lang](gex.sets, gex.reps)}</p>
+                                {gIdx === step && (() => {
+                                  const prev = prevLogs.get(gex.name);
+                                  if (!prev) return null;
+                                  const days = Math.round((Date.now() - new Date(prev.date).getTime()) / 86400000);
+                                  return <p className="text-xs text-zinc-500 mt-0.5">{extra.last_session[lang](prev.topWeight, prev.reps, days)}</p>;
+                                })()}
                               </div>
                             </div>
                             {gIdx === step && <span className="text-orange-400 text-xs">{extra.active_marker[lang]}</span>}
@@ -461,6 +495,12 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                           <div>
                             <p className={`font-semibold text-sm ${exIdx === step ? "text-white" : "text-gray-400"}`}>{ex.name}</p>
                             <p className="text-gray-500 text-xs">{extra.sets_x_reps[lang](ex.sets, ex.reps)}</p>
+                            {exIdx === step && (() => {
+                              const prev = prevLogs.get(ex.name);
+                              if (!prev) return null;
+                              const days = Math.round((Date.now() - new Date(prev.date).getTime()) / 86400000);
+                              return <p className="text-xs text-zinc-500 mt-0.5">{extra.last_session[lang](prev.topWeight, prev.reps, days)}</p>;
+                            })()}
                           </div>
                         </div>
                         {exIdx === step && <span className="text-brand-gold text-xs">{extra.active_marker[lang]}</span>}

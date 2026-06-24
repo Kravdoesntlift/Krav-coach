@@ -29,7 +29,7 @@ export default async function ProgressPage() {
   const [supabase, lang] = await Promise.all([createClient(), getLang()]);
   const { data: { user } } = await supabase.auth.getUser();
 
-  const [{ data: logs }, { data: checkins }, { data: completions }, { data: prs }, { data: completionDays }] = await Promise.all([
+  const [{ data: logs }, { data: checkins }, { data: completions }, { data: prs }, { data: completionDays }, { data: nutritionGoals }] = await Promise.all([
     supabase
       .from("workout_logs")
       .select("*")
@@ -57,6 +57,11 @@ export default async function ProgressPage() {
       .eq("client_id", user!.id)
       .order("created_at", { ascending: false })
       .limit(200),
+    supabase
+      .from("client_nutrition_goals")
+      .select("height_cm, age, sex")
+      .eq("client_id", user!.id)
+      .maybeSingle(),
   ]);
 
   // Group logs by exercise name — compute per-session volume and top set
@@ -232,6 +237,11 @@ export default async function ProgressPage() {
         longestStreak={longestStreak}
         totalWorkouts={completedDates.length}
         timeline={timelineEvents}
+        biometric={nutritionGoals ? {
+          height_cm: nutritionGoals.height_cm ?? null,
+          age: nutritionGoals.age ?? null,
+          sex: (nutritionGoals.sex as "M" | "F" | null) ?? null,
+        } : null}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Confetti from "@/components/ui/Confetti";
 import type { Achievement } from "@/lib/achievements";
 import { markAchievementsSeen } from "@/app/client/actions_persistence";
+import { useLang } from "@/lib/i18n/useLang";
 
 interface Props {
   achievements: Achievement[];
@@ -15,13 +16,14 @@ export default function AchievementUnlockModal({ achievements, seenAchievements 
   const [idx, setIdx]             = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
   const [visible, setVisible]     = useState(false);
+  const { lang } = useLang();
+  const isEN = lang === "en";
 
   useEffect(() => {
     const seen  = new Set(seenAchievements);
     const fresh = achievements.filter((a) => a.unlocked && !seen.has(a.id));
     if (fresh.length === 0) return;
 
-    // Mark fresh achievements as seen (fire and forget)
     markAchievementsSeen(fresh.map((a) => a.id));
 
     setQueue(fresh);
@@ -77,7 +79,7 @@ export default function AchievementUnlockModal({ achievements, seenAchievements 
 
           {/* Label */}
           <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-brand-gold mb-3">
-            Conquista desbloqueada!
+            {isEN ? "Achievement unlocked!" : "Conquista desbloqueada!"}
           </p>
 
           {/* Title */}
@@ -108,8 +110,8 @@ export default function AchievementUnlockModal({ achievements, seenAchievements 
             style={{ background: "linear-gradient(135deg,#E2C060,#A8893A)" }}
           >
             {idx + 1 < queue.length
-              ? `Ver próxima conquista →`
-              : "Continuar 🎉"}
+              ? (isEN ? "See next achievement →" : "Ver próxima conquista →")
+              : (isEN ? "Continue 🎉" : "Continuar 🎉")}
           </button>
         </div>
       </div>

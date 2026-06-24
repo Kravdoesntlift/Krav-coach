@@ -2,19 +2,12 @@
 
 import { useState } from "react";
 import { saveOnboarding } from "@/app/client/actions";
+import { useLang } from "@/lib/i18n/useLang";
 
 interface Props {
   clientId: string;
   onComplete: () => void;
 }
-
-const LEVELS = [
-  { value: "beginner", label: "Iniciante", desc: "Menos de 6 meses de treino" },
-  { value: "intermediate", label: "Intermédio", desc: "6 meses a 2 anos" },
-  { value: "advanced", label: "Avançado", desc: "Mais de 2 anos" },
-];
-
-const EQUIPMENT_OPTIONS = ["Ginásio completo", "Ginásio básico", "Casa (sem equipamento)", "Casa (com pesos)", "Ar livre"];
 
 export default function OnboardingModal({ clientId, onComplete }: Props) {
   const [step, setStep] = useState(0);
@@ -24,8 +17,25 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
   const [availability, setAvailability] = useState(3);
   const [equipment, setEquipment] = useState("");
   const [saving, setSaving] = useState(false);
-
   const [saveError, setSaveError] = useState<string | null>(null);
+  const { lang } = useLang();
+  const isEN = lang === "en";
+
+  const LEVELS = isEN
+    ? [
+        { value: "beginner",     label: "Beginner",     desc: "Less than 6 months of training" },
+        { value: "intermediate", label: "Intermediate", desc: "6 months to 2 years" },
+        { value: "advanced",     label: "Advanced",     desc: "More than 2 years" },
+      ]
+    : [
+        { value: "beginner",     label: "Iniciante",   desc: "Menos de 6 meses de treino" },
+        { value: "intermediate", label: "Intermédio",  desc: "6 meses a 2 anos" },
+        { value: "advanced",     label: "Avançado",    desc: "Mais de 2 anos" },
+      ];
+
+  const EQUIPMENT_OPTIONS = isEN
+    ? ["Full gym", "Basic gym", "Home (no equipment)", "Home (with weights)", "Outdoors"]
+    : ["Ginásio completo", "Ginásio básico", "Casa (sem equipamento)", "Casa (com pesos)", "Ar livre"];
 
   async function handleFinish() {
     setSaving(true);
@@ -40,11 +50,9 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
       equipment:   equipment || null,
     });
 
-    // Always save locally so modal doesn't re-appear even if DB has issues
     try { localStorage.setItem(`krav_onboarding_done_${clientId}`, "1"); } catch { /* ignore */ }
 
     if (result?.error) {
-      // Save error but still dismiss — data will be in localStorage
       console.warn("Onboarding save error:", result.error);
     }
 
@@ -52,10 +60,20 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
     onComplete();
   }
 
+  const dayLabel = isEN
+    ? availability === 1 ? "1 day — effective minimum"
+      : availability <= 3 ? `${availability} days — great to start`
+      : availability <= 5 ? `${availability} days — excellent commitment`
+      : `${availability} days — dedicated athlete!`
+    : availability === 1 ? "1 dia — mínimo eficaz"
+      : availability <= 3 ? `${availability} dias — ótimo para começar`
+      : availability <= 5 ? `${availability} dias — excelente comprometimento`
+      : `${availability} dias — atleta dedicado!`;
+
   const steps = [
     {
-      title: "Qual é o teu nível?",
-      subtitle: "Ajuda-nos a personalizar o teu programa",
+      title: isEN ? "What's your level?" : "Qual é o teu nível?",
+      subtitle: isEN ? "Help us personalise your programme" : "Ajuda-nos a personalizar o teu programa",
       content: (
         <div className="space-y-3">
           {LEVELS.map((l) => (
@@ -76,14 +94,16 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
       ),
     },
     {
-      title: "Qual é o teu objetivo?",
-      subtitle: "Sê específico — quanto mais detail, melhor o plano",
+      title: isEN ? "What's your goal?" : "Qual é o teu objetivo?",
+      subtitle: isEN ? "Be specific — the more detail, the better the plan" : "Sê específico — quanto mais detalhe, melhor o plano",
       content: (
         <div className="space-y-3">
           <textarea
             value={goals}
             onChange={(e) => setGoals(e.target.value)}
-            placeholder="Ex: Quero perder 8kg até ao verão, ganhar massa muscular nos braços, melhorar a resistência..."
+            placeholder={isEN
+              ? "E.g. Lose 8kg by summer, build muscle in arms, improve endurance..."
+              : "Ex: Quero perder 8kg até ao verão, ganhar massa muscular nos braços, melhorar a resistência..."}
             rows={4}
             className="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-gold resize-none"
             maxLength={500}
@@ -93,20 +113,22 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
             disabled={!goals.trim()}
             className="w-full py-3 bg-brand-gold text-black font-bold rounded-xl disabled:opacity-40"
           >
-            Continuar →
+            {isEN ? "Continue →" : "Continuar →"}
           </button>
         </div>
       ),
     },
     {
-      title: "Tens alguma lesão ou limitação?",
-      subtitle: "Importante para evitar exercícios que possam piorar",
+      title: isEN ? "Any injuries or limitations?" : "Tens alguma lesão ou limitação?",
+      subtitle: isEN ? "Important to avoid exercises that could make things worse" : "Importante para evitar exercícios que possam piorar",
       content: (
         <div className="space-y-3">
           <textarea
             value={injuries}
             onChange={(e) => setInjuries(e.target.value)}
-            placeholder="Ex: Joelho direito — ligamento cruzado operado em 2022. Sem exercícios de impacto..."
+            placeholder={isEN
+              ? "E.g. Right knee — ACL surgery in 2022. No high-impact exercises..."
+              : "Ex: Joelho direito — ligamento cruzado operado em 2022. Sem exercícios de impacto..."}
             rows={3}
             className="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-gold resize-none"
             maxLength={500}
@@ -115,14 +137,16 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
             onClick={() => setStep(3)}
             className="w-full py-3 bg-brand-gold text-black font-bold rounded-xl"
           >
-            {injuries.trim() ? "Continuar →" : "Nenhuma limitação →"}
+            {injuries.trim()
+              ? (isEN ? "Continue →" : "Continuar →")
+              : (isEN ? "No limitations →" : "Nenhuma limitação →")}
           </button>
         </div>
       ),
     },
     {
-      title: "Quantos dias por semana podes treinar?",
-      subtitle: "Sê realista — consistência supera intensidade",
+      title: isEN ? "How many days a week can you train?" : "Quantos dias por semana podes treinar?",
+      subtitle: isEN ? "Be realistic — consistency beats intensity" : "Sê realista — consistência supera intensidade",
       content: (
         <div className="space-y-4">
           <div className="flex justify-center">
@@ -138,24 +162,19 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
               >+</button>
             </div>
           </div>
-          <p className="text-gray-400 text-sm text-center">
-            {availability === 1 ? "1 dia — mínimo eficaz" :
-             availability <= 3 ? `${availability} dias — ótimo para começar` :
-             availability <= 5 ? `${availability} dias — excelente comprometimento` :
-             `${availability} dias — atleta dedicado!`}
-          </p>
+          <p className="text-gray-400 text-sm text-center">{dayLabel}</p>
           <button
             onClick={() => setStep(4)}
             className="w-full py-3 bg-brand-gold text-black font-bold rounded-xl"
           >
-            Continuar →
+            {isEN ? "Continue →" : "Continuar →"}
           </button>
         </div>
       ),
     },
     {
-      title: "Onde vais treinar?",
-      subtitle: "Adapta o programa ao teu contexto",
+      title: isEN ? "Where will you train?" : "Onde vais treinar?",
+      subtitle: isEN ? "We'll adapt the programme to your context" : "Adapta o programa ao teu contexto",
       content: (
         <div className="space-y-3">
           {EQUIPMENT_OPTIONS.map((eq) => (
@@ -176,7 +195,7 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
             disabled={saving || !equipment}
             className="w-full py-3 bg-brand-gold text-black font-bold rounded-xl mt-2 disabled:opacity-40"
           >
-            {saving ? "A guardar..." : "Concluir →"}
+            {saving ? (isEN ? "Saving..." : "A guardar...") : (isEN ? "Finish →" : "Concluir →")}
           </button>
         </div>
       ),
@@ -212,7 +231,7 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
             onClick={() => setStep((s) => s - 1)}
             className="mt-4 text-gray-600 text-xs hover:text-gray-400 transition-colors text-center w-full"
           >
-            ← Voltar
+            {isEN ? "← Back" : "← Voltar"}
           </button>
         )}
       </div>

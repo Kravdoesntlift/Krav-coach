@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useLang } from "@/lib/i18n/useLang";
 
 interface Challenge {
   id: string;
@@ -23,16 +24,15 @@ interface Props {
   clientId: string;
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  workouts: "treinos",
-  checkins: "check-ins",
-  weight_logs: "registos de peso",
-  custom: "tarefas",
-};
-
 export default function ChallengeCards({ challenges, progress: initialProgress, clientId }: Props) {
   const [progress, setProgress] = useState<Progress[]>(initialProgress);
   const [loading, setLoading] = useState<string | null>(null);
+  const { lang } = useLang();
+  const isEN = lang === "en";
+
+  const TYPE_LABELS: Record<string, string> = isEN
+    ? { workouts: "workouts", checkins: "check-ins", weight_logs: "weight logs", custom: "tasks" }
+    : { workouts: "treinos",  checkins: "check-ins", weight_logs: "registos de peso", custom: "tarefas" };
 
   if (!challenges.length) return null;
 
@@ -70,7 +70,9 @@ export default function ChallengeCards({ challenges, progress: initialProgress, 
 
   return (
     <div className="space-y-3">
-      <h3 className="text-white font-semibold text-sm">Desafios da semana</h3>
+      <h3 className="text-white font-semibold text-sm">
+        {isEN ? "Weekly challenges" : "Desafios da semana"}
+      </h3>
       {challenges.map((c) => {
         const prog = getProgress(c.id);
         const current = prog?.current_count ?? 0;
@@ -86,7 +88,7 @@ export default function ChallengeCards({ challenges, progress: initialProgress, 
                   <p className="text-gray-500 text-xs mt-0.5">{c.description}</p>
                 )}
                 <p className="text-gray-600 text-xs mt-0.5">
-                  Meta: {c.target_count} {TYPE_LABELS[c.target_type] ?? "tarefas"}
+                  {isEN ? "Goal" : "Meta"}: {c.target_count} {TYPE_LABELS[c.target_type] ?? (isEN ? "tasks" : "tarefas")}
                 </p>
               </div>
               <div className="shrink-0 text-right">
@@ -106,7 +108,7 @@ export default function ChallengeCards({ challenges, progress: initialProgress, 
 
             {done ? (
               <div className="flex items-center gap-2 text-green-400 text-sm font-semibold">
-                <span>Desafio concluído!</span>
+                <span>{isEN ? "Challenge complete!" : "Desafio concluído!"}</span>
                 <span>🏆</span>
               </div>
             ) : (
@@ -115,7 +117,7 @@ export default function ChallengeCards({ challenges, progress: initialProgress, 
                 disabled={loading === c.id}
                 className="w-full py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-gray-300 hover:text-white text-sm transition-colors disabled:opacity-50"
               >
-                {loading === c.id ? "..." : "+ Registar progresso"}
+                {loading === c.id ? "..." : (isEN ? "+ Log progress" : "+ Registar progresso")}
               </button>
             )}
           </div>
