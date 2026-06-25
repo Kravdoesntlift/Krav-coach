@@ -262,22 +262,22 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
           <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest mb-3">
             Total diário estimado
           </p>
-          <div className="flex gap-4 flex-wrap">
-            <div className="text-center">
-              <p className="text-brand-gold font-bold text-lg">{Math.round(dailyTotals.calories)}</p>
+          <div className="grid grid-cols-4 gap-2">
+            <div className="text-center bg-zinc-800/50 rounded-xl py-2.5">
+              <p className="text-brand-gold font-bold text-lg leading-tight">{Math.round(dailyTotals.calories)}</p>
               <p className="text-zinc-600 text-[10px]">kcal</p>
             </div>
-            <div className="text-center">
-              <p className="text-blue-400 font-bold text-lg">{Math.round(dailyTotals.protein_g)}g</p>
-              <p className="text-zinc-600 text-[10px]">proteína</p>
+            <div className="text-center bg-zinc-800/50 rounded-xl py-2.5">
+              <p className="text-blue-400 font-bold text-lg leading-tight">{Math.round(dailyTotals.protein_g)}g</p>
+              <p className="text-zinc-600 text-[10px]">prot</p>
             </div>
-            <div className="text-center">
-              <p className="text-orange-400 font-bold text-lg">{Math.round(dailyTotals.carbs_g)}g</p>
-              <p className="text-zinc-600 text-[10px]">hidratos</p>
+            <div className="text-center bg-zinc-800/50 rounded-xl py-2.5">
+              <p className="text-orange-400 font-bold text-lg leading-tight">{Math.round(dailyTotals.carbs_g)}g</p>
+              <p className="text-zinc-600 text-[10px]">hid</p>
             </div>
-            <div className="text-center">
-              <p className="text-pink-400 font-bold text-lg">{Math.round(dailyTotals.fat_g)}g</p>
-              <p className="text-zinc-600 text-[10px]">gordura</p>
+            <div className="text-center bg-zinc-800/50 rounded-xl py-2.5">
+              <p className="text-pink-400 font-bold text-lg leading-tight">{Math.round(dailyTotals.fat_g)}g</p>
+              <p className="text-zinc-600 text-[10px]">gord</p>
             </div>
           </div>
         </div>
@@ -349,10 +349,10 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
               {meal.foods.map((food, fi) => (
                 <div
                   key={fi}
-                  className="rounded-xl p-3 space-y-3"
+                  className="rounded-xl p-3 space-y-2.5"
                   style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
                 >
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
                     <input
                       className="input flex-1 text-sm"
                       placeholder="Nome do alimento"
@@ -363,20 +363,21 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
                       <button
                         type="button"
                         onClick={() => removeFood(mi, fi)}
-                        className="text-zinc-700 hover:text-red-400 text-sm transition-colors shrink-0"
+                        className="w-9 h-9 flex items-center justify-center rounded-xl text-zinc-600 hover:text-red-400 hover:bg-zinc-800 transition-colors shrink-0"
                       >
                         ✕
                       </button>
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  {/* Row 1: Quantidade + Kcal */}
+                  <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label className="text-[9px] font-semibold uppercase tracking-widest text-zinc-500 block mb-1">
                         Quantidade
                       </label>
                       <input
-                        className="input text-xs w-full"
+                        className="input text-sm w-full"
                         placeholder="Ex: 100g, 1 unid."
                         value={food.quantity}
                         onChange={(e) => updateFood(mi, fi, { quantity: e.target.value })}
@@ -388,19 +389,22 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
                       </label>
                       <input
                         type="number" min="0"
-                        className="input text-xs w-full"
+                        className="input text-sm w-full"
                         placeholder="0"
                         value={food.calories}
                         onChange={(e) => updateFood(mi, fi, { calories: e.target.value })}
                       />
                     </div>
+                  </div>
+                  {/* Row 2: Macros */}
+                  <div className="grid grid-cols-3 gap-2">
                     <div>
                       <label className="text-[9px] font-semibold uppercase tracking-widest text-blue-400 block mb-1">
                         Prot (g)
                       </label>
                       <input
                         type="number" min="0" step="0.1"
-                        className="input text-xs w-full"
+                        className="input text-sm w-full"
                         placeholder="0"
                         value={food.protein_g}
                         onChange={(e) => updateFood(mi, fi, { protein_g: e.target.value })}
@@ -412,7 +416,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
                       </label>
                       <input
                         type="number" min="0" step="0.1"
-                        className="input text-xs w-full"
+                        className="input text-sm w-full"
                         placeholder="0"
                         value={food.carbs_g}
                         onChange={(e) => updateFood(mi, fi, { carbs_g: e.target.value })}
@@ -424,7 +428,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
                       </label>
                       <input
                         type="number" min="0" step="0.1"
-                        className="input text-xs w-full"
+                        className="input text-sm w-full"
                         placeholder="0"
                         value={food.fat_g}
                         onChange={(e) => updateFood(mi, fi, { fat_g: e.target.value })}
@@ -469,11 +473,11 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
       )}
 
       {/* Actions */}
-      <div className="flex justify-end gap-3 pb-8">
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pb-8 pt-2">
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-4 py-2 rounded-xl text-sm text-zinc-400 hover:text-white transition-colors"
+          className="w-full sm:w-auto px-4 py-3 sm:py-2 rounded-xl text-sm text-zinc-400 hover:text-white transition-colors border border-zinc-800 sm:border-transparent"
         >
           Cancelar
         </button>
@@ -481,7 +485,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
           type="button"
           onClick={handleSave}
           disabled={saving}
-          className="btn-primary text-sm disabled:opacity-50"
+          className="btn-primary w-full sm:w-auto text-sm py-3 sm:py-2 disabled:opacity-50"
         >
           {saving ? "A guardar..." : "Guardar plano"}
         </button>
