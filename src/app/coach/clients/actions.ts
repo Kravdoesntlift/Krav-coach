@@ -97,6 +97,8 @@ export async function broadcastMessage(
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Não autenticado." };
+  const { data: callerProfile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (callerProfile?.role !== "coach") return { error: "Sem permissão." };
 
   const { data: plans } = await supabase
     .from("workout_plans")

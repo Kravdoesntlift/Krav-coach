@@ -100,7 +100,9 @@
       "mcp__82e11bf4-1a22-45ab-9290-c72ae48b88ae__update_event",
       "WebFetch(domain:www.googleapis.com)",
       "WebFetch(domain:pagespeed.web.dev)",
-      "Bash(npm i *)"
+      "Bash(npm i *)",
+      "mcp__visualize__read_me",
+      "mcp__visualize__show_widget"
     ]
   }
 }

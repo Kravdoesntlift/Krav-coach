@@ -52,6 +52,8 @@ export async function POST(req: NextRequest) {
     const { habit_id, logged_date } = body;
     if (!habit_id || !logged_date)
       return NextResponse.json({ error: "habit_id and logged_date required." }, { status: 400 });
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(logged_date) || isNaN(Date.parse(logged_date)))
+      return NextResponse.json({ error: "logged_date inválido." }, { status: 400 });
 
     // Check if log exists
     const { data: existing } = await supabase

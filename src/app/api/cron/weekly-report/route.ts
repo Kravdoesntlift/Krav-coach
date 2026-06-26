@@ -20,7 +20,8 @@ export async function GET(req: NextRequest) {
   // Get all coach-client relationships with active clients
   const { data: relationships } = await admin
     .from("coach_clients")
-    .select("coach_id, client_id, profiles!client_id(full_name, status)");
+    .select("coach_id, client_id, profiles!client_id(full_name, status)")
+    .eq("assigned_role", "coach");
 
   if (!relationships?.length) return NextResponse.json({ ok: true, processed: 0 });
 
@@ -75,8 +76,8 @@ export async function GET(req: NextRequest) {
           : Promise.resolve({ data: [] as { id: string; is_rest: boolean | null }[], error: null }),
         // Coach name
         admin.from("profiles").select("full_name").eq("id", coachId).single(),
-        // Client name
-        admin.from("profiles").select("full_name").eq("id", clientId).single(),
+        // Client name + lang
+        admin.from("profiles").select("full_name, lang").eq("id", clientId).single(),
         // Progress photos (front angle, oldest + newest)
         admin.from("progress_photos").select("photo_url, taken_at, angle")
           .eq("client_id", clientId)
@@ -109,12 +110,20 @@ export async function GET(req: NextRequest) {
       const hasNewPhoto = photoLatestUrl && photoBeforeUrl !== photoLatestUrl;
 
       const coachFirstName = ((coachProfile?.full_name as string | undefined) ?? "").split(" ")[0] || "Coach";
-      const clientFirstName = ((clientProfile?.full_name as string | undefined) ?? "").split(" ")[0] || "atleta";
+      const isEN = (clientProfile as { lang?: string } | null)?.lang === "en";
+      const clientFirstName = ((clientProfile?.full_name as string | undefined) ?? "").split(" ")[0] || (isEN ? "athlete" : "atleta");
 
       // Generate AI message with Groq
       let aiMessage: string | null = (feedback?.message as string | undefined) ?? null;
       if (!aiMessage && process.env.GROQ_API_KEY) {
-        const prompt = `És ${coachFirstName}, personal trainer. Escreve uma mensagem de motivação curta (2-3 frases, máximo 120 palavras) em português de Portugal para o teu cliente ${clientFirstName} com base nos resultados desta semana:
+        const prompt = isEN
+          ? `You are ${coachFirstName}, a personal trainer. Write a short motivational message (2-3 sentences, max 120 words) in English for your client ${clientFirstName} based on this week's results:
+- Workouts completed: ${workoutsCompleted} of ${workoutsTotal}
+${weightChange != null ? `- Weight: ${weightChange > 0 ? "+" : ""}${weightChange}kg vs last week` : ""}
+${waistChange != null ? `- Waist: ${waistChange > 0 ? "+" : ""}${waistChange}cm vs last week` : ""}
+${energyAvg != null ? `- Average energy: ${energyAvg}/5` : ""}
+Use a direct, encouraging and personal tone. NO emojis. Speak in first person as coach.`
+          : `És ${coachFirstName}, personal trainer. Escreve uma mensagem de motivação curta (2-3 frases, máximo 120 palavras) em português de Portugal para o teu cliente ${clientFirstName} com base nos resultados desta semana:
 - Treinos completados: ${workoutsCompleted} de ${workoutsTotal}
 ${weightChange != null ? `- Peso: ${weightChange > 0 ? "+" : ""}${weightChange}kg face à semana anterior` : ""}
 ${waistChange != null ? `- Cintura: ${waistChange > 0 ? "+" : ""}${waistChange}cm face à semana anterior` : ""}

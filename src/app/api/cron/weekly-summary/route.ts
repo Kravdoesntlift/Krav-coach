@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
   const monday = new Date(now);
   monday.setUTCDate(now.getUTCDate() - ((dayOfWeek + 6) % 7));
   const weekStart = monday.toISOString().slice(0, 10);
-  const weekEnd = now.toISOString().slice(0, 10);
+  const weekEnd = new Date(Date.UTC(monday.getUTCFullYear(), monday.getUTCMonth(), monday.getUTCDate() + 7)).toISOString().slice(0, 10);
 
   // All active clients
   const { data: clients } = await admin

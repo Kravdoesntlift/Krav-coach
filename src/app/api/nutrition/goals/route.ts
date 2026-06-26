@@ -52,6 +52,10 @@ export async function POST(req: NextRequest) {
 
   const { clientId, calories, protein, carbs, fat, goal } = body;
   if (!clientId) return NextResponse.json({ error: "clientId obrigatório." }, { status: 400 });
+  const validMacro = (v: unknown) => typeof v === "number" && Number.isFinite(v) && v >= 0 && v <= 10000;
+  if (!validMacro(calories) || !validMacro(protein) || !validMacro(carbs) || !validMacro(fat)) {
+    return NextResponse.json({ error: "Valores de macros inválidos." }, { status: 400 });
+  }
 
   // Verify coach–client relationship
   const { data: rel } = await supabase

@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-function generateCode(seed: string): string {
-  // Deterministic: take first 8 chars of the UUID, uppercased
-  return seed.replace(/-/g, "").slice(0, 8).toUpperCase();
+function generateCode(): string {
+  return require("crypto").randomBytes(6).toString("hex").toUpperCase();
 }
 
 export async function GET() {
@@ -32,7 +31,7 @@ export async function GET() {
   }
 
   // Generate a new code
-  const code = generateCode(user.id);
+  const code = generateCode();
   const { data: created, error } = await admin
     .from("referral_codes")
     .insert({ client_id: user.id, code })

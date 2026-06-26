@@ -59,7 +59,8 @@ export default async function ClientDetailPage({
     .select(`*, workout_days(*, exercises(*), workout_completions(*))`)
     .eq("coach_id", user!.id)
     .eq("client_id", clientId)
-    .order("week_start", { ascending: false });
+    .order("week_start", { ascending: false })
+    .limit(26);
 
   const { data: checkins } = await supabase
     .from("weekly_checkins")
@@ -86,14 +87,14 @@ export default async function ClientDetailPage({
     supabase.from("coach_notes").select("content")
       .eq("coach_id", user!.id).eq("client_id", clientId).maybeSingle(),
     supabase.from("personal_records").select("*")
-      .eq("client_id", clientId).order("recorded_at", { ascending: false }),
+      .eq("client_id", clientId).order("recorded_at", { ascending: false }).limit(200),
     admin.from("client_onboarding").select("*").eq("client_id", clientId).maybeSingle(),
     supabase.from("challenges").select("*")
       .eq("coach_id", user!.id).eq("client_id", clientId).eq("week_start", currentWeekStart),
     supabase.from("client_goals").select("*")
       .eq("client_id", clientId).order("created_at", { ascending: false }),
     supabase.from("progress_photos").select("*")
-      .eq("client_id", clientId).order("taken_at", { ascending: false }),
+      .eq("client_id", clientId).order("taken_at", { ascending: false }).limit(200),
     admin.from("nutrition_logs").select("logged_at,calories,protein_g,carbs_g,fat_g,meal_name")
       .eq("client_id", clientId)
       .gte("logged_at", currentWeekStart)

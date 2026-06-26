@@ -39,6 +39,9 @@ export async function POST(req: NextRequest) {
     if (!clientId || !priceAmount || !currency) {
       return NextResponse.json({ error: "Parâmetros inválidos." }, { status: 400 });
     }
+    if (!Number.isInteger(priceAmount) || priceAmount < 100 || priceAmount > 100_000_00) {
+      return NextResponse.json({ error: "Valor inválido. Mínimo €1, máximo €100.000." }, { status: 400 });
+    }
 
     const Stripe = (await import("stripe")).default;
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2026-04-22.dahlia" as "2026-04-22.dahlia" });

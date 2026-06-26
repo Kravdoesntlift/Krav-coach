@@ -204,12 +204,12 @@ export default function SignupPage() {
                 <div
                   className="flex items-start gap-2.5 px-4 py-3 rounded-xl text-sm"
                   style={{
-                    background: "rgba(201,168,76,0.07)",
-                    border: "1px solid rgba(201,168,76,0.2)",
+                    background: "rgba(220,38,38,0.08)",
+                    border: "1px solid rgba(220,38,38,0.25)",
                   }}
                 >
-                  <span className="text-brand-gold mt-0.5 shrink-0">⚠</span>
-                  <p className="text-brand-gold/90">{error}</p>
+                  <span className="text-red-400 mt-0.5 shrink-0">⚠</span>
+                  <p className="text-red-400">{error}</p>
                 </div>
               )}
 

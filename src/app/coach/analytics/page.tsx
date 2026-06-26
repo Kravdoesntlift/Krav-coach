@@ -90,7 +90,7 @@ export default async function AnalyticsPage() {
     supabase.from("workout_completions").select("client_id, created_at").gte("created_at", since + "T00:00:00"),
     supabase.from("stripe_subscriptions").select("status, amount_cents, current_period_end").eq("coach_id", user.id),
     supabase.from("workout_plans").select("client_id, week_start").eq("coach_id", user.id).gte("week_start", since),
-    supabase.from("leads").select("id, status, created_at").order("created_at"),
+    supabase.from("leads").select("id, status, created_at").order("created_at").limit(1000),
   ]);
 
   type ProfileRef = { status: string | null; created_at: string } | null;

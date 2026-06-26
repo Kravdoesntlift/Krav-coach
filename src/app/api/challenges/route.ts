@@ -28,6 +28,9 @@ export async function POST(req: NextRequest) {
   if (!month || !reward_title) {
     return NextResponse.json({ error: "month e reward_title são obrigatórios." }, { status: 400 });
   }
+  if (reward_image_url && (typeof reward_image_url !== "string" || !reward_image_url.startsWith("https://"))) {
+    return NextResponse.json({ error: "reward_image_url deve ser uma URL HTTPS válida." }, { status: 400 });
+  }
 
   const admin = createAdminClient();
   const { data, error } = await admin

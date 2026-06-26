@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
 
   const q = req.nextUrl.searchParams.get("q")?.trim();
   if (!q) return NextResponse.json({ foods: [] });
+  if (q.length > 200) return NextResponse.json({ foods: [] });
 
   const lang = req.nextUrl.searchParams.get("lang") === "en" ? "en" : "pt";
 

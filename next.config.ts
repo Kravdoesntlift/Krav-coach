@@ -16,8 +16,8 @@ const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
 
 const ContentSecurityPolicy = [
   "default-src 'self'",
-  // Next.js requires unsafe-inline for styles; unsafe-eval for dev HMR (noop in prod)
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  // Next.js requires unsafe-inline for styles; unsafe-eval only needed in dev for HMR
+  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   // Images: self + Supabase Storage
   `img-src 'self' data: blob: https://${supabaseHost}`,

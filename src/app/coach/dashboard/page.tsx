@@ -80,7 +80,8 @@ export default async function CoachDashboard() {
     .from("messages")
     .select("sender_id")
     .eq("receiver_id", user!.id)
-    .is("read_at", null);
+    .is("read_at", null)
+    .limit(500);
 
   const unreadByClient = new Map<string, number>();
   for (const m of unreadMsgs ?? []) {
@@ -100,7 +101,8 @@ export default async function CoachDashboard() {
     .from("weekly_checkins")
     .select("client_id, week_start")
     .in("client_id", allClientIds.length > 0 ? allClientIds : ["none"])
-    .order("week_start", { ascending: false });
+    .order("week_start", { ascending: false })
+    .limit(allClientIds.length > 0 ? allClientIds.length * 2 : 1);
 
   const lastCheckinByClient = new Map<string, string>();
   for (const c of recentCheckins ?? []) {

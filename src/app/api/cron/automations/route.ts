@@ -191,7 +191,7 @@ export async function GET(req: NextRequest) {
       const fullName = profileMap.get(clientId) ?? "";
       const firstName = fullName.split(" ")[0] || fullName;
       const content = automation.message_template.replace(
-        /\{\{nome\}\}/gi,
+        /\{\{nome\}\}|\{\{name\}\}/gi,
         firstName
       );
 

@@ -7,6 +7,8 @@ async function getCoach() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { supabase, user: null };
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (profile?.role !== "coach") return { supabase, user: null };
   return { supabase, user };
 }
 

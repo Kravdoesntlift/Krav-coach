@@ -23,6 +23,10 @@ export async function addTransformation(data: {
 
   if (profile?.role !== "coach") return { error: "Sem permissão." };
 
+  if (!data.before_url.startsWith("https://") || !data.after_url.startsWith("https://")) {
+    return { error: "URLs de imagem devem ser HTTPS." };
+  }
+
   const { error } = await supabase.from("client_transformations").insert({
     coach_id: user.id,
     display_name: data.display_name,

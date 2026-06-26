@@ -57,7 +57,16 @@ export async function POST(req: NextRequest) {
   const clientId = tokenRow.client_id;
 
   // Use provided date or today in UTC (YYYY-MM-DD)
-  const logDate = date ?? new Date().toISOString().slice(0, 10);
+  const today = new Date().toISOString().slice(0, 10);
+  const rawDate = date ?? today;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(rawDate) || isNaN(Date.parse(rawDate))) {
+    return NextResponse.json({ error: "date inválido." }, { status: 400 });
+  }
+  const daysDiff = (Date.parse(today) - Date.parse(rawDate)) / 86_400_000;
+  if (daysDiff < 0 || daysDiff > 30) {
+    return NextResponse.json({ error: "date fora do intervalo permitido (últimos 30 dias)." }, { status: 400 });
+  }
+  const logDate = rawDate;
 
   // Build update payload — only update fields that were sent
   const updates: Record<string, unknown> = {
