@@ -19,12 +19,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Too many requests. Please wait a moment." }, { status: 429 });
   }
 
-  const { message, history } = await req.json() as {
+  const { message, history: rawHistory } = await req.json() as {
     message: string;
-    history: { role: "user" | "assistant"; content: string }[];
+    history: { role: string; content: string }[];
   };
 
   if (!message?.trim()) return NextResponse.json({ error: "Empty message." }, { status: 400 });
+  if (message.length > 2000) return NextResponse.json({ error: "Message too long." }, { status: 400 });
+
+  // Validate and sanitize history — only allow known roles, cap content length
+  const history = (Array.isArray(rawHistory) ? rawHistory : [])
+    .filter((h) => h.role === "user" || h.role === "assistant")
+    .map((h) => ({ role: h.role as "user" | "assistant", content: String(h.content).slice(0, 2000) }))
+    .slice(-10);
 
   const admin = createAdminClient();
 
@@ -126,7 +133,7 @@ COMO RESPONDER:
     temperature: 0.7,
     messages: [
       { role: "system", content: systemPrompt },
-      ...history.slice(-10),
+      ...history,
       { role: "user", content: message },
     ],
   });

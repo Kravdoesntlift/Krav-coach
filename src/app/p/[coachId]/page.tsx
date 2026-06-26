@@ -97,20 +97,26 @@ export default async function CoachPublicPage({
           </div>
         </div>
 
-        {/* Stats */}
-        <div
-          className="grid grid-cols-2 gap-3 rounded-2xl p-5"
-          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
-        >
-          <div className="text-center">
-            <p className="text-3xl font-black" style={{ color: "#C9A84C" }}>{clientCount}</p>
-            <p className="text-zinc-500 text-xs mt-1">clientes ativos</p>
+        {/* Stats — only show if there's real data */}
+        {(clientCount > 0 || (completionCount ?? 0) > 0) && (
+          <div
+            className="grid grid-cols-2 gap-3 rounded-2xl p-5"
+            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+          >
+            {clientCount > 0 && (
+              <div className="text-center">
+                <p className="text-3xl font-black" style={{ color: "#C9A84C" }}>{clientCount}</p>
+                <p className="text-zinc-500 text-xs mt-1">clientes ativos</p>
+              </div>
+            )}
+            {(completionCount ?? 0) > 0 && (
+              <div className={`text-center ${clientCount === 0 ? "col-span-2" : ""}`}>
+                <p className="text-3xl font-black" style={{ color: "#C9A84C" }}>{completionCount}</p>
+                <p className="text-zinc-500 text-xs mt-1">treinos concluídos</p>
+              </div>
+            )}
           </div>
-          <div className="text-center">
-            <p className="text-3xl font-black" style={{ color: "#C9A84C" }}>{completionCount ?? 0}</p>
-            <p className="text-zinc-500 text-xs mt-1">treinos concluídos</p>
-          </div>
-        </div>
+        )}
 
         {/* What you get */}
         <div className="space-y-3">
@@ -233,13 +239,21 @@ export default async function CoachPublicPage({
         )}
 
         {/* CTA */}
-        <div className="space-y-3">
+        <div className="space-y-4">
+          {/* Trust signals */}
+          <div className="flex items-center justify-center gap-6 text-zinc-500 text-[11px]">
+            <span>7 dias grátis</span>
+            <span className="w-px h-3 bg-zinc-700" />
+            <span>Cancela a qualquer momento</span>
+            <span className="w-px h-3 bg-zinc-700" />
+            <span>Sem compromisso</span>
+          </div>
           <Link
             href={`/auth/signup?coach=${coachId}`}
             className="block w-full text-center py-4 rounded-2xl font-black text-black text-base tracking-wide transition-transform active:scale-95"
             style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
           >
-            Quero começar 🚀
+            Começar trial gratuito
           </Link>
           <p className="text-zinc-600 text-xs text-center">
             Já tens conta? <Link href="/auth/login" className="text-zinc-400 hover:text-white transition-colors underline">Entra aqui</Link>

@@ -23,12 +23,13 @@ export default async function AchievementsPage() {
     supabase.from("workout_plans")
       .select("week_start, workout_days(is_rest, workout_completions(client_id))")
       .eq("client_id", user!.id)
-      .order("week_start", { ascending: false }),
-    supabase.from("weekly_checkins").select("id").eq("client_id", user!.id),
-    supabase.from("personal_records").select("exercise_name").eq("client_id", user!.id),
+      .order("week_start", { ascending: false })
+      .limit(104),
+    supabase.from("weekly_checkins").select("id").eq("client_id", user!.id).limit(200),
+    supabase.from("personal_records").select("exercise_name").eq("client_id", user!.id).limit(200),
     supabase.from("profiles").select("full_name, seen_achievements").eq("id", user!.id).single(),
-    supabase.from("workout_logs").select("sets").eq("client_id", user!.id),
-    supabase.from("progress_photos").select("id").eq("client_id", user!.id),
+    supabase.from("workout_logs").select("sets").eq("client_id", user!.id).limit(500),
+    supabase.from("progress_photos").select("id").eq("client_id", user!.id).limit(200),
   ]);
 
   // ── Stats ──────────────────────────────────────────────────────

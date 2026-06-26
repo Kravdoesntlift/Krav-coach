@@ -212,6 +212,9 @@ export async function unassignClient(clientId: string, role: string = "coach") {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Não autenticado." };
 
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (profile?.role !== "coach") return { error: "Sem permissão." };
+
   const admin = createAdminClient();
   const { error } = await admin
     .from("coach_clients")

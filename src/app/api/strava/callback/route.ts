@@ -31,6 +31,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${siteUrl}/client/integrations?error=strava_csrf`);
   }
 
+  // Re-verify active session matches the uid in state to prevent token hijacking
+  const { createClient: createServerClient } = await import("@/lib/supabase/server");
+  const supabase = await createServerClient();
+  const { data: { user: sessionUser } } = await supabase.auth.getUser();
+  if (!sessionUser || sessionUser.id !== uid) {
+    return NextResponse.redirect(`${siteUrl}/client/integrations?error=strava_session`);
+  }
+
   // Exchange code for token
   const tokenRes = await fetch("https://www.strava.com/oauth/token", {
     method: "POST",

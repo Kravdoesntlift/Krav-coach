@@ -13,14 +13,21 @@ export async function POST(req: NextRequest) {
   const file = formData.get("file") as File | null;
   const slot = formData.get("slot") as "before" | "after" | null;
 
+  const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+  const ALLOWED_EXTS  = ["jpg", "jpeg", "png", "webp", "heic", "heif"];
+
   if (!file) return NextResponse.json({ error: "Ficheiro em falta" }, { status: 400 });
   if (slot !== "before" && slot !== "after") return NextResponse.json({ error: "Slot inválido" }, { status: 400 });
+
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+  if (!ALLOWED_TYPES.includes(file.type) || !ALLOWED_EXTS.includes(ext)) {
+    return NextResponse.json({ error: "Tipo de ficheiro não permitido. Usa JPEG, PNG ou WebP." }, { status: 400 });
+  }
   if (file.size > 5 * 1024 * 1024) return NextResponse.json({ error: "Imagem demasiado grande. Máximo 5MB." }, { status: 400 });
 
   const admin = createAdminClient();
   await admin.storage.createBucket("avatars", { public: true }).catch(() => {});
 
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
   const path = `${user.id}/transformation_${slot}.${ext}`;
   const bytes = await file.arrayBuffer();
 
@@ -31,7 +38,7 @@ export async function POST(req: NextRequest) {
 
   const { error: storageErr } = await admin.storage
     .from("avatars")
-    .upload(path, bytes, { contentType: file.type || "image/jpeg", upsert: true });
+    .upload(path, bytes, { contentType: ALLOWED_TYPES.includes(file.type) ? file.type : "image/jpeg", upsert: true });
 
   if (storageErr) return NextResponse.json({ error: storageErr.message }, { status: 500 });
 

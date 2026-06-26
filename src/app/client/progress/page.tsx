@@ -32,19 +32,22 @@ export default async function ProgressPage() {
   const [{ data: logs }, { data: checkins }, { data: completions }, { data: prs }, { data: completionDays }, { data: nutritionGoals }] = await Promise.all([
     supabase
       .from("workout_logs")
-      .select("*")
+      .select("exercise_name, sets, logged_at")
       .eq("client_id", user!.id)
-      .order("logged_at", { ascending: true }),
+      .order("logged_at", { ascending: true })
+      .limit(500),
     supabase
       .from("weekly_checkins")
       .select("week_start, weight_kg, waist_cm, chest_cm, arm_cm, energy_level")
       .eq("client_id", user!.id)
-      .order("week_start", { ascending: true }),
+      .order("week_start", { ascending: true })
+      .limit(104),
     supabase
       .from("workout_completions")
       .select("completed_at")
       .eq("client_id", user!.id)
-      .order("completed_at", { ascending: true }),
+      .order("completed_at", { ascending: true })
+      .limit(500),
     supabase
       .from("personal_records")
       .select("exercise_name, weight_kg, reps, recorded_at")

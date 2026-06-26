@@ -17,6 +17,12 @@ export async function GET(req: NextRequest) {
   if (profile?.role !== "coach") return NextResponse.json({ error: "Apenas coaches." }, { status: 403 });
 
   const admin = createAdminClient();
+
+  // Verify coach-client relationship before exposing client data
+  const { data: rel } = await supabase.from("coach_clients")
+    .select("id").eq("coach_id", user.id).eq("client_id", clientId).maybeSingle();
+  if (!rel) return NextResponse.json({ error: "Sem acesso a este cliente." }, { status: 403 });
+
   const { data } = await admin
     .from("client_nutrition_goals")
     .select("target_calories,target_protein_g,target_carbs_g,target_fat_g,goal")

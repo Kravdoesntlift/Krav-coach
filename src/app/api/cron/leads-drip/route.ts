@@ -23,6 +23,10 @@ export async function GET(req: NextRequest) {
   if (authHeader !== `Bearer ${cronSecret}`)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  if (!process.env.RESEND_API_KEY) {
+    return NextResponse.json({ error: "RESEND_API_KEY not configured" }, { status: 500 });
+  }
+
   const admin = createAdminClient();
   const resend = new Resend(process.env.RESEND_API_KEY);
   const FROM = process.env.RESEND_FROM ?? "André Kravchuk <noreply@kravcoaching.com>";

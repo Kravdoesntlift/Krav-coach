@@ -12,8 +12,16 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
 
+  const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+  const ALLOWED_EXTS  = ["jpg", "jpeg", "png", "webp", "heic", "heif"];
+
   if (!file) {
     return NextResponse.json({ error: "Ficheiro em falta" }, { status: 400 });
+  }
+
+  const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+  if (!ALLOWED_TYPES.includes(file.type) || !ALLOWED_EXTS.includes(ext)) {
+    return NextResponse.json({ error: "Tipo de ficheiro não permitido. Usa JPEG, PNG ou WebP." }, { status: 400 });
   }
   if (file.size > 3 * 1024 * 1024) {
     return NextResponse.json({ error: "Imagem demasiado grande. Máximo 3MB." }, { status: 400 });
@@ -24,7 +32,6 @@ export async function POST(req: NextRequest) {
   // Ensure bucket exists (public, so URLs work without signed tokens)
   await admin.storage.createBucket("avatars", { public: true }).catch(() => {});
 
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
   const path = `${user.id}/avatar.${ext}`;
   const bytes = await file.arrayBuffer();
 
@@ -37,7 +44,7 @@ export async function POST(req: NextRequest) {
   const { error: storageErr } = await admin.storage
     .from("avatars")
     .upload(path, bytes, {
-      contentType: file.type || "image/jpeg",
+      contentType: ALLOWED_TYPES.includes(file.type) ? file.type : "image/jpeg",
       upsert: true,
     });
 
