@@ -62,6 +62,7 @@ export async function GET(req: NextRequest) {
     athlete: { id: number };
   };
 
+  const { encrypt } = await import("@/lib/crypto");
   const admin = createAdminClient();
   const { error: dbErr } = await admin
     .from("health_integrations")
@@ -69,8 +70,8 @@ export async function GET(req: NextRequest) {
       {
         client_id: uid,
         provider: "strava",
-        access_token: tokenData.access_token,
-        refresh_token: tokenData.refresh_token,
+        access_token: encrypt(tokenData.access_token),
+        refresh_token: encrypt(tokenData.refresh_token),
         token_expires_at: new Date(tokenData.expires_at * 1000).toISOString(),
         provider_user_id: String(tokenData.athlete.id),
         is_active: true,

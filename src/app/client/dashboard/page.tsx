@@ -20,6 +20,7 @@ import InstallPrompt from "@/components/client/InstallPrompt";
 import NotificationPrompt from "@/components/client/NotificationPrompt";
 import AppBadge from "@/components/client/AppBadge";
 import RestDayCard from "@/components/client/RestDayCard";
+import WorkoutCacheWriter from "@/components/client/WorkoutCacheWriter";
 
 import type { WeeklyCheckin } from "@/lib/supabase/types";
 import MonthCalendar, { type DayStatus } from "@/components/client/MonthCalendar";
@@ -264,8 +265,26 @@ export default async function ClientDashboard() {
     totalPhotos: allPhotos?.length ?? 0,
   }, lang);
 
+  // Build cache payload for offline page
+  const weekDaysCache = plan
+    ? (plan.workout_days as WorkoutPlan["workout_days"])
+        ?.sort((a, b) => a.day_of_week - b.day_of_week)
+        .map((d) => ({
+          label: d.label ?? "",
+          exercises: (d.exercises ?? []).map((e: { name: string }) => e.name),
+          isRest: !!d.is_rest,
+        })) ?? []
+    : [];
+  const todayExNames = (todayDay?.exercises ?? []).map((e: { name: string }) => e.name);
+
   return (
     <>
+      <WorkoutCacheWriter
+        todayLabel={todayDay?.label ?? null}
+        todayExercises={todayExNames}
+        todayIsRest={!!todayDay?.is_rest}
+        weekDays={weekDaysCache}
+      />
       <AppBadge userId={user!.id} />
       <NotificationPrompt />
       <OnboardingWrapper clientId={user!.id} isComplete={isOnboardingComplete} />

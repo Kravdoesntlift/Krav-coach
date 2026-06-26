@@ -36,6 +36,16 @@ export async function POST(req: NextRequest) {
 
   const admin = createAdminClient();
 
+  // Idempotency: skip events already processed (invoice.paid can fire multiple times)
+  const { data: alreadyProcessed } = await admin
+    .from("stripe_processed_events")
+    .select("id")
+    .eq("id", event.id)
+    .maybeSingle();
+  if (alreadyProcessed) {
+    return NextResponse.json({ ok: true, duplicate: true });
+  }
+
   try {
     switch (event.type) {
       case "checkout.session.completed": {
@@ -312,6 +322,12 @@ export async function POST(req: NextRequest) {
       default:
         break;
     }
+
+    // Mark event as processed (idempotency guard)
+    await admin
+      .from("stripe_processed_events")
+      .insert({ id: event.id })
+      .throwOnError();
   } catch (err) {
     const message = err instanceof Error ? err.message : "Handler error";
     console.error("Stripe webhook handler error:", message);

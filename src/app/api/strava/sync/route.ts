@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { encrypt, decrypt } from "@/lib/crypto";
 
 export const runtime = "nodejs";
 
@@ -52,8 +53,8 @@ async function refreshStravaToken(
   };
 
   await admin.from("health_integrations").update({
-    access_token: data.access_token,
-    refresh_token: data.refresh_token,
+    access_token: encrypt(data.access_token),
+    refresh_token: encrypt(data.refresh_token),
     token_expires_at: new Date(data.expires_at * 1000).toISOString(),
   }).eq("id", integrationId);
 
@@ -81,11 +82,11 @@ export async function POST() {
   }
 
   // Refresh token if expired
-  let accessToken: string = integration.access_token;
+  let accessToken: string = decrypt(integration.access_token);
   if (integration.token_expires_at) {
     const expiresAt = new Date(integration.token_expires_at).getTime();
     if (Date.now() > expiresAt - 60_000) {
-      const refreshed = await refreshStravaToken(integration.refresh_token, integration.id, admin);
+      const refreshed = await refreshStravaToken(decrypt(integration.refresh_token), integration.id, admin);
       if (!refreshed) {
         await admin.from("health_integrations").update({ is_active: false }).eq("id", integration.id);
         return NextResponse.json({ error: "Token Strava expirado. Reconecta o Strava." }, { status: 401 });

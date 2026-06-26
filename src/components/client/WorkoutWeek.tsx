@@ -9,6 +9,7 @@ import Confetti from "@/components/ui/Confetti";
 import LiveWorkout from "@/components/client/LiveWorkout";
 import { haptic, HAPTIC } from "@/lib/haptic";
 import { useLang } from "@/lib/i18n/useLang";
+import { enqueueOfflineAction, useOfflineSync } from "@/hooks/useOfflineQueue";
 
 // Strings not in the shared dictionary
 const extra = {
@@ -72,6 +73,7 @@ interface Props {
 
 export default function WorkoutWeek({ plan, clientId, coachId }: Props) {
   const { t, lang } = useLang();
+  useOfflineSync(); // drain offline queue when connection returns
   const days = plan.workout_days ?? [];
   const sortedDays = [...days].sort((a, b) => a.day_of_week - b.day_of_week);
   const today = new Date().getDay();
@@ -218,12 +220,19 @@ function WorkoutDayCard({
   async function saveComplete(f: string, n: string) {
     setLoading(true);
     const supabase = createClient();
-    await supabase.from("workout_completions").insert({
+    const completionData = {
       client_id: clientId,
       day_id: day.id,
       feeling: f,
       note: n.trim() || null,
-    });
+    };
+    const { error: insertErr } = await supabase
+      .from("workout_completions")
+      .insert(completionData);
+    // If offline or network error, queue for later sync
+    if (insertErr && (insertErr.message?.includes("fetch") || !navigator.onLine)) {
+      enqueueOfflineAction("completion", completionData);
+    }
 
     // Calculate today's session volume from workout_logs
     const today = new Date();
@@ -273,8 +282,14 @@ function WorkoutDayCard({
   async function undoComplete() {
     setLoading(true);
     const supabase = createClient();
-    await supabase.from("workout_completions").delete()
-      .eq("client_id", clientId).eq("day_id", day.id);
+    const { error: delErr } = await supabase
+      .from("workout_completions")
+      .delete()
+      .eq("client_id", clientId)
+      .eq("day_id", day.id);
+    if (delErr && (delErr.message?.includes("fetch") || !navigator.onLine)) {
+      enqueueOfflineAction("undo_completion", { client_id: clientId, day_id: day.id });
+    }
     setCompleted(false);
     setFeeling("");
     setNote("");
