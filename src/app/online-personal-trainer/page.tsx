@@ -617,7 +617,7 @@ export default async function OnlinePersonalTrainerPage() {
           </div>
 
           {/* ── FOOTER ───────────────────────────────────────────── */}
-          <footer className="max-w-2xl mx-auto px-5 pb-10 flex items-center justify-between text-xs text-zinc-700">
+          <footer className="max-w-2xl mx-auto px-5 pb-10 flex items-center justify-between text-xs text-zinc-500">
             <span className="font-black tracking-tighter text-base text-zinc-600">
               KRAV<span style={{ color: "#A8893A" }}>.</span>
             </span>

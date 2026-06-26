@@ -75,7 +75,7 @@ export default function OfflinePage() {
           <div className="flex items-center justify-between">
             <p className="text-zinc-500 text-xs font-semibold tracking-widest uppercase">Treino de hoje</p>
             {cachedDate && (
-              <p className="text-zinc-700 text-[10px]">Guardado {cachedDate}</p>
+              <p className="text-zinc-500 text-[10px]">Guardado {cachedDate}</p>
             )}
           </div>
 
