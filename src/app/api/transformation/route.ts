@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { detectImageMime } from "@/lib/file-magic";
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -31,6 +32,12 @@ export async function POST(req: NextRequest) {
   const path = `${user.id}/transformation_${slot}.${ext}`;
   const bytes = await file.arrayBuffer();
 
+  // Verify magic bytes to prevent MIME-type spoofing
+  const detectedMime = detectImageMime(new Uint8Array(bytes));
+  if (!detectedMime) {
+    return NextResponse.json({ error: "Ficheiro inválido. Usa JPEG, PNG ou WebP." }, { status: 400 });
+  }
+
   // Remove old file for this slot
   const { data: existing } = await admin.storage.from("avatars").list(user.id);
   const old = existing?.find((f) => f.name.startsWith(`transformation_${slot}`));
@@ -38,7 +45,7 @@ export async function POST(req: NextRequest) {
 
   const { error: storageErr } = await admin.storage
     .from("avatars")
-    .upload(path, bytes, { contentType: ALLOWED_TYPES.includes(file.type) ? file.type : "image/jpeg", upsert: true });
+    .upload(path, bytes, { contentType: detectedMime, upsert: true });
 
   if (storageErr) return NextResponse.json({ error: storageErr.message }, { status: 500 });
 

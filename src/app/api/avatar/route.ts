@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { detectImageMime } from "@/lib/file-magic";
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -35,6 +36,12 @@ export async function POST(req: NextRequest) {
   const path = `${user.id}/avatar.${ext}`;
   const bytes = await file.arrayBuffer();
 
+  // Verify magic bytes to prevent MIME-type spoofing
+  const detectedMime = detectImageMime(new Uint8Array(bytes));
+  if (!detectedMime) {
+    return NextResponse.json({ error: "Ficheiro inválido. Usa JPEG, PNG ou WebP." }, { status: 400 });
+  }
+
   // Remove old avatar files (different extensions)
   const { data: existing } = await admin.storage.from("avatars").list(user.id);
   if (existing?.length) {
@@ -44,7 +51,7 @@ export async function POST(req: NextRequest) {
   const { error: storageErr } = await admin.storage
     .from("avatars")
     .upload(path, bytes, {
-      contentType: ALLOWED_TYPES.includes(file.type) ? file.type : "image/jpeg",
+      contentType: detectedMime,
       upsert: true,
     });
 
