@@ -260,10 +260,12 @@ export async function GET(req: NextRequest) {
   }
 
   // ── Trial expiry warnings (2 days left = day 5, 1 day left = day 6) ────────
+  // Use midnight-to-midnight UTC windows so clients who registered at any hour
+  // of the day are caught regardless of when the cron fires.
   const trialWarningDays = [2, 1];
   for (const daysLeft of trialWarningDays) {
-    const windowStart = new Date(today.getTime() + daysLeft * 86_400_000);
-    const windowEnd   = new Date(today.getTime() + (daysLeft + 1) * 86_400_000);
+    const windowStart = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + daysLeft));
+    const windowEnd   = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + daysLeft + 1));
 
     const { data: expiringClients } = await admin
       .from("profiles")
