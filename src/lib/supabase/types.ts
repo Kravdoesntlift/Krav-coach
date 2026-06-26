@@ -1,5 +1,5 @@
 export type Role = "client" | "coach";
-export type ClientStatus = "active" | "paused" | "cancelled";
+export type ClientStatus = "active" | "paused" | "cancelled" | "archived" | "pending";
 
 export interface Profile {
   id: string;

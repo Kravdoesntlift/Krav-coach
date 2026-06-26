@@ -42,9 +42,9 @@ export default async function ProgressPage() {
       .order("week_start", { ascending: true }),
     supabase
       .from("workout_completions")
-      .select("created_at")
+      .select("completed_at")
       .eq("client_id", user!.id)
-      .order("created_at", { ascending: true }),
+      .order("completed_at", { ascending: true }),
     supabase
       .from("personal_records")
       .select("exercise_name, weight_kg, reps, recorded_at")
@@ -53,9 +53,9 @@ export default async function ProgressPage() {
       .limit(50),
     supabase
       .from("workout_completions")
-      .select("created_at, day_id, workout_days(label)")
+      .select("completed_at, day_id, workout_days(label)")
       .eq("client_id", user!.id)
-      .order("created_at", { ascending: false })
+      .order("completed_at", { ascending: false })
       .limit(200),
     supabase
       .from("client_nutrition_goals")
@@ -92,7 +92,7 @@ export default async function ProgressPage() {
 
   // Streak calculation
   const completedDates = [...new Set(
-    (completions ?? []).map((c) => (c.created_at as string).slice(0, 10))
+    (completions ?? []).map((c) => (c.completed_at as string).slice(0, 10))
   )].sort();
 
   let currentStreak = 0;
@@ -128,7 +128,7 @@ export default async function ProgressPage() {
 
   // Workout completions
   for (const c of completionDays ?? []) {
-    const date = (c.created_at as string).slice(0, 10);
+    const date = (c.completed_at as string).slice(0, 10);
     const dayLabel = (c as Record<string, unknown>).workout_days
       ? ((c as Record<string, unknown>).workout_days as Record<string, unknown> | null)?.label as string | undefined
       : undefined;

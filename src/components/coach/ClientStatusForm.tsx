@@ -15,6 +15,8 @@ const STATUS_CONFIG: Record<ClientStatus, { label: string; color: string; bg: st
   active:    { label: "Ativo",     color: "text-green-400",  bg: "bg-green-500/10 border-green-500/30",   dot: "bg-green-400 animate-pulse" },
   paused:    { label: "Pausado",   color: "text-yellow-400", bg: "bg-yellow-500/10 border-yellow-500/30", dot: "bg-yellow-400" },
   cancelled: { label: "Cancelado", color: "text-red-400",    bg: "bg-red-500/10 border-red-500/30",       dot: "bg-red-400" },
+  archived:  { label: "Arquivado", color: "text-zinc-400",   bg: "bg-zinc-500/10 border-zinc-500/30",     dot: "bg-zinc-500" },
+  pending:   { label: "Pendente",  color: "text-blue-400",   bg: "bg-blue-500/10 border-blue-500/30",     dot: "bg-blue-400" },
 };
 
 export default function ClientStatusForm({ clientId, currentStatus, renewsAt }: Props) {
