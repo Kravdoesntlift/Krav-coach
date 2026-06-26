@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import ChatWindow from "@/components/ChatWindow";
 import type { Message } from "@/lib/supabase/types";
 
@@ -51,7 +52,7 @@ export default async function CoachClientChatPage({
       >
         {/* Avatar */}
         {client.avatar_url ? (
-          <img src={client.avatar_url} alt={client.full_name} className="w-12 h-12 rounded-full object-cover border border-zinc-700 shrink-0" />
+          <Image src={client.avatar_url} alt={client.full_name} width={48} height={48} className="w-12 h-12 rounded-full object-cover border border-zinc-700 shrink-0" />
         ) : (
           <div className="w-12 h-12 rounded-full flex items-center justify-center font-black text-black text-base shrink-0"
             style={{ background: "linear-gradient(135deg,#E2C060,#A8893A)" }}>

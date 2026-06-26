@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 
 interface Props {
   title: string;
@@ -240,7 +241,7 @@ export default function ShareAchievement({ title, description, icon, clientName 
           className="flex flex-col items-center w-full max-w-xs space-y-4"
           style={{ animation: "sa-scalein 0.25s ease both" }}
         >
-          <img src={imageUrl} alt="Conquista" className="w-full rounded-2xl shadow-2xl" />
+          <Image src={imageUrl} alt="Conquista" width={0} height={0} sizes="100vw" className="w-full rounded-2xl shadow-2xl" style={{ height: "auto" }} />
           <div className="flex gap-2 w-full">
             <button
               onClick={() => setStage("reveal")}

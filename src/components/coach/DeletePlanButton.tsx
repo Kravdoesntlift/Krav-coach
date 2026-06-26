@@ -12,12 +12,18 @@ interface Props {
 export default function DeletePlanButton({ planId, clientId, deletePlan }: Props) {
   const [confirming, setConfirming] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
   const router = useRouter();
 
   async function handleDelete() {
     setLoading(true);
     await deletePlan(planId, clientId);
+    setDone(true);
     router.refresh();
+  }
+
+  if (done) {
+    return <span className="text-xs text-zinc-500 px-3 py-1.5">Apagado ✓</span>;
   }
 
   if (confirming) {

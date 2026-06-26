@@ -94,17 +94,20 @@ export async function POST(req: NextRequest) {
           if (!existingMsg) {
             const [{ data: coachProfileData }, { data: clientProfileData }] = await Promise.all([
               admin.from("profiles").select("full_name").eq("id", coachId).single(),
-              admin.from("profiles").select("full_name").eq("id", clientId).single(),
+              admin.from("profiles").select("full_name, lang").eq("id", clientId).single(),
             ]);
             const coachFirst =
               (coachProfileData?.full_name ?? "").split(" ")[0] || "Coach";
+            const isEN = (clientProfileData as { lang?: string } | null)?.lang === "en";
             const clientFirst =
-              (clientProfileData?.full_name ?? "").split(" ")[0] || "atleta";
+              (clientProfileData?.full_name ?? "").split(" ")[0] || (isEN ? "athlete" : "atleta");
 
             await admin.from("messages").insert({
               sender_id: coachId,
               receiver_id: clientId,
-              content: `Olá ${clientFirst}! 👋 Sou o ${coachFirst}, o teu coach na KRAV. O teu pagamento foi confirmado e já tens acesso total à app. Vamos começar esta jornada juntos! 💪`,
+              content: isEN
+                ? `Hi ${clientFirst}! 👋 I'm ${coachFirst}, your KRAV coach. Your payment has been confirmed and you now have full access to the app. Let's start this journey together! 💪`
+                : `Olá ${clientFirst}! 👋 Sou o ${coachFirst}, o teu coach na KRAV. O teu pagamento foi confirmado e já tens acesso total à app. Vamos começar esta jornada juntos! 💪`,
             });
 
             // 3. Notify coach of new paying client
@@ -118,11 +121,13 @@ export async function POST(req: NextRequest) {
               console.error("[webhook] coach push failed:", coachPush.error);
             }
 
-            // 4. Notify client
+            // 4. Notify client (bilingual)
             const clientPush = await sendPushToUser(
               clientId,
-              "Pagamento confirmado!",
-              "Bem-vindo à KRAV! O teu coach vai contactar-te em breve.",
+              isEN ? "Payment confirmed!" : "Pagamento confirmado!",
+              isEN
+                ? "Welcome to KRAV! Your coach will reach out to you soon."
+                : "Bem-vindo à KRAV! O teu coach vai contactar-te em breve.",
               "/client/dashboard",
             ).catch((e: unknown) => ({ ok: false, error: String(e) }));
             if (!clientPush.ok) {

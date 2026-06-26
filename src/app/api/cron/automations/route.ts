@@ -88,6 +88,66 @@ export async function GET(req: NextRequest) {
       (profiles ?? []).map((p) => [p.id, (p.lang === "en" ? "en" : "pt") as "pt" | "en"])
     );
 
+    // ── Batch-fetch trigger data for all clients in this automation ──────────
+    // Avoids N+1 queries inside the per-client loop below.
+    type WD = { id: string; is_rest: boolean | null; workout_completions: { client_id: string }[] };
+
+    const lastCompletionMap = new Map<string, Date>();  // client_id → last completion date
+    const lastCheckinMap    = new Map<string, Date>();  // client_id → last checkin date
+    const hasCheckinThisWeekSet = new Set<string>();    // client_ids with a checkin this week
+    const weekPlanFireSet   = new Set<string>();        // client_ids that achieved perfect week
+
+    if (automation.trigger_type === "no_workout_days") {
+      const { data: completions } = await admin
+        .from("workout_completions")
+        .select("client_id, created_at")
+        .in("client_id", clientIds)
+        .order("created_at", { ascending: false });
+      const seen = new Set<string>();
+      for (const c of completions ?? []) {
+        if (!seen.has(c.client_id)) {
+          lastCompletionMap.set(c.client_id, new Date(c.created_at));
+          seen.add(c.client_id);
+        }
+      }
+    } else if (automation.trigger_type === "no_checkin_days") {
+      const { data: checkins } = await admin
+        .from("weekly_checkins")
+        .select("client_id, created_at")
+        .in("client_id", clientIds)
+        .order("created_at", { ascending: false });
+      const seen = new Set<string>();
+      for (const c of checkins ?? []) {
+        if (!seen.has(c.client_id)) {
+          lastCheckinMap.set(c.client_id, new Date(c.created_at));
+          seen.add(c.client_id);
+        }
+      }
+    } else if (automation.trigger_type === "checkin_monday" && dayOfWeek === 1) {
+      const { data: checkins } = await admin
+        .from("weekly_checkins")
+        .select("client_id")
+        .in("client_id", clientIds)
+        .eq("week_start", weekStart);
+      for (const c of checkins ?? []) hasCheckinThisWeekSet.add(c.client_id);
+    } else if (automation.trigger_type === "perfect_week" && dayOfWeek === 0) {
+      const { data: plans } = await admin
+        .from("workout_plans")
+        .select("client_id, workout_days(id, is_rest, workout_completions(client_id))")
+        .in("client_id", clientIds)
+        .eq("week_start", weekStart);
+      for (const plan of plans ?? []) {
+        const days = (plan.workout_days as WD[]) ?? [];
+        const activeDays = days.filter((d) => !d.is_rest);
+        const completedDays = activeDays.filter((d) =>
+          d.workout_completions?.some((c) => c.client_id === plan.client_id)
+        );
+        if (activeDays.length > 0 && completedDays.length >= activeDays.length) {
+          weekPlanFireSet.add(plan.client_id);
+        }
+      }
+    }
+
     for (const clientId of clientIds) {
       processed++;
 
@@ -98,88 +158,29 @@ export async function GET(req: NextRequest) {
         continue;
       }
 
-      // ── Evaluate trigger ──────────────────────────────────────────────────
+      // ── Evaluate trigger (uses pre-fetched maps) ──────────────────────────
       let shouldFire = false;
 
       if (automation.trigger_type === "no_workout_days") {
-        // Find last workout completion for this client
-        const { data: lastCompletion } = await admin
-          .from("workout_completions")
-          .select("created_at")
-          .eq("client_id", clientId)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        if (!lastCompletion) {
-          // Never completed a workout — fire
+        const lastDate = lastCompletionMap.get(clientId);
+        if (!lastDate) {
           shouldFire = true;
         } else {
-          const lastDate = new Date(lastCompletion.created_at);
-          const diffDays = Math.floor(
-            (today.getTime() - lastDate.getTime()) / 86400000
-          );
+          const diffDays = Math.floor((today.getTime() - lastDate.getTime()) / 86400000);
           shouldFire = diffDays > (automation.trigger_value ?? 3);
         }
       } else if (automation.trigger_type === "no_checkin_days") {
-        const { data: lastCheckin } = await admin
-          .from("weekly_checkins")
-          .select("created_at")
-          .eq("client_id", clientId)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        if (!lastCheckin) {
+        const lastDate = lastCheckinMap.get(clientId);
+        if (!lastDate) {
           shouldFire = true;
         } else {
-          const lastDate = new Date(lastCheckin.created_at);
-          const diffDays = Math.floor(
-            (today.getTime() - lastDate.getTime()) / 86400000
-          );
+          const diffDays = Math.floor((today.getTime() - lastDate.getTime()) / 86400000);
           shouldFire = diffDays > (automation.trigger_value ?? 7);
         }
       } else if (automation.trigger_type === "perfect_week") {
-        // Only fires on Sunday (dayOfWeek === 0)
-        if (dayOfWeek === 0) {
-          // Get all workout days for this client this week
-          const { data: weekPlan } = await admin
-            .from("workout_plans")
-            .select("workout_days(id, is_rest, workout_completions(client_id))")
-            .eq("client_id", clientId)
-            .eq("week_start", weekStart)
-            .maybeSingle();
-
-          if (weekPlan) {
-            type WD = {
-              id: string;
-              is_rest: boolean | null;
-              workout_completions: { client_id: string }[];
-            };
-            const days = (weekPlan.workout_days as WD[]) ?? [];
-            const activeDays = days.filter((d) => !d.is_rest);
-            const completedDays = activeDays.filter((d) =>
-              d.workout_completions?.some((c) => c.client_id === clientId)
-            );
-            shouldFire =
-              activeDays.length > 0 &&
-              completedDays.length >= activeDays.length;
-          }
-        }
+        if (dayOfWeek === 0) shouldFire = weekPlanFireSet.has(clientId);
       } else if (automation.trigger_type === "checkin_monday") {
-        // Only fires on Monday (dayOfWeek === 1)
-        if (dayOfWeek === 1) {
-          // Check if client already did check-in this week
-          const { data: checkin } = await admin
-            .from("weekly_checkins")
-            .select("id")
-            .eq("client_id", clientId)
-            .eq("week_start", weekStart)
-            .maybeSingle();
-
-          // Fire if no check-in yet this week
-          shouldFire = !checkin;
-        }
+        if (dayOfWeek === 1) shouldFire = !hasCheckinThisWeekSet.has(clientId);
       }
 
       if (!shouldFire) {

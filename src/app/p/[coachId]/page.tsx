@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function CoachPublicPage({
   params,
@@ -73,9 +74,11 @@ export default async function CoachPublicPage({
         {/* Coach hero */}
         <div className="flex flex-col items-center text-center gap-5">
           {coach.avatar_url ? (
-            <img
+            <Image
               src={coach.avatar_url}
               alt={coach.full_name}
+              width={96}
+              height={96}
               className="w-24 h-24 rounded-full object-cover border-2"
               style={{ borderColor: "rgba(201,168,76,0.5)" }}
             />
@@ -117,6 +120,15 @@ export default async function CoachPublicPage({
             )}
           </div>
         )}
+
+        {/* CTA (above the fold) */}
+        <Link
+          href={`/auth/signup?coach=${coachId}`}
+          className="block w-full text-center py-4 rounded-2xl font-black text-black text-base tracking-wide transition-transform active:scale-95"
+          style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
+        >
+          Começar trial gratuito
+        </Link>
 
         {/* What you get */}
         <div className="space-y-3">

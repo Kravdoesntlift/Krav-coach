@@ -1198,9 +1198,10 @@ export default function NutritionPage() {
   const [error,       setError]       = useState<string | null>(null);
 
   // UI state
-  const [showGoalsModal, setShowGoalsModal] = useState(false);
-  const [activeMeal,     setActiveMeal]     = useState<string | null>(null);
-  const [showManual,     setShowManual]     = useState(false);
+  const [showGoalsModal,  setShowGoalsModal]  = useState(false);
+  const [activeMeal,      setActiveMeal]      = useState<string | null>(null);
+  const [showManual,      setShowManual]      = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   // Manual form state
   const [mealName,     setMealName]     = useState("");
@@ -1324,10 +1325,10 @@ export default function NutritionPage() {
     setShowManual(false); setSaving(false);
   }
 
-  async function deleteLog(id: string) {
-    if (!window.confirm(extra.delete_confirm[lang])) return;
+  async function confirmDeleteLog(id: string) {
     await supabase.from("nutrition_logs").delete().eq("id", id);
     setLogs((prev) => prev.filter((l) => l.id !== id));
+    setPendingDeleteId(null);
   }
 
   function changeDay(delta: number) {
@@ -1488,7 +1489,16 @@ export default function NutritionPage() {
                   {log.description && <p className="text-zinc-500 text-xs mt-0.5 capitalize">{log.description}</p>}
                   {log.serving_g && <p className="text-zinc-700 text-[10px]">{log.serving_g}g</p>}
                 </div>
-                <button onClick={() => deleteLog(log.id)} className="shrink-0 text-zinc-700 hover:text-red-400 text-xs transition-colors">✕</button>
+                {pendingDeleteId === log.id ? (
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => confirmDeleteLog(log.id)} className="text-red-400 text-xs px-2 py-0.5 rounded bg-red-400/10 hover:bg-red-400/20 transition-colors">
+                      {lang === "en" ? "Delete" : "Apagar"}
+                    </button>
+                    <button onClick={() => setPendingDeleteId(null)} className="text-zinc-500 text-xs px-2 py-0.5 rounded hover:text-white transition-colors">✕</button>
+                  </div>
+                ) : (
+                  <button onClick={() => setPendingDeleteId(log.id)} className="shrink-0 text-zinc-700 hover:text-red-400 text-xs transition-colors">✕</button>
+                )}
               </div>
               {(log.calories || log.protein_g || log.carbs_g || log.fat_g) && (
                 <div className="flex gap-3 pt-1 border-t border-zinc-800/60 flex-wrap">

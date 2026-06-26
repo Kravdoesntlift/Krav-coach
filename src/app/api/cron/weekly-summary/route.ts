@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   // All active clients
   const { data: clients } = await admin
     .from("profiles")
-    .select("id, full_name")
+    .select("id, full_name, lang")
     .eq("role", "client")
     .or("status.is.null,status.eq.active");
 
@@ -38,13 +38,17 @@ export async function GET(req: NextRequest) {
 
   const clientIds = clients.map((c) => c.id);
 
-  // Fetch emails from auth.users for the email summary
+  // Fetch emails from auth.users (paginate to avoid 1000-user limit)
   const emailMap = new Map<string, string>();
   try {
-    // listUsers returns up to 1000 by default; for larger deployments paginate
-    const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 });
-    for (const u of users) {
-      if (u.email) emailMap.set(u.id, u.email);
+    let page = 1;
+    while (true) {
+      const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000, page });
+      for (const u of users) {
+        if (u.email) emailMap.set(u.id, u.email);
+      }
+      if (users.length < 1000) break;
+      page++;
     }
   } catch { /* non-critical — push still works without email */ }
 
@@ -102,20 +106,23 @@ export async function GET(req: NextRequest) {
     // Skip if completely inactive this week
     if (workouts === 0 && !didCheckin && steps === 0) continue;
 
-    // Build a concise, motivating message
-    const parts: string[] = [];
-    if (workouts > 0) parts.push(`${workouts} treino${workouts > 1 ? "s" : ""} ✅`);
-    if (didCheckin) parts.push("check-in feito ✅");
-    if (steps > 0) parts.push(`${(steps / 1000).toFixed(1)}k passos 👟`);
-    if (didNutrition) parts.push("nutrição registada 🥗");
-
-    const firstName = client.full_name?.split(" ")[0] ?? "Atleta";
+    const isEN = (client as { lang?: string }).lang === "en";
+    const firstName = client.full_name?.split(" ")[0] ?? (isEN ? "Athlete" : "Atleta");
     const score = workouts * 10 + (didCheckin ? 15 : 0) + Math.floor(steps / 1000) * 2 + (didNutrition ? 5 : 0);
 
-    const title = score >= 30 ? `🔥 Semana incrível, ${firstName}!` : `📊 Resumo da semana, ${firstName}`;
+    // Build bilingual message
+    const parts: string[] = [];
+    if (workouts > 0) parts.push(isEN ? `${workouts} workout${workouts > 1 ? "s" : ""} ✅` : `${workouts} treino${workouts > 1 ? "s" : ""} ✅`);
+    if (didCheckin) parts.push(isEN ? "check-in done ✅" : "check-in feito ✅");
+    if (steps > 0) parts.push(`${(steps / 1000).toFixed(1)}k ${isEN ? "steps" : "passos"} 👟`);
+    if (didNutrition) parts.push(isEN ? "nutrition logged 🥗" : "nutrição registada 🥗");
+
+    const title = score >= 30
+      ? (isEN ? `🔥 Incredible week, ${firstName}!` : `🔥 Semana incrível, ${firstName}!`)
+      : (isEN ? `📊 Week summary, ${firstName}` : `📊 Resumo da semana, ${firstName}`);
     const body = parts.length > 0
       ? parts.join(" · ")
-      : "Começa a semana que vem mais forte 💪";
+      : (isEN ? "Start next week stronger 💪" : "Começa a semana que vem mais forte 💪");
 
     const result = await sendPushToUser(client.id, title, body, "/client/progress");
     if (result.ok) sent++;

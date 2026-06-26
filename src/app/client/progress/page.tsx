@@ -201,7 +201,7 @@ export default async function ProgressPage() {
   return (
     <div className="space-y-6 page-enter">
       {/* Quick-access hub */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {hubLinks.map(({ href, emoji, label, sub }) => (
           <Link
             key={href}

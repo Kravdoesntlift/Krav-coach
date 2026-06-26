@@ -29,7 +29,8 @@ export async function GET(req: NextRequest) {
 
   const admin = createAdminClient();
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const FROM = process.env.RESEND_FROM ?? "André Kravchuk <noreply@kravcoaching.com>";
+  const FROM = process.env.RESEND_FROM ?? "André · KRAV Coaching <andre@kravcoaching.com>";
+  const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kravcoaching.com";
 
   const now = new Date();
   const daysAgo = (d: number) => new Date(now.getTime() - d * 86_400_000).toISOString();
@@ -42,6 +43,7 @@ export async function GET(req: NextRequest) {
     .select("id, name, email, emails_sent, created_at")
     .lte("created_at", daysAgo(3)) // at minimum 3 days old
     .lt("emails_sent", 3)          // sequence not yet complete
+    .is("unsubscribed_at", null)   // GDPR: skip unsubscribed leads
     .order("created_at", { ascending: true });
 
   if (dbErr) {
@@ -60,15 +62,16 @@ export async function GET(req: NextRequest) {
     let subject = "";
     let html = "";
 
+    const unsubUrl = `${SITE_URL}/api/unsubscribe?id=${lead.id}`;
     if (step === 0 && ageDays >= 3) {
       subject = "Já leste?";
-      html = email2(firstName);
+      html = email2(firstName, unsubUrl);
     } else if (step === 1 && ageDays >= 7) {
       subject = "O Guilherme";
-      html = email3(firstName);
+      html = email3(firstName, unsubUrl);
     } else if (step === 2 && ageDays >= 14) {
       subject = "último email";
-      html = email4(firstName);
+      html = email4(firstName, unsubUrl);
     } else {
       results.skipped++;
       continue;
@@ -108,7 +111,7 @@ export async function GET(req: NextRequest) {
    Short paragraphs, no images, no big headers.
 ────────────────────────────────────────────────────────────────────────────── */
 
-function wrap(body: string) {
+function wrap(body: string, unsubUrl: string) {
   return `<!DOCTYPE html>
 <html lang="pt">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
@@ -120,8 +123,9 @@ function wrap(body: string) {
         <td bgcolor="#ffffff" style="background:#ffffff;border-radius:12px;padding:36px 36px 32px;border:1px solid #ebebeb;">
           <p style="margin:0 0 24px 0;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#C9A84C;font-family:Helvetica,Arial,sans-serif;">KRAV COACH</p>
           ${body}
-          <p style="margin:32px 0 0;font-size:13px;color:#999;font-family:Helvetica,Arial,sans-serif;border-top:1px solid #f0f0f0;padding-top:20px;">
-            Recebeste este email porque pediste o guia gratuito em kravcoaching.com
+          <p style="margin:32px 0 0;font-size:12px;color:#bbb;font-family:Helvetica,Arial,sans-serif;border-top:1px solid #f0f0f0;padding-top:20px;line-height:1.6;">
+            Recebeste este email porque pediste o guia gratuito em kravcoaching.com<br>
+            <a href="${unsubUrl}" style="color:#bbb;text-decoration:underline;">Cancelar subscrição destes emails</a>
           </p>
         </td>
       </tr>
@@ -141,18 +145,18 @@ function link(href: string, text: string) {
 }
 
 // ── Email 2: day 3 ────────────────────────────────────────────────────────────
-function email2(firstName: string) {
+function email2(firstName: string, unsubUrl: string) {
   return wrap(`
     ${p(`Olá ${firstName},`)}
     ${p("já tiveste tempo de abrir o guia?")}
     ${p("A maioria das pessoas descarrega, acha interessante e depois a vida continua igual. Não é falta de vontade. É que informação sozinha raramente muda alguma coisa.")}
     ${p(`Se quiseres falar sobre a tua situação, responde aqui ou fala comigo no Instagram ${link("https://www.instagram.com/kravdoesntlift", "@kravdoesntlift")}.`)}
     ${p("André", "margin-bottom:0;")}
-  `);
+  `, unsubUrl);
 }
 
 // ── Email 3: day 7 ────────────────────────────────────────────────────────────
-function email3(firstName: string) {
+function email3(firstName: string, unsubUrl: string) {
   return wrap(`
     ${p(`Olá ${firstName},`)}
     ${p("o Guilherme chegou ao meu coaching com 67kg. Já treinava há dois anos e sabia o que estava a fazer. Mas o corpo não respondia.")}
@@ -160,16 +164,16 @@ function email3(firstName: string) {
     ${p("Não foi magia. Foi ter alguém a olhar para os números todas as semanas e ajustar o plano de acordo com o que estava a funcionar para ele.")}
     ${p(`Se quiseres ser o próximo: ${link("https://www.kravcoaching.com", "kravcoaching.com")}`)}
     ${p("André", "margin-bottom:0;")}
-  `);
+  `, unsubUrl);
 }
 
 // ── Email 4: day 14 ───────────────────────────────────────────────────────────
-function email4(firstName: string) {
+function email4(firstName: string, unsubUrl: string) {
   return wrap(`
     ${p(`Olá ${firstName},`)}
     ${p("não te mando mais emails sobre coaching depois deste.")}
     ${p("Se ainda não avançaste é porque o momento não é o certo e não há problema nenhum nisso.")}
     ${p(`Mas se tens pensado nisso e só precisavas de um empurrão, as vagas que tenho são poucas e enchem depressa. Podes falar comigo aqui ou no ${link("https://www.instagram.com/kravdoesntlift", "Instagram")}.`)}
     ${p("André", "margin-bottom:0;")}
-  `);
+  `, unsubUrl);
 }

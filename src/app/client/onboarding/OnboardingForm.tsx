@@ -161,7 +161,7 @@ export default function OnboardingForm({ clientId }: { clientId: string }) {
               <button
                 key={i}
                 onClick={() => toggleDay(i)}
-                className={`py-3 rounded-xl text-xs font-bold transition-colors ${
+                className={`min-h-[44px] rounded-xl text-xs font-bold transition-colors ${
                   availableDays.includes(i) ? "bg-brand-gold text-black" : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
                 }`}
               >

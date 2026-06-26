@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Image from "next/image";
 
 interface Props {
   currentBeforeUrl: string | null;
@@ -51,7 +52,7 @@ function SlotUpload({
         style={{ aspectRatio: "3/4" }}
       >
         {url ? (
-          <img src={url} alt={label} className="w-full h-full object-cover" />
+          <Image src={url} alt={label} fill className="object-cover" sizes="50vw" />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-zinc-600">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

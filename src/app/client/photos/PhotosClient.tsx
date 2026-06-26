@@ -184,7 +184,7 @@ function AngleSlider({
     const goldBadge = !beforeUrl;
     return (
       <div className="rounded-xl overflow-hidden bg-zinc-950 relative" style={{ aspectRatio: "3/4" }}>
-        <img src={url} alt={label} className="w-full h-full object-cover" draggable={false} />
+        <Image src={url} alt={label} fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" draggable={false} />
         <div className={`absolute top-1.5 left-1.5 text-[9px] px-1.5 py-0.5 rounded-full font-bold ${goldBadge ? "text-black" : "bg-black/70 text-white"}`}
           style={goldBadge ? { background: "rgba(201,168,76,0.9)" } : undefined}>
           {badge}
