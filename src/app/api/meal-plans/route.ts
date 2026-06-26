@@ -43,6 +43,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Nome obrigatório." }, { status: 400 });
   }
 
+  // Only coaches can create meal plans
+  const { data: callerProfile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (callerProfile?.role !== "coach") {
+    return NextResponse.json({ error: "Sem permissão." }, { status: 403 });
+  }
+
   // 1. Insert meal plan
   const { data: plan, error: planErr } = await supabase
     .from("meal_plans")
@@ -77,7 +83,7 @@ export async function POST(req: Request) {
 
     // 3. Insert foods for this meal
     if (meal.foods && meal.foods.length > 0) {
-      await supabase.from("meal_plan_foods").insert(
+      const { error: foodErr } = await supabase.from("meal_plan_foods").insert(
         meal.foods.map((f) => ({
           meal_id:     mealRow.id,
           food_name:   f.food_name,
@@ -90,6 +96,7 @@ export async function POST(req: Request) {
           order_index: f.order_index,
         }))
       );
+      if (foodErr) console.error("[meal-plans] food insert error:", foodErr.message);
     }
   }
 

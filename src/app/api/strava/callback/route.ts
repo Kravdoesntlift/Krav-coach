@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   const state = searchParams.get("state");
   const error = searchParams.get("error");
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL!;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kravcoaching.com";
 
   if (error || !code || !state) {
     return NextResponse.redirect(`${siteUrl}/client/integrations?error=strava_denied`);

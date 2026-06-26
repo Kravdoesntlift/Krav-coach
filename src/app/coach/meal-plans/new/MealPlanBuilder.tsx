@@ -18,20 +18,30 @@ interface FoodInput {
   notes: string;
 }
 
+type MealType =
+  | "breakfast"
+  | "morning_snack"
+  | "lunch"
+  | "afternoon_snack"
+  | "dinner"
+  | "supper"
+  | "snack";
+
 interface MealInput {
-  meal_type: "breakfast" | "lunch" | "dinner" | "snack";
+  meal_type: MealType;
   name: string;
   foods: FoodInput[];
 }
 
-const MEAL_TYPE_META = {
-  breakfast: { emoji: "🌅", label_pt: "Pequeno-almoço", label_en: "Breakfast" },
-  lunch:     { emoji: "☀️", label_pt: "Almoço",         label_en: "Lunch"     },
-  dinner:    { emoji: "🌙", label_pt: "Jantar",          label_en: "Dinner"    },
-  snack:     { emoji: "🍎", label_pt: "Snack",           label_en: "Snack"     },
-} as const;
-
-type MealType = keyof typeof MEAL_TYPE_META;
+const MEAL_TYPE_META: Record<MealType, { label_pt: string; label_en: string }> = {
+  breakfast:       { label_pt: "Pequeno-almoço", label_en: "Breakfast"       },
+  morning_snack:   { label_pt: "Snack manhã",    label_en: "Morning snack"   },
+  lunch:           { label_pt: "Almoço",          label_en: "Lunch"           },
+  afternoon_snack: { label_pt: "Snack tarde",     label_en: "Afternoon snack" },
+  dinner:          { label_pt: "Jantar",          label_en: "Dinner"          },
+  supper:          { label_pt: "Ceia",            label_en: "Supper"          },
+  snack:           { label_pt: "Snack",           label_en: "Snack"           },
+};
 
 const GOAL_OPTIONS: { value: "cut" | "bulk" | "maintenance"; label_pt: string; label_en: string }[] = [
   { value: "cut",         label_pt: "Perder gordura", label_en: "Lose fat"    },
@@ -44,7 +54,7 @@ const EMPTY_FOOD: FoodInput = {
 };
 
 function emptyMeal(): MealInput {
-  return { meal_type: "snack", name: "", foods: [{ ...EMPTY_FOOD }] };
+  return { meal_type: "snack", name: "Snack", foods: [{ ...EMPTY_FOOD }] };
 }
 
 export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }) {
@@ -98,10 +108,11 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
     ));
   }
 
-  function setMealType(mealIdx: number, t: MealType) {
-    const meta = MEAL_TYPE_META[t];
+  function setMealType(mealIdx: number, t: string) {
+    const key = t as MealType;
+    const meta = MEAL_TYPE_META[key] ?? { label_pt: t, label_en: t };
     updateMeal(mealIdx, {
-      meal_type: t,
+      meal_type: key,
       name: meals[mealIdx].name || meta.label_pt,
     });
   }
@@ -148,7 +159,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
       notes:     notes || null,
       meals: meals.map((m, mi) => ({
         meal_type:   m.meal_type,
-        name:        m.name || MEAL_TYPE_META[m.meal_type].label_pt,
+        name:        m.name || (MEAL_TYPE_META[m.meal_type]?.label_pt ?? m.meal_type),
         order_index: mi,
         foods: m.foods
           .filter((f) => f.food_name.trim())
@@ -291,31 +302,26 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
         return (
           <div key={mi} className="card p-5 space-y-4">
             {/* Meal header */}
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">{meta.emoji}</span>
-                <div className="flex gap-1">
-                  {(Object.keys(MEAL_TYPE_META) as MealType[]).map((t) => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => setMealType(mi, t)}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors
-                        ${meal.meal_type === t
-                          ? "bg-brand-gold/20 text-brand-gold border border-brand-gold/30"
-                          : "bg-zinc-800/60 text-zinc-500 border border-transparent hover:text-zinc-300"
-                        }`}
-                    >
-                      {MEAL_TYPE_META[t].emoji}
-                    </button>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest shrink-0">
+                  Tipo
+                </p>
+                <select
+                  className="input text-sm py-1.5 flex-1 min-w-0"
+                  value={meal.meal_type}
+                  onChange={(e) => setMealType(mi, e.target.value)}
+                >
+                  {(Object.entries(MEAL_TYPE_META) as [MealType, { label_pt: string }][]).map(([type, m]) => (
+                    <option key={type} value={type}>{m.label_pt}</option>
                   ))}
-                </div>
+                </select>
               </div>
               {meals.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeMeal(mi)}
-                  className="text-zinc-600 hover:text-red-400 transition-colors text-xs"
+                  className="text-zinc-600 hover:text-red-400 transition-colors text-sm shrink-0"
                 >
                   Remover
                 </button>

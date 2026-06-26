@@ -18,7 +18,9 @@ export async function GET(req: NextRequest) {
   }
 
   const startDate = `${year}-${String(mon).padStart(2, "0")}-01`;
-  const endDate   = `${year}-${String(mon).padStart(2, "0")}-31`;
+  // Last day of the month: first day of next month minus 1 day
+  const lastDay = new Date(Date.UTC(year, mon, 0)).getUTCDate();
+  const endDate = `${year}-${String(mon).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
 
   const admin = createAdminClient();
 

@@ -64,10 +64,11 @@ export async function GET(req: NextRequest) {
         admin.from("weekly_checkins").select("weight_kg, waist_cm")
           .eq("client_id", clientId).neq("week_start", weekStart)
           .order("week_start", { ascending: false }).limit(1).maybeSingle(),
-        // Workout completions this week
+        // Workout completions this week (Mon–Sun only)
         admin.from("workout_completions").select("id, day_id")
           .eq("client_id", clientId)
-          .gte("completed_at", weekStart),
+          .gte("completed_at", weekStart)
+          .lt("completed_at", new Date(new Date(weekStart).getTime() + 7 * 86400000).toISOString().split("T")[0]),
         // Total workout days in plan for this week
         planIds.length > 0
           ? admin.from("workout_days").select("id, is_rest").in("plan_id", planIds)
