@@ -11,6 +11,11 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
+    // Offline: redirect to the offline page instead of showing generic error
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      window.location.replace("/offline");
+      return;
+    }
     console.error(error);
   }, [error]);
 

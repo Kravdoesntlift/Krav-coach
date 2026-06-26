@@ -62,6 +62,16 @@ self.addEventListener("fetch", (event) => {
   // ── API routes — Network-Only (auth-gated, real-time data) ───────────────
   if (url.pathname.startsWith("/api/")) return;
 
+  // ── Next.js RSC payload requests — redirect to /offline on failure ────────
+  if (request.headers.get("RSC") === "1") {
+    event.respondWith(
+      fetch(request).catch(() =>
+        Response.redirect(new URL("/offline", self.location.origin).href, 302)
+      )
+    );
+    return;
+  }
+
   // ── Page navigations — Network-First, cache last response, offline fallback ─
   if (request.mode === "navigate") {
     event.respondWith(networkFirstPage(request));
