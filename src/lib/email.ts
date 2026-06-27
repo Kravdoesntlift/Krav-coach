@@ -6,6 +6,16 @@ function getResend() {
   return new Resend(process.env.RESEND_API_KEY);
 }
 
+// Wrapper that logs and throws on Resend API errors instead of silently swallowing them
+async function sendEmail(payload: Parameters<ReturnType<typeof getResend>["emails"]["send"]>[0]) {
+  const { error } = await getResend().emails.send(payload);
+  if (error) {
+    const to = Array.isArray(payload.to) ? payload.to.join(",") : payload.to;
+    console.error(`[email] Resend error sending to ${to} (subject: "${payload.subject}"):`, error);
+    throw new Error(`Email send failed: ${(error as { message?: string }).message ?? JSON.stringify(error)}`);
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Invoice email
 // ─────────────────────────────────────────────────────────────────────────────
@@ -61,7 +71,7 @@ export async function sendInvoiceEmail({
 </body>
 </html>`;
 
-  await getResend().emails.send({
+  await sendEmail({
     from: FROM, to,
     subject: isEN ? `KRAV Coaching Receipt — ${amountEur}` : `Recibo KRAV Coaching — ${amountEur}`,
     html,
@@ -80,7 +90,7 @@ export async function sendPaymentFailedEmail({
   const isEN = lang === "en";
   const firstName = clientName.split(" ")[0];
 
-  await getResend().emails.send({
+  await sendEmail({
     from: FROM, to,
     subject: isEN ? `Problem with your KRAV payment` : `Problema com o teu pagamento KRAV`,
     html: `
@@ -134,7 +144,7 @@ export async function sendWelcomeEmail({
         ["3", "Instala no telemóvel", "Abre o site no Safari/Chrome e usa 'Adicionar ao ecrã de início' para acesso nativo."],
       ];
 
-  await getResend().emails.send({
+  await sendEmail({
     from: FROM, to,
     subject: isEN ? `Welcome to KRAV, ${firstName}! 🏆` : `Bem-vindo(a) ao KRAV, ${firstName}! 🏆`,
     html: `
@@ -237,7 +247,7 @@ export async function sendTrialReminderEmail({
         ["Acesso direto ao coach via chat", "✓"],
       ];
 
-  await getResend().emails.send({
+  await sendEmail({
     from: FROM, to, subject,
     html: `
 <!DOCTYPE html>
@@ -305,7 +315,7 @@ export async function sendSubscriptionCancelledEmail({
   const firstName = clientName.split(" ")[0];
   const isEN = lang === "en";
 
-  await getResend().emails.send({
+  await sendEmail({
     from: FROM, to,
     subject: isEN ? `${firstName}, your KRAV access has been suspended` : `${firstName}, o teu acesso ao KRAV foi suspenso`,
     html: `
@@ -355,7 +365,7 @@ export async function sendRenewalReminderEmail({
   const firstName = clientName.split(" ")[0];
   const isEN = lang === "en";
 
-  await getResend().emails.send({
+  await sendEmail({
     from: FROM, to,
     subject: isEN ? `${firstName}, your plan renews on ${renewalDate}` : `${firstName}, o teu plano renova a ${renewalDate}`,
     html: `
@@ -425,7 +435,7 @@ export async function sendWeeklySummaryEmail({
     ? (isGreat ? `🔥 Amazing week, ${firstName}! Summary ${fmt(weekStart)}–${fmt(weekEnd)}` : `📊 Weekly summary — ${fmt(weekStart)}–${fmt(weekEnd)}`)
     : (isGreat ? `🔥 Semana incrível, ${firstName}! Resumo ${fmt(weekStart)}–${fmt(weekEnd)}` : `📊 Resumo da semana — ${fmt(weekStart)}–${fmt(weekEnd)}`);
 
-  await getResend().emails.send({
+  await sendEmail({
     from: FROM, to, subject,
     html: `
 <!DOCTYPE html>
@@ -504,7 +514,7 @@ export async function sendTrialEndEmail({
     ? ["Personalised weekly training plans", "Weekly check-ins & progress analysis", "Direct chat with your coach", "Full workout history & records"]
     : ["Planos de treino semanais personalizados", "Check-ins semanais e análise de progresso", "Chat direto com o coach", "Histórico completo de treinos e recordes"];
 
-  await getResend().emails.send({
+  await sendEmail({
     from: FROM, to, subject,
     html: `
 <!DOCTYPE html>

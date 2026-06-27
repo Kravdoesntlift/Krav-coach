@@ -135,7 +135,7 @@ export async function GET(req: NextRequest) {
         (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://kravcoaching.com");
       sendWeeklySummaryEmail({
         to: clientEmail,
-        clientName: client.full_name ?? "Atleta",
+        clientName: client.full_name ?? (isEN ? "Athlete" : "Atleta"),
         weekStart,
         weekEnd,
         workouts,
@@ -144,6 +144,7 @@ export async function GET(req: NextRequest) {
         didNutrition,
         score,
         siteUrl,
+        lang: isEN ? "en" : "pt",
       }).catch((e) => console.warn("[weekly-summary] email failed:", e));
     }
   }
