@@ -101,17 +101,16 @@ export async function POST(req: NextRequest) {
             .limit(1)
             .maybeSingle();
 
-          if (!existingMsg) {
-            const [{ data: coachProfileData }, { data: clientProfileData }] = await Promise.all([
-              admin.from("profiles").select("full_name").eq("id", coachId).single(),
-              admin.from("profiles").select("full_name, lang").eq("id", clientId).single(),
-            ]);
-            const coachFirst =
-              (coachProfileData?.full_name ?? "").split(" ")[0] || "Coach";
-            const isEN = (clientProfileData as { lang?: string } | null)?.lang === "en";
-            const clientFirst =
-              (clientProfileData?.full_name ?? "").split(" ")[0] || (isEN ? "athlete" : "atleta");
+          const [{ data: coachProfileData }, { data: clientProfileData }] = await Promise.all([
+            admin.from("profiles").select("full_name").eq("id", coachId).single(),
+            admin.from("profiles").select("full_name, lang").eq("id", clientId).single(),
+          ]);
+          const coachFirst = (coachProfileData?.full_name ?? "").split(" ")[0] || "Coach";
+          const isEN = (clientProfileData as { lang?: string } | null)?.lang === "en";
+          const clientFirst = (clientProfileData?.full_name ?? "").split(" ")[0] || (isEN ? "athlete" : "atleta");
 
+          // Welcome message — only if no prior message exists
+          if (!existingMsg) {
             await admin.from("messages").insert({
               sender_id: coachId,
               receiver_id: clientId,
@@ -119,30 +118,30 @@ export async function POST(req: NextRequest) {
                 ? `Hi ${clientFirst}! 👋 I'm ${coachFirst}, your KRAV coach. Your payment has been confirmed and you now have full access to the app. Let's start this journey together! 💪`
                 : `Olá ${clientFirst}! 👋 Sou o ${coachFirst}, o teu coach na KRAV. O teu pagamento foi confirmado e já tens acesso total à app. Vamos começar esta jornada juntos! 💪`,
             });
+          }
 
-            // 3. Notify coach of new paying client
-            const coachPush = await sendPushToUser(
-              coachId,
-              "Novo cliente pagante!",
-              `${clientFirst} subscreveu o teu programa.`,
-              `/coach/clients/${clientId}`,
-            ).catch((e: unknown) => ({ ok: false, error: String(e) }));
-            if (!coachPush.ok) {
-              console.error("[webhook] coach push failed:", coachPush.error);
-            }
+          // Notify coach — always, regardless of prior messages
+          const coachPush = await sendPushToUser(
+            coachId,
+            "💳 Novo pagamento recebido!",
+            `${clientFirst} subscreveu o teu programa.`,
+            `/coach/clients/${clientId}`,
+          ).catch((e: unknown) => ({ ok: false, error: String(e) }));
+          if (!coachPush.ok) {
+            console.error("[webhook] coach push failed:", coachPush.error);
+          }
 
-            // 4. Notify client (bilingual)
-            const clientPush = await sendPushToUser(
-              clientId,
-              isEN ? "Payment confirmed!" : "Pagamento confirmado!",
-              isEN
-                ? "Welcome to KRAV! Your coach will reach out to you soon."
-                : "Bem-vindo à KRAV! O teu coach vai contactar-te em breve.",
-              "/client/dashboard",
-            ).catch((e: unknown) => ({ ok: false, error: String(e) }));
-            if (!clientPush.ok) {
-              console.error("[webhook] client push failed:", clientPush.error);
-            }
+          // Notify client — always
+          const clientPush = await sendPushToUser(
+            clientId,
+            isEN ? "✅ Payment confirmed!" : "✅ Pagamento confirmado!",
+            isEN
+              ? "Welcome to KRAV! Your coach will reach out to you soon."
+              : "Bem-vindo à KRAV! O teu coach vai contactar-te em breve.",
+            "/client/dashboard",
+          ).catch((e: unknown) => ({ ok: false, error: String(e) }));
+          if (!clientPush.ok) {
+            console.error("[webhook] client push failed:", clientPush.error);
           }
         }
 
