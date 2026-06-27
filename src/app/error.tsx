@@ -11,12 +11,13 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Offline: redirect to the offline page instead of showing generic error
-    if (typeof navigator !== "undefined" && !navigator.onLine) {
-      window.location.replace("/offline");
-      return;
-    }
-    console.error(error);
+    // Ping the server; if it fails we are offline → show the static offline page.
+    // /api/ping is intentionally not cached by the service worker so this is a
+    // true network check, not a cache hit.
+    fetch("/api/ping", { cache: "no-store", signal: AbortSignal.timeout(3000) })
+      .then((r) => { if (!r.ok) throw new Error(); })
+      .catch(() => { window.location.replace("/offline.html"); })
+      .then(() => { console.error(error); });
   }, [error]);
 
   return (

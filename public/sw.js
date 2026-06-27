@@ -1,10 +1,10 @@
 // ─── Cache Config ────────────────────────────────────────────────────────────
 // Bump CACHE_VERSION on every deploy to force cache refresh.
-const CACHE_VERSION = "krav-v7";
+const CACHE_VERSION = "krav-v8";
 const STATIC_CACHE  = `${CACHE_VERSION}-static`;   // /_next/static/ — immutable JS/CSS
 const PAGES_CACHE   = `${CACHE_VERSION}-pages`;    // SSR page HTML
 const ASSETS_CACHE  = `${CACHE_VERSION}-assets`;   // icons, images, fonts
-const OFFLINE_URL   = "/offline";
+const OFFLINE_URL   = "/offline.html";             // static, no JS chunk deps
 
 const ALL_CACHES = [STATIC_CACHE, PAGES_CACHE, ASSETS_CACHE];
 
@@ -62,12 +62,13 @@ self.addEventListener("fetch", (event) => {
   // ── API routes — Network-Only (auth-gated, real-time data) ───────────────
   if (url.pathname.startsWith("/api/")) return;
 
-  // ── Next.js RSC payload requests — redirect to /offline on failure ────────
+  // ── Next.js RSC payload requests — redirect to offline.html on failure ──────
   if (request.headers.get("RSC") === "1") {
     event.respondWith(
-      fetch(request).catch(() =>
-        Response.redirect(new URL("/offline", self.location.origin).href, 302)
-      )
+      fetch(request).catch(async () => {
+        const offline = await caches.match(OFFLINE_URL);
+        return offline || Response.redirect(new URL(OFFLINE_URL, self.location.origin).href, 302);
+      })
     );
     return;
   }
