@@ -41,15 +41,87 @@ export default async function ClientDashboard() {
   monday.setUTCDate(today.getUTCDate() - ((dayOfWeek + 6) % 7));
   const weekStart = monday.toISOString().split("T")[0];
 
-  // Fetch plans with day info for streak + calendar
-  const { data: allPlans } = await supabase
-    .from("workout_plans")
-    .select("week_start, workout_days(day_of_week, is_rest, workout_completions(client_id))")
-    .eq("client_id", user!.id)
-    .order("week_start", { ascending: false })
-    .limit(26); // ~6 months
+  // End of this week (Sunday) — computed before queries, no DB dependency
+  const weekEnd = new Date(monday);
+  weekEnd.setUTCDate(monday.getUTCDate() + 6);
+  const weekEndStr = weekEnd.toISOString().split("T")[0];
 
-  // Build date → status map (used for both streak and calendar)
+  // ── PHASE 1: All independent queries in one parallel batch ────────────────
+  // Previously: allPlans ran alone, then 15 queries, then nutrition + testimonial
+  // = 3 sequential round-trips. Now everything is one round-trip.
+  // allLogs (sets JSON) and allPhotos removed from critical path — their
+  // achievement badges now trigger only from the dedicated achievements page.
+  const [
+    { data: allPlans },
+    { data: planThisWeek },
+    { data: feedback },
+    { data: mergedProfile },
+    { data: currentCheckin },
+    { data: weekChallenges },
+    { data: challengeProgress },
+    { data: clientGoals },
+    { data: onboardingRecord },
+    { data: weekLogs },
+    { data: allCheckins },
+    { data: allRecords },
+    { data: anyNutritionLog },
+    { data: pendingTestimonial },
+    { data: latestWeeklyReport },
+  ] = await Promise.all([
+    // 6-month history (streak + calendar)
+    supabase
+      .from("workout_plans")
+      .select("week_start, workout_days(day_of_week, is_rest, workout_completions(client_id))")
+      .eq("client_id", user!.id)
+      .order("week_start", { ascending: false })
+      .limit(26),
+    // This week's full plan (TodayCard + WorkoutWeek)
+    supabase
+      .from("workout_plans")
+      .select(`*, workout_days(*, exercises(*), workout_completions(*))`)
+      .eq("client_id", user!.id)
+      .eq("week_start", weekStart)
+      .maybeSingle(),
+    // Coach feedback this week
+    supabase
+      .from("coach_feedback")
+      .select("message, created_at")
+      .eq("client_id", user!.id)
+      .eq("week_start", weekStart)
+      .maybeSingle(),
+    // Profile — merged into one query (was two separate queries to same table)
+    supabase.from("profiles")
+      .select("full_name, tagline, welcomed_at, seen_achievements, avatar_url, subscription_renews_at")
+      .eq("id", user!.id)
+      .single(),
+    // Check-in this week
+    supabase.from("weekly_checkins").select("*").eq("client_id", user!.id).eq("week_start", weekStart).maybeSingle(),
+    // Challenges & goals
+    supabase.from("challenges").select("*").eq("client_id", user!.id).eq("week_start", weekStart),
+    supabase.from("challenge_progress").select("*").eq("client_id", user!.id),
+    supabase.from("client_goals").select("*").eq("client_id", user!.id).eq("completed", false).order("created_at"),
+    // Onboarding
+    supabase.from("client_onboarding").select("client_id").eq("client_id", user!.id).maybeSingle(),
+    // Exercises logged this week (muscle map)
+    supabase.from("workout_logs").select("exercise_name").eq("client_id", user!.id)
+      .gte("logged_at", weekStart).lte("logged_at", weekEndStr),
+    // Achievement counters (lightweight — just IDs/names)
+    supabase.from("weekly_checkins").select("id").eq("client_id", user!.id),
+    supabase.from("personal_records").select("exercise_name").eq("client_id", user!.id),
+    // Setup checklist + testimonial (was sequential after Promise.all)
+    supabase.from("nutrition_logs").select("id").eq("client_id", user!.id).limit(1).maybeSingle(),
+    supabase.from("testimonials").select("id").eq("client_id", user!.id)
+      .not("requested_at", "is", null).is("submitted_at", null).limit(1).maybeSingle(),
+    // Latest weekly report link
+    supabase.from("weekly_reports").select("id, week_start").eq("client_id", user!.id)
+      .order("week_start", { ascending: false }).limit(1).maybeSingle(),
+  ]);
+
+  // Unpack merged profile (downstream code uses both names)
+  const clientProfile = mergedProfile;
+  const fullProfile   = mergedProfile;
+
+  // Build date → status map (streak + calendar) — computed after allPlans resolves
   type PlanDay = { day_of_week: number; is_rest?: boolean; workout_completions: { client_id: string }[] };
   const dayStatuses: Record<string, DayStatus> = {};
   for (const plan of allPlans ?? []) {
@@ -68,7 +140,7 @@ export default async function ClientDashboard() {
     }
   }
 
-  // Daily streak: consecutive completed training days (rest days skipped, today excused if not done yet)
+  // Daily streak
   let streak = 0;
   for (const ds of Object.keys(dayStatuses).sort().reverse()) {
     const s = dayStatuses[ds];
@@ -77,59 +149,6 @@ export default async function ClientDashboard() {
     if (ds === todayStr) continue; // today not done yet — don't break
     break;
   }
-
-  // End of this week (Sunday)
-  const weekEnd = new Date(monday);
-  weekEnd.setUTCDate(monday.getUTCDate() + 6);
-  const weekEndStr = weekEnd.toISOString().split("T")[0];
-
-  const [{ data: planThisWeek }, { data: feedback }, { data: clientProfile }, { data: currentCheckin }, { data: fullProfile }, { data: weekChallenges }, { data: challengeProgress }, { data: clientGoals }, { data: onboardingRecord }, { data: weekLogs }, { data: allCheckins }, { data: allRecords }, { data: allLogs }, { data: allPhotos }, { data: latestWeeklyReport }] = await Promise.all([
-    supabase
-      .from("workout_plans")
-      .select(`*, workout_days(*, exercises(*), workout_completions(*))`)
-      .eq("client_id", user!.id)
-      .eq("week_start", weekStart)
-      .maybeSingle(),
-    supabase
-      .from("coach_feedback")
-      .select("message, created_at")
-      .eq("client_id", user!.id)
-      .eq("week_start", weekStart)
-      .maybeSingle(),
-    supabase.from("profiles").select("full_name, tagline, welcomed_at, seen_achievements, avatar_url").eq("id", user!.id).single(),
-    supabase.from("weekly_checkins").select("*").eq("client_id", user!.id).eq("week_start", weekStart).maybeSingle(),
-    supabase.from("profiles").select("subscription_renews_at").eq("id", user!.id).single(),
-    supabase.from("challenges").select("*").eq("client_id", user!.id).eq("week_start", weekStart),
-    supabase.from("challenge_progress").select("*").eq("client_id", user!.id),
-    supabase.from("client_goals").select("*").eq("client_id", user!.id).eq("completed", false).order("created_at"),
-    supabase.from("client_onboarding").select("client_id").eq("client_id", user!.id).maybeSingle(),
-    supabase.from("workout_logs").select("exercise_name").eq("client_id", user!.id)
-      .gte("logged_at", weekStart).lte("logged_at", weekEndStr),
-    supabase.from("weekly_checkins").select("id").eq("client_id", user!.id),
-    supabase.from("personal_records").select("exercise_name").eq("client_id", user!.id),
-    supabase.from("workout_logs").select("sets").eq("client_id", user!.id),
-    supabase.from("progress_photos").select("id").eq("client_id", user!.id),
-    supabase.from("weekly_reports").select("id, week_start").eq("client_id", user!.id)
-      .order("week_start", { ascending: false }).limit(1).maybeSingle(),
-  ]);
-
-  // Quick nutrition log check (for setup checklist)
-  const { data: anyNutritionLog } = await supabase
-    .from("nutrition_logs")
-    .select("id")
-    .eq("client_id", user!.id)
-    .limit(1)
-    .maybeSingle();
-
-  // Pending testimonial request from coach
-  const { data: pendingTestimonial } = await supabase
-    .from("testimonials")
-    .select("id")
-    .eq("client_id", user!.id)
-    .not("requested_at", "is", null)
-    .is("submitted_at", null)
-    .limit(1)
-    .maybeSingle();
 
   // Fallback: if no plan for this week, show the most recent plan
   let plan = planThisWeek;
@@ -257,12 +276,8 @@ export default async function ClientDashboard() {
     if (hasAny) achStreak++; else break;
   }
   const uniquePRExercises = new Set(allRecords?.map((r) => r.exercise_name) ?? []).size;
-  let achVolumeKg = 0;
-  for (const log of allLogs ?? []) {
-    for (const s of (log.sets as { weight_kg?: number; reps?: number; done: boolean }[]) ?? []) {
-      if (s.done && s.weight_kg && s.reps) achVolumeKg += s.weight_kg * s.reps;
-    }
-  }
+  // achVolumeKg and totalPhotos not computed here (those queries were removed from the
+  // dashboard critical path). Volume/photo badges still unlock on the achievements page.
   const achievements = computeAchievements({
     totalWeeksWithCompletion: achTotalWeeks,
     streak: achStreak,
@@ -270,9 +285,9 @@ export default async function ClientDashboard() {
     totalPRs: uniquePRExercises,
     hasPerfectWeek: achHasPerfect,
     totalWorkouts: achTotalWorkouts,
-    totalVolumeKg: achVolumeKg,
+    totalVolumeKg: 0,
     perfectWeeks: achPerfectWeeks,
-    totalPhotos: allPhotos?.length ?? 0,
+    totalPhotos: 0,
   }, lang);
 
   // Build cache payload for offline page
