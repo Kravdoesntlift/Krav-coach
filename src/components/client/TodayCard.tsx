@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { WorkoutDay } from "@/lib/supabase/types";
 import LiveWorkout from "./LiveWorkout";
 import { haptic, HAPTIC } from "@/lib/haptic";
@@ -18,6 +19,7 @@ export default function TodayCard({ day, clientId, isCompleted, completedCount, 
   const [liveMode, setLiveMode] = useState(false);
   const [done, setDone] = useState(isCompleted);
   const { lang } = useLang();
+  const router = useRouter();
   const isEN = lang === "en";
 
   const exercises = day.exercises ?? [];
@@ -44,7 +46,7 @@ export default function TodayCard({ day, clientId, isCompleted, completedCount, 
           dayId={day.id}
           clientId={clientId}
           dayLabel={day.label || (isEN ? "Today's workout" : "Treino de hoje")}
-          onComplete={async () => { setDone(true); setLiveMode(false); }}
+          onComplete={async () => { setDone(true); setLiveMode(false); router.refresh(); }}
           onClose={() => setLiveMode(false)}
         />
       )}
