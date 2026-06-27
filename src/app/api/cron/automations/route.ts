@@ -274,8 +274,9 @@ export async function GET(req: NextRequest) {
       .from("profiles")
       .select("id, full_name, lang")
       .eq("role", "client")
-      .eq("status", "active")
-      .gte("trial_ends_at", windowStart.toISOString())  // gte = inclusive
+      .not("status", "in", '("cancelled","past_due")')  // include active + null + any other
+      .not("trial_ends_at", "is", null)
+      .gte("trial_ends_at", windowStart.toISOString())
       .lt("trial_ends_at", windowEnd.toISOString());
 
     if (expErr) console.error("[cron/automations] trial warning query error:", expErr.message);
@@ -342,7 +343,8 @@ export async function GET(req: NextRequest) {
       .from("profiles")
       .select("id, full_name, lang")
       .eq("role", "client")
-      .eq("status", "active")
+      .not("status", "in", '("cancelled","past_due")')
+      .not("trial_ends_at", "is", null)
       .gte("trial_ends_at", expiredWindowStart.toISOString())
       .lt("trial_ends_at", expiredWindowEnd.toISOString());
 
