@@ -13,12 +13,17 @@ import { sendTrialReminderEmail, sendRenewalReminderEmail, sendTrialEndEmail } f
  */
 export async function GET(req: NextRequest) {
   // ── Auth ─────────────────────────────────────────────────────────────────
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return NextResponse.json({ error: "CRON_SECRET not configured" }, { status: 500 });
+  const cronSecret = process.env.CRON_SECRET?.trim();
+  if (!cronSecret) {
+    console.error("[cron/automations] CRON_SECRET env var is missing or empty");
+    return NextResponse.json({ error: "CRON_SECRET not configured" }, { status: 500 });
+  }
   const authHeader = req.headers.get("authorization");
   if (authHeader !== `Bearer ${cronSecret}`) {
+    console.error("[cron/automations] auth failed — header did not match CRON_SECRET");
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  console.log("[cron/automations] starting —", new Date().toISOString());
 
   const admin = createAdminClient();
 
