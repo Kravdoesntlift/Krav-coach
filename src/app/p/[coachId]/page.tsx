@@ -11,12 +11,18 @@ export default async function CoachPublicPage({
   const { coachId } = await params;
   const admin = createAdminClient();
 
-  const { data: coach } = await admin
+  // Support both UUID (old links) and slug (new clean links)
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(coachId);
+
+  const query = admin
     .from("profiles")
-    .select("id, full_name, avatar_url, tagline, role")
-    .eq("id", coachId)
-    .eq("role", "coach")
-    .maybeSingle();
+    .select("id, full_name, avatar_url, tagline, role, slug")
+    .eq("role", "coach");
+
+  const { data: coach } = await (isUuid
+    ? query.eq("id", coachId)
+    : query.eq("slug", coachId)
+  ).maybeSingle();
 
   if (!coach) notFound();
 
@@ -287,9 +293,16 @@ export default async function CoachPublicPage({
           </p>
         </div>
 
-        <p className="text-zinc-700 text-xs text-center">
-          Powered by <span className="font-black tracking-tighter">KRAV<span style={{ color: "#C9A84C" }}>.</span></span>
-        </p>
+        <div className="flex items-center justify-center gap-4 text-zinc-700 text-xs">
+          <span>
+            Powered by{" "}
+            <span className="font-black tracking-tighter">KRAV<span style={{ color: "#C9A84C" }}>.</span></span>
+          </span>
+          <span className="w-px h-3 bg-zinc-800" />
+          <Link href="/privacy" className="hover:text-zinc-500 transition-colors">
+            Privacidade
+          </Link>
+        </div>
       </div>
     </div>
   );

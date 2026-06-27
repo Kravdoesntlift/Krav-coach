@@ -2,18 +2,15 @@
 
 import { useState } from "react";
 
-export default function PublicLinkCard({ coachId }: { coachId: string }) {
+export default function PublicLinkCard({ coachId, slug }: { coachId: string; slug?: string | null }) {
   const [copied, setCopied] = useState(false);
 
-  const url = typeof window !== "undefined"
-    ? `${window.location.origin}/p/${coachId}`
-    : `/p/${coachId}`;
+  const path = slug ? `/p/${slug}` : `/p/${coachId}`;
+  const fullUrl = typeof window !== "undefined" ? `${window.location.origin}${path}` : path;
 
   async function copy() {
     try {
-      await navigator.clipboard.writeText(
-        typeof window !== "undefined" ? `${window.location.origin}/p/${coachId}` : ""
-      );
+      await navigator.clipboard.writeText(fullUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
@@ -29,8 +26,9 @@ export default function PublicLinkCard({ coachId }: { coachId: string }) {
           Partilha este link com potenciais clientes — vêem o teu perfil e podem registar-se
         </p>
       </div>
+
       <div className="flex items-center gap-2 bg-zinc-800 rounded-xl px-3 py-2">
-        <span className="text-zinc-500 text-xs truncate flex-1 font-mono">/p/{coachId.slice(0, 8)}…</span>
+        <span className="text-zinc-400 text-xs truncate flex-1 font-mono">{path}</span>
         <button
           onClick={copy}
           className={`shrink-0 px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
@@ -42,8 +40,15 @@ export default function PublicLinkCard({ coachId }: { coachId: string }) {
           {copied ? "✓ Copiado!" : "Copiar link"}
         </button>
       </div>
+
+      {!slug && (
+        <p className="text-zinc-600 text-[11px] px-0.5">
+          Define um slug no teu perfil para teres um link mais limpo para anúncios
+        </p>
+      )}
+
       <a
-        href={url}
+        href={fullUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="block text-center text-xs text-zinc-600 hover:text-zinc-400 transition-colors"

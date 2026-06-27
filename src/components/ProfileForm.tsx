@@ -37,6 +37,8 @@ const extra = {
   credentials:      { pt: "Credenciais / Diplomas", en: "Credentials / Certifications" },
   credentials_hint: { pt: "Uma por linha — aparecem como badges", en: "One per line — shown as badges" },
   credentials_note: { pt: "Cada linha = 1 badge na landing page", en: "Each line = 1 badge on landing page" },
+  slug_label:       { pt: "URL público (slug)", en: "Public URL (slug)" },
+  slug_hint:        { pt: "Letras minúsculas, números e hífens — ex: andre-kravchuk", en: "Lowercase letters, numbers and hyphens — e.g. andre-kravchuk" },
 } as const;
 
 interface Props {
@@ -48,6 +50,7 @@ interface Props {
     bio_en?: string | null;
     years_experience?: number | null;
     credentials?: string[] | null;
+    slug?: string | null;
   };
   email: string;
 }
@@ -55,6 +58,7 @@ interface Props {
 export default function ProfileForm({ profile, email }: Props) {
   const { lang, t } = useLang();
   const [fullName, setFullName] = useState(profile.full_name);
+  const [slug, setSlug] = useState(profile.slug ?? "");
   const [tagline, setTagline] = useState(profile.tagline ?? "");
   const [taglineEn, setTaglineEn] = useState(profile.tagline_en ?? "");
   const [bio, setBio] = useState(profile.bio ?? "");
@@ -76,6 +80,8 @@ export default function ProfileForm({ profile, email }: Props) {
     const supabase = createClient();
     const updates: Record<string, unknown> = { full_name: fullName.trim() };
     if (profile.role === "coach") {
+      const cleanSlug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "").replace(/-+/g, "-").replace(/^-|-$/g, "");
+      if (cleanSlug) updates.slug = cleanSlug;
       updates.tagline = tagline.trim();
       updates.tagline_en = taglineEn.trim();
       updates.bio = bio.trim();
@@ -144,6 +150,28 @@ export default function ProfileForm({ profile, email }: Props) {
           {/* Coach-only fields */}
           {profile.role === "coach" && (
             <>
+              <div>
+                <label className="label">
+                  {extra.slug_label[lang]} <span className="text-gray-600 text-[11px]">{extra.slug_hint[lang]}</span>
+                </label>
+                <div className="flex items-center gap-0 rounded-xl overflow-hidden border border-zinc-700 focus-within:border-brand-gold/50 transition-colors">
+                  <span className="bg-zinc-800 text-zinc-500 text-xs px-3 py-2.5 border-r border-zinc-700 whitespace-nowrap shrink-0">
+                    kravcoaching.com/p/
+                  </span>
+                  <input
+                    type="text"
+                    value={slug}
+                    onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
+                    className="bg-zinc-900 text-white text-sm px-3 py-2.5 flex-1 outline-none placeholder-zinc-600"
+                    placeholder="andre-kravchuk"
+                    maxLength={40}
+                  />
+                </div>
+                <p className="text-zinc-600 text-[11px] mt-1">
+                  Depois de guardar, podes partilhar este link limpo nos anúncios
+                </p>
+              </div>
+
               <div>
                 <label className="label">
                   {extra.tagline_pt[lang]} <span className="text-gray-600 text-[11px]">{extra.tagline_pt_hint[lang]}</span>

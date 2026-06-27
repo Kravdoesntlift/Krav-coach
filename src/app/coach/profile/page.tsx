@@ -67,7 +67,7 @@ export default async function CoachProfilePage() {
       </div>
 
       {/* Public link */}
-      <PublicLinkCard coachId={user!.id} />
+      <PublicLinkCard coachId={user!.id} slug={profile?.slug} />
 
       {/* Profile form */}
       <ProfileForm profile={profile} email={user!.email ?? ""} />
