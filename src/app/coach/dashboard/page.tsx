@@ -377,9 +377,12 @@ export default async function CoachDashboard() {
               const renewsAt = client.subscription_renews_at;
               const renewsSoon = !!(renewsAt && new Date(renewsAt + "T00:00:00") <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
               const trialEndsAt = client.trial_ends_at;
-              const trialDaysLeft = trialEndsAt
-                ? Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / 86_400_000)
-                : null;
+              const trialDaysLeft = trialEndsAt ? (() => {
+                const now = new Date(); const te = new Date(trialEndsAt);
+                const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+                const endUTC   = Date.UTC(te.getUTCFullYear(),  te.getUTCMonth(),  te.getUTCDate());
+                return Math.max(0, Math.round((endUTC - todayUTC) / 86_400_000));
+              })() : null;
               return {
                 id: client.id,
                 full_name: client.full_name,

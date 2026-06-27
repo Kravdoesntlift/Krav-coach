@@ -111,8 +111,10 @@ export default async function ClientDetailPage({
   // Trial badge
   let trialDaysLeft: number | null = null;
   if (client.trial_ends_at) {
-    const msLeft = new Date(client.trial_ends_at).getTime() - Date.now();
-    trialDaysLeft = Math.ceil(msLeft / 86_400_000);
+    const now = new Date(); const te = new Date(client.trial_ends_at);
+    const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    const endUTC   = Date.UTC(te.getUTCFullYear(),  te.getUTCMonth(),  te.getUTCDate());
+    trialDaysLeft  = Math.max(0, Math.round((endUTC - todayUTC) / 86_400_000));
   }
 
   // Group PRs by exercise

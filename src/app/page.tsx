@@ -182,12 +182,20 @@ export default async function LandingPage({
   const c = isEN ? t.en : t.pt;
 
   const admin = createAdminClient();
-  const { data: coach } = await admin
-    .from("profiles")
-    .select("id, full_name, avatar_url, tagline, tagline_en, bio, bio_en, years_experience, credentials, transformation_before_url, transformation_after_url")
-    .eq("role", "coach")
-    .limit(1)
-    .maybeSingle();
+  const [{ data: coach }, { data: publicTestimonials }] = await Promise.all([
+    admin
+      .from("profiles")
+      .select("id, full_name, avatar_url, tagline, tagline_en, bio, bio_en, years_experience, credentials, transformation_before_url, transformation_after_url")
+      .eq("role", "coach")
+      .limit(1)
+      .maybeSingle(),
+    admin
+      .from("testimonials")
+      .select("id, display_name, content, rating, result_highlight, duration_weeks")
+      .eq("is_public", true)
+      .order("submitted_at", { ascending: false })
+      .limit(6),
+  ]);
 
   // Self-service funnel — always /start (quiz + stripe)
   const signupUrl = "/start";
@@ -539,6 +547,62 @@ export default async function LandingPage({
             <p className="text-center text-zinc-600 text-xs">{c.install_hint}</p>
           </ScrollReveal>
         </section>
+
+        {/* ── TESTIMONIALS ─────────────────────────────────────── */}
+        {publicTestimonials && publicTestimonials.length > 0 && (
+          <section className="max-w-2xl mx-auto px-5 pb-20">
+            <ScrollReveal direction="up">
+              <p className="text-center text-xs font-semibold tracking-widest uppercase text-zinc-600 mb-3">
+                {isEN ? "What our clients say" : "O que dizem os nossos clientes"}
+              </p>
+              <h2 className="text-center text-2xl font-black text-white mb-8">
+                {isEN ? "Real results, real people" : "Resultados reais, pessoas reais"}
+              </h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {publicTestimonials.map((t) => (
+                  <div
+                    key={t.id}
+                    className="rounded-2xl p-5 flex flex-col gap-3"
+                    style={{
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid rgba(255,255,255,0.07)",
+                    }}
+                  >
+                    {/* Stars */}
+                    {t.rating && (
+                      <div className="flex gap-0.5">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <span key={i} style={{ color: i < t.rating! ? "#C9A84C" : "#27272a", fontSize: 14 }}>★</span>
+                        ))}
+                      </div>
+                    )}
+                    {/* Quote */}
+                    <p className="text-zinc-300 text-sm leading-relaxed flex-1">
+                      &ldquo;{t.content}&rdquo;
+                    </p>
+                    {/* Meta */}
+                    <div className="flex items-center justify-between gap-2 pt-1 border-t border-zinc-800/60">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-black shrink-0"
+                          style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
+                        >
+                          {(t.display_name?.[0] ?? "?").toUpperCase()}
+                        </div>
+                        <span className="text-white text-xs font-semibold">{t.display_name}</span>
+                      </div>
+                      {(t.result_highlight || t.duration_weeks) && (
+                        <span className="text-zinc-600 text-xs shrink-0">
+                          {t.result_highlight ?? `${t.duration_weeks}w`}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollReveal>
+          </section>
+        )}
 
         {/* ── PRICE ────────────────────────────────────────────── */}
         <section className="max-w-2xl mx-auto px-5 pb-20">

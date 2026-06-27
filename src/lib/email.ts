@@ -482,3 +482,93 @@ export async function sendWeeklySummaryEmail({
 </html>`,
   });
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Trial end email — sent on the day the trial expires (day 0)
+// Two CTAs: subscribe + leave feedback
+// ─────────────────────────────────────────────────────────────────────────────
+export async function sendTrialEndEmail({
+  to, clientName, siteUrl, lang = "pt",
+}: {
+  to: string; clientName: string; siteUrl: string; lang?: "pt" | "en";
+}) {
+  if (!process.env.RESEND_API_KEY) return;
+  const firstName = clientName.split(" ")[0];
+  const isEN = lang === "en";
+
+  const subject = isEN
+    ? `${firstName}, your KRAV trial has ended`
+    : `${firstName}, o teu trial KRAV terminou hoje`;
+
+  const benefits = isEN
+    ? ["Personalised weekly training plans", "Weekly check-ins & progress analysis", "Direct chat with your coach", "Full workout history & records"]
+    : ["Planos de treino semanais personalizados", "Check-ins semanais e análise de progresso", "Chat direto com o coach", "Histórico completo de treinos e recordes"];
+
+  await getResend().emails.send({
+    from: FROM, to, subject,
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0a0c;font-family:system-ui,-apple-system,sans-serif;color:#e4e4e7">
+  <div style="max-width:520px;margin:40px auto;padding:0 16px">
+    <div style="text-align:center;margin-bottom:28px">
+      <p style="font-size:24px;font-weight:900;letter-spacing:-0.5px;color:#fff;margin:0">KRAV<span style="color:#C9A84C">.</span></p>
+    </div>
+    <div style="background:#111113;border:1px solid #27272a;border-radius:20px;padding:32px;margin-bottom:16px">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:40px;margin-bottom:8px">⏰</div>
+        <p style="color:#C9A84C;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0 0 8px">
+          ${isEN ? "Trial ended" : "Trial encerrado"}
+        </p>
+        <h1 style="color:#fff;font-size:22px;font-weight:900;margin:0 0 12px">${isEN ? `${firstName}, your 7 days have ended` : `${firstName}, os teus 7 dias terminaram`}</h1>
+        <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0">
+          ${isEN
+            ? "Your trial is over, but everything you logged is saved — workouts, check-ins, progress, records. They will be waiting if you subscribe."
+            : "O teu trial terminou, mas tudo o que registaste fica guardado — treinos, check-ins, progresso, recordes. Está à tua espera se subscreveres."}
+        </p>
+      </div>
+      <div style="background:#0a0a0c;border:1px solid #1f1f23;border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        ${benefits.map((b) => `
+        <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #18181b">
+          <span style="color:#C9A84C;font-weight:900;font-size:13px;flex-shrink:0">✓</span>
+          <span style="color:#a1a1aa;font-size:13px">${b}</span>
+        </div>`).join("")}
+        <div style="padding-top:14px;text-align:right">
+          <span style="color:#fff;font-weight:900;font-size:22px">€127</span>
+          <span style="color:#71717a;font-size:13px"> ${isEN ? "/month" : "/mês"}</span>
+        </div>
+      </div>
+      <a href="${siteUrl}/client/dashboard"
+         style="display:block;background:linear-gradient(135deg,#E8C96B,#A8893A);color:#000;font-weight:800;font-size:15px;padding:15px 24px;border-radius:14px;text-decoration:none;text-align:center;margin-bottom:10px">
+        ${isEN ? "Continue my coaching →" : "Continuar o coaching →"}
+      </a>
+      <p style="color:#3f3f46;font-size:11px;text-align:center;margin:8px 0 0">
+        ${isEN ? "No commitment · Cancel at any time" : "Sem permanência · Cancelas a qualquer momento"}
+      </p>
+    </div>
+    <div style="background:#111113;border:1px solid #1f1f23;border-radius:16px;padding:24px;text-align:center;margin-bottom:20px">
+      <p style="color:#71717a;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin:0 0 8px">
+        ${isEN ? "Not subscribing for now?" : "Não vais subscrever por agora?"}
+      </p>
+      <p style="color:#fff;font-size:15px;font-weight:700;margin:0 0 10px">
+        ${isEN ? "Leave your feedback — it means a lot 🙏" : "Deixa o teu feedback — significa muito 🙏"}
+      </p>
+      <p style="color:#71717a;font-size:13px;line-height:1.6;margin:0 0 18px">
+        ${isEN
+          ? "2 minutes. Completely optional. Your opinion directly helps improve the coaching experience for future clients — and your testimonial may appear on the website."
+          : "2 minutos. Completamente opcional. A tua opinião ajuda directamente a melhorar a experiência de coaching para futuros clientes — e o teu testemunho poderá aparecer no site."}
+      </p>
+      <a href="${siteUrl}/client/dashboard"
+         style="display:inline-block;border:1px solid #3f3f46;color:#a1a1aa;font-weight:600;font-size:13px;padding:11px 24px;border-radius:12px;text-decoration:none">
+        ${isEN ? "Leave feedback →" : "Deixar feedback →"}
+      </a>
+    </div>
+    <p style="text-align:center;color:#3f3f46;font-size:11px;margin:0">
+      KRAV Coaching · <a href="mailto:kravdoesntlift@gmail.com" style="color:#52525b">${isEN ? "Contact support" : "Contactar suporte"}</a>
+    </p>
+  </div>
+</body>
+</html>`,
+  });
+}

@@ -6,6 +6,7 @@ import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import PushPrompt from "@/components/PushPrompt";
 import GlobalBadgeSync from "@/components/GlobalBadgeSync";
 import { PaywallSubscribeButton } from "@/components/client/PaywallSubscribeButton";
+import TrialFeedbackSection from "@/components/client/TrialFeedbackSection";
 import { LangProvider } from "@/components/LangProvider";
 import { ClientShell } from "@/components/client/ClientShell";
 
@@ -91,9 +92,13 @@ export default async function ClientLayout({
   let trialExpired = false;
 
   if (profile.trial_ends_at) {
-    const msLeft = new Date(profile.trial_ends_at).getTime() - Date.now();
-    trialDaysLeft = Math.ceil(msLeft / 86_400_000);
-    trialExpired  = trialDaysLeft <= 0;
+    const now      = new Date();
+    const trialEnd = new Date(profile.trial_ends_at);
+    // Calendar-day difference — updates at midnight UTC, not every 24h
+    const todayUTC = Date.UTC(now.getUTCFullYear(),      now.getUTCMonth(),      now.getUTCDate());
+    const endUTC   = Date.UTC(trialEnd.getUTCFullYear(), trialEnd.getUTCMonth(), trialEnd.getUTCDate());
+    trialDaysLeft  = Math.max(0, Math.round((endUTC - todayUTC) / 86_400_000));
+    trialExpired   = trialDaysLeft <= 0;
   }
 
   if (trialExpired) {
@@ -112,6 +117,7 @@ export default async function ClientLayout({
           reason="trial"
           subscribeAction={subscribeAction}
           logoutAction={logout}
+          showFeedback
         />
       );
     }
@@ -193,11 +199,13 @@ function Paywall({
   reason,
   subscribeAction,
   logoutAction,
+  showFeedback = false,
 }: {
   firstName: string;
   reason: "trial" | "cancelled";
   subscribeAction: () => Promise<void>;
   logoutAction: () => Promise<void>;
+  showFeedback?: boolean;
 }) {
   const benefits = [
     "Planos de treino semanais personalizados",
@@ -259,6 +267,8 @@ function Paywall({
             Falar com o coach no Instagram
           </a>
         </div>
+
+        {showFeedback && reason === "trial" && <TrialFeedbackSection />}
 
         <div className="h-px bg-zinc-800" />
         <form action={logoutAction}>

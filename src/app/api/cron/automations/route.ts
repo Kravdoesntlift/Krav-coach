@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPushToUser } from "@/lib/push";
-import { sendTrialReminderEmail, sendRenewalReminderEmail } from "@/lib/email";
+import { sendTrialReminderEmail, sendRenewalReminderEmail, sendTrialEndEmail } from "@/lib/email";
 
 /**
  * GET /api/cron/automations
@@ -319,6 +319,55 @@ export async function GET(req: NextRequest) {
         ];
       })
     );
+  }
+
+  // ── Trial end — day 0 (expired today) ────────────────────────────────────────
+  // Window: trial_ends_at fell within the last 24h UTC window (i.e., expired today)
+  {
+    const expiredWindowStart = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+    const expiredWindowEnd   = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + 1));
+
+    const { data: expiredClients } = await admin
+      .from("profiles")
+      .select("id, full_name, lang")
+      .eq("role", "client")
+      .eq("status", "active")
+      .gte("trial_ends_at", expiredWindowStart.toISOString())
+      .lt("trial_ends_at", expiredWindowEnd.toISOString());
+
+    if (expiredClients?.length) {
+      // Skip already-subscribed clients
+      const { data: activeSubs } = await admin
+        .from("stripe_subscriptions")
+        .select("client_id")
+        .in("client_id", expiredClients.map((c) => c.id))
+        .in("status", ["active", "trialing"]);
+      const subSet  = new Set((activeSubs ?? []).map((s) => s.client_id));
+      const toNotify = expiredClients.filter((c) => !subSet.has(c.id));
+
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kravcoaching.com";
+
+      await Promise.allSettled(
+        toNotify.flatMap((c) => {
+          const cLang: "pt" | "en" = (c as { lang?: string }).lang === "en" ? "en" : "pt";
+          return [
+            sendPushToUser(
+              c.id,
+              cLang === "en" ? "⏰ Your KRAV trial has ended" : "⏰ O teu trial KRAV terminou",
+              cLang === "en"
+                ? "Subscribe to keep your plan, history and coach access. Or leave us feedback — it takes 2 minutes."
+                : "Subscreve para manter o teu plano, histórico e acesso ao coach. Ou deixa-nos o teu feedback — são 2 minutos.",
+              "/client/dashboard",
+            ),
+            admin.auth.admin.getUserById(c.id).then(({ data }) => {
+              const email = data?.user?.email;
+              if (!email) return;
+              return sendTrialEndEmail({ to: email, clientName: c.full_name ?? "", siteUrl, lang: cLang });
+            }),
+          ];
+        })
+      );
+    }
   }
 
   // ── Subscription renewal reminder (3 days before period end) ────────────────
