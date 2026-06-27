@@ -96,34 +96,35 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
     return () => { if (elapsedRef.current) clearInterval(elapsedRef.current); };
   }, []);
 
-  // ── Media Session + local notification ────────────────────
+  // ── Media Session — atualiza quando muda de exercício ────────
+  // Não dispara em cada série para evitar spam de notificações.
+  // O áudio silencioso mantém a sessão ativa para aparecer no ecrã de bloqueio.
   useEffect(() => {
     if (finishing) return;
     const ex = sorted[step];
-    const doneSets = setLogs[step]?.filter((s) => s.done).length ?? 0;
-    const setLabel = `${isEN ? "Set" : "Série"} ${doneSets + 1}/${ex?.sets ?? 0}`;
-
+    const remaining = totalSteps - step;
     try {
       if ("mediaSession" in navigator && "MediaMetadata" in window) {
         navigator.mediaSession.metadata = new MediaMetadata({
-          title: ex?.name ?? dayLabel, artist: `KRAV · ${setLabel}`, album: dayLabel,
-          artwork: [{ src: "/icon.png", sizes: "192x192", type: "image/png" }],
+          title: ex?.name ?? dayLabel,
+          artist: `KRAV · ${step + 1}/${totalSteps} · ${ex?.sets}×${ex?.reps}`,
+          album: dayLabel,
+          artwork: [
+            { src: "/icon.png", sizes: "192x192", type: "image/png" },
+            { src: "/icon.svg", sizes: "any",    type: "image/svg+xml" },
+          ],
         });
-        navigator.mediaSession.setActionHandler("previoustrack", () => setStep((s) => Math.max(0, s - 1)));
-        navigator.mediaSession.setActionHandler("nexttrack", () => setStep((s) => Math.min(totalSteps - 1, s + 1)));
+        navigator.mediaSession.setActionHandler("previoustrack", () =>
+          setStep((s) => Math.max(0, s - 1))
+        );
+        navigator.mediaSession.setActionHandler("nexttrack", () =>
+          setStep((s) => Math.min(totalSteps - 1, s + 1))
+        );
         navigator.mediaSession.playbackState = "playing";
       }
     } catch { /* unsupported */ }
-
-    try {
-      if (Notification.permission === "granted") {
-        new Notification(`${ex?.name ?? dayLabel}`, {
-          body: `${setLabel} · KRAV Coach`, icon: "/icon.png",
-          tag: "krav-workout", silent: true,
-        });
-      }
-    } catch { /* unsupported */ }
-  }, [step, setLogs, sorted, dayLabel, isEN, totalSteps, finishing]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, finishing]); // ← ONLY step changes, never setLogs
 
   // ── Previous session data ─────────────────────────────────
   useEffect(() => {
