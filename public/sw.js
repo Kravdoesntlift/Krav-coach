@@ -1,6 +1,6 @@
 // ─── Cache Config ────────────────────────────────────────────────────────────
 // Bump CACHE_VERSION on every deploy to force cache refresh.
-const CACHE_VERSION = "krav-v8";
+const CACHE_VERSION = "krav-v9";
 const STATIC_CACHE  = `${CACHE_VERSION}-static`;   // /_next/static/ — immutable JS/CSS
 const PAGES_CACHE   = `${CACHE_VERSION}-pages`;    // SSR page HTML
 const ASSETS_CACHE  = `${CACHE_VERSION}-assets`;   // icons, images, fonts
@@ -8,11 +8,21 @@ const OFFLINE_URL   = "/offline.html";             // static, no JS chunk deps
 
 const ALL_CACHES = [STATIC_CACHE, PAGES_CACHE, ASSETS_CACHE];
 
+// Pages where stale content is acceptable (serve from cache instantly, refresh in background)
+const SWR_PAGES = [
+  "/client/dashboard",
+  "/client/history",
+  "/client/profile",
+  "/client/achievements",
+  "/client/checkin",
+  "/coach/dashboard",
+];
+
 // ─── Install — precache shell ─────────────────────────────────────────────────
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(ASSETS_CACHE).then((cache) =>
-      cache.addAll([OFFLINE_URL, "/manifest.json", "/icon.svg", "/icon.png"])
+      cache.addAll([OFFLINE_URL, "/manifest.json", "/icon.png", "/icon.svg"])
            .catch(() => cache.addAll([OFFLINE_URL, "/manifest.json", "/icon.svg"]))
     )
   );
@@ -73,7 +83,13 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // ── Page navigations — Network-First, cache last response, offline fallback ─
+  // ── Known app pages — Stale-While-Revalidate (instant open, fresh in background) ──
+  if (request.mode === "navigate" && SWR_PAGES.some((p) => url.pathname.startsWith(p))) {
+    event.respondWith(staleWhileRevalidate(request));
+    return;
+  }
+
+  // ── Other page navigations — Network-First, offline fallback ─────────────
   if (request.mode === "navigate") {
     event.respondWith(networkFirstPage(request));
     return;
@@ -95,9 +111,34 @@ async function cacheFirst(cacheName, request) {
     const response = await fetch(request);
     if (response.ok) cache.put(request, response.clone());
     return response;
-  } catch (err) {
+  } catch {
     return new Response("Offline", { status: 503 });
   }
+}
+
+// Serve from cache immediately if available; refresh in background.
+// On first visit (no cache) falls through to network.
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(PAGES_CACHE);
+  const cached = await cache.match(request);
+
+  const networkFetch = fetch(request).then((response) => {
+    if (response.ok) {
+      const ct = response.headers.get("content-type") ?? "";
+      if (ct.includes("text/html")) cache.put(request, response.clone());
+    }
+    return response;
+  }).catch(async () => {
+    // Offline and nothing cached — show offline page
+    if (!cached) {
+      const offline = await caches.match(OFFLINE_URL);
+      return offline || new Response("Offline", { status: 503 });
+    }
+    return cached;
+  });
+
+  // Return cached version instantly; network result updates cache for next time
+  return cached || networkFetch;
 }
 
 async function networkFirstPage(request) {
@@ -105,18 +146,13 @@ async function networkFirstPage(request) {
   try {
     const response = await fetch(request);
     if (response.ok) {
-      // Only cache text/html responses
       const ct = response.headers.get("content-type") ?? "";
-      if (ct.includes("text/html")) {
-        cache.put(request, response.clone());
-      }
+      if (ct.includes("text/html")) cache.put(request, response.clone());
     }
     return response;
   } catch {
-    // Offline: serve last cached version of this page
     const cached = await cache.match(request);
     if (cached) return cached;
-    // Final fallback: offline page
     const offline = await caches.match(OFFLINE_URL);
     return offline || new Response("Offline", { status: 503 });
   }
@@ -144,10 +180,11 @@ self.addEventListener("push", (event) => {
   const title = data.title || "KRAV Coach";
   const options = {
     body: data.body || "",
-    icon: "/icon.svg",
-    badge: "/icon.svg",
+    icon: "/icon.png",   // PNG required — SVG not supported by Chrome/Android
+    badge: "/icon.png",
     data: { url: data.url || "/" },
     vibrate: [200, 100, 200],
+    requireInteraction: false,
   };
 
   event.waitUntil(
