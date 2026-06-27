@@ -217,31 +217,46 @@ export default async function CoachPublicPage({
         {/* Testimonials */}
         {testimonials && testimonials.length > 0 && (
           <div className="space-y-5">
-            <p className="text-zinc-500 text-xs font-semibold tracking-widest uppercase text-center">
-              O que dizem os clientes
-            </p>
+            {/* Header with overall rating */}
+            <div className="text-center space-y-1.5">
+              <p className="text-zinc-500 text-xs font-semibold tracking-widest uppercase">
+                O que dizem os clientes
+              </p>
+              <div className="flex items-center justify-center gap-1">
+                {"★★★★★".split("").map((s, i) => (
+                  <span key={i} className="text-lg" style={{ color: "#C9A84C" }}>{s}</span>
+                ))}
+                <span className="text-zinc-400 text-sm ml-2">
+                  5.0 · {testimonials.length} {testimonials.length === 1 ? "avaliação" : "avaliações"}
+                </span>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 gap-4">
               {testimonials.map((t, i) => (
                 <div
                   key={i}
-                  className="relative bg-zinc-900 border border-zinc-800 rounded-2xl p-5"
+                  className="relative rounded-2xl p-5 space-y-3"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.12)" }}
                 >
-                  <div
-                    className="text-brand-gold text-4xl font-black leading-none mb-3"
-                    style={{ opacity: 0.3, color: "#C9A84C" }}
-                  >
-                    &ldquo;
+                  {/* Stars */}
+                  <div className="flex gap-0.5">
+                    {"★★★★★".split("").map((s, si) => (
+                      <span key={si} className="text-sm" style={{ color: "#C9A84C" }}>{s}</span>
+                    ))}
                   </div>
-                  <p className="text-white text-sm leading-relaxed">{t.content}</p>
-                  <div className="mt-4 pt-3 border-t border-zinc-800 flex items-center justify-between">
+
+                  <p className="text-zinc-200 text-sm leading-relaxed">&ldquo;{t.content}&rdquo;</p>
+
+                  <div className="flex items-center justify-between pt-1 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
                     <div>
-                      <p className="text-white text-xs font-semibold">{t.display_name}</p>
+                      <p className="text-white text-xs font-bold">{t.display_name}</p>
                       {t.result_highlight && (
-                        <p className="text-xs" style={{ color: "#C9A84C" }}>{t.result_highlight}</p>
+                        <p className="text-[11px] font-semibold mt-0.5" style={{ color: "#C9A84C" }}>{t.result_highlight}</p>
                       )}
                     </div>
                     {t.duration_weeks && (
-                      <p className="text-zinc-600 text-xs">{t.duration_weeks} sem.</p>
+                      <p className="text-zinc-600 text-xs shrink-0">{t.duration_weeks} sem.</p>
                     )}
                   </div>
                 </div>

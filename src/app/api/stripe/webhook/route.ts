@@ -156,6 +156,13 @@ export async function POST(req: NextRequest) {
         const periodEndTs = item?.current_period_end ?? null;
         const periodEnd = periodEndTs ? new Date(periodEndTs * 1000).toISOString() : null;
 
+        // Fetch client_id before updating (client_id never changes — just need the value)
+        const { data: existingSub } = await admin
+          .from("stripe_subscriptions")
+          .select("client_id")
+          .eq("id", subscription.id)
+          .maybeSingle();
+
         await admin
           .from("stripe_subscriptions")
           .update({
@@ -164,6 +171,21 @@ export async function POST(req: NextRequest) {
             current_period_end: periodEnd,
           })
           .eq("id", subscription.id);
+
+        // Sync profiles.status so middleware + app reflect the real subscription state
+        if (existingSub?.client_id) {
+          const profileStatus =
+            subscription.status === "active"   ? "active"   :
+            subscription.status === "trialing" ? "trialing" :
+            subscription.status === "past_due" ? "past_due" :
+            subscription.status === "unpaid"   ? "past_due" :
+            null;
+          if (profileStatus) {
+            await admin.from("profiles")
+              .update({ status: profileStatus })
+              .eq("id", existingSub.client_id);
+          }
+        }
 
         break;
       }
@@ -298,6 +320,8 @@ export async function POST(req: NextRequest) {
             const amountEur = `€ ${(amountCents / 100).toFixed(2).replace(".", ",")}`;
 
             await Promise.allSettled([
+              // Lock the account so the app reflects payment failure immediately
+              admin.from("profiles").update({ status: "past_due" }).eq("id", profile.id),
               email && sendPaymentFailedEmail({
                 to: email,
                 clientName: (profile.full_name ?? "").split(" ")[0] || "Client",

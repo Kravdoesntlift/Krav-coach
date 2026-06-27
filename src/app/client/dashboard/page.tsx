@@ -336,12 +336,28 @@ export default async function ClientDashboard() {
               {greeting}, <span className="text-gold-gradient">{firstName}</span>
             </h1>
           </div>
-          {streak > 0 && (
-            <div className="flex items-center gap-1.5 bg-brand-gold/8 border border-brand-gold/18 rounded-full px-2.5 py-1.5 glow-gold-sm shrink-0">
-              <span className="text-[13px]">🔥</span>
-              <span className="text-brand-gold font-black text-sm tabular-nums">{streak}</span>
-            </div>
-          )}
+
+          {/* Right side: streak + weekly progress */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Weekly workouts pill — only show if there's a plan */}
+            {plan && trainDays.length > 0 && (
+              <div className="flex items-center gap-1 rounded-full px-2.5 py-1.5" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                {Array.from({ length: trainDays.length }).map((_, i) => (
+                  <span
+                    key={i}
+                    className="w-2 h-2 rounded-full"
+                    style={{ background: i < completedDays ? "#C9A84C" : "rgba(255,255,255,0.12)" }}
+                  />
+                ))}
+              </div>
+            )}
+            {streak > 0 && (
+              <div className="flex items-center gap-1.5 bg-brand-gold/8 border border-brand-gold/18 rounded-full px-2.5 py-1.5 glow-gold-sm">
+                <span className="text-[13px]">🔥</span>
+                <span className="text-brand-gold font-black text-sm tabular-nums">{streak}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* ── 2. TODAY'S WORKOUT — the main reason they opened the app ── */}
@@ -443,15 +459,30 @@ export default async function ClientDashboard() {
           hasProfilePhoto={!!clientProfile?.avatar_url}
         />
 
-        {/* Testimonial request — subtle row, not a big banner */}
+        {/* Testimonial request */}
         {pendingTestimonial && (
-          <Link href="/client/testimonial" className="block">
-            <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-brand-gold/20 bg-brand-gold/5 hover:bg-brand-gold/8 transition-colors">
-              <span className="text-base shrink-0">⭐</span>
-              <p className="text-zinc-300 text-sm flex-1">
-                {lang === "en" ? "Your coach asked for a testimonial" : "O teu coach pediu o teu testemunho"}
-              </p>
-              <span className="text-brand-gold/60 text-xs shrink-0">→</span>
+          <Link href="/client/testimonial" className="block active:scale-[0.98] transition-transform">
+            <div
+              className="flex items-center gap-3.5 px-4 py-4 rounded-2xl"
+              style={{
+                background: "linear-gradient(135deg, rgba(201,168,76,0.1) 0%, rgba(201,168,76,0.04) 100%)",
+                border: "1px solid rgba(201,168,76,0.3)",
+              }}
+            >
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ background: "rgba(201,168,76,0.15)" }}>
+                ⭐
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-white font-bold text-sm leading-snug">
+                  {lang === "en" ? "Your coach wants your feedback" : "O teu coach quer o teu testemunho"}
+                </p>
+                <p className="text-zinc-400 text-xs mt-0.5">
+                  {lang === "en" ? "Share your experience — takes 2 min" : "Partilha a tua experiência — 2 min"}
+                </p>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 opacity-70">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
             </div>
           </Link>
         )}
