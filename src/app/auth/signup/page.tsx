@@ -225,6 +225,13 @@ export default function SignupPage() {
                   </span>
                 ) : "Começar trial gratuito de 7 dias"}
               </button>
+
+              <p className="text-zinc-600 text-[11px] text-center leading-relaxed">
+                Ao criares conta, aceitas a nossa{" "}
+                <Link href="/privacy" className="text-zinc-400 underline hover:text-white transition-colors">
+                  Política de Privacidade
+                </Link>
+              </p>
             </form>
           </div>
         )}
