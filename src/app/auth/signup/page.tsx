@@ -10,6 +10,7 @@ export default function SignupPage() {
   const [done, setDone] = useState(false);
   const [coachId, setCoachId]   = useState<string | null>(null);
   const [refCode, setRefCode]   = useState<string | null>(null);
+  const [detectedLang, setDetectedLang] = useState<"pt" | "en">("pt");
 
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
@@ -17,6 +18,12 @@ export default function SignupPage() {
     const r = p.get("ref");
     if (c) setCoachId(c);
     if (r) setRefCode(r);
+
+    // Detect browser language at signup time so the DB has it before the first app open
+    const browser = navigator.language.toLowerCase();
+    if (browser.startsWith("en") || browser.startsWith("de") || browser.startsWith("fr") || browser.startsWith("it")) {
+      setDetectedLang("en");
+    }
   }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -132,6 +139,7 @@ export default function SignupPage() {
             <form onSubmit={handleSubmit} className="space-y-3.5">
               {coachId && <input type="hidden" name="coach_id" value={coachId} />}
               {refCode && <input type="hidden" name="ref_code" value={refCode} />}
+              <input type="hidden" name="lang" value={detectedLang} />
 
               {/* Invite banner — coach invite */}
               {coachId && (

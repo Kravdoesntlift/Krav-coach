@@ -55,6 +55,7 @@ export async function signup(formData: FormData) {
   const password = formData.get("password") as string;
   const coachId = (formData.get("coach_id") as string | null)?.trim() || null;
   const refCode = (formData.get("ref_code") as string | null)?.trim().toUpperCase() || null;
+  const lang = (formData.get("lang") as string | null) === "en" ? "en" : "pt";
 
   if (!fullName) return { error: "Insere o teu nome." };
   if (password.length < 6) return { error: "A password deve ter pelo menos 6 caracteres." };
@@ -84,6 +85,10 @@ export async function signup(formData: FormData) {
   if (data.user?.id) {
     try {
       const admin = createAdminClient();
+
+      // Save detected language immediately so webhooks/emails use the right lang
+      // before the client ever opens the app (which is where LangProvider normally saves it)
+      await admin.from("profiles").update({ lang }).eq("id", data.user.id);
 
       // Resolve coachId — use param if valid, otherwise find first coach
       let resolvedCoachId = coachId;
