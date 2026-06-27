@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { sendPushToUser } from "@/lib/push";
 
 export async function requestTestimonial(data: {
   client_id: string;
@@ -20,6 +21,14 @@ export async function requestTestimonial(data: {
     .single();
   if (profile?.role !== "coach") return { error: "Sem permissão." };
 
+  // Fetch client lang to send push in the right language
+  const { data: clientProfile } = await supabase
+    .from("profiles")
+    .select("lang")
+    .eq("id", data.client_id)
+    .single();
+  const cLang: "pt" | "en" = clientProfile?.lang === "en" ? "en" : "pt";
+
   const { error } = await supabase.from("testimonials").insert({
     coach_id: user.id,
     client_id: data.client_id,
@@ -31,6 +40,17 @@ export async function requestTestimonial(data: {
   });
 
   if (error) return { error: error.message };
+
+  // Notify the client via push (fire-and-forget — don't block the action)
+  void sendPushToUser(
+    data.client_id,
+    cLang === "en" ? "⭐ Your coach wants your testimonial!" : "⭐ O teu coach quer o teu testemunho!",
+    cLang === "en"
+      ? "Share your experience — it only takes 2 minutes."
+      : "Partilha a tua experiência — só demora 2 minutos.",
+    "/client/testimonial",
+  );
+
   revalidatePath("/coach/testimonials");
   return {};
 }

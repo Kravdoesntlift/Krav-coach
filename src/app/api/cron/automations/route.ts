@@ -295,10 +295,9 @@ export async function GET(req: NextRequest) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kravcoaching.com";
 
     await Promise.allSettled(
-      toWarn.flatMap((c) => {
+      toWarn.map(async (c) => {
         const cLang: "pt" | "en" = (c as { lang?: string }).lang === "en" ? "en" : "pt";
-        return [
-          // Push notification (language-aware)
+        await Promise.allSettled([
           sendPushToUser(
             c.id,
             cLang === "en"
@@ -309,19 +308,26 @@ export async function GET(req: NextRequest) {
               : (daysLeft === 1 ? "Não percas o acesso. Subscreve agora." : "Ainda tens 2 dias. Activa a tua subscrição e continua."),
             "/client/dashboard",
           ),
-          // Email (language-aware)
-          admin.auth.admin.getUserById(c.id).then(({ data }) => {
-            const email = data?.user?.email;
-            if (!email) return;
-            return sendTrialReminderEmail({
-              to: email,
-              clientName: c.full_name ?? "",
-              daysLeft,
-              siteUrl,
-              lang: cLang,
-            });
-          }),
-        ];
+          (async () => {
+            try {
+              const { data, error } = await admin.auth.admin.getUserById(c.id);
+              if (error || !data?.user?.email) {
+                console.error(`[cron] trial warning: no email for ${c.id}`, error?.message ?? "email null");
+                return;
+              }
+              await sendTrialReminderEmail({
+                to: data.user.email,
+                clientName: c.full_name ?? "",
+                daysLeft,
+                siteUrl,
+                lang: cLang,
+              });
+              console.log(`[cron] trial warning email sent daysLeft=${daysLeft} to=${data.user.email}`);
+            } catch (err) {
+              console.error(`[cron] trial warning email failed for ${c.id}:`, err);
+            }
+          })(),
+        ]);
       })
     );
   }
@@ -353,9 +359,9 @@ export async function GET(req: NextRequest) {
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kravcoaching.com";
 
       await Promise.allSettled(
-        toNotify.flatMap((c) => {
+        toNotify.map(async (c) => {
           const cLang: "pt" | "en" = (c as { lang?: string }).lang === "en" ? "en" : "pt";
-          return [
+          await Promise.allSettled([
             sendPushToUser(
               c.id,
               cLang === "en" ? "⏰ Your KRAV trial has ended" : "⏰ O teu trial KRAV terminou",
@@ -364,12 +370,20 @@ export async function GET(req: NextRequest) {
                 : "Subscreve para manter o teu plano, histórico e acesso ao coach. Ou deixa-nos o teu feedback — são 2 minutos.",
               "/client/dashboard",
             ),
-            admin.auth.admin.getUserById(c.id).then(({ data }) => {
-              const email = data?.user?.email;
-              if (!email) return;
-              return sendTrialEndEmail({ to: email, clientName: c.full_name ?? "", siteUrl, lang: cLang });
-            }),
-          ];
+            (async () => {
+              try {
+                const { data, error } = await admin.auth.admin.getUserById(c.id);
+                if (error || !data?.user?.email) {
+                  console.error(`[cron] trial end: no email for ${c.id}`, error?.message ?? "email null");
+                  return;
+                }
+                await sendTrialEndEmail({ to: data.user.email, clientName: c.full_name ?? "", siteUrl, lang: cLang });
+                console.log(`[cron] trial end email sent to=${data.user.email}`);
+              } catch (err) {
+                console.error(`[cron] trial end email failed for ${c.id}:`, err);
+              }
+            })(),
+          ]);
         })
       );
     }

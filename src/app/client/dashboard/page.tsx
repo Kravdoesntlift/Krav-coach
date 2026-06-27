@@ -121,6 +121,16 @@ export default async function ClientDashboard() {
     .limit(1)
     .maybeSingle();
 
+  // Pending testimonial request from coach
+  const { data: pendingTestimonial } = await supabase
+    .from("testimonials")
+    .select("id")
+    .eq("client_id", user!.id)
+    .not("requested_at", "is", null)
+    .is("submitted_at", null)
+    .limit(1)
+    .maybeSingle();
+
   // Fallback: if no plan for this week, show the most recent plan
   let plan = planThisWeek;
   let isCurrentWeek = true;
@@ -330,6 +340,24 @@ export default async function ClientDashboard() {
         hasCompletedWorkout={completedDays > 0}
         hasProfilePhoto={!!clientProfile?.avatar_url}
       />
+
+      {/* Pending testimonial request */}
+      {pendingTestimonial && (
+        <Link href="/client/testimonial" className="block">
+          <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-brand-gold/8 border border-brand-gold/25 hover:bg-brand-gold/12 transition-colors">
+            <span className="text-2xl shrink-0">⭐</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-white font-bold text-sm leading-snug">
+                {lang === "en" ? "Your coach asked for your testimonial" : "O teu coach quer o teu testemunho"}
+              </p>
+              <p className="text-zinc-400 text-xs mt-0.5">
+                {lang === "en" ? "Tap to share your experience — 2 minutes" : "Clica para partilhar a tua experiência — 2 minutos"}
+              </p>
+            </div>
+            <span className="text-brand-gold shrink-0">→</span>
+          </div>
+        </Link>
+      )}
 
       {/* Install app prompt */}
       <InstallPrompt />
