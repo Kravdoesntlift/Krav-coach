@@ -260,21 +260,26 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // ── Trial expiry warnings (2 days left = day 5, 1 day left = day 6) ────────
-  // Use midnight-to-midnight UTC windows so clients who registered at any hour
-  // of the day are caught regardless of when the cron fires.
+  // ── Trial expiry warnings (2 days left, 1 day left) ─────────────────────────
+  // Window = [today+daysLeft 00:00 UTC, today+daysLeft+1 00:00 UTC)
+  // Using .gte/.lt (inclusive start) to catch clients who registered at midnight.
   const trialWarningDays = [2, 1];
   for (const daysLeft of trialWarningDays) {
     const windowStart = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + daysLeft));
     const windowEnd   = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + daysLeft + 1));
 
-    const { data: expiringClients } = await admin
+    console.log(`[cron/automations] trial warning daysLeft=${daysLeft} window=[${windowStart.toISOString()}, ${windowEnd.toISOString()})`);
+
+    const { data: expiringClients, error: expErr } = await admin
       .from("profiles")
       .select("id, full_name, lang")
       .eq("role", "client")
       .eq("status", "active")
-      .gt("trial_ends_at", windowStart.toISOString())
+      .gte("trial_ends_at", windowStart.toISOString())  // gte = inclusive
       .lt("trial_ends_at", windowEnd.toISOString());
+
+    if (expErr) console.error("[cron/automations] trial warning query error:", expErr.message);
+    console.log(`[cron/automations] trial warning daysLeft=${daysLeft} found=${expiringClients?.length ?? 0}`);
 
     if (!expiringClients?.length) continue;
 

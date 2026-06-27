@@ -15,6 +15,7 @@ import ChallengeForm from "@/components/coach/ChallengeForm";
 import GoalForm from "@/components/coach/GoalForm";
 import NotifyButton from "@/components/coach/NotifyButton";
 import MacroGoalsCoach from "@/components/coach/MacroGoalsCoach";
+import SendTrialEmailButton from "@/components/coach/SendTrialEmailButton";
 import Image from "next/image";
 import PhotoLightbox from "@/components/coach/PhotoLightbox";
 import type { ClientStatus } from "@/lib/supabase/types";
@@ -162,6 +163,9 @@ export default async function ClientDetailPage({
             trialDaysLeft > 0
               ? <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#C9A84C]/15 text-[#C9A84C] border border-[#C9A84C]/30">Trial · {trialDaysLeft}d</span>
               : <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">Trial expirado</span>
+          )}
+          {trialDaysLeft !== null && trialDaysLeft <= 2 && (
+            <SendTrialEmailButton clientId={clientId} daysLeft={trialDaysLeft} />
           )}
         </div>
         <div className="ml-auto flex gap-2">
