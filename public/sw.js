@@ -26,7 +26,9 @@ self.addEventListener("install", (event) => {
            .catch(() => cache.addAll([OFFLINE_URL, "/manifest.json", "/icon.svg"]))
     )
   );
-  self.skipWaiting();
+  // Do NOT call skipWaiting() here — it causes an abrupt SW takeover mid-session
+  // which on iOS can invalidate push subscriptions and break the notification toggle.
+  // ServiceWorkerRegister posts SKIP_WAITING after install completes safely.
 });
 
 // ─── Activate — clean stale caches ───────────────────────────────────────────
