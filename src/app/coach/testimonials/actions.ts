@@ -41,15 +41,15 @@ export async function requestTestimonial(data: {
 
   if (error) return { error: error.message };
 
-  // Notify the client via push (fire-and-forget — don't block the action)
-  void sendPushToUser(
+  // Notify the client via push
+  sendPushToUser(
     data.client_id,
     cLang === "en" ? "⭐ Your coach wants your testimonial!" : "⭐ O teu coach quer o teu testemunho!",
     cLang === "en"
       ? "Share your experience — it only takes 2 minutes."
       : "Partilha a tua experiência — só demora 2 minutos.",
     "/client/testimonial",
-  );
+  ).catch((err) => console.error("[testimonial] push failed:", err));
 
   revalidatePath("/coach/testimonials");
   return {};

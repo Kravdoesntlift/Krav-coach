@@ -104,7 +104,8 @@
       "mcp__visualize__read_me",
       "mcp__visualize__show_widget",
       "Bash(convert -background none /Users/kravchuk/Krav-coach/public/icon.svg -resize 512x512 /Users/kravchuk/Krav-coach/public/icon-512.png)",
-      "Bash(rsvg-convert -w 512 -h 512 /Users/kravchuk/Krav-coach/public/icon.svg -o /Users/kravchuk/Krav-coach/public/icon-512.png)"
+      "Bash(rsvg-convert -w 512 -h 512 /Users/kravchuk/Krav-coach/public/icon.svg -o /Users/kravchuk/Krav-coach/public/icon-512.png)",
+      "Bash(grep -E '@keyframes|^\\\\..*\\\\{' /Users/kravchuk/Krav-coach/src/app/globals.css)"
     ]
   }
 }

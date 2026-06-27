@@ -287,8 +287,24 @@ export default async function ClientDashboard() {
     : [];
   const todayExNames = (todayDay?.exercises ?? []).map((e: { name: string }) => e.name);
 
+  // next training day (used by RestDayCard)
+  const nextTrainingDay = (() => {
+    if (!plan) return null;
+    const days = (plan.workout_days as WorkoutPlan["workout_days"]) ?? [];
+    const trainDow = days.filter((d) => !d.is_rest).map((d) => d.day_of_week);
+    const DAY_SHORT = lang === "en"
+      ? ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+      : ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+    for (let i = 1; i <= 7; i++) {
+      const d = (today.getDay() + i) % 7;
+      if (trainDow.includes(d)) return DAY_SHORT[d];
+    }
+    return null;
+  })();
+
   return (
     <>
+      {/* ── Invisible helpers ── */}
       <WorkoutCacheWriter
         todayLabel={todayDay?.label ?? null}
         todayExercises={todayExNames}
@@ -307,230 +323,161 @@ export default async function ClientDashboard() {
         achievements={achievements}
         seenAchievements={clientProfile?.seen_achievements ?? []}
       />
-    <div className="space-y-4 md:space-y-6 page-enter">
-      {/* Hero header */}
-      <div className="space-y-2 md:space-y-3 pt-1">
-        <p className="text-zinc-600 text-xs font-semibold tracking-[0.15em] uppercase">
-          {todayName} · {today.toLocaleDateString(lang === "en" ? "en-GB" : "pt-PT", { day: "numeric", month: "long" })}
-        </p>
-        <h1 className="text-[1.75rem] md:text-[2.1rem] font-black tracking-tight leading-[1.1]">
-          {greeting},{" "}
-          <span className="text-gold-gradient">{firstName}</span>
-        </h1>
-        {streak > 0 && (
-          <div className="inline-flex items-center gap-2 bg-brand-gold/8 border border-brand-gold/18 rounded-full pl-2 pr-3.5 py-1.5 glow-gold-sm float">
-            <span
-              className="w-5 h-5 rounded-full flex items-center justify-center text-[11px]"
-              style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
-            >🔥</span>
-            <span className="text-brand-gold font-black text-sm tabular-nums">{streak}</span>
-            <span className="text-brand-gold/55 text-xs font-medium">
-              {streak === 1 ? t("streak_singular", lang) : t("streak_plural", lang)}
-            </span>
+
+      <div className="space-y-4 md:space-y-5 page-enter">
+
+        {/* ── 1. GREETING ── compact, sets the tone */}
+        <div className="flex items-center justify-between pt-1">
+          <div className="space-y-0.5">
+            <p className="text-zinc-600 text-[10px] font-semibold tracking-[0.18em] uppercase">
+              {todayName} · {today.toLocaleDateString(lang === "en" ? "en-GB" : "pt-PT", { day: "numeric", month: "long" })}
+            </p>
+            <h1 className="text-[1.6rem] md:text-[2rem] font-black tracking-tight leading-[1.1]">
+              {greeting}, <span className="text-gold-gradient">{firstName}</span>
+            </h1>
+          </div>
+          {streak > 0 && (
+            <div className="flex items-center gap-1.5 bg-brand-gold/8 border border-brand-gold/18 rounded-full px-2.5 py-1.5 glow-gold-sm shrink-0">
+              <span className="text-[13px]">🔥</span>
+              <span className="text-brand-gold font-black text-sm tabular-nums">{streak}</span>
+            </div>
+          )}
+        </div>
+
+        {/* ── 2. TODAY'S WORKOUT — the main reason they opened the app ── */}
+        {plan && todayDay && !todayDay.is_rest && (
+          <TodayCard
+            day={todayDay as Parameters<typeof TodayCard>[0]["day"]}
+            clientId={user!.id}
+            isCompleted={todayCompleted}
+            completedCount={completedDays}
+            totalCount={trainDays.length}
+          />
+        )}
+        {plan && todayDay?.is_rest && (
+          <RestDayCard label={todayDay.label} nextTrainingDay={nextTrainingDay} />
+        )}
+        {!plan && (
+          <div className="rounded-2xl p-5 flex items-center gap-4 border border-zinc-800/40" style={{ background: "rgba(18,18,20,0.85)" }}>
+            <div className="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-2xl shrink-0">🏋</div>
+            <div>
+              <p className="text-white font-bold text-sm">{t("no_plan_title", lang)}</p>
+              <p className="text-zinc-500 text-xs mt-0.5">{t("no_plan_coach_note", lang)}</p>
+            </div>
           </div>
         )}
-      </div>
 
-      {/* Setup checklist — shown to new clients until all steps are done */}
-      <SetupChecklist
-        clientId={user!.id}
-        hasCompletedOnboarding={isOnboardingComplete}
-        hasLoggedCheckin={!!currentCheckin}
-        hasLoggedNutrition={!!anyNutritionLog}
-        hasCompletedWorkout={completedDays > 0}
-        hasProfilePhoto={!!clientProfile?.avatar_url}
-      />
+        {/* ── 3. COACH MESSAGE — personal touch, right after the workout ── */}
+        {feedback?.message && (
+          <CoachFeedbackBanner message={feedback.message} weekStart={weekStart} />
+        )}
 
-      {/* Pending testimonial request */}
-      {pendingTestimonial && (
-        <Link href="/client/testimonial" className="block">
-          <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-brand-gold/8 border border-brand-gold/25 hover:bg-brand-gold/12 transition-colors">
-            <span className="text-2xl shrink-0">⭐</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-sm leading-snug">
-                {lang === "en" ? "Your coach asked for your testimonial" : "O teu coach quer o teu testemunho"}
-              </p>
-              <p className="text-zinc-400 text-xs mt-0.5">
-                {lang === "en" ? "Tap to share your experience — 2 minutes" : "Clica para partilhar a tua experiência — 2 minutos"}
-              </p>
+        {/* ── 4. WEEKLY WORKOUT VIEW — collapsible ── */}
+        {plan && (
+          <>
+            {!isCurrentWeek && (
+              <div className="text-xs text-zinc-600 bg-zinc-900/60 border border-zinc-800 rounded-xl px-4 py-2.5">
+                {t("showing_recent", lang)}
+              </div>
+            )}
+            <WorkoutWeek plan={plan as unknown as WorkoutPlan} clientId={user!.id} coachId={coachId ?? undefined} />
+          </>
+        )}
+
+        {/* ── 5. TRAINING CALENDAR ── */}
+        <MonthCalendar
+          year={today.getUTCFullYear()}
+          month={today.getUTCMonth()}
+          dayStatuses={dayStatuses}
+          todayStr={todayStr}
+          lang={lang}
+        />
+
+        {/* ── 6. GOALS + CHALLENGES ── */}
+        {clientGoals && clientGoals.length > 0 && (
+          <ClientGoals goals={clientGoals as Parameters<typeof ClientGoals>[0]["goals"]} />
+        )}
+        {weekChallenges && weekChallenges.length > 0 && (
+          <ChallengeCards
+            challenges={weekChallenges}
+            progress={challengeProgress ?? []}
+            clientId={user!.id}
+          />
+        )}
+
+        {/* ── 7. WEEKLY SUMMARY (Sundays) ── */}
+        <WeeklySummary
+          plan={plan as unknown as WorkoutPlan ?? null}
+          checkin={currentCheckin as WeeklyCheckin ?? null}
+          clientId={user!.id}
+          weekStart={weekStart}
+        />
+
+        {/* ── 8. MUSCLE MAP — collapsible, for curious athletes ── */}
+        <CollapsibleMuscleMap exerciseNames={weekExerciseNames} loggedNames={weekLoggedNames} />
+
+        {/* ── 9. INSIGHT CARDS — contextual, non-intrusive ── */}
+        {latestWeeklyReport && (
+          <Link href="/client/weekly-report" className="block">
+            <div className="rounded-2xl px-4 py-3.5 flex items-center gap-3 border transition-all active:scale-[0.98]" style={{ background: "rgba(18,18,20,0.85)", borderColor: "rgba(201,168,76,0.22)" }}>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ background: "linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))" }}>📊</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-white font-bold text-sm">{t("see_weekly_report", lang)}</p>
+                <p className="text-zinc-500 text-xs mt-0.5 truncate">{t("report_subtitle", lang)}</p>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><polyline points="9 18 15 12 9 6" /></svg>
             </div>
-            <span className="text-brand-gold shrink-0">→</span>
-          </div>
-        </Link>
-      )}
+          </Link>
+        )}
+        {monthlyData && <MonthlyReport {...monthlyData} />}
 
-      {/* Install app prompt */}
-      <InstallPrompt />
+        {/* ── 10. SECONDARY / ONCE-OFF — below the fold, unobtrusive ── */}
 
-      {/* Payment countdown — only when ≤ 7 days */}
-      {daysUntilRenewal !== null && daysUntilRenewal <= 7 && (
-        <div className={`flex items-center justify-between px-4 py-3 rounded-2xl border ${
-          daysUntilRenewal <= 0
-            ? "border-red-500/30 bg-red-500/5"
-            : daysUntilRenewal <= 3
-            ? "border-yellow-500/30 bg-yellow-500/5"
-            : "border-zinc-700 bg-zinc-900"
-        }`}>
-          <div>
-            <p className={`text-sm font-medium ${
-              daysUntilRenewal <= 0 ? "text-red-400" : daysUntilRenewal <= 3 ? "text-yellow-400" : "text-gray-300"
-            }`}>
+        {/* Setup guide — visible until complete, but never above the workout */}
+        <SetupChecklist
+          clientId={user!.id}
+          hasCompletedOnboarding={isOnboardingComplete}
+          hasLoggedCheckin={!!currentCheckin}
+          hasLoggedNutrition={!!anyNutritionLog}
+          hasCompletedWorkout={completedDays > 0}
+          hasProfilePhoto={!!clientProfile?.avatar_url}
+        />
+
+        {/* Testimonial request — subtle row, not a big banner */}
+        {pendingTestimonial && (
+          <Link href="/client/testimonial" className="block">
+            <div className="flex items-center gap-3 px-4 py-3 rounded-2xl border border-brand-gold/20 bg-brand-gold/5 hover:bg-brand-gold/8 transition-colors">
+              <span className="text-base shrink-0">⭐</span>
+              <p className="text-zinc-300 text-sm flex-1">
+                {lang === "en" ? "Your coach asked for a testimonial" : "O teu coach pediu o teu testemunho"}
+              </p>
+              <span className="text-brand-gold/60 text-xs shrink-0">→</span>
+            </div>
+          </Link>
+        )}
+
+        {/* Install PWA — only if not yet installed, at the very bottom */}
+        <InstallPrompt />
+
+        {/* Payment warning — only when urgent (≤ 3 days) */}
+        {daysUntilRenewal !== null && daysUntilRenewal <= 3 && (
+          <div className={`flex items-center justify-between px-4 py-3 rounded-2xl border ${
+            daysUntilRenewal <= 0 ? "border-red-500/30 bg-red-500/5" : "border-yellow-500/30 bg-yellow-500/5"
+          }`}>
+            <p className={`text-sm font-medium ${daysUntilRenewal <= 0 ? "text-red-400" : "text-yellow-400"}`}>
               {daysUntilRenewal <= 0
                 ? t("renewal_overdue", lang)
                 : daysUntilRenewal === 1
                 ? t("renewal_tomorrow", lang)
                 : `${t("renewal_in_days", lang)} ${daysUntilRenewal} ${t("days", lang)}`}
             </p>
-            <p className="text-gray-600 text-xs mt-0.5">
-              {new Date(renewsAt! + "T00:00:00").toLocaleDateString(lang === "en" ? "en-GB" : "pt-PT", { day: "numeric", month: "long" })}
-            </p>
+            <span className={`text-xl font-black tabular-nums ${daysUntilRenewal <= 0 ? "text-red-400" : "text-yellow-400"}`}>
+              {daysUntilRenewal <= 0 ? "!" : `D-${daysUntilRenewal}`}
+            </span>
           </div>
-          <span className={`text-2xl font-black tabular-nums ${
-            daysUntilRenewal <= 0 ? "text-red-400" : daysUntilRenewal <= 3 ? "text-yellow-400" : "text-gray-500"
-          }`}>
-            {daysUntilRenewal <= 0 ? "!" : `D-${daysUntilRenewal}`}
-          </span>
-        </div>
-      )}
+        )}
 
-      {/* Monthly report (1st of month) */}
-      {monthlyData && <MonthlyReport {...monthlyData} />}
-
-      {/* Weekly AI report card */}
-      {latestWeeklyReport && (
-        <Link href="/client/weekly-report" className="block">
-          <div
-            className="rounded-2xl px-4 py-3.5 flex items-center gap-3 border transition-all active:scale-[0.98]"
-            style={{
-              background: "rgba(18,18,20,0.85)",
-              borderColor: "rgba(201,168,76,0.22)",
-            }}
-          >
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
-              style={{ background: "linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))" }}
-            >
-              📊
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-sm">{t("see_weekly_report", lang)}</p>
-              <p className="text-zinc-500 text-xs mt-0.5 truncate">
-                {t("report_subtitle", lang)}
-              </p>
-            </div>
-            <svg
-              width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="#C9A84C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-              className="shrink-0"
-            >
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </div>
-        </Link>
-      )}
-
-      {/* TODAY CARD — hero do dia */}
-      {plan && todayDay && !todayDay.is_rest && (
-        <TodayCard
-          day={todayDay as Parameters<typeof TodayCard>[0]["day"]}
-          clientId={user!.id}
-          isCompleted={todayCompleted}
-          completedCount={completedDays}
-          totalCount={trainDays.length}
-        />
-      )}
-
-      {/* REST DAY CARD — active recovery */}
-      {plan && todayDay?.is_rest && (
-        <RestDayCard
-          label={todayDay.label}
-          nextTrainingDay={(() => {
-            const days = (plan.workout_days as WorkoutPlan["workout_days"]) ?? [];
-            const trainDow = days
-              .filter((d) => !d.is_rest)
-              .map((d) => d.day_of_week);
-            const todayDow2 = today.getDay();
-            const DAY_SHORT_PT = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
-            const DAY_SHORT_EN = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-            const shortNames = lang === "en" ? DAY_SHORT_EN : DAY_SHORT_PT;
-            for (let i = 1; i <= 7; i++) {
-              const d = (todayDow2 + i) % 7;
-              if (trainDow.includes(d)) return shortNames[d];
-            }
-            return null;
-          })()}
-        />
-      )}
-
-      {/* NO PLAN STATE — hero */}
-      {!plan && (
-        <div
-          className="rounded-2xl p-5 flex items-center gap-4 border border-zinc-800/40"
-          style={{ background: "rgba(18,18,20,0.85)" }}
-        >
-          <div className="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-2xl shrink-0">
-            🏋
-          </div>
-          <div>
-            <p className="text-white font-bold text-sm">{t("no_plan_title", lang)}</p>
-            <p className="text-zinc-500 text-xs mt-0.5">
-              {t("no_plan_coach_note", lang)}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Monthly calendar — always visible */}
-      <MonthCalendar
-        year={today.getUTCFullYear()}
-        month={today.getUTCMonth()}
-        dayStatuses={dayStatuses}
-        todayStr={todayStr}
-        lang={lang}
-      />
-
-      {/* Coach feedback banner */}
-      {feedback?.message && (
-        <CoachFeedbackBanner message={feedback.message} weekStart={weekStart} />
-      )}
-
-      {/* Muscle map — collapsible */}
-      <CollapsibleMuscleMap exerciseNames={weekExerciseNames} loggedNames={weekLoggedNames} />
-
-      {/* Goals */}
-      {clientGoals && clientGoals.length > 0 && (
-        <ClientGoals goals={clientGoals as Parameters<typeof ClientGoals>[0]["goals"]} />
-      )}
-
-      {/* Weekly challenges */}
-      {weekChallenges && weekChallenges.length > 0 && (
-        <ChallengeCards
-          challenges={weekChallenges}
-          progress={challengeProgress ?? []}
-          clientId={user!.id}
-        />
-      )}
-
-      {/* Weekly summary (Sundays only) */}
-      <WeeklySummary
-        plan={plan as unknown as WorkoutPlan ?? null}
-        checkin={currentCheckin as WeeklyCheckin ?? null}
-        clientId={user!.id}
-        weekStart={weekStart}
-      />
-
-      {/* Workout week — collapsible, só quando há plano */}
-      {plan && (
-        <>
-          {!isCurrentWeek && (
-            <div className="text-xs text-gray-500 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5">
-              {t("showing_recent", lang)}
-            </div>
-          )}
-          <WorkoutWeek plan={plan as unknown as WorkoutPlan} clientId={user!.id} coachId={coachId ?? undefined} />
-        </>
-      )}
-    </div>
+      </div>
     </>
   );
 }
