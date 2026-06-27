@@ -14,15 +14,31 @@ export default async function CoachPublicPage({
   // Support both UUID (old links) and slug (new clean links)
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(coachId);
 
-  const query = admin
-    .from("profiles")
-    .select("id, full_name, avatar_url, tagline, role, slug")
-    .eq("role", "coach");
+  let coach: { id: string; full_name: string; avatar_url?: string | null; tagline?: string | null; role: string; slug?: string | null } | null = null;
 
-  const { data: coach } = await (isUuid
-    ? query.eq("id", coachId)
-    : query.eq("slug", coachId)
-  ).maybeSingle();
+  if (isUuid) {
+    const { data } = await admin
+      .from("profiles")
+      .select("id, full_name, avatar_url, tagline, role, slug")
+      .eq("id", coachId)
+      .eq("role", "coach")
+      .maybeSingle();
+    coach = data;
+  } else {
+    // Slug lookup — try with slug column; if column missing (migration not run) fall back gracefully
+    const { data, error } = await admin
+      .from("profiles")
+      .select("id, full_name, avatar_url, tagline, role, slug")
+      .eq("slug", coachId)
+      .eq("role", "coach")
+      .maybeSingle();
+
+    if (error && error.message?.includes("column") && error.message?.includes("slug")) {
+      // Migration not run yet — slug column doesn't exist
+      notFound();
+    }
+    coach = data ?? null;
+  }
 
   if (!coach) notFound();
 
