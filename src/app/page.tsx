@@ -578,7 +578,7 @@ export default async function LandingPage({
                     )}
                     {/* Quote */}
                     <p className="text-zinc-300 text-sm leading-relaxed flex-1">
-                      &ldquo;{t.content}&rdquo;
+                      {t.content?.replace(/ — /g, " ")}
                     </p>
                     {/* Meta */}
                     <div className="flex items-center justify-between gap-2 pt-1 border-t border-zinc-800/60">
