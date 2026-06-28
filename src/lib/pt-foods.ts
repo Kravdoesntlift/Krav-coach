@@ -1418,7 +1418,112 @@ export const PT_FOODS: LocalFood[] = [
 
 ];
 
+// English → Portuguese translation map for food terms
+// Allows searching "egg", "chicken breast", "oats" etc. to find PT-named items
+const EN_TO_PT: Record<string, string> = {
+  // Eggs
+  "egg": "ovo", "eggs": "ovo", "boiled egg": "ovo cozido", "fried egg": "ovo frito",
+  "scrambled egg": "ovo mexido", "scrambled eggs": "ovo mexido",
+  "poached egg": "ovo escalfado", "raw egg": "ovo cru",
+  "omelette": "omelete", "omelet": "omelete", "egg white": "clara ovo",
+  // Chicken & poultry
+  "chicken": "frango", "breast": "peito", "chicken breast": "frango peito",
+  "thigh": "coxa", "chicken thigh": "frango coxa", "wing": "asa",
+  "drumstick": "frango perna", "turkey": "peru", "duck": "pato",
+  "grilled chicken": "frango grelhado", "roast chicken": "frango assado",
+  // Beef
+  "beef": "vaca", "steak": "bife", "ground beef": "vaca picada",
+  "mince": "picada", "minced beef": "vaca picada", "roast beef": "rosbife",
+  "sirloin": "lombo", "ribeye": "vazio",
+  // Pork
+  "pork": "porco", "ham": "fiambre", "bacon": "bacon",
+  "sausage": "salsicha", "chorizo": "chourico", "pork chop": "costeleta",
+  // Fish & seafood
+  "fish": "peixe", "tuna": "atum", "salmon": "salmao",
+  "cod": "bacalhau", "sardine": "sardinha", "sardines": "sardinha",
+  "shrimp": "camarao", "prawn": "camarao", "prawns": "camarao",
+  "sea bass": "robalo", "sea bream": "dourada", "trout": "truta",
+  "mackerel": "cavala", "octopus": "polvo", "squid": "lula",
+  "crab": "caranguejo", "clam": "amijoa",
+  // Dairy
+  "milk": "leite", "whole milk": "leite gordo", "skim milk": "leite magro",
+  "yogurt": "iogurte", "yoghurt": "iogurte", "greek yogurt": "iogurte grego",
+  "cheese": "queijo", "cream cheese": "queijo creme",
+  "butter": "manteiga", "cream": "natas", "whipped cream": "natas batidas",
+  "quark": "queijo fresco", "cottage cheese": "queijo cottage",
+  // Grains & carbs
+  "rice": "arroz", "white rice": "arroz branco", "brown rice": "arroz integral",
+  "pasta": "massa", "spaghetti": "esparguete", "penne": "penne",
+  "bread": "pao", "white bread": "pao branco", "toast": "tosta",
+  "oats": "aveia", "oatmeal": "aveia", "porridge": "papa aveia",
+  "corn": "milho", "cornflour": "amido milho", "flour": "farinha",
+  "wheat": "trigo", "couscous": "cuscus", "quinoa": "quinoa",
+  "granola": "granola", "muesli": "muesli",
+  // Potatoes & tubers
+  "potato": "batata", "potatoes": "batata", "sweet potato": "batata doce",
+  "fries": "batata frita", "french fries": "batata frita",
+  "mashed potato": "pure batata", "baked potato": "batata assada",
+  // Legumes
+  "beans": "feijao", "black beans": "feijao preto", "kidney beans": "feijao encarnado",
+  "chickpeas": "grao", "lentils": "lentilhas", "peas": "ervilhas",
+  "edamame": "edamame", "soybeans": "soja", "tofu": "tofu",
+  // Vegetables
+  "broccoli": "broculos", "spinach": "espinafres", "kale": "couve",
+  "lettuce": "alface", "tomato": "tomate", "tomatoes": "tomate",
+  "cucumber": "pepino", "carrot": "cenoura", "onion": "cebola",
+  "garlic": "alho", "pepper": "pimento", "red pepper": "pimento vermelho",
+  "green pepper": "pimento verde", "mushroom": "cogumelo", "mushrooms": "cogumelo",
+  "cabbage": "couve", "cauliflower": "couve flor", "zucchini": "curgete",
+  "courgette": "curgete", "eggplant": "beringela", "aubergine": "beringela",
+  "avocado": "abacate", "asparagus": "espargos", "artichoke": "alcachofra",
+  "celery": "aipo", "leek": "alho frances", "beetroot": "beterraba",
+  "beet": "beterraba", "pumpkin": "abobora", "squash": "abobora",
+  "corn cob": "milho", "sweet corn": "milho doce",
+  // Fruits
+  "apple": "maca", "banana": "banana", "orange": "laranja",
+  "grape": "uva", "grapes": "uva", "strawberry": "morango",
+  "strawberries": "morango", "watermelon": "melancia", "melon": "melao",
+  "peach": "pessego", "pear": "pera", "pineapple": "ananas",
+  "mango": "manga", "kiwi": "kiwi", "lemon": "limao", "lime": "lima",
+  "cherry": "cereja", "cherries": "cereja", "plum": "ameixa",
+  "fig": "figo", "raspberry": "framboesa", "blueberry": "mirtilo",
+  "blackberry": "amora", "coconut": "coco", "papaya": "papaia",
+  "passion fruit": "maracuja", "pomegranate": "roma",
+  // Nuts & seeds
+  "almond": "amendoa", "almonds": "amendoa", "walnut": "noz", "walnuts": "noz",
+  "peanut": "amendoim", "peanuts": "amendoim", "cashew": "caju",
+  "pistachio": "pistacio", "hazelnut": "avela", "pine nut": "pinhao",
+  "sunflower seed": "semente girassol", "chia": "chia", "flaxseed": "linhaca",
+  "pumpkin seed": "semente abobora",
+  // Fast food
+  "burger": "hamburguer", "hamburger": "hamburguer",
+  "pizza": "pizza", "hot dog": "cachorro", "nugget": "nuggets",
+  "nuggets": "nuggets", "sandwich": "sandes", "wrap": "wrap",
+  "kebab": "kebab",
+  // Snacks & sweets
+  "chocolate": "chocolate", "biscuit": "bolacha", "cookie": "bolacha",
+  "cake": "bolo", "ice cream": "gelado", "chips": "batata frita",
+  "crisps": "batata frita", "popcorn": "pipocas",
+  // Drinks
+  "water": "agua", "juice": "sumo", "coffee": "cafe", "tea": "cha",
+  "beer": "cerveja", "wine": "vinho", "orange juice": "sumo laranja",
+  // Oils & condiments
+  "olive oil": "azeite", "oil": "azeite", "sugar": "acucar",
+  "honey": "mel", "salt": "sal",
+  // Protein supplements
+  "whey": "whey", "protein powder": "proteina",
+  "protein shake": "batido proteina",
+};
 
+function translateQuery(query: string): string {
+  const q = query.toLowerCase().trim();
+  // Try full phrase first
+  if (EN_TO_PT[q]) return EN_TO_PT[q];
+  // Try word-by-word translation (translate each known word)
+  const words = q.split(" ");
+  const translated = words.map((w) => EN_TO_PT[w] ?? w);
+  return translated.join(" ");
+}
 
 function normalize(str: string): string {
   return str
@@ -1431,19 +1536,32 @@ function normalize(str: string): string {
     .trim();
 }
 
-export function searchLocalFoods(query: string, limit = 20): LocalFood[] {
+export function searchLocalFoods(query: string, lang: "pt" | "en" = "pt", limit = 20): LocalFood[] {
   if (!query || query.trim().length === 0) return [];
-  const q = normalize(query);
+
+  // For English queries, translate to Portuguese before searching
+  const effectiveQuery = lang === "en" ? translateQuery(query) : query;
+
+  const q = normalize(effectiveQuery);
+  // Also normalise the original query for fallback matching
+  const qOrig = normalize(query);
   const words = q.split(" ").filter(Boolean);
-  if (words.length === 0) return [];
-  // compact versions: "bigmac" → matches "big mac", "mcnuggets" → "mc nuggets"
+  const wordsOrig = qOrig.split(" ").filter(Boolean);
+  if (words.length === 0 && wordsOrig.length === 0) return [];
+
   const qCompact = q.replace(/\s/g, "");
+  const qOrigCompact = qOrig.replace(/\s/g, "");
 
   const results = PT_FOODS.filter((food) => {
     const n = normalize(food.name);
     const nCompact = n.replace(/\s/g, "");
-    // word-by-word match OR full-query-without-spaces match
-    return words.every((w) => n.includes(w)) || nCompact.includes(qCompact);
+    // Match against translated query OR original query (catches mixed terms)
+    return (
+      (words.length > 0 && words.every((w) => n.includes(w))) ||
+      nCompact.includes(qCompact) ||
+      (wordsOrig.length > 0 && wordsOrig.every((w) => n.includes(w))) ||
+      nCompact.includes(qOrigCompact)
+    );
   });
   return results.slice(0, limit);
 }

@@ -43,9 +43,8 @@ export async function GET(req: NextRequest) {
 
   const lang = req.nextUrl.searchParams.get("lang") === "en" ? "en" : "pt";
 
-  // Local PT database is only useful for Portuguese-language queries.
-  // Skip entirely for English users — send them straight to OpenFoodFacts with lc=en.
-  const localFoods = lang === "en" ? [] : searchLocalFoods(q).map((f) => ({
+  // Always search local DB — for EN queries the search function translates terms internally
+  const localFoods = searchLocalFoods(q, lang).map((f) => ({
     id: f.id,
     name: f.name,
     source: "local" as const,
@@ -67,8 +66,8 @@ export async function GET(req: NextRequest) {
     },
   }));
 
-  // Return early only for PT users with enough local results
-  if (lang === "pt" && localFoods.length >= 5) {
+  // Return early if local DB has enough results (both PT and EN)
+  if (localFoods.length >= 5) {
     return NextResponse.json({ foods: localFoods.slice(0, 20) });
   }
 
