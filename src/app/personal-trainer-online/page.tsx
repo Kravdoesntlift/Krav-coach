@@ -533,59 +533,6 @@ export default async function PersonalTrainerOnlinePage() {
             <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }} />
           </div>
 
-          {/* ── RESULT ───────────────────────────────────────────── */}
-          <section className="max-w-2xl mx-auto px-5 pb-16 space-y-6">
-            <ScrollReveal direction="up">
-              <p className="text-zinc-500 text-xs font-bold tracking-[0.18em] uppercase text-center">
-                Resultado real
-              </p>
-            </ScrollReveal>
-
-            <ScrollReveal direction="up" delay={80}>
-              <div
-                className="rounded-3xl p-6 space-y-5"
-                style={{
-                  background: "linear-gradient(160deg, rgba(201,168,76,0.07) 0%, rgba(10,10,12,0.95) 100%)",
-                  border: "1px solid rgba(201,168,76,0.2)",
-                }}
-              >
-                <div className="flex items-center gap-5">
-                  <div className="text-center shrink-0">
-                    <p className="text-5xl font-black" style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                      +20kg
-                    </p>
-                    <p className="text-zinc-500 text-xs mt-1">de massa muscular</p>
-                  </div>
-                  <div className="h-14 w-px shrink-0" style={{ background: "rgba(201,168,76,0.2)" }} />
-                  <p className="text-zinc-300 text-sm leading-relaxed">
-                    Cliente começou do zero e ganhou 20 kg de massa muscular com planos semanais personalizados, acompanhamento nutricional e coaching direto.
-                  </p>
-                </div>
-
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {[
-                    "💬 Suporte 24/7",
-                    "🔒 Cancela quando quiseres",
-                    "🎯 Plano em 24h",
-                    "📱 App incluída",
-                  ].map((badge, i) => (
-                    <span
-                      key={i}
-                      className="text-zinc-500 text-[11px] font-medium bg-white/[0.03] border border-white/[0.06] rounded-full px-3 py-1.5"
-                    >
-                      {badge}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </ScrollReveal>
-          </section>
-
-          {/* ── DIVIDER ──────────────────────────────────────────── */}
-          <div className="max-w-2xl mx-auto px-5 pb-6">
-            <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }} />
-          </div>
-
           {/* ── FAQ ──────────────────────────────────────────────── */}
           <section className="max-w-2xl mx-auto px-5 pb-20 space-y-4">
             <ScrollReveal direction="up">
