@@ -96,11 +96,12 @@ export default async function ClientDetailPage({
       .eq("client_id", clientId).order("created_at", { ascending: false }),
     supabase.from("progress_photos").select("*")
       .eq("client_id", clientId).order("taken_at", { ascending: false }).limit(200),
-    admin.from("nutrition_logs").select("logged_at,calories,protein_g,carbs_g,fat_g,meal_name")
+    admin.from("nutrition_logs").select("logged_at,calories,protein_g,carbs_g,fat_g,meal_name,description,serving_g")
       .eq("client_id", clientId)
       .gte("logged_at", currentWeekStart)
       .lte("logged_at", currentWeekEnd)
-      .order("logged_at", { ascending: true }),
+      .order("logged_at", { ascending: true })
+      .order("created_at", { ascending: true }),
     admin.from("client_workouts").select("id,date,title,type,duration_min,calories,distance_km,source")
       .eq("client_id", clientId)
       .order("date", { ascending: false })
@@ -131,7 +132,7 @@ export default async function ClientDetailPage({
   }
 
   // Nutrition: aggregate by day for this week
-  type NLog = { logged_at: string; calories: number | null; protein_g: number | null; carbs_g: number | null; fat_g: number | null; meal_name: string };
+  type NLog = { logged_at: string; calories: number | null; protein_g: number | null; carbs_g: number | null; fat_g: number | null; meal_name: string; description?: string | null; serving_g?: number | null };
   const nutritionByDay = new Map<string, NLog[]>();
   for (const log of (nutritionLogs ?? []) as NLog[]) {
     if (!nutritionByDay.has(log.logged_at)) nutritionByDay.set(log.logged_at, []);
@@ -559,32 +560,66 @@ export default async function ClientDetailPage({
               const prot = logs.reduce((s, l) => s + (l.protein_g ?? 0), 0);
               const carb = logs.reduce((s, l) => s + (l.carbs_g   ?? 0), 0);
               const fat  = logs.reduce((s, l) => s + (l.fat_g     ?? 0), 0);
-              const fmtDate = new Date(date + "T00:00:00").toLocaleDateString("pt-PT", { weekday: "short", day: "numeric", month: "short" });
+              const fmtDate = new Date(date + "T00:00:00").toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "short" });
+
+              // Group items by meal_name
+              const mealMap = new Map<string, NLog[]>();
+              for (const l of logs) {
+                const key = l.meal_name || "Sem nome";
+                if (!mealMap.has(key)) mealMap.set(key, []);
+                mealMap.get(key)!.push(l);
+              }
+
               return (
                 <div
                   key={date}
-                  className="rounded-2xl p-4 space-y-3"
-                  style={{ background: "rgba(18,18,20,0.7)", border: "1px solid rgba(255,255,255,0.05)" }}
+                  className="rounded-2xl overflow-hidden"
+                  style={{ background: "rgba(18,18,20,0.7)", border: "1px solid rgba(255,255,255,0.06)" }}
                 >
-                  <div className="flex items-center justify-between">
+                  {/* Day header */}
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
                     <p className="text-white text-sm font-semibold capitalize">{fmtDate}</p>
-                    <div className="flex gap-3 text-xs">
-                      {cal  > 0 && <span className="text-brand-gold font-semibold">{cal} kcal</span>}
+                    <div className="flex gap-3 text-xs font-medium">
+                      {cal  > 0 && <span className="text-brand-gold">{cal} kcal</span>}
                       {prot > 0 && <span className="text-blue-400">{prot}g P</span>}
                       {carb > 0 && <span className="text-orange-400">{carb}g H</span>}
                       {fat  > 0 && <span className="text-pink-400">{fat}g G</span>}
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {logs.map((l, i) => (
-                      <span
-                        key={i}
-                        className="text-xs text-zinc-400 px-2 py-1 rounded-lg"
-                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
-                      >
-                        {l.meal_name}
-                      </span>
-                    ))}
+
+                  {/* Meals */}
+                  <div className="divide-y divide-white/[0.04]">
+                    {Array.from(mealMap.entries()).map(([mealName, items]) => {
+                      const mCal  = items.reduce((s, l) => s + (l.calories  ?? 0), 0);
+                      const mProt = items.reduce((s, l) => s + (l.protein_g ?? 0), 0);
+                      return (
+                        <div key={mealName} className="px-4 py-2.5 space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <p className="text-zinc-300 text-xs font-semibold uppercase tracking-wide">{mealName}</p>
+                            <div className="flex gap-2 text-[11px] text-zinc-500">
+                              {mCal  > 0 && <span>{mCal} kcal</span>}
+                              {mProt > 0 && <span>{mProt}g P</span>}
+                            </div>
+                          </div>
+                          {/* Individual food items */}
+                          <div className="space-y-1">
+                            {items.map((item, i) => (
+                              <div key={i} className="flex items-center justify-between gap-2">
+                                <p className="text-zinc-400 text-xs flex-1 truncate">
+                                  {item.description || "—"}
+                                  {item.serving_g && (
+                                    <span className="text-zinc-600 ml-1">· {item.serving_g}g</span>
+                                  )}
+                                </p>
+                                {(item.calories ?? 0) > 0 && (
+                                  <span className="text-zinc-600 text-[11px] shrink-0">{item.calories} kcal</span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
