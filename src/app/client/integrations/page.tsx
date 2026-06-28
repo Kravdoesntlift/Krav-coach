@@ -154,20 +154,22 @@ function AppleShortcutSection({ token, lang }: { token: string; lang: "pt" | "en
 
   const steps2 = lang === "en" ? [
     <>Open the <strong className="text-white">Shortcuts</strong> app on iPhone</>,
-    <>Tap <strong className="text-white">+</strong> to create a new Shortcut</>,
-    <>Add the action <strong className="text-white">"Health — Read Health Data"</strong> → choose <strong className="text-white">Steps</strong>, period <strong className="text-white">Today</strong></>,
+    <>Tap <strong className="text-white">+</strong> → name it <strong className="text-white">"KRAV Sync"</strong></>,
+    <>Add action <strong className="text-white">"Health — Read Health Data"</strong> → <strong className="text-white">Steps</strong> · period <strong className="text-white">Today</strong> → rename output to <strong className="text-white">Steps</strong></>,
+    <>Add another <strong className="text-white">"Read Health Data"</strong> → <strong className="text-white">Active Energy Burned</strong> · period <strong className="text-white">Today</strong> (sum) → rename to <strong className="text-white">Calories</strong></>,
     <>Add <strong className="text-white">"URL"</strong> and paste: <code className="text-brand-gold bg-zinc-900 px-1 rounded">{webhookUrl}</code></>,
-    <>Add <strong className="text-white">"Get Contents of URL"</strong> → Method: <strong className="text-white">POST</strong>, Type: <strong className="text-white">JSON</strong></>,
-    <>In the JSON body add: <code className="text-brand-gold bg-zinc-900 px-1 rounded break-all">{`{"token":"YOUR_TOKEN","steps":"Health Data"}`}</code></>,
-    <>Replace <strong className="text-white">YOUR_TOKEN</strong> with the token you copied</>,
+    <>Add <strong className="text-white">"Get Contents of URL"</strong> → Method: <strong className="text-white">POST</strong>, Body type: <strong className="text-white">JSON</strong></>,
+    <>JSON body: <code className="text-brand-gold bg-zinc-900 px-1 rounded text-[10px] break-all">{`{"token":"YOUR_TOKEN","steps":"Steps","active_calories":"Calories"}`}</code></>,
+    <>Replace <strong className="text-white">YOUR_TOKEN</strong> with the token you copied above</>,
   ] : [
     <>Abre a app <strong className="text-white">Atalhos</strong> no iPhone</>,
-    <>Toca em <strong className="text-white">+</strong> para criar um novo Atalho</>,
-    <>Adiciona a ação <strong className="text-white">"Saúde — Ler Dados de Saúde"</strong> → escolhe <strong className="text-white">Passos</strong>, período <strong className="text-white">Hoje</strong></>,
+    <>Toca em <strong className="text-white">+</strong> → dá o nome <strong className="text-white">"KRAV Sync"</strong></>,
+    <>Adiciona a ação <strong className="text-white">"Saúde — Ler Dados de Saúde"</strong> → <strong className="text-white">Passos</strong> · período <strong className="text-white">Hoje</strong> (Soma) → renomeia para <strong className="text-white">Passos</strong></>,
+    <>Adiciona outra <strong className="text-white">"Ler Dados de Saúde"</strong> → <strong className="text-white">Calorias Ativas</strong> · período <strong className="text-white">Hoje</strong> (Soma) → renomeia para <strong className="text-white">Calorias</strong></>,
     <>Adiciona <strong className="text-white">"URL"</strong> e cola: <code className="text-brand-gold bg-zinc-900 px-1 rounded">{webhookUrl}</code></>,
     <>Adiciona <strong className="text-white">"Conteúdos de URL"</strong> → Método: <strong className="text-white">POST</strong>, Tipo: <strong className="text-white">JSON</strong></>,
-    <>No corpo JSON adiciona: <code className="text-brand-gold bg-zinc-900 px-1 rounded break-all">{`{"token":"SEU_TOKEN","steps":"Dados de Saúde"}`}</code></>,
-    <>Substitui <strong className="text-white">SEU_TOKEN</strong> pelo token que copiaste</>,
+    <>Corpo JSON: <code className="text-brand-gold bg-zinc-900 px-1 rounded text-[10px] break-all">{`{"token":"SEU_TOKEN","steps":"Passos","active_calories":"Calorias"}`}</code></>,
+    <>Substitui <strong className="text-white">SEU_TOKEN</strong> pelo token que copiaste acima</>,
   ];
 
   const steps3 = lang === "en" ? [

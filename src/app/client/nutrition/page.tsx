@@ -272,8 +272,9 @@ function FoodSearch({
     debounce.current = setTimeout(async () => {
       setSearching(true); setSearchErr(null);
       try {
-        // Search local PT foods
-        const localMatches = searchLocalFoods(query).map((f) => ({
+        // PT local database only for Portuguese users — skip for English to avoid
+        // returning Portuguese food names when the user searches in English
+        const localMatches = lang === "en" ? [] : searchLocalFoods(query).map((f) => ({
           id: f.id,
           name: f.name,
           source: "local" as const,
@@ -294,31 +295,29 @@ function FoodSearch({
           .filter((cf) => cf.name.toLowerCase().includes(queryLower) || (cf.brand ?? "").toLowerCase().includes(queryLower))
           .map(customFoodToResult);
 
-        // If we have 5+ combined, skip external API
-        if (localMatches.length + customMatches.length >= 5) {
+        // Skip external API only for PT users with enough local results
+        if (lang === "pt" && localMatches.length + customMatches.length >= 5) {
           setResults([...customMatches, ...localMatches].slice(0, 20));
           setSearching(false);
           return;
         }
 
-        // Otherwise call the API (which also does local search server-side + OFF fallback)
+        // Call the API (OFF fallback, uses correct language)
         const res = await fetch(`/api/food/search?q=${encodeURIComponent(query)}&lang=${lang}`);
         const data = await res.json() as { foods?: FoodResult[]; error?: string };
         if (data.error) {
           setSearchErr(data.error);
           setResults([...customMatches, ...localMatches]);
         } else {
-          const apiIds = new Set((data.foods ?? []).map((f) => f.id));
           const merged = [
             ...customMatches,
             ...(data.foods ?? []).filter((f) => !customMatches.some((c) => c.id === f.id)),
           ].slice(0, 20);
-          void apiIds; // used implicitly
           setResults(merged);
         }
       } catch {
-        // Fallback: just show local + custom results
-        const localMatches = searchLocalFoods(query).map((f) => ({
+        // Fallback: show custom + local (PT only) results
+        const fallbackLocal = lang === "en" ? [] : searchLocalFoods(query).map((f) => ({
           id: f.id, name: f.name, source: "local" as const,
           servingSize: f.servingSize,
           per100g: {
@@ -334,7 +333,7 @@ function FoodSearch({
         const customMatches = customFoods
           .filter((cf) => cf.name.toLowerCase().includes(queryLower))
           .map(customFoodToResult);
-        setResults([...customMatches, ...localMatches].slice(0, 20));
+        setResults([...customMatches, ...fallbackLocal].slice(0, 20));
       } finally {
         setSearching(false);
       }
@@ -344,7 +343,7 @@ function FoodSearch({
   // ── Ingredient search (for recipe builder) ──
   useEffect(() => {
     if (ingQuery.length < 2) { setIngResults([]); return; }
-    const localMatches = searchLocalFoods(ingQuery).map((f) => ({
+    const localMatches = lang === "en" ? [] : searchLocalFoods(ingQuery).map((f) => ({
       id: f.id, name: f.name, source: "local" as const,
       servingSize: f.servingSize,
       per100g: {
@@ -361,7 +360,7 @@ function FoodSearch({
       .filter((cf) => cf.name.toLowerCase().includes(queryLower))
       .map(customFoodToResult);
     setIngResults([...customMatches, ...localMatches].slice(0, 15));
-  }, [ingQuery]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ingQuery, lang]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Load recipes when tab opens ──
   useEffect(() => {

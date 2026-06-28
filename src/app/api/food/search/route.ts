@@ -43,10 +43,9 @@ export async function GET(req: NextRequest) {
 
   const lang = req.nextUrl.searchParams.get("lang") === "en" ? "en" : "pt";
 
-  // 1. Search local Portuguese foods database first
-  const localResults = searchLocalFoods(q);
-
-  const localFoods = localResults.map((f) => ({
+  // Local PT database is only useful for Portuguese-language queries.
+  // Skip entirely for English users — send them straight to OpenFoodFacts with lc=en.
+  const localFoods = lang === "en" ? [] : searchLocalFoods(q).map((f) => ({
     id: f.id,
     name: f.name,
     source: "local" as const,
@@ -68,8 +67,8 @@ export async function GET(req: NextRequest) {
     },
   }));
 
-  // 2. If we have 5+ local results, return immediately (no external API call)
-  if (localFoods.length >= 5) {
+  // Return early only for PT users with enough local results
+  if (lang === "pt" && localFoods.length >= 5) {
     return NextResponse.json({ foods: localFoods.slice(0, 20) });
   }
 
