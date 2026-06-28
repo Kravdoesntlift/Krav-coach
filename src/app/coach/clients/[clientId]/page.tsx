@@ -307,12 +307,19 @@ export default async function ClientDetailPage({
       )}
 
       {/* Client's own workouts */}
-      {clientWorkouts && clientWorkouts.length > 0 && (
-        <section>
-          <h2 className="text-white font-semibold mb-3">
-            Treinos do cliente
+      <section>
+        <h2 className="text-white font-semibold mb-3">
+          Treinos próprios do cliente
+          {clientWorkouts && clientWorkouts.length > 0 && (
             <span className="ml-2 text-xs font-normal text-zinc-500">{clientWorkouts.length} registos</span>
-          </h2>
+          )}
+        </h2>
+        {!clientWorkouts || clientWorkouts.length === 0 ? (
+          <p className="text-zinc-600 text-sm">
+            O cliente ainda não registou treinos próprios.
+            {!clientWorkouts && " (Corre supabase/migration_client_workouts.sql para activar esta funcionalidade)"}
+          </p>
+        ) : (
           <div className="space-y-2">
             {clientWorkouts.map((w) => {
               const srcColors: Record<string, string> = {
@@ -344,8 +351,8 @@ export default async function ClientDetailPage({
               );
             })}
           </div>
-        </section>
-      )}
+        )}
+      </section>
 
       {/* Progress photos */}
       <section id="fotos">
