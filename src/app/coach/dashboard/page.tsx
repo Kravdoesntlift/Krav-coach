@@ -118,7 +118,7 @@ export default async function CoachDashboard() {
       const c = r.profiles as unknown as { status?: string; trial_ends_at?: string | null; subscription_renews_at?: string | null } | null;
       if (!c || clientsWithPlansSet.has(r.client_id)) return false;
       if (c.status !== "active") return false;
-      if (c.trial_ends_at && c.trial_ends_at < todayStr && !c.subscription_renews_at) return false;
+      if (c.trial_ends_at && c.trial_ends_at <= todayStr && !c.subscription_renews_at) return false;
       return true;
     })
     .map((r) => {
