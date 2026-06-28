@@ -25,6 +25,7 @@ export const translations = {
   nav_integrations:{ pt: "⌚ Integrações",     en: "⌚ Integrations" },
   nav_referral:    { pt: "👥 Referências",     en: "👥 Referrals" },
   nav_meal_plan:   { pt: "🥗 Plano Alimentar", en: "🥗 Meal Plan" },
+  nav_my_workouts: { pt: "💪 Os meus treinos", en: "💪 My Workouts" },
 
   // ── Trial banner ───────────────────────────────────────────────────────────
   trial_ends_tomorrow: { pt: "O teu trial termina amanhã.", en: "Your trial ends tomorrow." },

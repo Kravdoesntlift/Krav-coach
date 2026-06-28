@@ -37,6 +37,7 @@ export function ClientShell({
         { href: "/client/checkin",       label: t("nav_checkin") },
         { href: "/client/daily-log",     label: t("nav_daily_log") },
         { href: "/client/history",       label: t("nav_history") },
+        { href: "/client/workouts",      label: t("nav_my_workouts") },
         { href: "/client/records",       label: t("nav_prs") },
         { href: "/client/achievements",  label: t("nav_achievements") },
         { href: "/client/photos",        label: t("nav_photos") },

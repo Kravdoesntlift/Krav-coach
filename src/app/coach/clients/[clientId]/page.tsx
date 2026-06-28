@@ -82,7 +82,7 @@ export default async function ClientDetailPage({
   const currentWeekEnd = weekEndDate.toISOString().split("T")[0];
 
   const admin = createAdminClient();
-  const [{ data: feedbackRow }, { data: coachNote }, { data: clientPRs }, { data: onboarding }, { data: challenges }, { data: goals }, { data: progressPhotos }, { data: nutritionLogs }] = await Promise.all([
+  const [{ data: feedbackRow }, { data: coachNote }, { data: clientPRs }, { data: onboarding }, { data: challenges }, { data: goals }, { data: progressPhotos }, { data: nutritionLogs }, { data: clientWorkouts }] = await Promise.all([
     supabase.from("coach_feedback").select("message")
       .eq("coach_id", user!.id).eq("client_id", clientId).eq("week_start", currentWeekStart).maybeSingle(),
     supabase.from("coach_notes").select("content")
@@ -101,6 +101,10 @@ export default async function ClientDetailPage({
       .gte("logged_at", currentWeekStart)
       .lte("logged_at", currentWeekEnd)
       .order("logged_at", { ascending: true }),
+    admin.from("client_workouts").select("id,date,title,type,duration_min,calories,distance_km,source")
+      .eq("client_id", clientId)
+      .order("date", { ascending: false })
+      .limit(20),
   ]);
 
   // Attention alert: no check-in in last 2 weeks
@@ -297,6 +301,47 @@ export default async function ClientDetailPage({
                 </p>
               </div>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* Client's own workouts */}
+      {clientWorkouts && clientWorkouts.length > 0 && (
+        <section>
+          <h2 className="text-white font-semibold mb-3">
+            Treinos do cliente
+            <span className="ml-2 text-xs font-normal text-zinc-500">{clientWorkouts.length} registos</span>
+          </h2>
+          <div className="space-y-2">
+            {clientWorkouts.map((w) => {
+              const srcColors: Record<string, string> = {
+                manual: "bg-zinc-700 text-zinc-300",
+                strava: "bg-orange-900/50 text-orange-400",
+                apple_health: "bg-pink-900/50 text-pink-400",
+                garmin: "bg-blue-900/50 text-blue-400",
+              };
+              const srcColor = srcColors[w.source ?? "manual"] ?? srcColors.manual;
+              const typeIcons: Record<string, string> = { strength: "🏋️", cardio: "🏃", sports: "⚽", yoga: "🧘", mobility: "🤸", other: "💪" };
+              return (
+                <div key={w.id} className="card px-4 py-3 flex items-center gap-3">
+                  <span className="text-lg shrink-0">{typeIcons[w.type ?? "other"] ?? "💪"}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-white text-sm font-medium truncate">{w.title}</span>
+                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${srcColor}`}>
+                        {(w.source ?? "manual").replace("_", " ")}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5 text-zinc-500 text-xs">
+                      <span>{new Date(w.date + "T12:00:00").toLocaleDateString("pt-PT", { day: "numeric", month: "short" })}</span>
+                      {w.duration_min && <span>⏱ {w.duration_min} min</span>}
+                      {w.calories && <span>🔥 {w.calories} kcal</span>}
+                      {w.distance_km && <span>📍 {Number(w.distance_km)} km</span>}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
       )}

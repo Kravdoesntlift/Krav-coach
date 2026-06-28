@@ -12,8 +12,10 @@ interface StravaActivity {
   start_date: string;       // ISO 8601
   distance: number;         // metres
   moving_time: number;      // seconds
+  elapsed_time: number;
   total_elevation_gain: number;
   average_heartrate?: number;
+  calories?: number;
 }
 
 // Estimate steps from Strava activity
@@ -24,8 +26,18 @@ function estimateSteps(activity: StravaActivity): number {
   if (type.includes("run") || type === "run") return Math.round(distanceKm * 1300);
   if (type.includes("walk") || type === "hike") return Math.round(distanceKm * 1400);
   if (type.includes("ride") || type.includes("cycle")) return Math.round(distanceKm * 200);
-  // Other activities: rough estimate
   return Math.round(distanceKm * 800);
+}
+
+// Map Strava sport type to app workout type
+function stravaTypeToWorkoutType(stravaType: string): string {
+  const t = stravaType.toLowerCase();
+  if (t.includes("run") || t.includes("walk") || t.includes("hike") || t.includes("swim") || t.includes("ride") || t.includes("cycle") || t === "virtualride" || t === "ebike") return "cardio";
+  if (t === "weighttraining" || t === "workout" || t.includes("crossfit") || t.includes("strength") || t === "rockclimbing") return "strength";
+  if (t === "yoga") return "yoga";
+  if (t.includes("mobility") || t.includes("stretch") || t.includes("pilates")) return "mobility";
+  if (t.includes("soccer") || t.includes("basketball") || t.includes("tennis") || t.includes("football") || t.includes("sport") || t.includes("golf") || t.includes("rugby") || t.includes("surf")) return "sports";
+  return "other";
 }
 
 async function refreshStravaToken(
@@ -61,7 +73,7 @@ async function refreshStravaToken(
   return data.access_token;
 }
 
-// POST — sync today's (and yesterday's) Strava activities into daily_health_logs
+// POST — sync Strava activities: steps into daily_health_logs + workouts into client_workouts
 export async function POST() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -95,10 +107,10 @@ export async function POST() {
     }
   }
 
-  // Fetch activities from last 2 days
-  const twoDaysAgo = Math.floor(Date.now() / 1000) - 2 * 86400;
+  // Fetch activities from last 30 days to catch up on any missed sync
+  const thirtyDaysAgo = Math.floor(Date.now() / 1000) - 30 * 86400;
   const activitiesRes = await fetch(
-    `https://www.strava.com/api/v3/athlete/activities?after=${twoDaysAgo}&per_page=30`,
+    `https://www.strava.com/api/v3/athlete/activities?after=${thirtyDaysAgo}&per_page=50`,
     { headers: { Authorization: `Bearer ${accessToken}` } }
   );
 
@@ -108,7 +120,7 @@ export async function POST() {
 
   const activities: StravaActivity[] = await activitiesRes.json();
 
-  // Group by date and sum estimated steps
+  // 1. Steps — group by date and sum
   const byDate = new Map<string, number>();
   for (const act of activities) {
     const date = act.start_date.slice(0, 10);
@@ -116,17 +128,36 @@ export async function POST() {
     byDate.set(date, (byDate.get(date) ?? 0) + steps);
   }
 
-  // Upsert into daily_health_logs
-  const upserts = Array.from(byDate.entries()).map(([date, steps]) => ({
+  const stepUpserts = Array.from(byDate.entries()).map(([date, steps]) => ({
     client_id: user.id,
     log_date: date,
     steps,
   }));
 
-  if (upserts.length > 0) {
+  if (stepUpserts.length > 0) {
     await admin
       .from("daily_health_logs")
-      .upsert(upserts, { onConflict: "client_id,log_date" });
+      .upsert(stepUpserts, { onConflict: "client_id,log_date" });
+  }
+
+  // 2. Workouts — upsert each activity into client_workouts (deduplicated by external_id)
+  const workoutUpserts = activities.map((act) => ({
+    client_id: user.id,
+    date: act.start_date.slice(0, 10),
+    title: act.name || act.type,
+    type: stravaTypeToWorkoutType(act.type),
+    duration_min: act.moving_time > 0 ? Math.round(act.moving_time / 60) : null,
+    calories: act.calories ?? null,
+    distance_km: act.distance > 0 ? Math.round(act.distance / 10) / 100 : null,
+    avg_heart_rate: act.average_heartrate ?? null,
+    source: "strava",
+    external_id: String(act.id),
+  }));
+
+  if (workoutUpserts.length > 0) {
+    await admin
+      .from("client_workouts")
+      .upsert(workoutUpserts, { onConflict: "client_id,source,external_id" });
   }
 
   // Update last_synced_at
@@ -138,8 +169,8 @@ export async function POST() {
   return NextResponse.json({
     ok: true,
     activitiesSynced: activities.length,
-    daysSynced: upserts.length,
-    summary: Object.fromEntries(byDate),
+    workoutsImported: workoutUpserts.length,
+    daysSynced: stepUpserts.length,
   });
 }
 
