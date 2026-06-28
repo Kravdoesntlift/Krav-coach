@@ -109,12 +109,17 @@ export default async function CoachDashboard() {
     if (!lastCheckinByClient.has(c.client_id)) lastCheckinByClient.set(c.client_id, c.week_start);
   }
 
+  const todayStr = today.toISOString().slice(0, 10);
+
   // New clients: assigned via coach_clients but with no workout_plans at all
   const clientsWithPlansSet = new Set((allPlans ?? []).map((p) => p.client_id));
   const newClients = (assignedRows ?? [])
     .filter((r) => {
-      const c = r.profiles as unknown as AllClientEntry | null;
-      return c && !clientsWithPlansSet.has(r.client_id) && c.status === "active";
+      const c = r.profiles as unknown as { status?: string; trial_ends_at?: string | null; subscription_renews_at?: string | null } | null;
+      if (!c || clientsWithPlansSet.has(r.client_id)) return false;
+      if (c.status !== "active") return false;
+      if (c.trial_ends_at && c.trial_ends_at < todayStr && !c.subscription_renews_at) return false;
+      return true;
     })
     .map((r) => {
       const c = r.profiles as unknown as AllClientEntry & { created_at?: string };
@@ -172,8 +177,15 @@ export default async function CoachDashboard() {
     if (c && !allClientMap.has(c.id)) allClientMap.set(c.id, c);
   }
 
-  const allClients = Array.from(allClientMap.values()).filter((c) => c.status === "active");
-  const weekClients = Array.from(clientMap.values()).filter((c) => c.status === "active");
+  // A client is truly active if status=active AND (trial hasn't expired OR has a subscription)
+  function isReallyActive(c: AllClientEntry): boolean {
+    if (c.status !== "active") return false;
+    if (c.trial_ends_at && c.trial_ends_at < todayStr && !c.subscription_renews_at) return false;
+    return true;
+  }
+
+  const allClients = Array.from(allClientMap.values()).filter(isReallyActive);
+  const weekClients = Array.from(clientMap.values()).filter((c) => isReallyActive(c as unknown as AllClientEntry));
 
   // Smart alerts
   type AlertType = "no_checkin" | "renewal" | "overdue_renewal" | "no_completion" | "perfect_week" | "pr_week" | "at_risk";
@@ -291,7 +303,7 @@ export default async function CoachDashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard label="Clientes ativos" value={String(allClients.filter((c) => (c.status ?? "active") === "active").length)} sub={`de ${allClients.length} total`} />
+        <StatCard label="Clientes ativos" value={String(allClients.length)} sub={`de ${allClients.length} total`} />
         <StatCard label="Treinos esta semana" value={`${avgCompletion}%`} sub="taxa de conclusão" highlight={avgCompletion >= 70} />
         <StatCard label="Check-ins" value={`${checkinCount}/${weekClients.length}`} sub="esta semana" />
         <StatCard label="Mensagens novas" value={String(totalUnread)} highlight={totalUnread > 0} sub={totalUnread > 0 ? "por responder" : "em dia"} />
