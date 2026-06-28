@@ -15,32 +15,34 @@ interface ClientWorkout {
   distance_km: number | null;
   notes: string | null;
   source: "manual" | "strava" | "apple_health" | "garmin";
-  created_at: string;
 }
 
-const TYPE_LABELS: Record<WorkoutType, { pt: string; en: string; icon: string }> = {
-  strength:  { pt: "Força",        en: "Strength",  icon: "🏋️" },
-  cardio:    { pt: "Cardio",       en: "Cardio",    icon: "🏃" },
-  sports:    { pt: "Desporto",     en: "Sports",    icon: "⚽" },
-  yoga:      { pt: "Yoga",         en: "Yoga",      icon: "🧘" },
-  mobility:  { pt: "Mobilidade",   en: "Mobility",  icon: "🤸" },
-  other:     { pt: "Outro",        en: "Other",     icon: "💪" },
+const TYPE_OPTIONS: { value: WorkoutType; icon: string; pt: string; en: string }[] = [
+  { value: "strength",  icon: "🏋️", pt: "Força",      en: "Strength"  },
+  { value: "cardio",    icon: "🏃", pt: "Cardio",     en: "Cardio"    },
+  { value: "sports",    icon: "⚽", pt: "Desporto",   en: "Sports"    },
+  { value: "yoga",      icon: "🧘", pt: "Yoga",       en: "Yoga"      },
+  { value: "mobility",  icon: "🤸", pt: "Mobilidade", en: "Mobility"  },
+  { value: "other",     icon: "💪", pt: "Outro",      en: "Other"     },
+];
+
+const SOURCE_BADGE: Record<string, { label: string; cls: string }> = {
+  manual:       { label: "Manual",       cls: "bg-zinc-700/60 text-zinc-300" },
+  strava:       { label: "Strava",       cls: "bg-orange-900/40 text-orange-400" },
+  apple_health: { label: "Apple Health", cls: "bg-pink-900/40 text-pink-400" },
+  garmin:       { label: "Garmin",       cls: "bg-blue-900/40 text-blue-400" },
 };
 
-const SOURCE_BADGE: Record<string, { label: string; color: string }> = {
-  manual:        { label: "Manual",      color: "bg-zinc-700 text-zinc-300" },
-  strava:        { label: "Strava",      color: "bg-orange-900/50 text-orange-400" },
-  apple_health:  { label: "Apple Health",color: "bg-pink-900/50 text-pink-400" },
-  garmin:        { label: "Garmin",      color: "bg-blue-900/50 text-blue-400" },
-};
-
-function formatDate(d: string) {
-  return new Date(d + "T12:00:00").toLocaleDateString("pt-PT", { weekday: "short", day: "numeric", month: "short" });
+function fmtDate(d: string, locale: string) {
+  return new Date(d + "T12:00:00").toLocaleDateString(locale, {
+    weekday: "short", day: "numeric", month: "short",
+  });
 }
 
 export default function MyWorkoutsPage() {
   const { lang } = useLang();
   const isEN = lang === "en";
+  const locale = isEN ? "en-GB" : "pt-PT";
 
   const [workouts, setWorkouts] = useState<ClientWorkout[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,12 +51,11 @@ export default function MyWorkoutsPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Form state
-  const [title, setTitle] = useState("");
-  const [type, setType] = useState<WorkoutType>("strength");
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [title, setTitle]       = useState("");
+  const [type, setType]         = useState<WorkoutType>("strength");
+  const [date, setDate]         = useState(new Date().toISOString().slice(0, 10));
   const [duration, setDuration] = useState("");
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes]       = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -91,7 +92,7 @@ export default function MyWorkoutsPage() {
       await load();
     } else {
       const d = await res.json() as { error?: string };
-      setError(d.error ?? "Erro ao guardar.");
+      setError(d.error ?? (isEN ? "Failed to save." : "Erro ao guardar."));
     }
     setSaving(false);
   }
@@ -103,153 +104,193 @@ export default function MyWorkoutsPage() {
     setDeleting(null);
   }
 
-  const cardStyle = {
-    background: "linear-gradient(160deg, rgba(39,39,42,0.9) 0%, rgba(18,18,22,0.95) 100%)",
+  const card = {
+    background: "linear-gradient(160deg,rgba(39,39,42,0.9) 0%,rgba(18,18,22,0.95) 100%)",
     border: "1px solid rgba(255,255,255,0.07)",
-    boxShadow: "0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 32px rgba(0,0,0,0.4)",
   };
 
   return (
-    <div className="space-y-5 page-enter">
+    <div className="space-y-4 page-enter">
+
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-white">
+          <h1 className="text-xl font-black tracking-tight text-white">
             {isEN ? "My Workouts" : "Os meus treinos"}
           </h1>
           <p className="text-zinc-500 text-sm mt-0.5">
-            {isEN ? "Log your own sessions" : "Regista as tuas próprias sessões"}
+            {isEN ? "Log your own sessions" : "Regista as tuas sessões"}
           </p>
         </div>
         <button
-          onClick={() => setShowForm((v) => !v)}
-          className="px-4 py-2 rounded-xl text-sm font-bold text-black"
-          style={{ background: "linear-gradient(135deg, #C9A84C, #A8893A)" }}
+          onClick={() => { setShowForm((v) => !v); setError(null); }}
+          className="shrink-0 h-10 px-4 rounded-xl text-sm font-bold text-black transition-opacity active:opacity-70"
+          style={{ background: "linear-gradient(135deg,#C9A84C,#A8893A)" }}
         >
-          {showForm ? (isEN ? "Cancel" : "Cancelar") : (isEN ? "+ Log workout" : "+ Registar")}
+          {showForm ? (isEN ? "Cancel" : "Cancelar") : (isEN ? "+ Log" : "+ Adicionar")}
         </button>
       </div>
 
-      {/* Log form */}
+      {/* Form */}
       {showForm && (
-        <div className="rounded-2xl p-5 space-y-4" style={cardStyle}>
-          <h2 className="text-white font-bold">{isEN ? "New workout" : "Novo treino"}</h2>
-          <form onSubmit={handleSubmit} className="space-y-3">
+        <div className="rounded-2xl p-4 space-y-4" style={card}>
+          <h2 className="text-white font-bold text-base">
+            {isEN ? "New workout" : "Novo treino"}
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* Type selector — pill grid */}
             <div>
-              <label className="label">{isEN ? "Title" : "Título"}</label>
+              <label className="label mb-2 block">{isEN ? "Type" : "Tipo"}</label>
+              <div className="grid grid-cols-3 gap-2">
+                {TYPE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setType(opt.value)}
+                    className="flex flex-col items-center gap-1 py-3 rounded-xl border transition-all active:scale-95"
+                    style={type === opt.value
+                      ? { background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.5)" }
+                      : { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }
+                    }
+                  >
+                    <span className="text-xl leading-none">{opt.icon}</span>
+                    <span className={`text-[11px] font-semibold ${type === opt.value ? "text-brand-gold" : "text-zinc-400"}`}>
+                      {isEN ? opt.en : opt.pt}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Title */}
+            <div>
+              <label className="label">{isEN ? "Name" : "Nome"}</label>
               <input
-                className="input" required
-                placeholder={isEN ? "e.g. Chest & Triceps" : "ex. Peito e Tríceps"}
-                value={title} onChange={(e) => setTitle(e.target.value)}
+                className="input text-base"
+                required
+                placeholder={isEN ? "e.g. Chest & Triceps" : "ex: Peito e Tríceps"}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
               />
             </div>
 
+            {/* Date + Duration side by side */}
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="label">{isEN ? "Type" : "Tipo"}</label>
-                <select className="input" value={type} onChange={(e) => setType(e.target.value as WorkoutType)}>
-                  {(Object.entries(TYPE_LABELS) as [WorkoutType, typeof TYPE_LABELS[WorkoutType]][]).map(([k, v]) => (
-                    <option key={k} value={k}>{v.icon} {isEN ? v.en : v.pt}</option>
-                  ))}
-                </select>
-              </div>
               <div>
                 <label className="label">{isEN ? "Date" : "Data"}</label>
                 <input
                   type="date" className="input"
-                  value={date} onChange={(e) => setDate(e.target.value)}
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
                   max={new Date().toISOString().slice(0, 10)}
+                />
+              </div>
+              <div>
+                <label className="label">{isEN ? "Duration (min)" : "Duração (min)"}</label>
+                <input
+                  type="number" className="input"
+                  min={1} max={600}
+                  placeholder="60"
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
                 />
               </div>
             </div>
 
+            {/* Notes */}
             <div>
-              <label className="label">{isEN ? "Duration (minutes)" : "Duração (minutos)"}</label>
-              <input
-                type="number" className="input" min={1} max={600}
-                placeholder="60"
-                value={duration} onChange={(e) => setDuration(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className="label">{isEN ? "Notes (optional)" : "Notas (opcional)"}</label>
+              <label className="label">{isEN ? "Notes" : "Notas"} <span className="text-zinc-600 font-normal">{isEN ? "(optional)" : "(opcional)"}</span></label>
               <textarea
-                className="input resize-none" rows={2}
+                className="input resize-none"
+                rows={2}
                 placeholder={isEN ? "How did it go?" : "Como correu?"}
-                value={notes} onChange={(e) => setNotes(e.target.value)}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
               />
             </div>
 
-            {error && <p className="text-red-400 text-sm">{error}</p>}
+            {error && (
+              <p className="text-red-400 text-sm">{error}</p>
+            )}
 
             <button
-              type="submit" disabled={saving || !title.trim()}
-              className="btn-primary w-full py-2.5 rounded-xl text-sm"
+              type="submit"
+              disabled={saving || !title.trim()}
+              className="btn-primary w-full py-3 rounded-xl font-bold text-sm disabled:opacity-50"
             >
-              {saving ? (isEN ? "Saving..." : "A guardar...") : (isEN ? "Save workout" : "Guardar treino")}
+              {saving
+                ? (isEN ? "Saving…" : "A guardar…")
+                : (isEN ? "Save workout" : "Guardar treino")}
             </button>
           </form>
         </div>
       )}
 
-      {/* Workout list */}
+      {/* List */}
       {loading ? (
         <div className="space-y-3">
-          {[1,2,3].map((i) => (
-            <div key={i} className="h-20 rounded-2xl bg-zinc-900/60 animate-pulse" />
+          {[0,1,2].map((i) => (
+            <div key={i} className="h-[72px] rounded-2xl bg-zinc-900/60 animate-pulse" />
           ))}
         </div>
       ) : workouts.length === 0 ? (
-        <div className="rounded-2xl p-8 text-center" style={cardStyle}>
+        <div className="rounded-2xl p-8 text-center" style={card}>
           <p className="text-4xl mb-3">💪</p>
-          <p className="text-white font-semibold">
-            {isEN ? "No workouts yet" : "Ainda sem treinos registados"}
+          <p className="text-white font-semibold text-sm">
+            {isEN ? "No workouts yet" : "Nenhum treino registado"}
           </p>
-          <p className="text-zinc-500 text-sm mt-1">
+          <p className="text-zinc-500 text-xs mt-1 leading-relaxed">
             {isEN
-              ? "Log your first session or connect Strava to import automatically"
-              : "Regista a tua primeira sessão ou liga o Strava para importar automaticamente"}
+              ? "Log your first session above, or connect Strava to import automatically."
+              : "Regista a tua primeira sessão acima, ou liga o Strava para importar automaticamente."}
           </p>
         </div>
       ) : (
-        <div className="space-y-3 stagger">
+        <div className="space-y-2 stagger">
           {workouts.map((w) => {
-            const typeInfo = w.type ? TYPE_LABELS[w.type] : null;
-            const srcInfo = SOURCE_BADGE[w.source] ?? SOURCE_BADGE.manual;
+            const typeInfo = w.type ? TYPE_OPTIONS.find((o) => o.value === w.type) : null;
+            const src = SOURCE_BADGE[w.source] ?? SOURCE_BADGE.manual;
             return (
-              <div key={w.id} className="rounded-2xl p-4" style={cardStyle}>
-                <div className="flex items-start justify-between gap-3">
+              <div key={w.id} className="rounded-2xl px-4 py-3" style={card}>
+                <div className="flex items-start gap-3">
+                  <span className="text-xl leading-none mt-0.5 shrink-0">
+                    {typeInfo?.icon ?? "💪"}
+                  </span>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {typeInfo && (
-                        <span className="text-sm">{typeInfo.icon}</span>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white text-sm font-semibold leading-tight truncate">{w.title}</p>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <span className="text-zinc-500 text-xs">{fmtDate(w.date, locale)}</span>
+                          {w.duration_min && <span className="text-zinc-500 text-xs">· {w.duration_min} min</span>}
+                          {w.calories && <span className="text-zinc-500 text-xs">· {w.calories} kcal</span>}
+                          {w.distance_km && <span className="text-zinc-500 text-xs">· {w.distance_km} km</span>}
+                        </div>
+                      </div>
+                      {w.source === "manual" && (
+                        <button
+                          onClick={() => handleDelete(w.id)}
+                          disabled={deleting === w.id}
+                          className="text-zinc-600 hover:text-red-400 transition-colors text-xl leading-none shrink-0 -mt-0.5 px-1"
+                          aria-label="Apagar"
+                        >
+                          {deleting === w.id ? "…" : "×"}
+                        </button>
                       )}
-                      <span className="text-white font-semibold text-sm truncate">{w.title}</span>
-                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${srcInfo.color}`}>
-                        {srcInfo.label}
-                      </span>
                     </div>
-                    <div className="flex items-center gap-3 mt-1 text-zinc-500 text-xs">
-                      <span>{formatDate(w.date)}</span>
-                      {w.duration_min && <span>⏱ {w.duration_min} min</span>}
-                      {w.calories && <span>🔥 {w.calories} kcal</span>}
-                      {w.distance_km && <span>📍 {w.distance_km} km</span>}
-                    </div>
-                    {w.notes && (
-                      <p className="text-zinc-400 text-xs mt-1.5 leading-relaxed line-clamp-2">{w.notes}</p>
+                    {(w.source !== "manual" || w.notes) && (
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${src.cls}`}>
+                          {src.label}
+                        </span>
+                        {w.notes && (
+                          <p className="text-zinc-500 text-xs truncate">{w.notes}</p>
+                        )}
+                      </div>
                     )}
                   </div>
-                  {w.source === "manual" && (
-                    <button
-                      onClick={() => handleDelete(w.id)}
-                      disabled={deleting === w.id}
-                      className="text-zinc-600 hover:text-red-400 transition-colors text-lg shrink-0 leading-none"
-                      title={isEN ? "Delete" : "Apagar"}
-                    >
-                      {deleting === w.id ? "..." : "×"}
-                    </button>
-                  )}
                 </div>
               </div>
             );
@@ -258,17 +299,16 @@ export default function MyWorkoutsPage() {
       )}
 
       {/* Strava tip */}
-      <div className="rounded-xl px-4 py-3 flex items-start gap-3"
-        style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}>
-        <span className="text-brand-gold text-lg shrink-0">⚡</span>
+      <div
+        className="rounded-xl px-4 py-3 flex items-center gap-3"
+        style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.12)" }}
+      >
+        <span className="text-brand-gold text-base shrink-0">⚡</span>
         <p className="text-zinc-400 text-xs leading-relaxed">
           {isEN
-            ? "Connect Strava in Integrations to import your runs, rides and gym sessions automatically."
-            : "Liga o Strava nas Integrações para importar os teus treinos automaticamente."}
-          {" "}
-          <a href="/client/integrations" className="text-brand-gold hover:underline">
-            {isEN ? "Go to integrations →" : "Integrações →"}
-          </a>
+            ? <>Connect Strava to import workouts automatically. <a href="/client/integrations" className="text-brand-gold">Integrations →</a></>
+            : <>Liga o Strava para importar os teus treinos automaticamente. <a href="/client/integrations" className="text-brand-gold">Integrações →</a></>
+          }
         </p>
       </div>
     </div>
