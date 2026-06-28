@@ -67,6 +67,7 @@ export default async function ClientDashboard() {
     { data: anyNutritionLog },
     { data: pendingTestimonial },
     { data: latestWeeklyReport },
+    { data: manualWorkouts },
   ] = await Promise.all([
     // 6-month history (streak + calendar)
     supabase
@@ -115,6 +116,9 @@ export default async function ClientDashboard() {
     // Latest weekly report link
     supabase.from("weekly_reports").select("id, week_start").eq("client_id", user!.id)
       .order("week_start", { ascending: false }).limit(1).maybeSingle(),
+    // Manual workouts (own sessions) — for streak + calendar overlay
+    supabase.from("client_workouts").select("date").eq("client_id", user!.id)
+      .order("date", { ascending: false }).limit(200),
   ]);
 
   // Unpack merged profile (downstream code uses both names)
@@ -137,6 +141,14 @@ export default async function ClientDashboard() {
         done                ? "completed" :
         ds > todayStr       ? "future"    :
                               "missed";
+    }
+  }
+
+  // Overlay manual workouts — any day with a self-logged workout counts as completed
+  for (const w of manualWorkouts ?? []) {
+    const d = w.date as string;
+    if (!dayStatuses[d] || dayStatuses[d] === "missed") {
+      dayStatuses[d] = "completed";
     }
   }
 
@@ -204,7 +216,8 @@ export default async function ClientDashboard() {
   const completedDays = trainDays.filter((d) =>
     d.workout_completions?.some((c: { client_id: string }) => c.client_id === user!.id)
   ).length;
-  const todayCompleted = !!todayDay?.workout_completions?.some(
+  const todayHasManualWorkout = (manualWorkouts ?? []).some((w) => (w.date as string) === todayStr);
+  const todayCompleted = todayHasManualWorkout || !!todayDay?.workout_completions?.some(
     (c: { client_id: string }) => c.client_id === user!.id
   );
 

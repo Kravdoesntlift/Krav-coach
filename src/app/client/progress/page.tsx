@@ -17,7 +17,7 @@ export default async function ProgressPage() {
   const [supabase, lang] = await Promise.all([createClient(), getLang()]);
   const { data: { user } } = await supabase.auth.getUser();
 
-  const [{ data: logs }, { data: checkins }, { data: completions }, { data: prs }, { data: completionDays }, { data: nutritionGoals }] = await Promise.all([
+  const [{ data: logs }, { data: checkins }, { data: completions }, { data: prs }, { data: completionDays }, { data: nutritionGoals }, { data: ownWorkouts }] = await Promise.all([
     supabase
       .from("workout_logs")
       .select("exercise_name, sets, logged_at")
@@ -53,6 +53,12 @@ export default async function ProgressPage() {
       .select("height_cm, age, sex")
       .eq("client_id", user!.id)
       .maybeSingle(),
+    supabase
+      .from("client_workouts")
+      .select("date, title")
+      .eq("client_id", user!.id)
+      .order("date", { ascending: true })
+      .limit(500),
   ]);
 
   // Group logs by exercise name — compute per-session volume and top set
@@ -81,10 +87,11 @@ export default async function ProgressPage() {
     arm_cm:   (c as Record<string, unknown>).arm_cm as number ?? null,
   }));
 
-  // Streak calculation
-  const completedDates = [...new Set(
-    (completions ?? []).map((c) => (c.completed_at as string).slice(0, 10))
-  )].sort();
+  // Streak calculation — merge coach plan completions + own logged workouts
+  const completedDates = [...new Set([
+    ...(completions ?? []).map((c) => (c.completed_at as string).slice(0, 10)),
+    ...(ownWorkouts ?? []).map((w) => w.date as string),
+  ])].sort();
 
   let currentStreak = 0;
   let longestStreak = 0;
@@ -129,6 +136,20 @@ export default async function ProgressPage() {
       label: extra.workout_done_tl[lang],
       sub: dayLabel ?? undefined,
     });
+  }
+
+  // Own workouts — add to timeline (deduplicate dates already covered by coach completions)
+  const coachCompletionDates = new Set((completionDays ?? []).map((c) => (c.completed_at as string).slice(0, 10)));
+  for (const w of ownWorkouts ?? []) {
+    const date = w.date as string;
+    if (!coachCompletionDates.has(date)) {
+      timelineEvents.push({
+        type: "workout",
+        date,
+        label: extra.workout_done_tl[lang],
+        sub: (w as Record<string, unknown>).title as string | undefined,
+      });
+    }
   }
 
   // Personal records
