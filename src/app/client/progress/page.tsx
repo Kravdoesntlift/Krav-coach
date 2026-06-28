@@ -1,28 +1,16 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import ProgressTabs, { TimelineEvent } from "./ProgressTabs";
-import { t } from "@/lib/i18n";
 import { getLang } from "@/lib/i18n/getLang";
 
 const extra = {
-  consecutive_days:  { pt: "dias seguidos 🔥",  en: "consecutive days 🔥" },
-  total_workouts:    { pt: "treinos totais",     en: "total workouts" },
-  best_streak:       { pt: "melhor série",       en: "best streak" },
+  consecutive_days:  { pt: "dias seguidos",  en: "consecutive days" },
+  total_workouts:    { pt: "treinos totais", en: "total workouts" },
+  best_streak:       { pt: "melhor série",   en: "best streak" },
   workout_done_tl:   { pt: "Treino concluído",   en: "Workout done" },
   weekly_checkin_tl: { pt: "Check-in semanal",   en: "Weekly check-in" },
   energy_tl:         { pt: "Energia",            en: "Energy" },
-  weight_logged:     { pt: "Peso registado",     en: "Weight logged" },
-  vs_prev_week:      { pt: "vs semana anterior", en: "vs previous week" },
-  hub_checkin_sub:   { pt: "Semanal",            en: "Weekly" },
-  hub_log_label:     { pt: "Registo",            en: "Log" },
-  hub_log_sub:       { pt: "Passos & Água",      en: "Steps & Water" },
-  hub_history_sub:   { pt: "Treinos",            en: "Workouts" },
-  hub_prs_sub:       { pt: "Records",            en: "Records" },
-  hub_badges_sub:    { pt: "Badges",             en: "Badges" },
-  hub_photos_sub:    { pt: "Progresso",          en: "Progress" },
-  hub_report_label:  { pt: "Relatórios",         en: "Reports" },
-  hub_report_sub:    { pt: "Mensal",             en: "Monthly" },
-  hub_ranking_label: { pt: "Ranking",            en: "Ranking" },
+  weight_logged:     { pt: "Peso registado",      en: "Weight logged" },
+  vs_prev_week:      { pt: "vs semana anterior",  en: "vs previous week" },
 } as const;
 
 export default async function ProgressPage() {
@@ -187,34 +175,8 @@ export default async function ProgressPage() {
   // Sort descending by date
   timelineEvents.sort((a, b) => b.date.localeCompare(a.date));
 
-  const hubLinks = [
-    { href: "/client/checkin",      emoji: "📋", label: t("nav_checkin", lang).replace("📋 ", ""),    sub: extra.hub_checkin_sub[lang] },
-    { href: "/client/daily-log",    emoji: "🔥", label: extra.hub_log_label[lang],                    sub: extra.hub_log_sub[lang] },
-    { href: "/client/history",      emoji: "📅", label: t("history", lang),                           sub: extra.hub_history_sub[lang] },
-    { href: "/client/records",      emoji: "🏆", label: "PRs",                                        sub: extra.hub_prs_sub[lang] },
-    { href: "/client/achievements", emoji: "⭐", label: t("achievements", lang),                      sub: extra.hub_badges_sub[lang] },
-    { href: "/client/photos",       emoji: "📸", label: t("nav_photos", lang).replace("📸 ", ""),     sub: extra.hub_photos_sub[lang] },
-    { href: "/client/report",       emoji: "📊", label: extra.hub_report_label[lang],                 sub: extra.hub_report_sub[lang] },
-    { href: "/client/leaderboard",  emoji: "🥇", label: extra.hub_ranking_label[lang],                sub: "Leaderboard" },
-  ];
-
   return (
     <div className="space-y-6 page-enter">
-      {/* Quick-access hub */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        {hubLinks.map(({ href, emoji, label, sub }) => (
-          <Link
-            key={href}
-            href={href}
-            className="flex flex-col items-center gap-1 py-4 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition-colors text-center"
-          >
-            <span className="text-2xl leading-none">{emoji}</span>
-            <span className="text-white text-[11px] font-semibold leading-tight">{label}</span>
-            <span className="text-zinc-600 text-[10px] leading-tight">{sub}</span>
-          </Link>
-        ))}
-      </div>
-
       {/* Stats strip */}
       <div className="grid grid-cols-3 gap-2">
         <div className="bg-zinc-900 rounded-2xl p-3 text-center border border-zinc-800">

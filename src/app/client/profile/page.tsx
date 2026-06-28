@@ -8,6 +8,18 @@ import TwoFactorSettings from "@/components/client/TwoFactorSettings";
 import { logout } from "@/app/auth/actions";
 import { t } from "@/lib/i18n";
 import { getLang } from "@/lib/i18n/getLang";
+import type { ReactNode } from "react";
+import { BotIcon, CalendarIcon, UsersIcon } from "@/components/ui/Icons";
+
+function WatchIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="7" />
+      <polyline points="12 9 12 12 13.5 13.5" />
+      <path d="M16.51 17.35l-.35 3.83a2 2 0 0 1-2 1.82H9.83a2 2 0 0 1-2-1.82l-.35-3.83m.01-10.7.35-3.83A2 2 0 0 1 9.83 1h4.35a2 2 0 0 1 2 1.82l.35 3.83" />
+    </svg>
+  );
+}
 
 const extra = {
   profile_title:   { pt: "Perfil",              en: "Profile" },
@@ -49,11 +61,11 @@ export default async function ClientProfilePage() {
     .limit(1)
     .maybeSingle();
 
-  const tools = [
-    { href: "/client/ai-coach",     emoji: "🤖", label: "AI Coach",                   sub: extra.ai_coach_sub[lang] },
-    { href: "/client/sessions",     emoji: "📅", label: extra.sessions_label[lang],    sub: extra.sessions_sub[lang] },
-    { href: "/client/integrations", emoji: "⌚", label: extra.integrations_label[lang], sub: "Apple Health · Strava" },
-    { href: "/client/referral",     emoji: "👥", label: extra.referral_label[lang],    sub: extra.referral_sub[lang] },
+  const tools: { href: string; icon: React.ReactNode; label: string; sub: string }[] = [
+    { href: "/client/ai-coach",     icon: <BotIcon size={20} />,      label: "AI Coach",                    sub: extra.ai_coach_sub[lang] },
+    { href: "/client/sessions",     icon: <CalendarIcon size={20} />, label: extra.sessions_label[lang],    sub: extra.sessions_sub[lang] },
+    { href: "/client/integrations", icon: <WatchIcon />,              label: extra.integrations_label[lang], sub: "Apple Health · Strava" },
+    { href: "/client/referral",     icon: <UsersIcon size={20} />,    label: extra.referral_label[lang],    sub: extra.referral_sub[lang] },
   ];
 
   return (
@@ -82,13 +94,13 @@ export default async function ClientProfilePage() {
 
       {/* Quick links grid */}
       <div className="grid grid-cols-2 gap-2">
-        {tools.map(({ href, emoji, label, sub }) => (
+        {tools.map(({ href, icon, label, sub }) => (
           <Link
             key={href}
             href={href}
             className="flex items-center gap-3 p-4 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition-colors"
           >
-            <span className="text-2xl leading-none w-8 text-center flex-shrink-0">{emoji}</span>
+            <span className="w-8 flex-shrink-0 flex items-center justify-center text-zinc-400">{icon}</span>
             <div className="min-w-0">
               <p className="text-white text-sm font-semibold leading-tight">{label}</p>
               <p className="text-zinc-500 text-[11px] leading-tight mt-0.5 truncate">{sub}</p>

@@ -3,7 +3,7 @@ import { useLang } from "@/lib/i18n/useLang";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
 import type { NavItem } from "@/components/Navbar";
-import { DumbbellIcon, ChatIcon, ChartIcon, UserIcon, ForkKnifeIcon, ClipboardIcon, TrophyIcon, CalendarIcon, FlameIcon, BotIcon, StarIcon } from "@/components/ui/Icons";
+import { DumbbellIcon, ChatIcon, ChartIcon, UserIcon, ForkKnifeIcon, ClipboardIcon, TrophyIcon, CalendarIcon, FlameIcon, StarIcon, CameraIcon, FileIcon, MedalIcon } from "@/components/ui/Icons";
 import type { ReactNode } from "react";
 import type { Profile } from "@/lib/supabase/types";
 
@@ -69,15 +69,17 @@ export function ClientShell({
     { href: "/client/profile",   label: t("nav_profile"),   icon: <UserIcon size={22} />,      badge: 0 },
   ];
 
-  // "Mais" drawer — clean labels (no emoji prefixes, icons are separate)
+  // "Mais" drawer — 9 items, 3×3 grid, no duplicates with other tabs
   const clientMoreNav = [
-    { href: "/client/workouts",     label: isEN ? "My Workouts"  : "Meus Treinos",  icon: <DumbbellIcon size={24} /> },
+    { href: "/client/workouts",     label: isEN ? "My Workouts" : "Meus Treinos",   icon: <DumbbellIcon size={24} /> },
     { href: "/client/checkin",      label: "Check-in",                               icon: <ClipboardIcon size={24} /> },
-    { href: "/client/daily-log",    label: isEN ? "Daily Log"    : "Registo Diário", icon: <FlameIcon size={24} /> },
-    { href: "/client/history",      label: isEN ? "History"      : "Histórico",      icon: <CalendarIcon size={24} /> },
-    { href: "/client/achievements", label: isEN ? "Achievements" : "Conquistas",     icon: <TrophyIcon size={24} /> },
-    { href: "/client/ai-coach",     label: "AI Coach",                               icon: <BotIcon size={24} /> },
-    { href: "/client/records",      label: "PRs",                                    icon: <StarIcon size={24} /> },
+    { href: "/client/daily-log",    label: isEN ? "Daily Log"   : "Registo Diário",  icon: <FlameIcon size={24} /> },
+    { href: "/client/history",      label: isEN ? "History"     : "Histórico",       icon: <CalendarIcon size={24} /> },
+    { href: "/client/records",      label: "PRs",                                    icon: <TrophyIcon size={24} /> },
+    { href: "/client/achievements", label: isEN ? "Achievements": "Conquistas",      icon: <StarIcon size={24} /> },
+    { href: "/client/photos",       label: isEN ? "Photos"      : "Fotos",           icon: <CameraIcon size={24} /> },
+    { href: "/client/report",       label: isEN ? "Reports"     : "Relatórios",      icon: <FileIcon size={24} /> },
+    { href: "/client/leaderboard",  label: "Ranking",                                icon: <MedalIcon size={24} /> },
   ];
 
   return (

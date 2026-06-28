@@ -211,3 +211,14 @@ export function UsersIcon({ size, className }: IconProps) {
     </svg>
   );
 }
+
+export function MedalIcon({ size, className }: IconProps) {
+  return (
+    <svg {...d(size, className)}>
+      <circle cx="12" cy="15" r="6" />
+      <path d="M8.56 2.9A7 7 0 0 1 16.83 4L12 9 7.17 4a7 7 0 0 1 1.39-1.1z" />
+      <path d="M7.17 4L4 6.5l3 4.5" />
+      <path d="M16.83 4L20 6.5l-3 4.5" />
+    </svg>
+  );
+}
