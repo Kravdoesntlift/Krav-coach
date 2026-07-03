@@ -75,9 +75,14 @@ export async function POST(req: NextRequest) {
           current_period_end: periodEnd,
         }, { onConflict: "id" });
 
+        // Clear trial and set renewal date automatically from Stripe
         await admin
           .from("profiles")
-          .update({ status: "active" })
+          .update({
+            status: "active",
+            trial_ends_at: null,
+            subscription_renews_at: periodEnd,
+          })
           .eq("id", clientId);
 
         // Self-service flow: ensure assignment + send welcome message & push notifications
@@ -171,7 +176,7 @@ export async function POST(req: NextRequest) {
           })
           .eq("id", subscription.id);
 
-        // Sync profiles.status so middleware + app reflect the real subscription state
+        // Sync profiles.status + renewal date so app always reflects real Stripe state
         if (existingSub?.client_id) {
           const profileStatus =
             subscription.status === "active"   ? "active"   :
@@ -181,7 +186,12 @@ export async function POST(req: NextRequest) {
             null;
           if (profileStatus) {
             await admin.from("profiles")
-              .update({ status: profileStatus })
+              .update({
+                status: profileStatus,
+                subscription_renews_at: periodEnd,
+                // Clear trial once subscription is active (safe no-op if already null)
+                ...(profileStatus === "active" ? { trial_ends_at: null } : {}),
+              })
               .eq("id", existingSub.client_id);
           }
         }
