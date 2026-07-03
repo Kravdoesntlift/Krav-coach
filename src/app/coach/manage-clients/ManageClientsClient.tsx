@@ -9,6 +9,8 @@ export interface ClientRow {
   full_name: string;
   status: string | null;
   avatar_url: string | null;
+  trial_ends_at?: string | null;
+  trial_expired?: boolean;
   assignments: { assigned_role: string; coach_id: string }[];
 }
 
@@ -127,6 +129,11 @@ function ClientCard({
             <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${st.color}`}>
               {st.label}
             </span>
+            {client.trial_expired && (
+              <span className="text-[11px] px-2 py-0.5 rounded-full font-medium text-red-400 bg-red-400/10">
+                Trial expirado
+              </span>
+            )}
             {myAssignments.map((a) => (
               <span key={a.assigned_role}
                 className="text-[11px] px-2 py-0.5 rounded-full bg-brand-gold/10 text-brand-gold font-medium">

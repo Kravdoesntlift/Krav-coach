@@ -16,7 +16,7 @@ export default async function ManageClientsPage() {
   // All client profiles
   const { data: allProfiles } = await supabase
     .from("profiles")
-    .select("id, full_name, status, avatar_url")
+    .select("id, full_name, status, avatar_url, trial_ends_at, subscription_renews_at")
     .eq("role", "client")
     .order("full_name");
 
@@ -32,11 +32,17 @@ export default async function ManageClientsPage() {
     assignmentsByClient.set(a.client_id, list);
   }
 
+  const todayStr = new Date().toISOString().slice(0, 10);
   const clients: ClientRow[] = (allProfiles ?? []).map((p) => ({
     id: p.id,
     full_name: p.full_name,
     status: p.status ?? "active",
     avatar_url: p.avatar_url ?? null,
+    trial_ends_at: (p as { trial_ends_at?: string | null }).trial_ends_at ?? null,
+    trial_expired:
+      !!(p as { trial_ends_at?: string | null; subscription_renews_at?: string | null }).trial_ends_at &&
+      ((p as { trial_ends_at?: string | null }).trial_ends_at ?? "") < todayStr &&
+      !((p as { subscription_renews_at?: string | null }).subscription_renews_at),
     assignments: assignmentsByClient.get(p.id) ?? [],
   }));
 
