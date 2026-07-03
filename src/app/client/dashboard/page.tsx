@@ -152,14 +152,13 @@ export default async function ClientDashboard() {
     }
   }
 
-  // Daily streak
+  // Daily streak — rest days are free passes, missed training days break it
   let streak = 0;
   for (const ds of Object.keys(dayStatuses).sort().reverse()) {
     const s = dayStatuses[ds];
     if (s === "rest" || s === "future") continue;
     if (s === "completed") { streak++; continue; }
-    if (ds === todayStr) continue; // today not done yet — don't break
-    break;
+    break; // "missed" always breaks — including today
   }
 
   // Fallback: if no plan for this week, show the most recent plan
