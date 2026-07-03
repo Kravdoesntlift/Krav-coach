@@ -128,7 +128,7 @@ COMO RESPONDER:
   const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
   const completion = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
+    model: "qwen/qwen3-32b",
     max_tokens: 1024,
     temperature: 0.7,
     messages: [

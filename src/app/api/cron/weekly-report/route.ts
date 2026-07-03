@@ -138,7 +138,7 @@ Usa um tom direto, encorajador e pessoal. NÃO uses emojis. Fala na primeira pes
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: "llama-3.3-70b-versatile",
+              model: "qwen/qwen3-32b",
               messages: [{ role: "user", content: prompt }],
               max_tokens: 150,
               temperature: 0.7,
