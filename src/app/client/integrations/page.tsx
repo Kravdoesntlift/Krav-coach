@@ -42,16 +42,16 @@ const extra = {
   data_note:       { pt: "Os dados são usados apenas para o leaderboard e registo diário. O teu coach pode ver os passos sincronizados.", en: "Data is only used for the leaderboard and daily log. Your coach can see synced steps." },
 
   // Apple Shortcut steps
-  step1_title:     { pt: "Passo 1 — Copia o teu token único", en: "Step 1 — Copy your unique token" },
-  step1_desc:      { pt: "Este token identifica-te de forma segura. Não o partilhes com ninguém.", en: "This token identifies you securely. Don't share it with anyone." },
+  step1_title:     { pt: "Passo 1 — Instala o Atalho no iPhone", en: "Step 1 — Install the Shortcut on iPhone" },
+  step1_desc:      { pt: "Toca no botão abaixo para instalar o Atalho já configurado com os teus dados. Abre automaticamente na app Atalhos — só tens de tocar em \"Adicionar Atalho\".", en: "Tap the button below to install the Shortcut pre-configured with your data. It opens automatically in the Shortcuts app — just tap \"Add Shortcut\"." },
   copied:          { pt: "✓ Copiado", en: "✓ Copied" },
-  copy:            { pt: "Copiar", en: "Copy" },
+  copy:            { pt: "Copiar link", en: "Copy link" },
   next:            { pt: "Próximo →", en: "Next →" },
   back:            { pt: "← Voltar", en: "← Back" },
   done:            { pt: "✓ Concluído", en: "✓ Done" },
   step2_title:     { pt: "Passo 2 — Cria o Atalho no iPhone", en: "Step 2 — Create the Shortcut on iPhone" },
   step3_title:     { pt: "Passo 3 — Automatiza a sincronização", en: "Step 3 — Automate the sync" },
-  step3_done_msg:  { pt: "✓ A partir de agora, os teus passos do Apple Health serão enviados automaticamente todos os dias às 23:30!", en: "✓ From now on, your Apple Health steps will be sent automatically every day at 23:30!" },
+  step3_done_msg:  { pt: "✓ Pronto! Os teus passos serão enviados automaticamente todos os dias às 23:30.", en: "✓ Done! Your steps will sync automatically every day at 23:30." },
 } as const;
 
 function ProviderCard({
@@ -144,32 +144,27 @@ function AppleShortcutSection({ token, lang }: { token: string; lang: "pt" | "en
   const [copied, setCopied] = useState(false);
   const [step, setStep] = useState(1);
 
-  const webhookUrl = `${SITE_URL}/api/health/sync`;
+  // Full sync URL with token embedded — user copies once and pastes into Shortcuts
+  const syncUrl = `${SITE_URL}/api/health/sync?token=${token}`;
 
-  function copyToken() {
-    navigator.clipboard.writeText(token);
+  function copySyncUrl() {
+    navigator.clipboard.writeText(syncUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
 
   const steps2 = lang === "en" ? [
-    <>Open the <strong className="text-white">Shortcuts</strong> app on iPhone</>,
-    <>Tap <strong className="text-white">+</strong> → name it <strong className="text-white">"KRAV Sync"</strong></>,
-    <>Add action <strong className="text-white">"Health — Read Health Data"</strong> → <strong className="text-white">Steps</strong> · period <strong className="text-white">Today</strong> → rename output to <strong className="text-white">Steps</strong></>,
-    <>Add another <strong className="text-white">"Read Health Data"</strong> → <strong className="text-white">Active Energy Burned</strong> · period <strong className="text-white">Today</strong> (sum) → rename to <strong className="text-white">Calories</strong></>,
-    <>Add <strong className="text-white">"URL"</strong> and paste: <code className="text-brand-gold bg-zinc-900 px-1 rounded">{webhookUrl}</code></>,
-    <>Add <strong className="text-white">"Get Contents of URL"</strong> → Method: <strong className="text-white">POST</strong>, Body type: <strong className="text-white">JSON</strong></>,
-    <>JSON body: <code className="text-brand-gold bg-zinc-900 px-1 rounded text-[10px] break-all">{`{"token":"YOUR_TOKEN","steps":"Steps","active_calories":"Calories"}`}</code></>,
-    <>Replace <strong className="text-white">YOUR_TOKEN</strong> with the token you copied above</>,
+    <>Open the <strong className="text-white">Shortcuts</strong> app → tap <strong className="text-white">+</strong> → name it <strong className="text-white">"KRAV Sync"</strong></>,
+    <>Tap <strong className="text-white">Add Action</strong> → search <strong className="text-white">"Read Health Data"</strong> → choose <strong className="text-white">Steps Count</strong> → period <strong className="text-white">Today</strong>, aggregate <strong className="text-white">Sum</strong></>,
+    <>Tap <strong className="text-white">Add Action</strong> again → search <strong className="text-white">"Get Contents of URL"</strong></>,
+    <>In the URL field, paste the link you copied in Step 1. Then type <code className="text-brand-gold bg-zinc-900 px-1 rounded">&amp;steps=</code> at the end. Tap the blue <strong className="text-white">variable</strong> icon and select the <strong className="text-white">Steps Count</strong> result from the action above.</>,
+    <>Leave Method as <strong className="text-white">GET</strong>. Tap <strong className="text-white">Done</strong> — the shortcut is ready.</>,
   ] : [
-    <>Abre a app <strong className="text-white">Atalhos</strong> no iPhone</>,
-    <>Toca em <strong className="text-white">+</strong> → dá o nome <strong className="text-white">"KRAV Sync"</strong></>,
-    <>Adiciona a ação <strong className="text-white">"Saúde — Ler Dados de Saúde"</strong> → <strong className="text-white">Passos</strong> · período <strong className="text-white">Hoje</strong> (Soma) → renomeia para <strong className="text-white">Passos</strong></>,
-    <>Adiciona outra <strong className="text-white">"Ler Dados de Saúde"</strong> → <strong className="text-white">Calorias Ativas</strong> · período <strong className="text-white">Hoje</strong> (Soma) → renomeia para <strong className="text-white">Calorias</strong></>,
-    <>Adiciona <strong className="text-white">"URL"</strong> e cola: <code className="text-brand-gold bg-zinc-900 px-1 rounded">{webhookUrl}</code></>,
-    <>Adiciona <strong className="text-white">"Conteúdos de URL"</strong> → Método: <strong className="text-white">POST</strong>, Tipo: <strong className="text-white">JSON</strong></>,
-    <>Corpo JSON: <code className="text-brand-gold bg-zinc-900 px-1 rounded text-[10px] break-all">{`{"token":"SEU_TOKEN","steps":"Passos","active_calories":"Calorias"}`}</code></>,
-    <>Substitui <strong className="text-white">SEU_TOKEN</strong> pelo token que copiaste acima</>,
+    <>Abre a app <strong className="text-white">Atalhos</strong> → toca em <strong className="text-white">+</strong> → dá o nome <strong className="text-white">"KRAV Sync"</strong></>,
+    <>Toca em <strong className="text-white">Adicionar Ação</strong> → pesquisa <strong className="text-white">"Ler Dados de Saúde"</strong> → escolhe <strong className="text-white">Contagem de Passos</strong> → período <strong className="text-white">Hoje</strong>, agregar <strong className="text-white">Soma</strong></>,
+    <>Toca em <strong className="text-white">Adicionar Ação</strong> novamente → pesquisa <strong className="text-white">"Conteúdos de URL"</strong></>,
+    <>No campo de URL, cola o link que copiaste no Passo 1. Depois escreve <code className="text-brand-gold bg-zinc-900 px-1 rounded">&amp;steps=</code> no fim. Toca no ícone de <strong className="text-white">variável</strong> (bolinha azul) e seleciona o resultado de <strong className="text-white">Contagem de Passos</strong> da ação acima.</>,
+    <>O Método já é <strong className="text-white">GET</strong> por defeito — não mudas nada mais. Toca em <strong className="text-white">Concluído</strong>.</>,
   ];
 
   const steps3 = lang === "en" ? [
@@ -212,21 +207,38 @@ function AppleShortcutSection({ token, lang }: { token: string; lang: "pt" | "en
         <div className="space-y-3">
           <p className="text-white text-sm font-semibold">{extra.step1_title[lang]}</p>
           <p className="text-gray-400 text-xs leading-relaxed">{extra.step1_desc[lang]}</p>
+
+          {/* One-tap install — downloads the personalised .shortcut file */}
+          <a
+            href="/api/health/shortcut"
+            className="w-full btn-primary py-3 text-sm font-semibold flex items-center justify-center gap-2 rounded-xl"
+          >
+            <span>📲</span>
+            <span>{lang === "en" ? "Install Shortcut (1 tap)" : "Instalar Atalho (1 toque)"}</span>
+          </a>
+
+          <div className="flex items-center gap-2 text-gray-600 text-[11px]">
+            <div className="flex-1 h-px bg-zinc-800" />
+            <span>{lang === "en" ? "or copy the link manually" : "ou copia o link manualmente"}</span>
+            <div className="flex-1 h-px bg-zinc-800" />
+          </div>
+
           <div className="flex gap-2">
-            <div className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 font-mono text-xs text-gray-300 truncate">
-              {token}
+            <div className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 font-mono text-[10px] text-gray-300 truncate">
+              {syncUrl}
             </div>
             <button
-              onClick={copyToken}
-              className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+              onClick={copySyncUrl}
+              className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors flex-shrink-0 ${
                 copied ? "bg-green-500/20 text-green-400" : "bg-brand-gold/10 text-brand-gold border border-brand-gold/20 hover:bg-brand-gold/20"
               }`}
             >
               {copied ? extra.copied[lang] : extra.copy[lang]}
             </button>
           </div>
-          <button onClick={() => setStep(2)} className="w-full btn-primary py-2.5 text-sm">
-            {extra.next[lang]}
+
+          <button onClick={() => setStep(2)} className="w-full py-2.5 text-sm rounded-xl bg-zinc-800 text-gray-400 hover:bg-zinc-700 transition-colors">
+            {lang === "en" ? "Set up manually instead →" : "Configurar manualmente →"}
           </button>
         </div>
       )}

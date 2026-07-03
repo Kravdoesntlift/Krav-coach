@@ -26,34 +26,25 @@ function toInt(v: unknown): number | null {
   return isFinite(n) && n >= 0 ? n : null;
 }
 
-export async function POST(req: NextRequest) {
-  let body: Record<string, unknown>;
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "JSON inválido." }, { status: 400 });
-  }
-
-  const { token, steps, water_ml, date, source, workout_minutes, active_calories } = body as {
-    token?: string;
-    steps?: number | string;
-    water_ml?: number | string;
-    date?: string;
-    source?: string;
-    workout_minutes?: number | string;
-    active_calories?: number | string;
-  };
-
+async function handleSync(params: {
+  token?: string;
+  steps?: number | string;
+  water_ml?: number | string;
+  date?: string;
+  source?: string;
+  workout_minutes?: number | string;
+  active_calories?: number | string;
+}) {
+  const { token, steps, water_ml, date, source, workout_minutes, active_calories } = params;
   if (!token) return NextResponse.json({ error: "token obrigatório." }, { status: 400 });
 
-  // Rate limit by token (prefix to avoid collisions)
+  // Rate limit by token
   if (isRateLimited(`sync:${token}`)) {
     return NextResponse.json({ error: "Demasiados pedidos. Tenta mais tarde." }, { status: 429 });
   }
 
   const admin = createAdminClient();
 
-  // Resolve client from token
   const { data: tokenRow } = await admin
     .from("health_tokens")
     .select("client_id")
@@ -64,7 +55,6 @@ export async function POST(req: NextRequest) {
 
   const clientId = tokenRow.client_id;
 
-  // Use provided date or today in UTC (YYYY-MM-DD)
   const today = new Date().toISOString().slice(0, 10);
   const rawDate = date ?? today;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(rawDate) || isNaN(Date.parse(rawDate))) {
@@ -76,7 +66,6 @@ export async function POST(req: NextRequest) {
   }
   const logDate = rawDate;
 
-  // Build update payload — coerce all numeric fields (Shortcuts sends strings)
   const updates: Record<string, unknown> = {
     client_id: clientId,
     log_date: logDate,
@@ -93,7 +82,6 @@ export async function POST(req: NextRequest) {
   if (workoutVal !== null) updates.workout_minutes = workoutVal;
   if (calVal !== null) updates.active_calories = calVal;
 
-  // Nothing to do if no data fields were provided
   if (Object.keys(updates).length <= 3) {
     return NextResponse.json({ ok: true, message: "Nenhum dado para guardar." });
   }
@@ -113,4 +101,27 @@ export async function POST(req: NextRequest) {
     active_calories: calVal,
     source: source ?? "api",
   });
+}
+
+// GET — iOS Shortcuts friendly: ?token=TOKEN&steps=8432&calories=300
+export async function GET(req: NextRequest) {
+  const token = req.nextUrl.searchParams.get("token") ?? undefined;
+  const steps = req.nextUrl.searchParams.get("steps") ?? undefined;
+  const calories = req.nextUrl.searchParams.get("calories") ?? req.nextUrl.searchParams.get("active_calories") ?? undefined;
+  const water_ml = req.nextUrl.searchParams.get("water_ml") ?? undefined;
+  const date = req.nextUrl.searchParams.get("date") ?? undefined;
+
+  return handleSync({ token, steps, active_calories: calories, water_ml, date, source: "apple_health" });
+}
+
+export async function POST(req: NextRequest) {
+  let body: Record<string, unknown>;
+  try { body = await req.json(); }
+  catch { return NextResponse.json({ error: "JSON inválido." }, { status: 400 }); }
+
+  const { token, steps, water_ml, date, source, workout_minutes, active_calories } = body as {
+    token?: string; steps?: number | string; water_ml?: number | string; date?: string;
+    source?: string; workout_minutes?: number | string; active_calories?: number | string;
+  };
+  return handleSync({ token, steps, water_ml, date, source, workout_minutes, active_calories });
 }

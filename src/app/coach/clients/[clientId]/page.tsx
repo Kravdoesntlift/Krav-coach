@@ -94,7 +94,7 @@ export default async function ClientDetailPage({
       .eq("coach_id", user!.id).eq("client_id", clientId).eq("week_start", currentWeekStart),
     supabase.from("client_goals").select("*")
       .eq("client_id", clientId).order("created_at", { ascending: false }),
-    supabase.from("progress_photos").select("*")
+    admin.from("progress_photos").select("*")
       .eq("client_id", clientId).order("taken_at", { ascending: false }).limit(200),
     admin.from("nutrition_logs").select("logged_at,calories,protein_g,carbs_g,fat_g,meal_name,description,serving_g")
       .eq("client_id", clientId)
@@ -139,7 +139,10 @@ export default async function ClientDetailPage({
     nutritionByDay.get(log.logged_at)!.push(log);
   }
   const nutritionDays = [...nutritionByDay.entries()].sort(([a], [b]) => b.localeCompare(a));
-  const totalNutritionLogs = nutritionLogs?.length ?? 0;
+  // Count unique meals (date+meal_name), not individual food items
+  const totalNutritionLogs = new Set(
+    (nutritionLogs ?? []).map((l) => `${l.logged_at}:${(l as Record<string,unknown>).meal_name}`)
+  ).size;
 
   return (
     <div className="space-y-10 page-enter">
