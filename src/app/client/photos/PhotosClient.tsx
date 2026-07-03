@@ -423,26 +423,50 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
 
     const newPhotos: ProgressPhoto[] = [];
 
-    for (const [angle, file] of Object.entries(files) as [Angle, File][]) {
-      const body = new FormData();
-      body.append("file", file);
-      body.append("angle", angle);
-      body.append("caption", "");
+    try {
+      for (const [angle, file] of Object.entries(files) as [Angle, File][]) {
+        const body = new FormData();
+        body.append("file", file);
+        body.append("angle", angle);
+        body.append("caption", "");
+        body.append("taken_at", taken_at);
 
-      const res  = await fetch("/api/photos/upload", { method: "POST", body });
-      const json = await res.json();
+        let res: Response;
+        try {
+          res = await fetch("/api/photos/upload", { method: "POST", body });
+        } catch {
+          setUploadError(lang === "en"
+            ? `Network error uploading ${angle} — check your connection and try again.`
+            : `Erro de rede ao enviar ${angle} — verifica a ligação e tenta novamente.`);
+          return;
+        }
 
-      if (!res.ok || json.error) {
-        setUploadError(extra.upload_error[lang](angle, json.error ?? extra.try_again[lang]));
-        setUploading(false);
-        return;
+        // Parse response safely — server may return HTML on unexpected errors
+        let json: Record<string, unknown> = {};
+        const ct = res.headers.get("content-type") ?? "";
+        if (ct.includes("application/json")) {
+          json = await res.json();
+        }
+
+        if (!res.ok || json.error) {
+          const msg = typeof json.error === "string"
+            ? json.error
+            : `HTTP ${res.status}`;
+          setUploadError(extra.upload_error[lang](angle, msg));
+          return;
+        }
+        newPhotos.push(json.photo as ProgressPhoto);
       }
-      newPhotos.push(json.photo as ProgressPhoto);
-    }
 
-    setPhotos((prev) => [...newPhotos, ...prev]);
-    resetUpload();
-    setUploading(false);
+      setPhotos((prev) => [...newPhotos, ...prev]);
+      resetUpload();
+    } catch (err) {
+      setUploadError(lang === "en"
+        ? `Unexpected error: ${String(err)}`
+        : `Erro inesperado: ${String(err)}`);
+    } finally {
+      setUploading(false);
+    }
   }
 
   async function deletePhoto(id: string, photoUrl: string) {
