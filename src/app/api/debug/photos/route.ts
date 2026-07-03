@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   const [{ data: photos, error: photosErr }, { data: buckets, error: bucketsErr }, { data: files, error: filesErr }] = await Promise.all([
     admin.from("progress_photos").select("*").eq("client_id", clientId ?? user.id).limit(20),
     admin.storage.listBuckets(),
-    admin.storage.from("progress-photos").list(clientId ?? user.id, { limit: 20 }).catch(() => ({ data: null, error: "list failed" })),
+    admin.storage.from("progress-photos").list(clientId ?? user.id, { limit: 20 }),
   ]);
 
   return NextResponse.json({
@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     db_error: photosErr?.message ?? null,
     buckets: buckets?.map(b => ({ id: b.id, name: b.name, public: b.public })) ?? [],
     buckets_error: bucketsErr?.message ?? null,
-    storage_files: (files as { data: unknown[] | null; error: unknown }).data ?? [],
-    storage_error: (files as { data: unknown[] | null; error: unknown }).error ?? null,
+    storage_files: files ?? [],
+    storage_error: filesErr?.message ?? null,
   });
 }
