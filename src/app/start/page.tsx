@@ -17,7 +17,7 @@ interface QuizState {
   height: string;
   currentWeight: string;
   level: Level | null;
-  availableDays: number;
+  selectedDays: number[]; // 0=Mon … 6=Sun
   sessionDuration: number;
   injuries: string;
   noInjuries: boolean;
@@ -65,18 +65,10 @@ const T = {
 
   // Step 4 — Schedule
   step4_title:      { pt: "O teu horário de treino",                              en: "Your training schedule" },
-  days_label:       { pt: "Quantos dias por semana podes treinar?",               en: "How many days per week can you train?" },
+  days_label:       { pt: "Que dias da semana podes treinar?",                    en: "Which days of the week can you train?" },
+  days_sub:         { pt: (n: number) => n === 0 ? "Seleciona pelo menos 1 dia" : n === 1 ? "1 dia selecionado" : `${n} dias selecionados`,
+                      en: (n: number) => n === 0 ? "Select at least 1 day" : n === 1 ? "1 day selected" : `${n} days selected` },
   duration_label:   { pt: "Quanto tempo tens por sessão?",                        en: "How long do you have per session?" },
-  days2:            { pt: "2 dias — mínimo mas eficaz",                           en: "2 days — minimal but effective" },
-  days3:            { pt: "3 dias — o mais recomendado para começar",             en: "3 days — most recommended to start" },
-  days4:            { pt: "4 dias — ótimo equilíbrio treino/recuperação",         en: "4 days — great training/recovery balance" },
-  days5:            { pt: "5 dias — ritmo avançado, boa recuperação necessária",  en: "5 days — advanced pace, good recovery needed" },
-  days6:            { pt: "6 dias — máxima intensidade, para avançados",          en: "6 days — maximum intensity, for advanced athletes" },
-  days7:            { pt: "7 dias — todos os dias, sem descanso",                 en: "7 days — every day, no rest days" },
-  min30:            { pt: "30 min",                                               en: "30 min" },
-  min45:            { pt: "45 min",                                               en: "45 min" },
-  min60:            { pt: "60 min",                                               en: "60 min" },
-  min90:            { pt: "90 min+",                                              en: "90 min+" },
 
   // Step 5 — Injuries
   step5_title:      { pt: "Tens alguma lesão ou limitação física?",               en: "Do you have any injuries or physical limitations?" },
@@ -229,6 +221,69 @@ function StepWrapper({ title, sub, children }: { title: string; sub?: string; ch
   );
 }
 
+// Days 0=Mon…6=Sun (UI order: Mon first)
+const DAY_LABELS_PT = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+const DAY_LABELS_EN = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+function DayPicker({ selected, onChange, lang }: {
+  selected: number[];
+  onChange: (days: number[]) => void;
+  lang: Lang;
+}) {
+  const labels = lang === "pt" ? DAY_LABELS_PT : DAY_LABELS_EN;
+
+  function toggle(idx: number) {
+    onChange(
+      selected.includes(idx)
+        ? selected.filter((d) => d !== idx)
+        : [...selected, idx].sort((a, b) => a - b)
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-7 gap-1.5">
+      {labels.map((label, idx) => {
+        const isSelected = selected.includes(idx);
+        const isWeekend = idx >= 5;
+        return (
+          <button
+            key={idx}
+            type="button"
+            onClick={() => toggle(idx)}
+            className="flex flex-col items-center gap-1.5 py-3 rounded-2xl transition-all duration-200 active:scale-90"
+            style={{
+              background: isSelected
+                ? "linear-gradient(160deg,#E8C96B,#C9A84C)"
+                : isWeekend
+                ? "rgba(255,255,255,0.03)"
+                : "rgba(255,255,255,0.04)",
+              border: isSelected
+                ? "1.5px solid rgba(201,168,76,0.6)"
+                : isWeekend
+                ? "1.5px solid rgba(255,255,255,0.05)"
+                : "1.5px solid rgba(255,255,255,0.07)",
+              boxShadow: isSelected ? "0 0 12px rgba(201,168,76,0.25), inset 0 1px 0 rgba(255,255,255,0.15)" : "none",
+            }}
+          >
+            <span
+              className="text-[11px] font-black tracking-tight leading-none"
+              style={{ color: isSelected ? "#000" : isWeekend ? "#52525b" : "#71717a" }}
+            >
+              {label}
+            </span>
+            {isSelected ? (
+              <span className="w-1.5 h-1.5 rounded-full bg-black opacity-60" />
+            ) : (
+              <span className="w-1.5 h-1.5 rounded-full"
+                style={{ background: isWeekend ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.12)" }} />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 export default function StartPage() {
@@ -236,7 +291,7 @@ export default function StartPage() {
   const [lang, setLang] = useState<Lang>("pt");
   const [quiz, setQuiz] = useState<QuizState>({
     goal: null, sex: null, age: "", height: "", currentWeight: "",
-    level: null, availableDays: 3, sessionDuration: 60,
+    level: null, selectedDays: [], sessionDuration: 60,
     injuries: "", noInjuries: false, equipment: null,
     fullName: "", email: "", password: "", confirmPassword: "",
   });
@@ -265,7 +320,7 @@ export default function StartPage() {
       );
     }
     if (step === 3) return quiz.level !== null;
-    if (step === 4) return quiz.availableDays >= 2 && quiz.sessionDuration > 0;
+    if (step === 4) return quiz.selectedDays.length >= 1 && quiz.sessionDuration > 0;
     if (step === 5) return quiz.noInjuries || quiz.injuries.trim().length > 0;
     if (step === 6) return quiz.equipment !== null;
     if (step === 7) {
@@ -290,7 +345,8 @@ export default function StartPage() {
         password: quiz.password,
         goal: quiz.goal!,
         level: quiz.level!,
-        availableDays: quiz.availableDays,
+        availableDays: quiz.selectedDays.length,
+        selectedDays: quiz.selectedDays,
         injuries: quiz.noInjuries ? "" : quiz.injuries.trim(),
         equipment: quiz.equipment!,
         lang,
@@ -308,11 +364,6 @@ export default function StartPage() {
       setLoading(false);
     }
   }
-
-  const dayLabels: Record<number, string> = {
-    2: tx(T.days2, lang), 3: tx(T.days3, lang), 4: tx(T.days4, lang),
-    5: tx(T.days5, lang), 6: tx(T.days6, lang), 7: tx(T.days7, lang),
-  };
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
@@ -395,25 +446,14 @@ export default function StartPage() {
           {/* STEP 4 — Schedule (days + duration) */}
           {step === 4 && (
             <StepWrapper title={tx(T.step4_title, lang)}>
-              {/* Days */}
-              <div className="space-y-3">
+              {/* Day picker */}
+              <div className="space-y-4">
                 <p className="text-[11px] text-zinc-500 font-semibold uppercase tracking-wide">{tx(T.days_label, lang)}</p>
-                <div className="flex items-center">
-                  {[2, 3, 4, 5, 6, 7].map((d) => (
-                    <button key={d} type="button" onClick={() => set("availableDays", d)}
-                      className="flex-1 py-5 font-black text-lg transition-all active:scale-95"
-                      style={{
-                        background: quiz.availableDays === d ? "linear-gradient(135deg,#E8C96B,#C9A84C)" : "rgba(255,255,255,0.04)",
-                        border: "1px solid rgba(255,255,255,0.07)",
-                        color: quiz.availableDays === d ? "#000" : "#71717a",
-                        borderRadius: d === 2 ? "1rem 0 0 1rem" : d === 7 ? "0 1rem 1rem 0" : "0",
-                        borderLeft: d === 2 ? undefined : "none",
-                      }}>
-                      {d}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-center text-zinc-500 text-sm">{dayLabels[quiz.availableDays]}</p>
+                <DayPicker selected={quiz.selectedDays} onChange={(d) => set("selectedDays", d)} lang={lang} />
+                <p className="text-center text-sm font-semibold transition-colors"
+                  style={{ color: quiz.selectedDays.length > 0 ? "#C9A84C" : "#52525b" }}>
+                  {T.days_sub[lang](quiz.selectedDays.length)}
+                </p>
               </div>
 
               {/* Duration */}
@@ -425,8 +465,9 @@ export default function StartPage() {
                       className="py-4 rounded-2xl font-bold text-sm transition-all active:scale-95"
                       style={{
                         background: quiz.sessionDuration === d ? "linear-gradient(135deg,#E8C96B,#C9A84C)" : "rgba(255,255,255,0.04)",
-                        border: "1px solid rgba(255,255,255,0.07)",
+                        border: `1px solid ${quiz.sessionDuration === d ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.07)"}`,
                         color: quiz.sessionDuration === d ? "#000" : "#71717a",
+                        boxShadow: quiz.sessionDuration === d ? "0 0 16px rgba(201,168,76,0.2)" : "none",
                       }}>
                       {d === 90 ? "90+" : d}<br />
                       <span className="text-[10px] font-medium opacity-70">min</span>

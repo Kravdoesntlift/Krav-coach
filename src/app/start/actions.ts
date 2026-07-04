@@ -10,6 +10,7 @@ export interface SignupPayload {
   goal: string;
   level: string;
   availableDays: number;
+  selectedDays?: number[];
   injuries: string;
   equipment: string;
   lang?: "pt" | "en";
@@ -40,7 +41,7 @@ export async function signupAndStartCheckout(
 async function _signupAndTrial(
   payload: SignupPayload
 ): Promise<SignupResult> {
-  const { fullName, email, password, goal, level, availableDays, injuries, equipment, lang = "pt",
+  const { fullName, email, password, goal, level, availableDays, selectedDays, injuries, equipment, lang = "pt",
     biologicalSex, age, heightCm, currentWeightKg, sessionDuration } = payload;
 
   const admin = createAdminClient();
@@ -80,7 +81,7 @@ async function _signupAndTrial(
   await admin.from("profiles").update({ status: "active", trial_ends_at: trialEndsAt, lang }).eq("id", clientId);
 
   // 4. Save onboarding data
-  const days = Array.from({ length: availableDays }, (_, i) => i);
+  const days = selectedDays ?? Array.from({ length: availableDays }, (_, i) => i);
   await admin.from("client_onboarding").upsert(
     {
       client_id: clientId,
