@@ -102,7 +102,7 @@ export async function GET(req: NextRequest) {
     { data: nutritionLogs },
     { data: healthLogs },
   ] = await Promise.all([
-    admin.from("profiles").select("id, full_name").in("id", clientIds),
+    admin.from("profiles").select("id, full_name, status, trial_ends_at, subscription_renews_at").in("id", clientIds),
     // workout completions — join to get week_start for filtering
     admin
       .from("workout_completions")
@@ -132,10 +132,21 @@ export async function GET(req: NextRequest) {
       .lt("log_date", monthEnd),
   ]);
 
-  // Build score per client
+  // Filter out clients with expired trials (trial ended + no active subscription)
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const activeProfileIds = new Set(
+    (profiles ?? [])
+      .filter((p) => {
+        const trialEnded = p.trial_ends_at && (p.trial_ends_at as string) < todayStr;
+        const hasSub = !!(p.subscription_renews_at);
+        return !trialEnded || hasSub;
+      })
+      .map((p) => p.id)
+  );
+
   const profileMap = new Map((profiles ?? []).map((p) => [p.id, p.full_name as string]));
 
-  const scores = clientIds.map((cid) => {
+  const scores = clientIds.filter((cid) => activeProfileIds.has(cid)).map((cid) => {
     const workoutCount = (workouts ?? []).filter((w) => w.client_id === cid).length;
     const checkinCount = (checkins ?? []).filter((c) => c.client_id === cid).length;
 
