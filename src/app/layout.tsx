@@ -25,6 +25,20 @@ export const metadata: Metadata = {
     siteName: "KRAV Coach",
     locale: "pt_PT",
     type: "website",
+    images: [
+      {
+        url: "https://kravcoaching.com/api/og",
+        width: 1200,
+        height: 630,
+        alt: "KRAV Coach — Personal Trainer Online",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "KRAV Coach — Personal Trainer Online",
+    description: "Trial grátis de 7 dias. Plano personalizado, nutrição e coaching direto — tudo na tua app.",
+    images: ["https://kravcoaching.com/api/og"],
   },
   appleWebApp: {
     capable: true,
