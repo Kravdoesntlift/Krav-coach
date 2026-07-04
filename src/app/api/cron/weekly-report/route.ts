@@ -147,7 +147,8 @@ Usa um tom direto, encorajador e pessoal. NÃO uses emojis. Fala na primeira pes
           const groqData = await groqRes.json() as {
             choices?: { message?: { content?: string } }[];
           };
-          aiMessage = groqData.choices?.[0]?.message?.content?.trim() ?? null;
+          const rawMsg = groqData.choices?.[0]?.message?.content?.trim() ?? null;
+          aiMessage = rawMsg ? rawMsg.replace(/<think>[\s\S]*?<\/think>\s*/g, "").trim() || null : null;
         } catch (e) {
           console.error("[weekly-report] Groq error:", e);
         }
