@@ -44,6 +44,10 @@ const t = {
   iphone_tab:      { pt: "iPhone",                en: "iPhone" },
   android_tab:     { pt: "Android",               en: "Android" },
   your_link:       { pt: "O teu link pessoal (privado — não partilhes)", en: "Your personal link (private — do not share)" },
+  steps_connected: { pt: "Passos sincronizados", en: "Steps synced" },
+  steps_last:      { pt: "Último registo:", en: "Last record:" },
+  steps_reconfigure: { pt: "Reconfigurar", en: "Reconfigure" },
+  steps_connected_desc: { pt: "O teu dispositivo está a enviar passos corretamente.", en: "Your device is sending steps correctly." },
 
   apple_title:     { pt: "Apple Health — Passos Diários", en: "Apple Health — Daily Steps" },
   apple_subtitle:  { pt: "iPhone · Apple Watch · iOS 16+", en: "iPhone · Apple Watch · iOS 16+" },
@@ -384,6 +388,8 @@ export default function IntegrationsPage() {
   const searchParams = useSearchParams();
   const [token, setToken] = useState<string | null>(null);
   const [integrations, setIntegrations] = useState<Integration[]>([]);
+  const [hasSyncedSteps, setHasSyncedSteps] = useState(false);
+  const [lastStepSync, setLastStepSync] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [platform, setPlatform] = useState<"iphone" | "android">("iphone");
   const [showHealthSection, setShowHealthSection] = useState(false);
@@ -407,6 +413,20 @@ export default function IntegrationsPage() {
       const tokenData = await tokenRes.json();
       setToken(tokenData.token ?? null);
       setIntegrations((intRes.data ?? []) as Integration[]);
+
+      // Check if user has ever synced steps via shortcut
+      const { data: healthLog } = await supabase
+        .from("daily_health_logs")
+        .select("log_date")
+        .eq("client_id", user.id)
+        .order("log_date", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (healthLog) {
+        setHasSyncedSteps(true);
+        setLastStepSync(healthLog.log_date as string);
+      }
+
       setLoading(false);
     }
     load();
@@ -472,6 +492,30 @@ export default function IntegrationsPage() {
       {/* Health sync card */}
       <div className="card p-5">
         {!showHealthSection ? (
+          hasSyncedSteps ? (
+            /* Connected state */
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-2xl flex-shrink-0">📱</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-white font-semibold">{lang === "pt" ? "Sincronização de Passos" : "Step Sync"}</p>
+                  <span className="text-[10px] bg-green-500/15 text-green-400 px-2 py-0.5 rounded-full font-semibold">{t.steps_connected[lang]}</span>
+                </div>
+                <p className="text-gray-500 text-xs mt-0.5">{t.steps_connected_desc[lang]}</p>
+                {lastStepSync && (
+                  <p className="text-gray-600 text-[11px] mt-1">
+                    {t.steps_last[lang]} {new Date(lastStepSync).toLocaleDateString(lang === "en" ? "en-GB" : "pt-PT", { day: "numeric", month: "short" })}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => setShowHealthSection(true)}
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-800 text-gray-500 hover:text-gray-300 transition-colors flex-shrink-0"
+              >
+                {t.steps_reconfigure[lang]}
+              </button>
+            </div>
+          ) : (
           <div className="space-y-4">
             <div>
               <p className="text-white font-semibold">{lang === "pt" ? "Sincronização de Passos" : "Step Sync"}</p>
@@ -498,6 +542,7 @@ export default function IntegrationsPage() {
               </button>
             </div>
           </div>
+          )
         ) : (
           <div className="space-y-4">
             {/* Platform tabs */}
