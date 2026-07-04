@@ -139,7 +139,9 @@ COMO RESPONDER:
   });
 
   const fallback = isEN ? "Could not get a reply. Please try again." : "Não consegui responder. Tenta novamente.";
-  const reply = completion.choices[0]?.message?.content?.trim() ?? fallback;
+  const raw = completion.choices[0]?.message?.content?.trim() ?? fallback;
+  // Strip Qwen3 extended-thinking blocks before sending to client
+  const reply = raw.replace(/<think>[\s\S]*?<\/think>\s*/g, "").trim() || fallback;
 
   return NextResponse.json({ reply });
 }

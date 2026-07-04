@@ -177,7 +177,9 @@ Responde APENAS com um objeto JSON válido no seguinte formato (sem markdown, se
     const groqData = (await groqRes.json()) as {
       choices: { message: { content: string } }[];
     };
-    const content = groqData.choices?.[0]?.message?.content ?? "{}";
+    const rawContent = groqData.choices?.[0]?.message?.content ?? "{}";
+    // Strip Qwen3 extended-thinking blocks before parsing JSON
+    const content = rawContent.replace(/<think>[\s\S]*?<\/think>\s*/g, "").trim() || "{}";
 
     let plan: SuggestedPlan;
     try {

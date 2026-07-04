@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: ["/", "/personal-trainer-online", "/online-personal-trainer", "/start", "/links", "/guia"],
-        disallow: ["/coach/", "/client/", "/auth/", "/api/", "/offline"],
+        disallow: ["/coach/", "/client/", "/auth/", "/api/", "/offline", "/p/"],
       },
     ],
     sitemap: "https://kravcoaching.com/sitemap.xml",

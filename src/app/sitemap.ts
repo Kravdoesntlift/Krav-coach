@@ -6,31 +6,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: BASE,
-      lastModified: new Date(),
+      lastModified: new Date("2026-06-01"),
       changeFrequency: "weekly",
       priority: 1,
     },
     {
       url: `${BASE}/personal-trainer-online`,
-      lastModified: new Date(),
+      lastModified: new Date("2026-06-01"),
       changeFrequency: "monthly",
       priority: 0.9,
     },
     {
       url: `${BASE}/online-personal-trainer`,
-      lastModified: new Date(),
+      lastModified: new Date("2026-06-01"),
       changeFrequency: "monthly",
       priority: 0.9,
     },
     {
       url: `${BASE}/start`,
-      lastModified: new Date(),
+      lastModified: new Date("2026-06-01"),
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
       url: `${BASE}/links`,
-      lastModified: new Date(),
+      lastModified: new Date("2026-06-01"),
       changeFrequency: "monthly",
       priority: 0.5,
     },

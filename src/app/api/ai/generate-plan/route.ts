@@ -102,7 +102,9 @@ Regras:
       ],
     });
 
-    const raw = completion.choices[0]?.message?.content?.trim() ?? "";
+    const rawContent = completion.choices[0]?.message?.content?.trim() ?? "";
+    // Strip Qwen3 extended-thinking blocks before parsing JSON
+    const raw = rawContent.replace(/<think>[\s\S]*?<\/think>\s*/g, "").trim();
 
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return NextResponse.json({ error: "IA não devolveu JSON válido" }, { status: 500 });
