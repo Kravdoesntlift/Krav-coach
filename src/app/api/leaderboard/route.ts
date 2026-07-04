@@ -110,12 +110,14 @@ export async function GET(req: NextRequest) {
       .in("client_id", clientIds)
       .gte("completed_at", monthStart)
       .lt("completed_at", monthEnd),
+    // Filter by created_at (when the check-in was submitted), not week_start
+    // (week_start can be in the prior month for check-ins done early in a new month)
     admin
       .from("weekly_checkins")
-      .select("client_id, week_start")
+      .select("client_id, created_at")
       .in("client_id", clientIds)
-      .gte("week_start", monthStart)
-      .lt("week_start", monthEnd),
+      .gte("created_at", monthStart)
+      .lt("created_at", monthEnd),
     admin
       .from("nutrition_logs")
       .select("client_id, logged_at")
