@@ -13,6 +13,11 @@ export interface SignupPayload {
   injuries: string;
   equipment: string;
   lang?: "pt" | "en";
+  biologicalSex?: string;
+  age?: number;
+  heightCm?: number;
+  currentWeightKg?: number;
+  sessionDuration?: number;
 }
 
 export interface SignupResult {
@@ -35,7 +40,8 @@ export async function signupAndStartCheckout(
 async function _signupAndTrial(
   payload: SignupPayload
 ): Promise<SignupResult> {
-  const { fullName, email, password, goal, level, availableDays, injuries, equipment, lang = "pt" } = payload;
+  const { fullName, email, password, goal, level, availableDays, injuries, equipment, lang = "pt",
+    biologicalSex, age, heightCm, currentWeightKg, sessionDuration } = payload;
 
   const admin = createAdminClient();
 
@@ -86,6 +92,11 @@ async function _signupAndTrial(
       fitness_level: level,
       availability: availableDays,
       equipment,
+      biological_sex: biologicalSex ?? null,
+      age: age ?? null,
+      height_cm: heightCm ?? null,
+      current_weight_kg: currentWeightKg ?? null,
+      session_duration: sessionDuration ?? null,
       completed_at: new Date().toISOString(),
     },
     { onConflict: "client_id" }

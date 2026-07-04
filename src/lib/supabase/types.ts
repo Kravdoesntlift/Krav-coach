@@ -70,6 +70,10 @@ export interface WeeklyCheckin {
   arm_cm: number | null;
   sleep_quality: number | null;
   stress_level: number | null;
+  recovery_level: number | null;
+  motivation_level: number | null;
+  nutrition_adherence: "yes" | "partial" | "no" | null;
+  hip_cm: number | null;
   created_at: string;
   // joined
   client?: Profile;

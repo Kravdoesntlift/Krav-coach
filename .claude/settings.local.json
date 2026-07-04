@@ -105,7 +105,20 @@
       "mcp__visualize__show_widget",
       "Bash(convert -background none /Users/kravchuk/Krav-coach/public/icon.svg -resize 512x512 /Users/kravchuk/Krav-coach/public/icon-512.png)",
       "Bash(rsvg-convert -w 512 -h 512 /Users/kravchuk/Krav-coach/public/icon.svg -o /Users/kravchuk/Krav-coach/public/icon-512.png)",
-      "Bash(grep -E '@keyframes|^\\\\..*\\\\{' /Users/kravchuk/Krav-coach/src/app/globals.css)"
+      "Bash(grep -E '@keyframes|^\\\\..*\\\\{' /Users/kravchuk/Krav-coach/src/app/globals.css)",
+      "Bash(grep -v \"^$\")",
+      "Bash(npm info *)",
+      "Bash(git -C /Users/kravchuk/Krav-coach diff --stat)",
+      "Bash(git -C /Users/kravchuk/Krav-coach add src/app/api/health/sync/route.ts src/app/client/integrations/page.tsx src/app/coach/clients/\\\\[clientId\\\\]/page.tsx src/app/api/health/shortcut/ package.json package-lock.json supabase/migration_photos_fix.sql)",
+      "Bash(git -C /Users/kravchuk/Krav-coach commit -m ' *)",
+      "Bash(git -C /Users/kravchuk/Krav-coach push origin main)",
+      "Bash(git -C /Users/kravchuk/Krav-coach log --oneline -5)",
+      "Bash(git -C /Users/kravchuk/Krav-coach add src/app/api/debug/photos/route.ts)",
+      "Bash(git -C /Users/kravchuk/Krav-coach commit -m \"fix: debug route types\")",
+      "Bash(git -C /Users/kravchuk/Krav-coach add src/app/client/photos/PhotosClient.tsx)",
+      "Bash(git -C /Users/kravchuk/Krav-coach add src/app/client/dashboard/page.tsx)",
+      "Bash(git -C /Users/kravchuk/Krav-coach add src/app/api/ai/coach-chat/route.ts src/app/api/ai/generate-plan/route.ts src/app/api/ai/suggest-plan/route.ts src/app/api/cron/weekly-report/route.ts)",
+      "Bash(grep -v \"^api$\\\\|^auth$\\\\|^client$\\\\|^coach$\")"
     ]
   }
 }
