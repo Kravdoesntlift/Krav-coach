@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { signupAndStartCheckout } from "./actions";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -73,7 +74,9 @@ const T = {
   confirm_pw:       { pt: "Confirmar password",                                   en: "Confirm password" },
   confirm_pw_ph:    { pt: "Repete a password",                                    en: "Repeat password" },
   pw_mismatch:      { pt: "As passwords não coincidem.",                          en: "Passwords do not match." },
-  terms:            { pt: "Ao criar conta aceitas os nossos termos de serviço. 7 dias grátis, sem cartão de crédito.", en: "By creating an account you accept our terms of service. 7 days free, no credit card required." },
+  terms_pre:        { pt: "Ao criar conta aceitas os nossos", en: "By creating an account you accept our" },
+  terms_link:       { pt: "termos de serviço", en: "terms of service" },
+  terms_post:       { pt: ". 7 dias grátis, sem cartão de crédito.", en: ". 7 days free, no credit card required." },
   back:             { pt: "Voltar",                                               en: "Back" },
   continue:         { pt: "Continuar",                                            en: "Continue" },
   start_trial:      { pt: "Começar trial gratuito de 7 dias",                    en: "Start 7-day free trial" },
@@ -374,7 +377,13 @@ export default function StartPage() {
                     <p className="text-red-400 text-xs mt-1 ml-1">{tx(T.pw_mismatch, lang)}</p>
                   )}
                 </div>
-                <p className="text-zinc-600 text-xs text-center pt-1">{tx(T.terms, lang)}</p>
+                <p className="text-zinc-600 text-xs text-center pt-1">
+                  {tx(T.terms_pre, lang)}{" "}
+                  <Link href="/terms" target="_blank" className="underline hover:text-zinc-400 transition-colors">
+                    {tx(T.terms_link, lang)}
+                  </Link>
+                  {tx(T.terms_post, lang)}
+                </p>
               </div>
             </StepWrapper>
           )}
