@@ -82,10 +82,7 @@ async function handleSync(params: {
   if (workoutVal !== null) updates.workout_minutes = workoutVal;
   if (calVal !== null) updates.active_calories = calVal;
 
-  if (Object.keys(updates).length <= 3) {
-    return NextResponse.json({ ok: true, message: "Nenhum dado para guardar." });
-  }
-
+  // Always write a record (marks shortcut as active; metrics default to 0 in DB)
   const { error } = await admin
     .from("daily_health_logs")
     .upsert(updates, { onConflict: "client_id,log_date" });
