@@ -169,6 +169,7 @@ export default async function ClientDashboard() {
       .from("workout_plans")
       .select(`*, workout_days(*, exercises(*), workout_completions(*))`)
       .eq("client_id", user!.id)
+      .lte("week_start", weekStart)
       .order("week_start", { ascending: false })
       .limit(1)
       .maybeSingle();

@@ -425,37 +425,48 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
 
     try {
       for (const [angle, file] of Object.entries(files) as [Angle, File][]) {
-        const body = new FormData();
-        body.append("file", file);
-        body.append("angle", angle);
-        body.append("caption", "");
-        body.append("taken_at", taken_at);
+        const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
 
-        let res: Response;
+        // Step 1 — Get a signed upload URL (tiny request, no file)
+        let signJson: { signedUrl?: string; path?: string; error?: string };
         try {
-          res = await fetch("/api/photos/upload", { method: "POST", body });
-        } catch {
-          setUploadError(lang === "en"
-            ? `Network error uploading ${angle} — check your connection and try again.`
-            : `Erro de rede ao enviar ${angle} — verifica a ligação e tenta novamente.`);
+          const signRes = await fetch(`/api/photos/sign?angle=${angle}&ext=${ext}`);
+          signJson = await signRes.json();
+          if (!signRes.ok || signJson.error) throw new Error(signJson.error ?? `HTTP ${signRes.status}`);
+        } catch (e) {
+          setUploadError(extra.upload_error[lang](angle, e instanceof Error ? e.message : "Erro ao preparar upload"));
           return;
         }
 
-        // Parse response safely — server may return HTML on unexpected errors
-        let json: Record<string, unknown> = {};
-        const ct = res.headers.get("content-type") ?? "";
-        if (ct.includes("application/json")) {
-          json = await res.json();
-        }
-
-        if (!res.ok || json.error) {
-          const msg = typeof json.error === "string"
-            ? json.error
-            : `HTTP ${res.status}`;
-          setUploadError(extra.upload_error[lang](angle, msg));
+        // Step 2 — Upload file directly to Supabase Storage (bypasses Vercel 4.5MB limit)
+        try {
+          const putRes = await fetch(signJson.signedUrl!, {
+            method: "PUT",
+            body: file,
+            headers: { "Content-Type": file.type || "application/octet-stream" },
+          });
+          if (!putRes.ok) throw new Error(`Storage error ${putRes.status}`);
+        } catch (e) {
+          setUploadError(extra.upload_error[lang](angle, e instanceof Error ? e.message : "Erro ao enviar ficheiro"));
           return;
         }
-        newPhotos.push(json.photo as ProgressPhoto);
+
+        // Step 3 — Record in DB + notify coach (tiny JSON request)
+        let recordJson: { photo?: ProgressPhoto; error?: string };
+        try {
+          const recordRes = await fetch("/api/photos/record", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ path: signJson.path, angle, caption: "" }),
+          });
+          recordJson = await recordRes.json();
+          if (!recordRes.ok || recordJson.error) throw new Error(recordJson.error ?? `HTTP ${recordRes.status}`);
+        } catch (e) {
+          setUploadError(extra.upload_error[lang](angle, e instanceof Error ? e.message : "Erro ao guardar"));
+          return;
+        }
+
+        newPhotos.push(recordJson.photo as ProgressPhoto);
       }
 
       setPhotos((prev) => [...newPhotos, ...prev]);

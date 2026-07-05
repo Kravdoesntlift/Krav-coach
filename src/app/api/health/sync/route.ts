@@ -20,9 +20,14 @@ function isRateLimited(key: string): boolean {
   return false;
 }
 
-// iOS Shortcuts can send numbers as strings — coerce safely
+// iOS Shortcuts can send numbers as strings, sometimes locale-formatted (e.g. "8.432" in PT = 8432)
 function toInt(v: unknown): number | null {
-  const n = typeof v === "string" ? parseInt(v, 10) : typeof v === "number" ? Math.round(v) : NaN;
+  if (typeof v === "number") return isFinite(v) && v >= 0 ? Math.round(v) : null;
+  if (typeof v !== "string") return null;
+  // Strip all non-digit characters (handles "8.432", "8,432", "8 432", "8432.0")
+  const digitsOnly = v.replace(/[^\d]/g, "");
+  if (!digitsOnly) return null;
+  const n = parseInt(digitsOnly, 10);
   return isFinite(n) && n >= 0 ? n : null;
 }
 
