@@ -114,9 +114,9 @@ export default async function ClientDetailPage({
   const lastCheckin = checkins?.[0];
   const needsAttention = !lastCheckin || new Date(lastCheckin.week_start) < twoWeeksAgo;
 
-  // Trial badge
+  // Trial badge — only show if client has no active subscription
   let trialDaysLeft: number | null = null;
-  if (client.trial_ends_at) {
+  if (client.trial_ends_at && !client.subscription_renews_at) {
     const now = new Date(); const te = new Date(client.trial_ends_at);
     const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
     const endUTC   = Date.UTC(te.getUTCFullYear(),  te.getUTCMonth(),  te.getUTCDate());
