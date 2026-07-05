@@ -553,10 +553,10 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
       {/* ── Lightbox ─────────────────────────────────────────────────────── */}
       {lightbox && (
         <div
-          className="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center overflow-y-auto"
           onClick={() => setLightbox(null)}
         >
-          <div className="max-w-sm w-full space-y-3" onClick={(e) => e.stopPropagation()}>
+          <div className="max-w-sm w-full space-y-3 px-4 py-6 my-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white font-medium text-sm capitalize">
@@ -571,7 +571,7 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
                 aria-label={t("close")}
               >✕</button>
             </div>
-            <Image src={lightbox.photo_url} alt="" width={800} height={600} className="w-full rounded-2xl max-h-[70vh] object-contain" />
+            <Image src={lightbox.photo_url} alt="" width={800} height={1200} className="w-full rounded-2xl object-contain" />
             <button
               onClick={() => deletePhoto(lightbox.id, lightbox.photo_url)}
               className="w-full py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm hover:bg-red-500/20 transition-colors"
