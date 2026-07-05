@@ -90,76 +90,75 @@ export default function PhotoLightbox({ photos }: Props) {
         ))}
       </div>
 
-      {/* Lightbox overlay */}
+      {/* Lightbox overlay — scrollable so tall portrait photos are fully visible */}
       {currentPhoto && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.92)" }}
+          className="fixed inset-0 z-50 overflow-y-auto"
+          style={{ background: "rgba(0,0,0,0.95)" }}
           onClick={close}
           role="dialog"
           aria-modal="true"
           aria-label="Visualizar foto"
         >
-          {/* Content — stop propagation so clicking image doesn't close */}
-          <div
-            className="relative w-full max-w-3xl flex flex-col gap-3"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-white text-sm font-medium">
-                  {currentPhoto.caption ?? "Foto de progresso"}
-                </p>
-                <p className="text-zinc-500 text-xs">{formatDate(currentPhoto.taken_at)}</p>
+          <div className="min-h-full flex items-center justify-center p-4">
+            {/* Content — stop propagation so clicking image doesn't close */}
+            <div
+              className="relative w-full max-w-lg flex flex-col gap-3 py-2"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-white text-sm font-medium">
+                    {currentPhoto.caption ?? "Foto de progresso"}
+                  </p>
+                  <p className="text-zinc-500 text-xs">{formatDate(currentPhoto.taken_at)}</p>
+                </div>
+                <button
+                  onClick={close}
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-zinc-300 hover:text-white transition-colors shrink-0"
+                  style={{ background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.3)" }}
+                  aria-label="Fechar lightbox"
+                >
+                  ✕
+                </button>
               </div>
-              <button
-                onClick={close}
-                className="w-9 h-9 rounded-full flex items-center justify-center text-zinc-300 hover:text-white transition-colors shrink-0"
-                style={{ background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.3)" }}
-                aria-label="Fechar lightbox"
-              >
-                ✕
-              </button>
-            </div>
 
-            {/* Image */}
-            <div className="relative w-full rounded-2xl overflow-hidden bg-zinc-950" style={{ maxHeight: "70vh" }}>
+              {/* Image — full width, no height cap so portrait photos render completely */}
               <Image
                 src={currentPhoto.photo_url}
                 alt={currentPhoto.caption ?? "Foto de progresso"}
                 width={900}
-                height={675}
-                className="w-full object-contain"
-                style={{ maxHeight: "70vh" }}
+                height={1200}
+                className="w-full rounded-2xl object-contain"
                 priority
               />
-            </div>
 
-            {/* Navigation */}
-            {photos.length > 1 && (
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={prev}
-                  className="px-4 py-2 rounded-xl text-sm font-semibold text-black transition-colors"
-                  style={{ background: "#C9A84C" }}
-                  aria-label="Foto anterior"
-                >
-                  ← Anterior
-                </button>
-                <span className="text-zinc-500 text-xs">
-                  {(lightboxIndex ?? 0) + 1} / {photos.length}
-                </span>
-                <button
-                  onClick={next}
-                  className="px-4 py-2 rounded-xl text-sm font-semibold text-black transition-colors"
-                  style={{ background: "#C9A84C" }}
-                  aria-label="Próxima foto"
-                >
-                  Seguinte →
-                </button>
-              </div>
-            )}
+              {/* Navigation */}
+              {photos.length > 1 && (
+                <div className="flex items-center justify-between">
+                  <button
+                    onClick={prev}
+                    className="px-4 py-2 rounded-xl text-sm font-semibold text-black transition-colors"
+                    style={{ background: "#C9A84C" }}
+                    aria-label="Foto anterior"
+                  >
+                    ← Anterior
+                  </button>
+                  <span className="text-zinc-500 text-xs">
+                    {(lightboxIndex ?? 0) + 1} / {photos.length}
+                  </span>
+                  <button
+                    onClick={next}
+                    className="px-4 py-2 rounded-xl text-sm font-semibold text-black transition-colors"
+                    style={{ background: "#C9A84C" }}
+                    aria-label="Próxima foto"
+                  >
+                    Seguinte →
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
