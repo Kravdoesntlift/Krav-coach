@@ -234,16 +234,25 @@ export default async function ClientDetailPage({
       </section>
 
       {/* Onboarding data */}
-      {onboarding && (
+      {onboarding && (() => {
+        const ob = onboarding as Record<string, unknown>;
+        const sexLabel: Record<string, string> = { male: "Masculino", female: "Feminino", other: "Outro" };
+        const dayNames = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+        // Only the v2 quiz records which specific days were chosen. Legacy rows
+        // stored a placeholder 0..n-1 array, so showing those days would be fiction.
+        const hasDayDetail = ob.session_duration != null;
+        const chosenDays = Array.isArray(ob.available_days) ? (ob.available_days as number[]) : [];
+
+        return (
         <section>
           <h2 className="text-white font-semibold mb-3">Perfil do Cliente</h2>
           <div className="card p-5 space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {(onboarding.fitness_level ?? (onboarding as Record<string,unknown>).level) && (
+              {(onboarding.fitness_level ?? ob.level) && (
                 <div className="bg-zinc-800/60 rounded-xl p-3">
                   <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Nível</p>
                   <p className="text-white text-sm font-semibold capitalize">
-                    {onboarding.fitness_level ?? (onboarding as Record<string,unknown>).level as string}
+                    {onboarding.fitness_level ?? ob.level as string}
                   </p>
                 </div>
               )}
@@ -253,6 +262,36 @@ export default async function ClientDetailPage({
                   <p className="text-white text-sm font-semibold">{onboarding.availability} dias/sem</p>
                 </div>
               )}
+              {ob.session_duration != null && (
+                <div className="bg-zinc-800/60 rounded-xl p-3">
+                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Duração sessão</p>
+                  <p className="text-white text-sm font-semibold">{String(ob.session_duration)} min</p>
+                </div>
+              )}
+              {ob.biological_sex != null && (
+                <div className="bg-zinc-800/60 rounded-xl p-3">
+                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Sexo</p>
+                  <p className="text-white text-sm font-semibold">{sexLabel[String(ob.biological_sex)] ?? String(ob.biological_sex)}</p>
+                </div>
+              )}
+              {ob.age != null && (
+                <div className="bg-zinc-800/60 rounded-xl p-3">
+                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Idade</p>
+                  <p className="text-white text-sm font-semibold">{String(ob.age)} anos</p>
+                </div>
+              )}
+              {ob.height_cm != null && (
+                <div className="bg-zinc-800/60 rounded-xl p-3">
+                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Altura</p>
+                  <p className="text-white text-sm font-semibold">{String(ob.height_cm)} cm</p>
+                </div>
+              )}
+              {ob.current_weight_kg != null && (
+                <div className="bg-zinc-800/60 rounded-xl p-3">
+                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Peso inicial</p>
+                  <p className="text-white text-sm font-semibold">{String(ob.current_weight_kg)} kg</p>
+                </div>
+              )}
               {onboarding.equipment && (
                 <div className="bg-zinc-800/60 rounded-xl p-3">
                   <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Equipamento</p>
@@ -260,11 +299,33 @@ export default async function ClientDetailPage({
                 </div>
               )}
             </div>
-            {(onboarding.goals_text ?? (onboarding as Record<string,unknown>).goal) && (
+
+            {hasDayDetail && chosenDays.length > 0 && (
+              <div>
+                <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Dias que pode treinar</p>
+                <div className="grid grid-cols-7 gap-1.5 max-w-sm">
+                  {dayNames.map((name, idx) => {
+                    const on = chosenDays.includes(idx);
+                    return (
+                      <div key={idx} className="py-2 rounded-lg text-center text-[11px] font-bold"
+                        style={{
+                          background: on ? "linear-gradient(160deg,#E8C96B,#C9A84C)" : "rgba(255,255,255,0.04)",
+                          color: on ? "#000" : "#52525b",
+                          border: `1px solid ${on ? "rgba(201,168,76,0.5)" : "rgba(255,255,255,0.06)"}`,
+                        }}>
+                        {name}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {(onboarding.goals_text ?? ob.goal) && (
               <div>
                 <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1.5">Objetivo</p>
                 <p className="text-zinc-300 text-sm leading-relaxed">
-                  {onboarding.goals_text ?? String((onboarding as Record<string,unknown>).goal ?? "").replace("_", " ")}
+                  {onboarding.goals_text ?? String(ob.goal ?? "").replace("_", " ")}
                 </p>
               </div>
             )}
@@ -276,7 +337,8 @@ export default async function ClientDetailPage({
             )}
           </div>
         </section>
-      )}
+        );
+      })()}
 
       {/* Goals */}
       <section>

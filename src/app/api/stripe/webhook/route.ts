@@ -16,6 +16,222 @@ function getStripe() {
   });
 }
 
+type Admin = ReturnType<typeof createAdminClient>;
+
+/**
+ * Resolve the KRAV client behind a Stripe object without trusting metadata.
+ *
+ * Metadata is only present on checkouts our own app created. Payments made from
+ * a reused payment link, the Stripe dashboard, or an older checkout carry none —
+ * and the old code bailed out entirely in that case, leaving the client
+ * unprovisioned. Falls back to the customer mapping, then the customer's email.
+ */
+async function resolveClientId(
+  admin: Admin,
+  opts: { metadataClientId?: string | null; customerId?: string | null },
+): Promise<string | null> {
+  const { metadataClientId, customerId } = opts;
+
+  if (metadataClientId) return metadataClientId;
+  if (!customerId) return null;
+
+  // 1. Customer already mapped to a profile
+  const { data: byCustomer } = await admin
+    .from("profiles")
+    .select("id")
+    .eq("stripe_customer_id", customerId)
+    .maybeSingle();
+  if (byCustomer?.id) return byCustomer.id;
+
+  // 2. Ask Stripe — the customer may carry our metadata, or match a user by email
+  try {
+    const stripe = getStripe();
+    const customer = await stripe.customers.retrieve(customerId);
+    if (customer.deleted) return null;
+
+    const metaId = customer.metadata?.client_id;
+    if (metaId) {
+      await admin.from("profiles").update({ stripe_customer_id: customerId }).eq("id", metaId);
+      return metaId;
+    }
+
+    if (customer.email) {
+      const { data: users } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+      const match = users?.users.find(
+        (u) => u.email?.toLowerCase() === customer.email!.toLowerCase(),
+      );
+      if (match) {
+        await admin.from("profiles").update({ stripe_customer_id: customerId }).eq("id", match.id);
+        return match.id;
+      }
+    }
+  } catch (e) {
+    console.error("[webhook] resolveClientId lookup failed:", e);
+  }
+
+  return null;
+}
+
+/** Resolve the coach: metadata → existing assignment → the single coach on the platform. */
+async function resolveCoachId(
+  admin: Admin,
+  opts: { metadataCoachId?: string | null; clientId: string },
+): Promise<string | null> {
+  if (opts.metadataCoachId) return opts.metadataCoachId;
+
+  const { data: link } = await admin
+    .from("coach_clients")
+    .select("coach_id")
+    .eq("client_id", opts.clientId)
+    .maybeSingle();
+  if (link?.coach_id) return link.coach_id;
+
+  const { data: coach } = await admin
+    .from("profiles")
+    .select("id")
+    .eq("role", "coach")
+    .limit(1)
+    .maybeSingle();
+  return coach?.id ?? null;
+}
+
+/** Map a Stripe subscription status onto a profiles.status value. */
+function profileStatusFor(stripeStatus: string): string | null {
+  switch (stripeStatus) {
+    case "active":
+    case "trialing":
+      return "active";
+    case "past_due":
+    case "unpaid":
+      return "past_due";
+    case "canceled":
+    case "incomplete_expired":
+      return "cancelled";
+    default:
+      return null;
+  }
+}
+
+/**
+ * Provision a paying client: subscription row, profile state, coach assignment.
+ *
+ * This is the critical path — it must always run to completion. Callers keep
+ * notifications out of here so a push/email failure can never leave the client
+ * unprovisioned.
+ */
+async function provisionSubscription(
+  admin: Admin,
+  args: {
+    subscription: Stripe.Subscription;
+    clientId: string;
+    coachId: string | null;
+  },
+): Promise<void> {
+  const { subscription, clientId, coachId } = args;
+  const item = subscription.items.data[0];
+  const amountCents = item?.price?.unit_amount ?? null;
+  const periodEndTs = item?.current_period_end ?? null;
+  const periodEnd = periodEndTs ? new Date(periodEndTs * 1000).toISOString() : null;
+
+  const { error: subErr } = await admin.from("stripe_subscriptions").upsert(
+    {
+      id: subscription.id,
+      client_id: clientId,
+      ...(coachId ? { coach_id: coachId } : {}),
+      status: subscription.status,
+      amount_cents: amountCents,
+      current_period_end: periodEnd,
+    },
+    { onConflict: "id" },
+  );
+  if (subErr) console.error("[webhook] stripe_subscriptions upsert failed:", subErr);
+
+  const status = profileStatusFor(subscription.status);
+  const isLive = subscription.status === "active" || subscription.status === "trialing";
+
+  const { error: profErr } = await admin
+    .from("profiles")
+    .update({
+      ...(status ? { status } : {}),
+      subscription_renews_at: periodEnd,
+      // A paid subscription supersedes any trial countdown
+      ...(isLive ? { trial_ends_at: null } : {}),
+      ...(subscription.customer
+        ? { stripe_customer_id: typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id }
+        : {}),
+    })
+    .eq("id", clientId);
+  if (profErr) console.error("[webhook] profiles update failed:", profErr);
+
+  if (coachId) {
+    const { error: ccErr } = await admin.from("coach_clients").upsert(
+      { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
+      { onConflict: "coach_id,client_id,assigned_role" },
+    );
+    if (ccErr) console.error("[webhook] coach_clients upsert failed:", ccErr);
+  }
+}
+
+/** Welcome message + push. Never throws — notifications must not block provisioning. */
+async function notifyNewSubscriber(
+  admin: Admin,
+  args: { clientId: string; coachId: string | null },
+): Promise<void> {
+  try {
+    const { clientId, coachId } = args;
+
+    const [{ data: coachProfileData }, { data: clientProfileData }] = await Promise.all([
+      coachId
+        ? admin.from("profiles").select("full_name").eq("id", coachId).maybeSingle()
+        : Promise.resolve({ data: null }),
+      admin.from("profiles").select("full_name, lang").eq("id", clientId).maybeSingle(),
+    ]);
+
+    const coachFirst = (coachProfileData?.full_name ?? "").split(" ")[0] || "Coach";
+    const isEN = (clientProfileData as { lang?: string } | null)?.lang === "en";
+    const clientFirst =
+      (clientProfileData?.full_name ?? "").split(" ")[0] || (isEN ? "athlete" : "atleta");
+
+    if (coachId) {
+      const { data: existingMsg } = await admin
+        .from("messages")
+        .select("id")
+        .eq("sender_id", coachId)
+        .eq("receiver_id", clientId)
+        .limit(1)
+        .maybeSingle();
+
+      if (!existingMsg) {
+        await admin.from("messages").insert({
+          sender_id: coachId,
+          receiver_id: clientId,
+          content: isEN
+            ? `Hi ${clientFirst}! 👋 I'm ${coachFirst}, your KRAV coach. Your payment has been confirmed and you now have full access to the app. Let's start this journey together! 💪`
+            : `Olá ${clientFirst}! 👋 Sou o ${coachFirst}, o teu coach na KRAV. O teu pagamento foi confirmado e já tens acesso total à app. Vamos começar esta jornada juntos! 💪`,
+        });
+      }
+
+      await sendPushToUser(
+        coachId,
+        "💳 Novo pagamento recebido!",
+        `${clientFirst} subscreveu o teu programa.`,
+        `/coach/clients/${clientId}`,
+      ).catch((e: unknown) => console.error("[webhook] coach push failed:", e));
+    }
+
+    await sendPushToUser(
+      clientId,
+      isEN ? "✅ Payment confirmed!" : "✅ Pagamento confirmado!",
+      isEN
+        ? "Welcome to KRAV! Your coach will reach out to you soon."
+        : "Bem-vindo à KRAV! O teu coach vai contactar-te em breve.",
+      "/client/dashboard",
+    ).catch((e: unknown) => console.error("[webhook] client push failed:", e));
+  } catch (e) {
+    console.error("[webhook] notifyNewSubscriber failed:", e);
+  }
+}
+
 export async function POST(req: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
     return NextResponse.json({ error: "Stripe não configurado." }, { status: 503 });
@@ -50,150 +266,79 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
-        const coachId = session.metadata?.coach_id;
-        const clientId = session.metadata?.client_id;
+        if (!session.subscription) break;
 
-        if (!coachId || !clientId || !session.subscription) break;
+        const customerId =
+          typeof session.customer === "string" ? session.customer : session.customer?.id ?? null;
+
+        const clientId = await resolveClientId(admin, {
+          metadataClientId: session.metadata?.client_id,
+          customerId,
+        });
+        if (!clientId) {
+          console.error("[webhook] checkout.session.completed: could not resolve client", {
+            session: session.id,
+            customerId,
+          });
+          break;
+        }
+
+        const coachId = await resolveCoachId(admin, {
+          metadataCoachId: session.metadata?.coach_id,
+          clientId,
+        });
 
         const stripe = getStripe();
-        const subscription = await stripe.subscriptions.retrieve(
-          session.subscription as string
-        );
+        const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
 
-        const item = subscription.items.data[0];
-        const amountCents = item?.price?.unit_amount ?? null;
-        // In Stripe v22, current_period_end moved from Subscription to SubscriptionItem
-        const periodEndTs = item?.current_period_end ?? null;
-        const periodEnd = periodEndTs ? new Date(periodEndTs * 1000).toISOString() : null;
-
-        await admin.from("stripe_subscriptions").upsert({
-          id: subscription.id,          // primary key = Stripe subscription ID
-          client_id: clientId,
-          coach_id: coachId,
-          status: subscription.status,
-          amount_cents: amountCents,
-          current_period_end: periodEnd,
-        }, { onConflict: "id" });
-
-        // Clear trial and set renewal date automatically from Stripe
-        await admin
-          .from("profiles")
-          .update({
-            status: "active",
-            trial_ends_at: null,
-            subscription_renews_at: periodEnd,
-          })
-          .eq("id", clientId);
-
-        // Self-service flow: ensure assignment + send welcome message & push notifications
-        // We always run this when coach_id + client_id are in metadata (only set by our flow)
-        {
-          // 1. Ensure client is assigned to coach (upsert = safe to repeat)
-          const { error: ccErr } = await admin.from("coach_clients").upsert(
-            { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
-            { onConflict: "coach_id,client_id,assigned_role" }
-          );
-          if (ccErr) {
-            console.error("[webhook] coach_clients upsert error:", ccErr);
-          }
-
-          // 2. Welcome message in chat (only if no message exists yet)
-          const { data: existingMsg } = await admin
-            .from("messages")
-            .select("id")
-            .eq("sender_id", coachId)
-            .eq("receiver_id", clientId)
-            .limit(1)
-            .maybeSingle();
-
-          const [{ data: coachProfileData }, { data: clientProfileData }] = await Promise.all([
-            admin.from("profiles").select("full_name").eq("id", coachId).single(),
-            admin.from("profiles").select("full_name, lang").eq("id", clientId).single(),
-          ]);
-          const coachFirst = (coachProfileData?.full_name ?? "").split(" ")[0] || "Coach";
-          const isEN = (clientProfileData as { lang?: string } | null)?.lang === "en";
-          const clientFirst = (clientProfileData?.full_name ?? "").split(" ")[0] || (isEN ? "athlete" : "atleta");
-
-          // Welcome message — only if no prior message exists
-          if (!existingMsg) {
-            await admin.from("messages").insert({
-              sender_id: coachId,
-              receiver_id: clientId,
-              content: isEN
-                ? `Hi ${clientFirst}! 👋 I'm ${coachFirst}, your KRAV coach. Your payment has been confirmed and you now have full access to the app. Let's start this journey together! 💪`
-                : `Olá ${clientFirst}! 👋 Sou o ${coachFirst}, o teu coach na KRAV. O teu pagamento foi confirmado e já tens acesso total à app. Vamos começar esta jornada juntos! 💪`,
-            });
-          }
-
-          // Notify coach — always, regardless of prior messages
-          const coachPush = await sendPushToUser(
-            coachId,
-            "💳 Novo pagamento recebido!",
-            `${clientFirst} subscreveu o teu programa.`,
-            `/coach/clients/${clientId}`,
-          ).catch((e: unknown) => ({ ok: false, error: String(e) }));
-          if (!coachPush.ok) {
-            console.error("[webhook] coach push failed:", coachPush.error);
-          }
-
-          // Notify client — always
-          const clientPush = await sendPushToUser(
-            clientId,
-            isEN ? "✅ Payment confirmed!" : "✅ Pagamento confirmado!",
-            isEN
-              ? "Welcome to KRAV! Your coach will reach out to you soon."
-              : "Bem-vindo à KRAV! O teu coach vai contactar-te em breve.",
-            "/client/dashboard",
-          ).catch((e: unknown) => ({ ok: false, error: String(e) }));
-          if (!clientPush.ok) {
-            console.error("[webhook] client push failed:", clientPush.error);
-          }
-        }
+        await provisionSubscription(admin, { subscription, clientId, coachId });
+        await notifyNewSubscriber(admin, { clientId, coachId });
 
         break;
       }
 
+      // A subscription can appear without ever passing through our checkout
+      // (dashboard-created, payment link, migrated). Treat both the same way.
+      case "customer.subscription.created":
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
-        const item = subscription.items.data[0];
-        const amountCents = item?.price?.unit_amount ?? null;
-        const periodEndTs = item?.current_period_end ?? null;
-        const periodEnd = periodEndTs ? new Date(periodEndTs * 1000).toISOString() : null;
+        const customerId =
+          typeof subscription.customer === "string"
+            ? subscription.customer
+            : subscription.customer?.id ?? null;
 
-        // Fetch client_id before updating (client_id never changes — just need the value)
+        // Prefer the mapping we already have; fall back to full resolution
         const { data: existingSub } = await admin
           .from("stripe_subscriptions")
           .select("client_id")
           .eq("id", subscription.id)
           .maybeSingle();
 
-        await admin
-          .from("stripe_subscriptions")
-          .update({
-            status: subscription.status,
-            amount_cents: amountCents,
-            current_period_end: periodEnd,
-          })
-          .eq("id", subscription.id);
+        const clientId =
+          existingSub?.client_id ??
+          (await resolveClientId(admin, {
+            metadataClientId: subscription.metadata?.client_id,
+            customerId,
+          }));
 
-        // Sync profiles.status + renewal date so app always reflects real Stripe state
-        if (existingSub?.client_id) {
-          const profileStatus =
-            subscription.status === "active"   ? "active"   :
-            subscription.status === "trialing" ? "trialing" :
-            subscription.status === "past_due" ? "past_due" :
-            subscription.status === "unpaid"   ? "past_due" :
-            null;
-          if (profileStatus) {
-            await admin.from("profiles")
-              .update({
-                status: profileStatus,
-                subscription_renews_at: periodEnd,
-                // Clear trial once subscription is active (safe no-op if already null)
-                ...(profileStatus === "active" ? { trial_ends_at: null } : {}),
-              })
-              .eq("id", existingSub.client_id);
-          }
+        if (!clientId) {
+          console.error("[webhook] subscription event: could not resolve client", {
+            subscription: subscription.id,
+            customerId,
+          });
+          break;
+        }
+
+        const coachId = await resolveCoachId(admin, {
+          metadataCoachId: subscription.metadata?.coach_id,
+          clientId,
+        });
+
+        await provisionSubscription(admin, { subscription, clientId, coachId });
+
+        // First time we've seen this subscription → it's a new subscriber
+        if (!existingSub && (subscription.status === "active" || subscription.status === "trialing")) {
+          await notifyNewSubscriber(admin, { clientId, coachId });
         }
 
         break;
@@ -253,10 +398,13 @@ export async function POST(req: NextRequest) {
           ? invoice.customer : invoice.customer?.id;
         if (!customerId) break;
 
+        const invoiceClientId = await resolveClientId(admin, { customerId });
+        if (!invoiceClientId) break;
+
         const { data: profile } = await admin
           .from("profiles")
           .select("id, full_name, lang")
-          .eq("stripe_customer_id", customerId)
+          .eq("id", invoiceClientId)
           .maybeSingle();
         if (!profile) break;
 
@@ -316,11 +464,14 @@ export async function POST(req: NextRequest) {
         const customerId = typeof invoice.customer === "string"
           ? invoice.customer : invoice.customer?.id;
         if (customerId) {
-          const { data: profile } = await admin
-            .from("profiles")
-            .select("id, full_name, lang")
-            .eq("stripe_customer_id", customerId)
-            .maybeSingle();
+          const failClientId = await resolveClientId(admin, { customerId });
+          const { data: profile } = failClientId
+            ? await admin
+                .from("profiles")
+                .select("id, full_name, lang")
+                .eq("id", failClientId)
+                .maybeSingle()
+            : { data: null };
           if (profile) {
             const { data: authUser } = await admin.auth.admin.getUserById(profile.id);
             const email = authUser?.user?.email;
