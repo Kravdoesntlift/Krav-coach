@@ -68,7 +68,14 @@ export async function GET(req: NextRequest) {
   });
   const admin = createAdminClient();
 
-  const report = { scanned: 0, repaired: 0, unmatched: [] as string[], errors: [] as string[] };
+  const report = {
+    scanned: 0,
+    repaired: 0,
+    unmatched: [] as string[],
+    stale: [] as string[],
+    errors: [] as string[],
+  };
+  const seenInStripe = new Set<string>();
 
   // The platform's coach — used when a subscription has no assignment yet
   const { data: coachRow } = await admin
@@ -91,6 +98,7 @@ export async function GET(req: NextRequest) {
   try {
     for await (const subscription of stripe.subscriptions.list({ status: "all", limit: 100 })) {
       report.scanned++;
+      seenInStripe.add(subscription.id);
 
       try {
         const customerId =
@@ -224,9 +232,31 @@ export async function GET(req: NextRequest) {
     }
   } catch (e) {
     report.errors.push(`list: ${e instanceof Error ? e.message : String(e)}`);
+    // The Stripe listing is incomplete — skip stale detection entirely rather
+    // than mistake "not fetched" for "no longer exists".
+    return NextResponse.json(report);
   }
 
-  if (report.repaired || report.unmatched.length || report.errors.length) {
+  // Rows the database believes are live but Stripe has never heard of. Left
+  // alone these keep granting access to someone who is not paying. Mark them
+  // cancelled rather than deleting, so the history stays auditable.
+  try {
+    const { data: dbRows } = await admin
+      .from("stripe_subscriptions")
+      .select("id, status")
+      .in("status", ["active", "trialing", "past_due"]);
+
+    for (const row of dbRows ?? []) {
+      if (seenInStripe.has(row.id)) continue;
+      await admin.from("stripe_subscriptions").update({ status: "cancelled" }).eq("id", row.id);
+      report.stale.push(row.id);
+      report.repaired++;
+    }
+  } catch (e) {
+    report.errors.push(`stale-sweep: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  if (report.repaired || report.unmatched.length || report.stale.length || report.errors.length) {
     console.log("[reconcile-billing]", JSON.stringify(report));
   }
 

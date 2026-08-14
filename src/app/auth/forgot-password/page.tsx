@@ -14,7 +14,14 @@ export default function ForgotPasswordPage() {
     setError(null);
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-    const result = await forgotPassword(formData);
+    let result: Awaited<ReturnType<typeof forgotPassword>> | undefined;
+    try {
+      result = await forgotPassword(formData);
+    } catch {
+      setError("Não foi possível enviar agora. Espera um minuto e tenta outra vez.");
+      setLoading(false);
+      return;
+    }
     setLoading(false);
     if (result?.error) { setError(result.error); return; }
     setDone(true);

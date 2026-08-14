@@ -43,10 +43,19 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Auth actions + signup: max 10 per minute per IP (brute-force protection)
-  if (pathname.startsWith("/auth") || pathname === "/start") {
-    if (isRateLimited(ip, "/auth", 10, 60_000)) {
-      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  // Auth actions + signup: throttle credential SUBMISSIONS only.
+  //
+  // Never throttle GETs here. Loading /auth/login costs several requests on its
+  // own (the document, plus Next.js prefetching the "forgot password" and
+  // "/start" links), so a GET-inclusive limit burns through in two page views
+  // and then serves a raw JSON body in place of the login page — indistinguishable
+  // from the app being down. Brute-force protection only needs to cover POSTs.
+  if (request.method === "POST" && (pathname.startsWith("/auth") || pathname === "/start")) {
+    if (isRateLimited(ip, "/auth", 20, 60_000)) {
+      return NextResponse.json(
+        { error: "rate_limited", message: "Demasiadas tentativas. Espera um minuto." },
+        { status: 429 },
+      );
     }
   }
 

@@ -107,7 +107,8 @@ const T = {
   start_trial:      { pt: "Começar trial gratuito de 7 dias",                    en: "Start 7-day free trial" },
   processing:       { pt: "A processar...",                                       en: "Processing..." },
   err_unexpected:   { pt: "Erro inesperado. Tenta novamente.",                    en: "Unexpected error. Please try again." },
-  err_network:      { pt: "Erro de rede. Tenta novamente.",                       en: "Network error. Please try again." },
+  err_network:      { pt: "Não foi possível concluir. Verifica a ligação, espera um momento e tenta novamente.",
+                      en: "Could not complete. Check your connection, wait a moment and try again." },
 } as const;
 
 function tx<V>(entry: { pt: V; en: V }, lang: Lang): V {

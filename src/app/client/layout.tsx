@@ -102,14 +102,27 @@ export default async function ClientLayout({
   }
 
   if (trialExpired) {
-    const { data: activeSub } = await supabase
+    // A client can legitimately hold more than one subscription row (a resubscribe,
+    // or a stale row for a subscription that no longer exists in Stripe), so this
+    // must not use maybeSingle() — that errors on multiple rows and would paywall
+    // a paying client. Take any live row.
+    const { data: liveSubs } = await supabase
       .from("stripe_subscriptions")
       .select("status")
       .eq("client_id", user.id)
       .in("status", ["active", "trialing"])
-      .maybeSingle();
+      .limit(1);
+    const activeSub = liveSubs?.[0] ?? null;
 
-    if (!activeSub) {
+    // profiles.subscription_renews_at is maintained by the webhook and the nightly
+    // reconciliation. Honour it as a second signal so a lagging or missing
+    // subscription row can never lock out someone who has paid.
+    const renewsAt = profile.subscription_renews_at
+      ? new Date(profile.subscription_renews_at as string)
+      : null;
+    const hasFutureRenewal = renewsAt !== null && renewsAt.getTime() >= Date.now();
+
+    if (!activeSub && !hasFutureRenewal) {
       const firstName = profile.full_name?.split(" ")[0] ?? "atleta";
       return (
         <Paywall

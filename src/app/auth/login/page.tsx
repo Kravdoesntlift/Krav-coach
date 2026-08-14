@@ -22,7 +22,16 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-    const result = await login(formData);
+    let result: Awaited<ReturnType<typeof login>> | undefined;
+    try {
+      result = await login(formData);
+    } catch {
+      // Throttled or network failure — the action never returned a value.
+      // Without this the button would stay stuck on "A entrar...".
+      setError("Não foi possível entrar agora. Espera um minuto e tenta outra vez.");
+      setLoading(false);
+      return;
+    }
     if (result?.error) { setError(result.error); setLoading(false); return; }
     if (result?.role === "coach") window.location.href = "/coach/dashboard";
     else window.location.href = "/client/dashboard";
