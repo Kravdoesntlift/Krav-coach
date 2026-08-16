@@ -215,9 +215,14 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
     updateDay(dayOfWeek, { exercises: day.exercises.filter((_, i) => i !== idx) });
   }
 
-  async function saveDaysAndExercises(supabase: ReturnType<typeof createClient>, planId: string) {
+  /** Returns null on success, or a message describing what failed to save. */
+  async function saveDaysAndExercises(
+    supabase: ReturnType<typeof createClient>,
+    planId: string,
+  ): Promise<string | null> {
     for (const [i, day] of days.entries()) {
-      const { data: dayRow } = await supabase
+      const dayName = DAY_NAMES_FULL[day.day_of_week] ?? `dia ${day.day_of_week}`;
+      const { data: dayRow, error: dayErr } = await supabase
         .from("workout_days")
         .insert({
           plan_id: planId,
@@ -229,7 +234,12 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
         .select()
         .single();
 
-      if (!dayRow || day.is_rest) continue;
+      // Skipping silently here loses a whole training day with no sign that
+      // anything went wrong — the plan just opens short.
+      if (dayErr || !dayRow) {
+        return `Não foi possível guardar ${dayName}: ${dayErr?.message ?? "erro desconhecido"}`;
+      }
+      if (day.is_rest) continue;
 
       const exerciseRows = day.exercises
         .filter((ex) => ex.name.trim())
@@ -245,9 +255,13 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
         }));
 
       if (exerciseRows.length > 0) {
-        await supabase.from("exercises").insert(exerciseRows);
+        const { error: exErr } = await supabase.from("exercises").insert(exerciseRows);
+        if (exErr) {
+          return `Não foi possível guardar os exercícios de ${dayName}: ${exErr.message}`;
+        }
       }
     }
+    return null;
   }
 
   async function saveAsTemplate() {
@@ -288,8 +302,12 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
 
       if (updateErr) { setError("Erro ao atualizar plano."); setLoading(false); return; }
 
+      // Editing replaces the days wholesale, so a failed re-insert leaves the
+      // plan empty. Surface it immediately — the coach still has the form filled
+      // in and can retry, instead of finding out when the client opens the app.
       await supabase.from("workout_days").delete().eq("plan_id", existingPlan.id);
-      await saveDaysAndExercises(supabase, existingPlan.id);
+      const saveErr = await saveDaysAndExercises(supabase, existingPlan.id);
+      if (saveErr) { setError(saveErr); setLoading(false); return; }
 
       // Notify client — plan updated
       fetch("/api/push/send", {
@@ -313,7 +331,14 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
 
       if (planErr || !plan) { setError("Erro ao criar plano."); setLoading(false); return; }
 
-      await saveDaysAndExercises(supabase, plan.id);
+      const saveErr = await saveDaysAndExercises(supabase, plan.id);
+      if (saveErr) {
+        // Drop the shell plan so it can't sit in the list looking complete.
+        await supabase.from("workout_plans").delete().eq("id", plan.id);
+        setError(saveErr);
+        setLoading(false);
+        return;
+      }
 
       // Notify client — new plan assigned
       fetch("/api/push/send", {

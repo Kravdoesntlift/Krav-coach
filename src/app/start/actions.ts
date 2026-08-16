@@ -77,8 +77,17 @@ async function _signupAndTrial(
   const clientId = authData.user.id;
 
   // 3. Set active + 7-day trial + lang preference
+  // This one must not fail quietly: without it the account exists but has no
+  // trial, so the client pays for nothing and hits the paywall on first login.
   const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-  await admin.from("profiles").update({ status: "active", trial_ends_at: trialEndsAt, lang }).eq("id", clientId);
+  const { error: trialErr } = await admin
+    .from("profiles")
+    .update({ status: "active", trial_ends_at: trialEndsAt, lang })
+    .eq("id", clientId);
+  if (trialErr) {
+    console.error("[signupAndTrial] could not start trial:", trialErr.message);
+    return { error: "A conta foi criada mas o trial não ficou activo. Contacta o suporte antes de continuar." };
+  }
 
   // 4. Save onboarding data
   // Store the days actually picked, as JS day numbers (0=Sun…6=Sat) to match
@@ -107,11 +116,15 @@ async function _signupAndTrial(
     { onConflict: "client_id" }
   );
 
-  // 5. Assign coach
-  await admin.from("coach_clients").upsert(
+  // 5. Assign coach — without this the client is invisible in the dashboard,
+  // analytics and every coach-side query, so a failure here needs to be loud.
+  const { error: assignErr } = await admin.from("coach_clients").upsert(
     { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
     { onConflict: "coach_id,client_id,assigned_role" }
   );
+  if (assignErr) {
+    console.error("[signupAndTrial] coach assignment failed:", assignErr.message);
+  }
 
   // 6. Sign user in (sets browser session cookie)
   const supabase = await createClient();

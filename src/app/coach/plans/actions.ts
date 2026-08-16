@@ -39,67 +39,11 @@ export async function duplicatePlan(planId: string) {
 
   if (!plan) return { error: "Plano não encontrado." };
 
-  // New week = week_start + 7 days
-  const newWeekStart = new Date(plan.week_start);
-  newWeekStart.setDate(newWeekStart.getDate() + 7);
-  const newWeekStr = newWeekStart.toISOString().split("T")[0];
-
-  // Create new plan
-  const { data: newPlan, error: planErr } = await supabase
-    .from("workout_plans")
-    .insert({
-      coach_id: plan.coach_id,
-      client_id: plan.client_id,
-      name: plan.name,
-      week_start: newWeekStr,
-    })
-    .select()
-    .single();
-
-  if (planErr || !newPlan) return { error: "Erro ao duplicar plano." };
-
-  // Clone days + exercises — batch inserts
-  const sourceDays = plan.workout_days ?? [];
-
-  if (sourceDays.length > 0) {
-    const { data: insertedDays } = await supabase
-      .from("workout_days")
-      .insert(
-        sourceDays.map((day: { day_of_week: number; label: string | null; order_index: number }) => ({
-          plan_id: newPlan.id,
-          day_of_week: day.day_of_week,
-          label: day.label,
-          order_index: day.order_index,
-        }))
-      )
-      .select("id, day_of_week, order_index");
-
-    if (insertedDays && insertedDays.length > 0) {
-      type InsertedDay = { id: string; day_of_week: number; order_index: number };
-      const allExercises: {
-        day_id: string; name: string; sets: number; reps: string;
-        notes: string | null; order_index: number;
-      }[] = [];
-
-      for (const day of sourceDays) {
-        const matched = (insertedDays as InsertedDay[]).find(
-          (d) => d.day_of_week === day.day_of_week && d.order_index === day.order_index
-        );
-        if (!matched) continue;
-        for (const ex of day.exercises ?? []) {
-          allExercises.push({
-            day_id: matched.id,
-            name: ex.name, sets: ex.sets, reps: ex.reps,
-            notes: ex.notes, order_index: ex.order_index,
-          });
-        }
-      }
-
-      if (allExercises.length > 0) {
-        await supabase.from("exercises").insert(allExercises);
-      }
-    }
-  }
+  // Share one implementation with createProgram. The copy that used to live here
+  // had drifted: it dropped is_rest, video_url and superset_group, so duplicating
+  // a plan quietly turned rest days into training days and lost exercise videos.
+  const result = await clonePlanWeeks(supabase, plan, 1);
+  if ("error" in result) return { error: result.error };
 
   revalidatePath(`/coach/clients/${plan.client_id}`);
   redirect(`/coach/clients/${plan.client_id}`);
@@ -116,9 +60,13 @@ async function clonePlanWeeks(
     }>;
   },
   weeksOffset: number
-) {
-  const newDate = new Date(plan.week_start);
-  newDate.setDate(newDate.getDate() + weeksOffset * 7);
+): Promise<{ planId: string } | { error: string }> {
+  // All UTC. A "YYYY-MM-DD" string parses as UTC midnight, so mixing in local
+  // getters/setters shifts the result by a day whenever the span crosses a DST
+  // change — 2026-03-23 + 1 week came out as Sunday the 29th instead of Monday
+  // the 30th, and a week_start that isn't a Monday never matches the dashboard.
+  const newDate = new Date(plan.week_start + "T00:00:00Z");
+  newDate.setUTCDate(newDate.getUTCDate() + weeksOffset * 7);
   const newWeekStr = newDate.toISOString().split("T")[0];
 
   const { data: newPlan, error } = await supabase
@@ -126,12 +74,14 @@ async function clonePlanWeeks(
     .insert({ coach_id: plan.coach_id, client_id: plan.client_id, name: plan.name, week_start: newWeekStr })
     .select()
     .single();
-  if (error || !newPlan) return;
+  if (error || !newPlan) {
+    return { error: error?.message ?? "Erro ao criar o plano." };
+  }
 
   const sourceDays = plan.workout_days ?? [];
-  if (sourceDays.length === 0) return;
+  if (sourceDays.length === 0) return { planId: newPlan.id as string };
 
-  const { data: insertedDays } = await supabase
+  const { data: insertedDays, error: daysErr } = await supabase
     .from("workout_days")
     .insert(sourceDays.map((d) => ({
       plan_id: newPlan.id,
@@ -142,7 +92,12 @@ async function clonePlanWeeks(
     })))
     .select("id, day_of_week, order_index");
 
-  if (!insertedDays?.length) return;
+  // A plan whose days failed to copy is worse than no plan — it looks complete
+  // in the list but opens empty. Remove it and report instead.
+  if (daysErr || !insertedDays?.length) {
+    await supabase.from("workout_plans").delete().eq("id", newPlan.id);
+    return { error: daysErr?.message ?? "Erro ao copiar os dias do plano." };
+  }
 
   type IDay = { id: string; day_of_week: number; order_index: number };
   const exRows: object[] = [];
@@ -159,7 +114,15 @@ async function clonePlanWeeks(
       });
     }
   }
-  if (exRows.length > 0) await supabase.from("exercises").insert(exRows);
+  if (exRows.length > 0) {
+    const { error: exErr } = await supabase.from("exercises").insert(exRows);
+    if (exErr) {
+      await supabase.from("workout_plans").delete().eq("id", newPlan.id);
+      return { error: exErr.message };
+    }
+  }
+
+  return { planId: newPlan.id as string };
 }
 
 // ── Create a multi-week program from an existing plan ────────────────────────
@@ -179,8 +142,18 @@ export async function createProgram(planId: string, totalWeeks: number) {
   if (!plan) return { error: "Plano não encontrado." };
 
   // Clone weeks 2..N (week 1 already exists as the source plan)
+  let created = 1;
   for (let w = 1; w < totalWeeks; w++) {
-    await clonePlanWeeks(supabase, plan, w);
+    const result = await clonePlanWeeks(supabase, plan, w);
+    if ("error" in result) {
+      // Stop at the first failure and say how far it got, rather than reporting
+      // a full programme the coach doesn't actually have.
+      revalidatePath(`/coach/clients/${plan.client_id}`);
+      return {
+        error: `Criadas ${created} de ${totalWeeks} semanas. A semana ${w + 1} falhou: ${result.error}`,
+      };
+    }
+    created++;
   }
 
   revalidatePath(`/coach/clients/${plan.client_id}`);
