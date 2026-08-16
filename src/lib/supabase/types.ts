@@ -330,7 +330,15 @@ export interface MealPlanFood {
   order_index: number;
 }
 
+// Day numbering follows JavaScript's Date.getDay(): 0 = Sunday … 6 = Saturday.
+// Everything that stores a weekday (workout_days.day_of_week,
+// client_onboarding.available_days) uses this and only this. Index these arrays
+// directly with the stored number — never re-base it.
 export const DAY_NAMES = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+export const DAY_NAMES_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+/** Display order for a training week (Monday first), as JS day numbers. */
+export const WEEK_ORDER_MON_FIRST = [1, 2, 3, 4, 5, 6, 0] as const;
 export const DAY_NAMES_FULL = [
   "Domingo",
   "Segunda",

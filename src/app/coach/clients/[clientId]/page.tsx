@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { DAY_NAMES_FULL } from "@/lib/supabase/types";
+import { DAY_NAMES, DAY_NAMES_FULL, WEEK_ORDER_MON_FIRST } from "@/lib/supabase/types";
 import { deletePlan, duplicatePlan } from "@/app/coach/plans/actions";
 import DeletePlanButton from "@/components/coach/DeletePlanButton";
 import DuplicatePlanButton from "@/components/coach/DuplicatePlanButton";
@@ -237,10 +237,9 @@ export default async function ClientDetailPage({
       {onboarding && (() => {
         const ob = onboarding as Record<string, unknown>;
         const sexLabel: Record<string, string> = { male: "Masculino", female: "Feminino", other: "Outro" };
-        const dayNames = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
-        // Only the v2 quiz records which specific days were chosen. Legacy rows
-        // stored a placeholder 0..n-1 array, so showing those days would be fiction.
-        const hasDayDetail = ob.session_duration != null;
+        // available_days is only ever written from a real selection, so a
+        // non-empty array can be trusted. Clients from before the quiz asked
+        // which days simply have none recorded.
         const chosenDays = Array.isArray(ob.available_days) ? (ob.available_days as number[]) : [];
 
         return (
@@ -300,14 +299,15 @@ export default async function ClientDetailPage({
               )}
             </div>
 
-            {hasDayDetail && chosenDays.length > 0 && (
+            {chosenDays.length > 0 && (
               <div>
                 <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Dias que pode treinar</p>
                 <div className="grid grid-cols-7 gap-1.5 max-w-sm">
-                  {dayNames.map((name, idx) => {
-                    const on = chosenDays.includes(idx);
+                  {WEEK_ORDER_MON_FIRST.map((day) => {
+                    const name = DAY_NAMES[day];
+                    const on = chosenDays.includes(day);
                     return (
-                      <div key={idx} className="py-2 rounded-lg text-center text-[11px] font-bold"
+                      <div key={day} className="py-2 rounded-lg text-center text-[11px] font-bold"
                         style={{
                           background: on ? "linear-gradient(160deg,#E8C96B,#C9A84C)" : "rgba(255,255,255,0.04)",
                           color: on ? "#000" : "#52525b",

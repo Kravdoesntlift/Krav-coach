@@ -81,7 +81,11 @@ async function _signupAndTrial(
   await admin.from("profiles").update({ status: "active", trial_ends_at: trialEndsAt, lang }).eq("id", clientId);
 
   // 4. Save onboarding data
-  const days = selectedDays ?? Array.from({ length: availableDays }, (_, i) => i);
+  // Store the days actually picked, as JS day numbers (0=Sun…6=Sat) to match
+  // workout_days.day_of_week. If the caller sent no selection we genuinely don't
+  // know which days — record none rather than inventing 0..n-1, which would read
+  // as a real (and wrong) set of weekdays. The count still lives in `availability`.
+  const days = selectedDays ?? [];
   await admin.from("client_onboarding").upsert(
     {
       client_id: clientId,

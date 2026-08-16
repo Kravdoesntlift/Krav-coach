@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { signupAndStartCheckout } from "./actions";
+import { DAY_NAMES, DAY_NAMES_EN, WEEK_ORDER_MON_FIRST } from "@/lib/supabase/types";
 
 type Lang = "pt" | "en";
 type Goal = "lose_weight" | "gain_muscle" | "athletic";
@@ -17,7 +18,7 @@ interface QuizState {
   height: string;
   currentWeight: string;
   level: Level | null;
-  selectedDays: number[]; // 0=Mon … 6=Sun
+  selectedDays: number[]; // JS day numbers: 0=Sun … 6=Sat
   sessionDuration: number;
   injuries: string;
   noInjuries: boolean;
@@ -222,35 +223,34 @@ function StepWrapper({ title, sub, children }: { title: string; sub?: string; ch
   );
 }
 
-// Days 0=Mon…6=Sun (UI order: Mon first)
-const DAY_LABELS_PT = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
-const DAY_LABELS_EN = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
+// Selections are stored as JS day numbers (0=Sun…6=Sat) to match
+// workout_days.day_of_week and DAY_NAMES. Only the display order is Monday-first.
 function DayPicker({ selected, onChange, lang }: {
   selected: number[];
   onChange: (days: number[]) => void;
   lang: Lang;
 }) {
-  const labels = lang === "pt" ? DAY_LABELS_PT : DAY_LABELS_EN;
+  const labels = lang === "pt" ? DAY_NAMES : DAY_NAMES_EN;
 
-  function toggle(idx: number) {
+  function toggle(day: number) {
     onChange(
-      selected.includes(idx)
-        ? selected.filter((d) => d !== idx)
-        : [...selected, idx].sort((a, b) => a - b)
+      selected.includes(day)
+        ? selected.filter((d) => d !== day)
+        : [...selected, day].sort((a, b) => a - b)
     );
   }
 
   return (
     <div className="grid grid-cols-7 gap-1.5">
-      {labels.map((label, idx) => {
-        const isSelected = selected.includes(idx);
-        const isWeekend = idx >= 5;
+      {WEEK_ORDER_MON_FIRST.map((day) => {
+        const label = labels[day];
+        const isSelected = selected.includes(day);
+        const isWeekend = day === 0 || day === 6;
         return (
           <button
-            key={idx}
+            key={day}
             type="button"
-            onClick={() => toggle(idx)}
+            onClick={() => toggle(day)}
             className="flex flex-col items-center gap-1.5 py-3 rounded-2xl transition-all duration-200 active:scale-90"
             style={{
               background: isSelected
