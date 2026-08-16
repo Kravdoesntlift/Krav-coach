@@ -7,6 +7,7 @@ import { DAY_NAMES_FULL } from "@/lib/supabase/types";
 import ProgressRing from "@/components/ui/ProgressRing";
 import Confetti from "@/components/ui/Confetti";
 import LiveWorkout from "@/components/client/LiveWorkout";
+import ExerciseNotes from "@/components/client/ExerciseNotes";
 import { haptic, HAPTIC } from "@/lib/haptic";
 import { useLang } from "@/lib/i18n/useLang";
 import { enqueueOfflineAction, useOfflineSync } from "@/hooks/useOfflineQueue";
@@ -761,12 +762,12 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
 
   return (
     <div className="px-5 py-3">
-      <div className="flex items-center gap-4">
-        <div className="flex-1">
+      {/* items-start so sets/reps stay level with the exercise name instead of
+          floating to the middle of a tall note */}
+      <div className="flex items-start gap-4">
+        <div className="flex-1 min-w-0">
           <p className="text-white text-sm font-medium">{exercise.name}</p>
-          {exercise.notes && (
-            <p className="text-gray-500 text-xs mt-0.5">{exercise.notes}</p>
-          )}
+          {exercise.notes && <ExerciseNotes notes={exercise.notes} />}
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <div className="text-right">

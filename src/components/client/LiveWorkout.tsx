@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Exercise } from "@/lib/supabase/types";
 import { useLang } from "@/lib/i18n/useLang";
+import ExerciseNotes from "@/components/client/ExerciseNotes";
 
 function beep(freq = 880, vol = 0.35) {
   try {
@@ -372,7 +373,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
             </span>
           )}
         </div>
-        {cur?.notes && <p className="text-zinc-600 text-xs mt-0.5 italic">{cur.notes}</p>}
+        {cur?.notes && <ExerciseNotes notes={cur.notes} compact />}
       </div>
 
       {/* ── COLUMN HEADERS (shrink-0) ── */}
