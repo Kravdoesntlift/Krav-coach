@@ -22,6 +22,7 @@ const extra = {
   exercise_singular:  { pt: "exercício",                  en: "exercise" },
   exercise_plural:    { pt: "exercícios",                 en: "exercises" },
   start_btn:          { pt: "▶ Iniciar",                  en: "▶ Start" },
+  catch_up:           { pt: "· ainda podes fazer",        en: "· you can still do it" },
   rest_timer_lbl:     { pt: "⏱ Timer de descanso",       en: "⏱ Rest timer" },
   how_was_workout:    { pt: "Como correu o treino?",      en: "How did the workout go?" },
   feeling_heavy:      { pt: "Pesado",                     en: "Heavy" },
@@ -169,6 +170,9 @@ export default function WorkoutWeek({ plan, clientId, coachId }: Props) {
                 clientId={clientId}
                 coachId={coachId}
                 isToday={day.day_of_week === today}
+                // Position within a Monday-first week, so "earlier" means
+                // earlier in the training week rather than a lower day number.
+                isPast={((day.day_of_week + 6) % 7) < ((today + 6) % 7)}
                 onComplete={handleDayComplete}
                 onUndo={handleDayUndo}
               />
@@ -186,6 +190,7 @@ function WorkoutDayCard({
   clientId,
   coachId,
   isToday,
+  isPast,
   onComplete,
   onUndo,
 }: {
@@ -193,6 +198,7 @@ function WorkoutDayCard({
   clientId: string;
   coachId?: string;
   isToday: boolean;
+  isPast: boolean;
   onComplete?: () => void;
   onUndo?: () => void;
 }) {
@@ -343,6 +349,11 @@ function WorkoutDayCard({
             <p className="font-semibold text-white">
               {DAY_NAMES_FULL[day.day_of_week]}
               {isToday && <span className="ml-2 text-xs text-brand-gold font-normal">{t("today")}</span>}
+              {/* A missed session is not lost — it can be ticked whenever it
+                  gets done. Without saying so, the dimmed card reads as locked. */}
+              {isPast && !completed && (
+                <span className="ml-2 text-xs text-zinc-500 font-normal">{extra.catch_up[lang]}</span>
+              )}
             </p>
             {day.label && <p className="text-xs text-gray-500 mt-0.5">{day.label}</p>}
           </div>

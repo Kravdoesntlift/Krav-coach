@@ -9,6 +9,7 @@ interface OFFProduct {
   product_name?: string;
   product_name_pt?: string;
   product_name_en?: string;
+  brands?: string;
   nutriments?: {
     "energy-kcal_100g"?: number;
     proteins_100g?: number;
@@ -30,6 +31,22 @@ interface OFFProduct {
 function round1(n: number | undefined | null): number | null {
   if (n == null || isNaN(n)) return null;
   return Math.round(n * 10) / 10;
+}
+
+/**
+ * Append the brand unless the name already carries it.
+ *
+ * Open Food Facts stores the brand separately, so many products come back with
+ * a bare descriptor — Nestum's range lists as "Chocolate", "Cereal", "5 Cereais".
+ * Searching "nestum" then returns a list where nothing looks like Nestum.
+ */
+function withBrand(name: string, brands?: string): string {
+  const brand = brands?.split(",")[0]?.trim();
+  if (!brand) return name;
+  const norm = (s: string) =>
+    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (norm(name).includes(norm(brand))) return name;
+  return `${name} — ${brand}`;
 }
 
 export async function GET(req: NextRequest) {
@@ -66,15 +83,13 @@ export async function GET(req: NextRequest) {
     },
   }));
 
-  // Return early if local DB has enough results (both PT and EN)
-  if (localFoods.length >= 5) {
-    return NextResponse.json({ foods: localFoods.slice(0, 20) });
-  }
-
-  // 3. Supplement with Open Food Facts (3-second timeout)
+  // Always consult Open Food Facts, even when the local list looks full.
+  // The local DB only holds generic foods, so short-circuiting on "aveia" or
+  // "arroz" meant branded supermarket products could never be found — the whole
+  // reason someone searches for a brand by name. Local hits still rank first.
   const fields = [
     "id", "product_name", "product_name_pt", "product_name_en",
-    "nutriments",
+    "brands", "nutriments",
   ].join(",");
 
   const url = new URL("https://world.openfoodfacts.org/cgi/search.pl");
@@ -109,9 +124,10 @@ export async function GET(req: NextRequest) {
       })
       .map((p) => {
         const n = p.nutriments ?? {};
-        const name = lang === "en"
+        const base = lang === "en"
           ? (p.product_name_en || p.product_name || p.product_name_pt || "Unknown product")
           : (p.product_name_pt || p.product_name || p.product_name_en || "Produto desconhecido");
+        const name = withBrand(base, p.brands);
         const sodiumMg = n.sodium_100g != null ? Math.round(n.sodium_100g * 1000) : null;
         return {
           id: String(p.id),
@@ -137,7 +153,10 @@ export async function GET(req: NextRequest) {
       })
       .filter((f) => !localIds.has(f.id));
 
-    const combined = [...localFoods, ...offFoods].slice(0, 20);
+    // Cap the generic local hits so branded results always get room. "arroz"
+    // alone fills 20 local entries, which would push every supermarket product
+    // off the end of the list.
+    const combined = [...localFoods.slice(0, 10), ...offFoods].slice(0, 20);
     return NextResponse.json({ foods: combined });
   } catch {
     // OFF failed or timed out — return local results only

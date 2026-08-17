@@ -139,7 +139,10 @@ export default async function ClientDashboard() {
       dayStatuses[ds] =
         d.is_rest           ? "rest"      :
         done                ? "completed" :
-        ds > todayStr       ? "future"    :
+        // Today is still open — you haven't missed a session you can still do.
+        // Marking it missed reset the streak to zero every training-day morning
+        // and painted today red on the calendar before the day was over.
+        ds >= todayStr      ? "future"    :
                               "missed";
     }
   }
