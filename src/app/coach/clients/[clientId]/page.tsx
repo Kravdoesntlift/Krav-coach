@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { DAY_NAMES, DAY_NAMES_FULL, WEEK_ORDER_MON_FIRST } from "@/lib/supabase/types";
+import { signPhotoUrls } from "@/lib/storage";
 import { deletePlan, duplicatePlan } from "@/app/coach/plans/actions";
 import DeletePlanButton from "@/components/coach/DeletePlanButton";
 import DuplicatePlanButton from "@/components/coach/DuplicatePlanButton";
@@ -107,6 +108,10 @@ export default async function ClientDetailPage({
       .order("date", { ascending: false })
       .limit(20),
   ]);
+
+  // Progress photos live in a private bucket. The coach's ownership of this
+  // client was verified above, so signing here is safe.
+  const signedPhotos = await signPhotoUrls(progressPhotos ?? []);
 
   // Attention alert: no check-in in last 2 weeks
   const twoWeeksAgo = new Date();
@@ -431,9 +436,9 @@ export default async function ClientDetailPage({
           <p className="text-zinc-600 text-sm">O cliente ainda não submeteu fotos de progresso.</p>
         ) : (
           <PhotoLightbox
-            photos={progressPhotos.map((p) => ({
+            photos={signedPhotos.map((p) => ({
               id: p.id,
-              photo_url: p.photo_url,
+              photo_url: p.photo_url ?? "",
               caption: (p as Record<string, unknown>).angle
                 ? `${String((p as Record<string, unknown>).angle) === "front" ? "Frente" : String((p as Record<string, unknown>).angle) === "side" ? "Lado" : "Costas"}${p.caption ? ` · ${p.caption}` : ""}`
                 : (p.caption ?? null),

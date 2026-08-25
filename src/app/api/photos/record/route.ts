@@ -13,8 +13,15 @@ export async function POST(req: NextRequest) {
   };
   if (!path) return NextResponse.json({ error: "path em falta" }, { status: 400 });
 
+  // The path arrives from the browser, so it has to be proven to belong to the
+  // caller. /api/photos/sign only ever issues `<user id>/<timestamp>.<ext>`;
+  // without this check a client could post someone else's path and register
+  // their progress photo as their own, then read it through their own signed URL.
+  if (!/^[0-9a-f-]{36}\/[0-9]+\.[a-z0-9]{1,5}$/i.test(path) || !path.startsWith(`${user.id}/`)) {
+    return NextResponse.json({ error: "path inválido" }, { status: 403 });
+  }
+
   const admin = createAdminClient();
-  const { data: urlData } = admin.storage.from("progress-photos").getPublicUrl(path);
 
   const today = new Date();
   const taken_at = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
@@ -23,7 +30,7 @@ export async function POST(req: NextRequest) {
     .from("progress_photos")
     .insert({
       client_id: user.id,
-      photo_url: urlData.publicUrl,
+      photo_url: path,   // object path — signed on read; the bucket is private
       caption: caption?.trim() || null,
       taken_at,
       ...(angle ? { angle } : {}),

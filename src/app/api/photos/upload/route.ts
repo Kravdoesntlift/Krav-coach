@@ -35,8 +35,6 @@ export async function POST(req: NextRequest) {
   const admin = createAdminClient();
 
   // Ensure bucket exists and is public — both calls are idempotent
-  await admin.storage.createBucket("progress-photos", { public: true }).catch(() => {});
-  await admin.storage.updateBucket("progress-photos", { public: true }).catch(() => {});
 
   const path = `${user.id}/${Date.now()}.${ext}`;
   const bytes = await file.arrayBuffer();
@@ -58,7 +56,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: storageErr.message }, { status: 500 });
   }
 
-  const { data: urlData } = admin.storage.from("progress-photos").getPublicUrl(path);
 
   const today = new Date();
   const taken_at = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
@@ -67,7 +64,7 @@ export async function POST(req: NextRequest) {
     .from("progress_photos")
     .insert({
       client_id: user.id,
-      photo_url: urlData.publicUrl,
+      photo_url: path,   // object path — signed on read; the bucket is private
       caption,
       taken_at,
       ...(angle ? { angle } : {}),

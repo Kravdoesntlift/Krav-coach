@@ -15,8 +15,11 @@ export async function GET(req: NextRequest) {
   }
 
   const admin = createAdminClient();
-  await admin.storage.createBucket("progress-photos", { public: true }).catch(() => {});
-  await admin.storage.updateBucket("progress-photos", { public: true }).catch(() => {});
+  // Private: progress photos are only ever served through a signed URL issued to
+  // a caller we have already authorised. A public bucket makes every photo
+  // readable by anyone who ever sees the link.
+  await admin.storage.createBucket("progress-photos", { public: false }).catch(() => {});
+  await admin.storage.updateBucket("progress-photos", { public: false }).catch(() => {});
 
   const path = `${user.id}/${Date.now()}.${ext}`;
   const { data, error: signErr } = await admin.storage

@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import PhotosClient from "./PhotosClient";
 import { t } from "@/lib/i18n";
 import { getLang } from "@/lib/i18n/getLang";
+import { signPhotoUrls } from "@/lib/storage";
 
 export default async function PhotosPage() {
   const supabase = await createClient();
@@ -18,13 +19,16 @@ export default async function PhotosPage() {
     .eq("client_id", user!.id)
     .order("taken_at", { ascending: false });
 
+  // The bucket is private; hand the page short-lived signed links, never paths.
+  const signed = await signPhotoUrls(photos ?? []);
+
   return (
     <div className="space-y-6 page-enter">
       <div>
         <h1 className="text-2xl font-bold text-white">{t("progress_photos", lang)}</h1>
         <p className="text-gray-400 text-sm mt-1">{extra.sub[lang]}</p>
       </div>
-      <PhotosClient clientId={user!.id} initialPhotos={photos ?? []} />
+      <PhotosClient clientId={user!.id} initialPhotos={signed} />
     </div>
   );
 }

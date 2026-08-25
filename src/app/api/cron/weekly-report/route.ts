@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { signPhotoUrls } from "@/lib/storage";
 import { sendPushToUser } from "@/lib/push";
 
 export async function GET(req: NextRequest) {
@@ -103,10 +104,15 @@ export async function GET(req: NextRequest) {
           : null;
       const energyAvg = checkin?.energy_level ?? null;
 
-      // Photos: oldest front vs newest front
+      // Photos: oldest front vs newest front.
+      // The bucket is private, so these have to be signed. Seven days: long
+      // enough to open the email at leisure, short enough that the link is dead
+      // before the next report goes out. Email is not a channel to hold a
+      // long-lived link to someone's progress photos.
       const frontPhotos = (photos ?? []) as { photo_url: string; taken_at: string; angle: string }[];
-      const photoBeforeUrl = frontPhotos[0]?.photo_url ?? null;
-      const photoLatestUrl = frontPhotos[frontPhotos.length - 1]?.photo_url ?? null;
+      const signedFront = await signPhotoUrls(frontPhotos, 60 * 60 * 24 * 7);
+      const photoBeforeUrl = signedFront[0]?.photo_url ?? null;
+      const photoLatestUrl = signedFront[signedFront.length - 1]?.photo_url ?? null;
       const hasNewPhoto = photoLatestUrl && photoBeforeUrl !== photoLatestUrl;
 
       const coachFirstName = ((coachProfile?.full_name as string | undefined) ?? "").split(" ")[0] || "Coach";
