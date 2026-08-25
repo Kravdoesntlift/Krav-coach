@@ -29,6 +29,9 @@ interface Props {
 
 interface SetLog { weight: string; reps: string; done: boolean; }
 
+/** Client-side memory of typed substitutions, per planned exercise. */
+const RECENT_SWAPS_KEY = "krav_recent_swaps_v1";
+
 export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onComplete, onClose }: Props) {
   const { lang } = useLang();
   const isEN = lang === "en";
@@ -53,6 +56,12 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
   // the client actually did when a machine was taken.
   const [swaps, setSwaps]           = useState<Record<number, string>>({});
   const [swapOpen, setSwapOpen]     = useState(false);
+  const [customOpen, setCustomOpen] = useState(false);
+  const [customName, setCustomName] = useState("");
+  // Substitutions this client has typed before, keyed by the planned exercise.
+  // Someone training at home swaps the same way every week; making them retype
+  // it each session would be the fastest way to stop them logging at all.
+  const [recentSwaps, setRecentSwaps] = useState<Record<string, string[]>>({});
 
   const restRef    = useRef<ReturnType<typeof setInterval> | null>(null);
   const elapsedRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -79,15 +88,61 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
   const prev          = prevLogs.get(curName);
   const daysAgo       = prev ? Math.round((Date.now() - new Date(prev.date).getTime()) / 86400000) : null;
 
-  function chooseExercise(name: string) {
+  /** Options offered for the current step, in the order they should be shown. */
+  const swapOptions: { name: string; kind: "planned" | "alternative" | "recent" }[] = (() => {
+    const planned = sorted[step]?.name;
+    if (!planned) return [];
+    const seen = new Set<string>();
+    const out: { name: string; kind: "planned" | "alternative" | "recent" }[] = [];
+    const push = (name: string, kind: "planned" | "alternative" | "recent") => {
+      const key = name.trim().toLowerCase();
+      if (!name.trim() || seen.has(key)) return;
+      seen.add(key);
+      out.push({ name: name.trim(), kind });
+    };
+    push(planned, "planned");
+    alternatives.forEach((a) => push(a, "alternative"));
+    (recentSwaps[planned] ?? []).forEach((r) => push(r, "recent"));
+    return out;
+  })();
+
+  function chooseExercise(rawName: string) {
+    // Collapse whitespace so "Flexões " and "Flexões" stay one exercise in the
+    // history rather than splitting into two.
+    const name = rawName.trim().replace(/\s+/g, " ");
+    if (!name) return;
+
+    const planned = sorted[step]?.name;
     setSwaps((prevSwaps) => {
       const next = { ...prevSwaps };
-      if (name === sorted[step]?.name) delete next[step];
+      if (name === planned) delete next[step];
       else next[step] = name;
       return next;
     });
+
+    // Remember anything the client typed that isn't the plan or a listed option.
+    const isKnown = swapOptions.some((o) => o.name.toLowerCase() === name.toLowerCase());
+    if (planned && !isKnown) {
+      setRecentSwaps((prevRecent) => {
+        const list = [name, ...(prevRecent[planned] ?? []).filter((n) => n.toLowerCase() !== name.toLowerCase())].slice(0, 3);
+        const next = { ...prevRecent, [planned]: list };
+        try { localStorage.setItem(RECENT_SWAPS_KEY, JSON.stringify(next)); } catch { /* private mode */ }
+        return next;
+      });
+    }
+
     setSwapOpen(false);
+    setCustomOpen(false);
+    setCustomName("");
   }
+
+  // ── Remembered substitutions ──────────────────────────────
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(RECENT_SWAPS_KEY);
+      if (raw) setRecentSwaps(JSON.parse(raw) as Record<string, string[]>);
+    } catch { /* unreadable or private mode — just offer no history */ }
+  }, []);
 
   // ── Wake Lock ──────────────────────────────────────────────
   useEffect(() => {
@@ -402,9 +457,11 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
           )}
         </div>
 
-        {/* Swap — the machine you planned for is often taken. Logging what was
-            actually done beats logging the plan and hoping it matched. */}
-        {alternatives.length > 0 && (
+        {/* Swap — the planned machine is often taken, and someone training at
+            home may have no way to do it at all. Always available: 124 exercises
+            in the library carry no listed alternatives, and gating on that left
+            those with no way out. */}
+        {cur && (
           <div className="mt-2">
             {swapped && (
               <p className="text-[10px] text-zinc-600 mb-1.5">
@@ -413,7 +470,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
             )}
             <button
               type="button"
-              onClick={() => setSwapOpen((v) => !v)}
+              onClick={() => { setSwapOpen((v) => !v); setCustomOpen(false); }}
               className="inline-flex items-center gap-1.5 rounded-lg text-[11px] font-bold transition-all active:scale-95"
               style={{
                 padding: "6px 10px",
@@ -428,14 +485,13 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
 
             {swapOpen && (
               <div className="mt-2 space-y-1.5">
-                {[sorted[step]?.name, ...alternatives].filter(Boolean).map((opt) => {
+                {swapOptions.map(({ name: opt, kind }) => {
                   const active = opt === curName;
-                  const isOriginal = opt === sorted[step]?.name;
                   return (
                     <button
-                      key={opt}
+                      key={`${kind}-${opt}`}
                       type="button"
-                      onClick={() => chooseExercise(opt as string)}
+                      onClick={() => chooseExercise(opt)}
                       className="w-full text-left rounded-xl text-xs transition-all active:scale-[0.98]"
                       style={{
                         padding: "10px 12px",
@@ -445,15 +501,60 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                       }}
                     >
                       <span className="font-semibold">{opt}</span>
-                      {isOriginal && (
+                      {kind === "planned" && (
                         <span className="ml-2 text-[10px] text-zinc-600">
                           {isEN ? "planned" : "do plano"}
+                        </span>
+                      )}
+                      {kind === "recent" && (
+                        <span className="ml-2 text-[10px] text-zinc-600">
+                          {isEN ? "used before" : "já usaste"}
                         </span>
                       )}
                       {active && <span className="float-right">✓</span>}
                     </button>
                   );
                 })}
+
+                {/* Free text, for anyone whose gym — or living room — simply
+                    doesn't have the listed options. */}
+                {customOpen ? (
+                  <form
+                    onSubmit={(e) => { e.preventDefault(); chooseExercise(customName); }}
+                    className="flex gap-1.5"
+                  >
+                    <input
+                      autoFocus
+                      value={customName}
+                      onChange={(e) => setCustomName(e.target.value)}
+                      maxLength={80}
+                      placeholder={isEN ? "What did you do?" : "O que fizeste?"}
+                      className="flex-1 bg-zinc-800 border border-zinc-700/50 rounded-xl text-white text-xs px-3 py-2.5 placeholder-zinc-600 focus:outline-none focus:border-brand-gold/40"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!customName.trim()}
+                      className="rounded-xl text-xs font-bold px-3 transition-all active:scale-95 disabled:opacity-30"
+                      style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)", color: "#000" }}
+                    >
+                      OK
+                    </button>
+                  </form>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setCustomOpen(true)}
+                    className="w-full text-left rounded-xl text-xs transition-all active:scale-[0.98]"
+                    style={{
+                      padding: "10px 12px",
+                      background: "rgba(255,255,255,0.02)",
+                      border: "1px dashed rgba(255,255,255,0.12)",
+                      color: "#71717a",
+                    }}
+                  >
+                    + {isEN ? "Another exercise" : "Outro exercício"}
+                  </button>
+                )}
               </div>
             )}
           </div>
