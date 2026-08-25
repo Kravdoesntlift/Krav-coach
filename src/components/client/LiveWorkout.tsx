@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { Exercise } from "@/lib/supabase/types";
 import { useLang } from "@/lib/i18n/useLang";
 import ExerciseNotes from "@/components/client/ExerciseNotes";
+import { parseExerciseNote } from "@/lib/exercise-notes";
 
 function beep(freq = 880, vol = 0.35) {
   try {
@@ -47,6 +48,11 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
   const [saving, setSaving]         = useState(false);
   const [wakeLock, setWakeLock]     = useState(false);
   const [prevLogs, setPrevLogs]     = useState<Map<string, { topWeight: number; reps: number; date: string }>>(new Map());
+  // Substitutions chosen during this session, by exercise index. Deliberately
+  // not persisted to the plan: the plan is the coach's, this is a record of what
+  // the client actually did when a machine was taken.
+  const [swaps, setSwaps]           = useState<Record<number, string>>({});
+  const [swapOpen, setSwapOpen]     = useState(false);
 
   const restRef    = useRef<ReturnType<typeof setInterval> | null>(null);
   const elapsedRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -60,8 +66,28 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
   const totalSets     = setLogs.reduce((s, e) => s + e.length, 0);
   const completedSets = setLogs.reduce((s, e) => s + e.filter((r) => r.done).length, 0);
   const progress      = totalSets > 0 ? completedSets / totalSets : 0;
-  const prev          = prevLogs.get(cur?.name ?? "");
+
+  /** What the client is actually doing for step `i` — the swap if there is one. */
+  const nameFor = (i: number) => swaps[i] ?? sorted[i]?.name ?? "";
+  const curName = nameFor(step);
+  const swapped = swaps[step] != null;
+  // Coach-approved substitutions for this exercise, plus a way back to the original.
+  const alternatives = parseExerciseNote(cur?.notes).alternatives;
+
+  // History follows the exercise being done, so a substitute correctly shows no
+  // past numbers rather than the original's.
+  const prev          = prevLogs.get(curName);
   const daysAgo       = prev ? Math.round((Date.now() - new Date(prev.date).getTime()) / 86400000) : null;
+
+  function chooseExercise(name: string) {
+    setSwaps((prevSwaps) => {
+      const next = { ...prevSwaps };
+      if (name === sorted[step]?.name) delete next[step];
+      else next[step] = name;
+      return next;
+    });
+    setSwapOpen(false);
+  }
 
   // ── Wake Lock ──────────────────────────────────────────────
   useEffect(() => {
@@ -107,7 +133,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
     try {
       if ("mediaSession" in navigator && "MediaMetadata" in window) {
         navigator.mediaSession.metadata = new MediaMetadata({
-          title: ex?.name ?? dayLabel,
+          title: nameFor(step) || dayLabel,
           artist: `KRAV · ${step + 1}/${totalSteps} · ${ex?.sets}×${ex?.reps}`,
           album: dayLabel,
           artwork: [
@@ -131,7 +157,9 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
   useEffect(() => {
     (async () => {
       const supabase = createClient();
-      const names = sorted.map((e) => e.name);
+      // Include each exercise's substitutes so history is already loaded if the
+      // client swaps mid-session.
+      const names = Array.from(new Set(sorted.flatMap((e) => [e.name, ...parseExerciseNote(e.notes).alternatives])));
       const { data } = await supabase.from("workout_logs").select("exercise_name, sets, logged_at")
         .eq("client_id", clientId).in("exercise_name", names)
         .order("logged_at", { ascending: false }).limit(names.length * 3);
@@ -201,7 +229,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
     await Promise.all(
       sorted.map((ex, i) =>
         supabase.from("workout_logs").upsert({
-          client_id: clientId, exercise_name: ex.name, day_id: dayId, logged_at,
+          client_id: clientId, exercise_name: nameFor(i), day_id: dayId, logged_at,
           sets: setLogs[i].map((s) => ({ weight_kg: s.weight ? parseFloat(s.weight) : null, reps: parseInt(s.reps) || ex.reps, done: s.done })),
         }, { onConflict: "client_id,exercise_name,day_id,logged_at" })
       )
@@ -301,7 +329,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
               const vol   = setLogs[i].filter((s) => s.done).reduce((sum, s) => sum+(parseFloat(s.weight)||0)*(parseInt(s.reps)||0), 0);
               return (
                 <div key={ex.id} className="flex items-center justify-between px-4 py-2.5 border-b border-zinc-800/40 last:border-0">
-                  <span className="text-white text-sm truncate max-w-[55%]">{ex.name}</span>
+                  <span className="text-white text-sm truncate max-w-[55%]">{nameFor(i)}</span>
                   <div className="flex items-center gap-3">
                     <span className={`text-xs ${done===total?"text-brand-gold":"text-zinc-500"}`}>{done}/{total}</span>
                     {vol > 0 && <span className="text-zinc-400 text-xs">{vol.toFixed(0)}kg</span>}
@@ -363,7 +391,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
           {isEN ? `Exercise ${step+1} of ${totalSteps}` : `Exercício ${step+1} de ${totalSteps}`}
         </p>
         <h2 className="text-white font-black leading-tight" style={{ fontSize: "clamp(1.35rem,5.5vw,1.9rem)" }}>
-          {cur?.name}
+          {curName}
         </h2>
         <div className="flex flex-wrap items-center gap-x-3 mt-0.5">
           <span className="text-brand-gold text-sm font-semibold">{cur?.sets} × {cur?.reps} reps</span>
@@ -373,7 +401,68 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
             </span>
           )}
         </div>
-        {cur?.notes && <ExerciseNotes notes={cur.notes} compact />}
+
+        {/* Swap — the machine you planned for is often taken. Logging what was
+            actually done beats logging the plan and hoping it matched. */}
+        {alternatives.length > 0 && (
+          <div className="mt-2">
+            {swapped && (
+              <p className="text-[10px] text-zinc-600 mb-1.5">
+                {isEN ? "Instead of" : "Em vez de"} <span className="text-zinc-500">{cur?.name}</span>
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={() => setSwapOpen((v) => !v)}
+              className="inline-flex items-center gap-1.5 rounded-lg text-[11px] font-bold transition-all active:scale-95"
+              style={{
+                padding: "6px 10px",
+                background: swapped ? "rgba(201,168,76,0.12)" : "rgba(255,255,255,0.04)",
+                border: `1px solid ${swapped ? "rgba(201,168,76,0.3)" : "rgba(255,255,255,0.08)"}`,
+                color: swapped ? "#E8C96B" : "#a1a1aa",
+              }}
+            >
+              <span aria-hidden>⇄</span>
+              {isEN ? "Swap exercise" : "Trocar exercício"}
+            </button>
+
+            {swapOpen && (
+              <div className="mt-2 space-y-1.5">
+                {[sorted[step]?.name, ...alternatives].filter(Boolean).map((opt) => {
+                  const active = opt === curName;
+                  const isOriginal = opt === sorted[step]?.name;
+                  return (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => chooseExercise(opt as string)}
+                      className="w-full text-left rounded-xl text-xs transition-all active:scale-[0.98]"
+                      style={{
+                        padding: "10px 12px",
+                        background: active ? "rgba(201,168,76,0.12)" : "rgba(255,255,255,0.03)",
+                        border: `1px solid ${active ? "rgba(201,168,76,0.35)" : "rgba(255,255,255,0.06)"}`,
+                        color: active ? "#E8C96B" : "#d4d4d8",
+                      }}
+                    >
+                      <span className="font-semibold">{opt}</span>
+                      {isOriginal && (
+                        <span className="ml-2 text-[10px] text-zinc-600">
+                          {isEN ? "planned" : "do plano"}
+                        </span>
+                      )}
+                      {active && <span className="float-right">✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Alternatives are offered as buttons above, so the note need not list
+            them. Cues are dropped after a swap because they describe the planned
+            movement, not the one being done. */}
+        {cur?.notes && <ExerciseNotes notes={cur.notes} compact hideAlternatives hideCues={swapped} />}
       </div>
 
       {/* ── COLUMN HEADERS (shrink-0) ── */}
@@ -385,8 +474,13 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
         <span />
       </div>
 
-      {/* ── SET ROWS (flex-1, scrolls only if many sets) ── */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-3" style={{ gap: "0.375rem", display: "flex", flexDirection: "column" }}>
+      {/* ── SET ROWS ──
+          Sized to content (shrinking to scroll only when there are many sets)
+          rather than flex-1. Stretching it pushed the rest timer to the bottom
+          of the screen, leaving a large empty band between the last set and the
+          controls you reach for immediately after finishing it. */}
+      <div className="min-h-0 overflow-y-auto px-4 pb-3"
+        style={{ flex: "0 1 auto", gap: "0.375rem", display: "flex", flexDirection: "column" }}>
         {curLogs.map((s, si) => (
           <div key={si}
             style={{
@@ -418,9 +512,9 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
         ))}
       </div>
 
-      {/* ── BOTTOM (shrink-0) ── */}
-      <div className="shrink-0 px-4 pt-3 pb-3 space-y-2" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-        {/* Rest presets */}
+      {/* ── REST PRESETS ──
+          Directly under the sets, where you look the moment a set is done. */}
+      <div className="shrink-0 px-4 pb-1">
         <div className="flex items-center gap-1.5">
           <span className="text-zinc-600 text-xs shrink-0">⏱</span>
           {[30, 60, 90, 120].map((s) => (
@@ -434,7 +528,14 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
             </button>
           ))}
         </div>
-        {/* Nav */}
+      </div>
+
+      {/* Absorbs the slack so navigation stays within thumb reach at the bottom
+          instead of floating up under the sets. */}
+      <div className="flex-1 min-h-0" />
+
+      {/* ── NAV (shrink-0) ── */}
+      <div className="shrink-0 px-4 pt-3 pb-3" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
         <div className="flex gap-2">
           <button onClick={() => setStep((s) => s - 1)} disabled={step === 0}
             className="rounded-2xl text-sm font-bold transition-all active:scale-95 disabled:opacity-20"

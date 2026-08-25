@@ -1,44 +1,38 @@
 "use client";
 
 import { useState } from "react";
+import { parseExerciseNote } from "@/lib/exercise-notes";
 
 /**
- * Renders a structured exercise note.
+ * Renders a structured exercise note: prescription as chips, the intensity
+ * technique as a badge, cues as body text, and substitutions behind a toggle.
  *
- * Notes are written as plain lines so they stay readable anywhere they are shown
- * raw (coach view, PDF export). This splits them back into their parts:
- *
- *   Aquec. 2-3 séries · Descanso 3-5 min · RPE ~6-7 (última ~7-8)
- *   Última série até à falha
- *   1 segundo de pausa em baixo em cada repetição...
- *   Alternativas: Supino Inclinado com Halteres · Supino Inclinado na Máquina
- *
- * Anything unrecognised falls through as body text, so a note that does not
- * follow the convention still renders sensibly instead of disappearing.
+ * `hideAlternatives` is for screens that offer swapping themselves — the live
+ * workout lists them as buttons, so repeating them here would be noise.
  */
-
-const TECHNIQUES = [
-  "Última série até à falha + LLPs (prolongar a série)",
-  "Última série até à falha",
-  "Última série em myo-reps",
-  "Terminar com alongamento estático (30s)",
-];
-
-export default function ExerciseNotes({ notes, compact = false }: { notes: string; compact?: boolean }) {
+export default function ExerciseNotes({
+  notes,
+  compact = false,
+  hideAlternatives = false,
+  hideCues = false,
+}: {
+  notes: string;
+  compact?: boolean;
+  hideAlternatives?: boolean;
+  /**
+   * Drop the coaching cues. Sets, rest and RPE carry over to a substitute, but
+   * the cue describes the planned movement — "start with the cable low" is wrong
+   * once you've swapped a crossover for a pec deck.
+   */
+  hideCues?: boolean;
+}) {
   const [showAlts, setShowAlts] = useState(false);
+  const parsed = parseExerciseNote(notes);
+  const { chips, technique, alternatives } = parsed;
+  const cues = hideCues ? [] : parsed.cues;
 
-  const lines = notes.split("\n").map((l) => l.trim()).filter(Boolean);
-  if (lines.length === 0) return null;
-
-  const prescription = lines.find((l) => l.startsWith("Aquec."));
-  const technique = lines.find((l) => TECHNIQUES.includes(l));
-  const altLine = lines.find((l) => l.startsWith("Alternativas:"));
-  const cues = lines.filter((l) => l !== prescription && l !== technique && l !== altLine);
-
-  const chips = prescription ? prescription.split("·").map((s) => s.trim()).filter(Boolean) : [];
-  const alts = altLine
-    ? altLine.replace(/^Alternativas:\s*/, "").split("·").map((s) => s.trim()).filter(Boolean)
-    : [];
+  if (!chips.length && !technique && !cues.length && !alternatives.length) return null;
+  const alts = hideAlternatives ? [] : alternatives;
 
   return (
     <div className={compact ? "space-y-1.5 mt-1" : "space-y-2 mt-1.5"}>
