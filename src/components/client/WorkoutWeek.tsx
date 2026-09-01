@@ -6,7 +6,7 @@ import type { WorkoutPlan, WorkoutDay, Exercise } from "@/lib/supabase/types";
 import { DAY_NAMES_FULL } from "@/lib/supabase/types";
 import ProgressRing from "@/components/ui/ProgressRing";
 import Confetti from "@/components/ui/Confetti";
-import LiveWorkout from "@/components/client/LiveWorkout";
+import LiveWorkout, { getActiveWorkoutDayId } from "@/components/client/LiveWorkout";
 import ExerciseNotes from "@/components/client/ExerciseNotes";
 import { haptic, HAPTIC } from "@/lib/haptic";
 import { useLang } from "@/lib/i18n/useLang";
@@ -23,6 +23,7 @@ const extra = {
   exercise_plural:    { pt: "exercícios",                 en: "exercises" },
   start_btn:          { pt: "▶ Iniciar",                  en: "▶ Start" },
   catch_up:           { pt: "· ainda podes fazer",        en: "· you can still do it" },
+  resume_btn:         { pt: "▶ Retomar",                  en: "▶ Resume" },
   rest_timer_lbl:     { pt: "⏱ Timer de descanso",       en: "⏱ Rest timer" },
   how_was_workout:    { pt: "Como correu o treino?",      en: "How did the workout go?" },
   feeling_heavy:      { pt: "Pesado",                     en: "Heavy" },
@@ -213,6 +214,10 @@ function WorkoutDayCard({
   const [showTimer, setShowTimer] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [liveMode, setLiveMode] = useState(false);
+  // An unfinished workout for this day, left on the device. Read after mount so
+  // the server render and the first client render agree.
+  const [hasUnfinished, setHasUnfinished] = useState(false);
+  useEffect(() => { setHasUnfinished(getActiveWorkoutDayId() === day.id); }, [day.id, liveMode]);
   const [feeling, setFeeling] = useState(existingCompletion?.feeling ?? "");
   const [note, setNote] = useState(existingCompletion?.note ?? "");
   const [sessionVolume, setSessionVolume] = useState<number | null>(null);
@@ -365,9 +370,13 @@ function WorkoutDayCard({
           {!completed && exercises.length > 0 && (
             <button
               onClick={(e) => { e.stopPropagation(); setLiveMode(true); }}
-              className="px-2.5 py-1 rounded-lg bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-semibold hover:bg-brand-gold/20 transition-colors"
+              className={`px-2.5 py-1 rounded-lg border text-xs font-semibold transition-colors ${
+                hasUnfinished
+                  ? "bg-brand-gold text-black border-brand-gold hover:brightness-110"
+                  : "bg-brand-gold/10 border-brand-gold/30 text-brand-gold hover:bg-brand-gold/20"
+              }`}
             >
-              {extra.start_btn[lang]}
+              {hasUnfinished ? extra.resume_btn[lang] : extra.start_btn[lang]}
             </button>
           )}
           <span className="text-gray-600 text-xs">{open ? "▲" : "▼"}</span>

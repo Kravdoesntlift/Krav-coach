@@ -32,18 +32,75 @@ interface SetLog { weight: string; reps: string; done: boolean; }
 /** Client-side memory of typed substitutions, per planned exercise. */
 const RECENT_SWAPS_KEY = "krav_recent_swaps_v1";
 
+/**
+ * A workout in progress, mirrored to the device.
+ *
+ * Everything used to live in React state and only reached the database on
+ * "Terminar". Tapping another tab or refreshing threw away every set logged so
+ * far — mid-workout, with no warning. Sets are written here as they are entered
+ * so the session survives leaving the screen, and works when the gym has no
+ * signal.
+ */
+const ACTIVE_WORKOUT_KEY = "krav_active_workout_v1";
+
+interface ActiveWorkout {
+  dayId: string;
+  startedAt: number;
+  step: number;
+  setLogs: SetLog[][];
+  swaps: Record<number, string>;
+  restDur: number;
+}
+
+function readActiveWorkout(dayId: string, shape: number[]): ActiveWorkout | null {
+  try {
+    const raw = localStorage.getItem(ACTIVE_WORKOUT_KEY);
+    if (!raw) return null;
+    const saved = JSON.parse(raw) as ActiveWorkout;
+    if (saved.dayId !== dayId) return null;
+    // The coach may have edited the plan since. Restoring a mismatched shape
+    // would put weights against the wrong exercise, so drop it instead.
+    if (!Array.isArray(saved.setLogs) || saved.setLogs.length !== shape.length) return null;
+    if (saved.setLogs.some((rows, i) => !Array.isArray(rows) || rows.length !== shape[i])) return null;
+    return saved;
+  } catch {
+    return null;
+  }
+}
+
+export function clearActiveWorkout() {
+  try { localStorage.removeItem(ACTIVE_WORKOUT_KEY); } catch { /* private mode */ }
+}
+
+/** The day that has an unfinished workout on this device, if any. */
+export function getActiveWorkoutDayId(): string | null {
+  try {
+    const raw = localStorage.getItem(ACTIVE_WORKOUT_KEY);
+    return raw ? (JSON.parse(raw) as ActiveWorkout).dayId ?? null : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onComplete, onClose }: Props) {
   const { lang } = useLang();
   const isEN = lang === "en";
   const sorted = [...exercises].sort((a, b) => a.order_index - b.order_index);
 
+  // Start blank so the first client render matches the server's. Reading storage
+  // during render makes the two disagree, and React does not patch up attribute
+  // mismatches — the values came back but the ticked rows silently did not.
+  // The saved session is applied in an effect below instead.
   const [step, setStep]           = useState(0);
   const [setLogs, setSetLogs]     = useState<SetLog[][]>(
     sorted.map((ex) => Array.from({ length: ex.sets }, () => ({ weight: "", reps: String(ex.reps ?? ""), done: false })))
   );
+  const [hydrated, setHydrated]   = useState(false);
   const [restActive, setRestActive] = useState(false);
   const [restDur, setRestDur]       = useState(90);
   const [restLeft, setRestLeft]     = useState(0);
+  // The set that started this rest, so its inputs can be reached while resting.
+  const [restSet, setRestSet]       = useState<{ ex: number; si: number } | null>(null);
   const [elapsed, setElapsed]       = useState(0);
   const [finishing, setFinishing]   = useState(false);
   const [feeling, setFeeling]       = useState("");
@@ -135,6 +192,36 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
     setCustomOpen(false);
     setCustomName("");
   }
+
+  // ── Restore an unfinished session ─────────────────────────
+  useEffect(() => {
+    const saved = readActiveWorkout(dayId, sorted.map((ex) => ex.sets));
+    if (saved) {
+      setStep(saved.step);
+      setSetLogs(saved.setLogs);
+      setSwaps(saved.swaps ?? {});
+      setRestDur(saved.restDur ?? 90);
+      startedAt.current = saved.startedAt;
+      setElapsed(Math.floor((Date.now() - saved.startedAt) / 1000));
+    }
+    setHydrated(true);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dayId]);
+
+  // ── Mirror the session to the device ──────────────────────
+  // Written on every change so nothing is lost to a stray tab tap, a refresh,
+  // or the browser reclaiming memory on a backgrounded phone.
+  useEffect(() => {
+    // Writing before the restore effect has run would overwrite the saved
+    // session with the blank initial state.
+    if (!hydrated || finishing) return;
+    try {
+      const snapshot: ActiveWorkout = {
+        dayId, startedAt: startedAt.current, step, setLogs, swaps, restDur,
+      };
+      localStorage.setItem(ACTIVE_WORKOUT_KEY, JSON.stringify(snapshot));
+    } catch { /* private mode or quota — the session still works in memory */ }
+  }, [hydrated, dayId, step, setLogs, swaps, restDur, finishing]);
 
   // ── Remembered substitutions ──────────────────────────────
   useEffect(() => {
@@ -264,7 +351,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
       copy[exIdx][si].done = !wasDone;
       if (!wasDone) {
         const group = (sorted[exIdx] as Exercise & { superset_group?: string | null }).superset_group?.trim();
-        if (!group) startRest(restDur);
+        if (!group) { setRestSet({ ex: exIdx, si }); startRest(restDur); }
       }
       return copy;
     });
@@ -297,6 +384,9 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
     // Clear workout notification
     try { new Notification("KRAV · Treino concluído 🏆", { body: `${dayLabel}`, icon: "/icon.png", tag: "krav-workout", silent: true }); } catch { /* ignore */ }
 
+    // Only now is it safe to drop the local copy.
+    clearActiveWorkout();
+
     await onComplete(feeling || "💪", note);
     setSaving(false);
   }
@@ -312,7 +402,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
     >
       {/* ── REST OVERLAY ── */}
       {restActive && (
-        <div className="absolute inset-0 z-30 bg-black flex flex-col items-center justify-center gap-6">
+        <div className="absolute inset-0 z-30 bg-black flex flex-col items-center justify-center gap-5 overflow-y-auto px-4 py-6">
           <p className="text-zinc-500 text-xs font-semibold tracking-widest uppercase">
             {isEN ? "Rest" : "Descanso"}
           </p>
@@ -328,6 +418,35 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
               <span className="text-zinc-500 text-xs mt-1">{isEN ? "seconds" : "segundos"}</span>
             </div>
           </div>
+          {/* Log the set you just finished, without leaving the timer.
+              The overlay used to cover every input, so the only way to write
+              down what you lifted was to cancel your own rest. */}
+          {restSet && setLogs[restSet.ex]?.[restSet.si] && (
+            <div className="w-full max-w-[280px]">
+              <p className="text-zinc-600 text-[10px] font-semibold tracking-widest uppercase text-center mb-2">
+                {isEN ? `Set ${restSet.si + 1} — what you did` : `Série ${restSet.si + 1} — o que fizeste`}
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <label className="block text-zinc-700 text-[10px] uppercase mb-1 text-center">
+                    {isEN ? "Weight kg" : "Peso kg"}
+                  </label>
+                  <input type="number" inputMode="decimal" placeholder="—"
+                    value={setLogs[restSet.ex][restSet.si].weight}
+                    onChange={(e) => updateLog(restSet.ex, restSet.si, "weight", e.target.value)}
+                    className="bg-zinc-800 border border-zinc-700/50 rounded-xl text-white text-base text-center w-full py-2.5 focus:outline-none focus:border-brand-gold/50" />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-zinc-700 text-[10px] uppercase mb-1 text-center">Reps</label>
+                  <input type="number" inputMode="numeric"
+                    value={setLogs[restSet.ex][restSet.si].reps}
+                    onChange={(e) => updateLog(restSet.ex, restSet.si, "reps", e.target.value)}
+                    className="bg-zinc-800 border border-zinc-700/50 rounded-xl text-white text-base text-center w-full py-2.5 focus:outline-none focus:border-brand-gold/50" />
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="flex gap-2">
             {[30, 60, 90, 120].map((s) => (
               <button key={s} onClick={() => { setRestDur(s); setRestLeft(s); }}
