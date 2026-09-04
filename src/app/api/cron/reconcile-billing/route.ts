@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import Stripe from "stripe";
+import { syncSubscription, getStripe } from "@/lib/billing/sync";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,22 +17,6 @@ export const dynamic = "force-dynamic";
  *
  * Idempotent: writes only where Stripe and the DB actually disagree.
  */
-
-function profileStatusFor(stripeStatus: string): string | null {
-  switch (stripeStatus) {
-    case "active":
-    case "trialing":
-      return "active";
-    case "past_due":
-    case "unpaid":
-      return "past_due";
-    case "canceled":
-    case "incomplete_expired":
-      return "cancelled";
-    default:
-      return null;
-  }
-}
 
 /** Allow the Vercel cron (Bearer secret) or a signed-in coach running it manually. */
 async function isAuthorised(req: NextRequest): Promise<boolean> {
@@ -58,14 +42,11 @@ export async function GET(req: NextRequest) {
   if (!(await isAuthorised(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  if (!process.env.STRIPE_SECRET_KEY) {
+  const stripe = getStripe();
+  if (!stripe) {
     return NextResponse.json({ error: "Stripe not configured" }, { status: 503 });
   }
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2026-04-22.dahlia" as "2026-04-22.dahlia",
-    httpClient: Stripe.createFetchHttpClient(),
-  });
   const admin = createAdminClient();
 
   const report = {
@@ -74,6 +55,10 @@ export async function GET(req: NextRequest) {
     unmatched: [] as string[],
     stale: [] as string[],
     errors: [] as string[],
+    // How long the Stripe webhook has been silent. Every subscription in this
+    // database was written by this job rather than by an event, which is only
+    // visible if someone thinks to look — so the job says it out loud.
+    webhook: { lastEventAt: null as string | null, silentDays: null as number | null, healthy: true },
   };
   const seenInStripe = new Set<string>();
 
@@ -145,22 +130,12 @@ export async function GET(req: NextRequest) {
           continue;
         }
 
-        // ── Compare against what the DB believes ─────────────────────────────
-        const item = subscription.items.data[0];
-        const amountCents = item?.price?.unit_amount ?? null;
-        const periodEndTs = item?.current_period_end ?? null;
-        const periodEnd = periodEndTs ? new Date(periodEndTs * 1000).toISOString() : null;
-
-        const [{ data: dbSub }, { data: dbProfile }, { data: dbLink }] = await Promise.all([
+        // ── Make the DB agree with Stripe ────────────────────────────────────
+        const [{ data: dbSub }, { data: dbLink }] = await Promise.all([
           admin
             .from("stripe_subscriptions")
-            .select("status, current_period_end, coach_id")
+            .select("coach_id")
             .eq("id", subscription.id)
-            .maybeSingle(),
-          admin
-            .from("profiles")
-            .select("status, subscription_renews_at, trial_ends_at, stripe_customer_id")
-            .eq("id", clientId)
             .maybeSingle(),
           admin
             .from("coach_clients")
@@ -169,63 +144,16 @@ export async function GET(req: NextRequest) {
             .maybeSingle(),
         ]);
 
-        const coachId = dbSub?.coach_id ?? dbLink?.coach_id ?? subscription.metadata?.coach_id ?? fallbackCoachId;
-        const wantStatus = profileStatusFor(subscription.status);
-        const isLive = subscription.status === "active" || subscription.status === "trialing";
+        const coachId =
+          dbSub?.coach_id ?? dbLink?.coach_id ?? subscription.metadata?.coach_id ?? fallbackCoachId;
 
-        let didRepair = false;
-
-        // Subscription row missing or stale
-        if (
-          !dbSub ||
-          dbSub.status !== subscription.status ||
-          dbSub.current_period_end !== periodEnd
-        ) {
-          await admin.from("stripe_subscriptions").upsert(
-            {
-              id: subscription.id,
-              client_id: clientId,
-              ...(coachId ? { coach_id: coachId } : {}),
-              status: subscription.status,
-              amount_cents: amountCents,
-              current_period_end: periodEnd,
-            },
-            { onConflict: "id" },
-          );
-          didRepair = true;
-        }
-
-        // Profile out of sync with billing reality
-        const profileNeedsFix =
-          !dbProfile ||
-          (wantStatus && dbProfile.status !== wantStatus) ||
-          dbProfile.subscription_renews_at !== periodEnd ||
-          (isLive && dbProfile.trial_ends_at !== null) ||
-          (customerId && dbProfile.stripe_customer_id !== customerId);
-
-        if (profileNeedsFix) {
-          await admin
-            .from("profiles")
-            .update({
-              ...(wantStatus ? { status: wantStatus } : {}),
-              subscription_renews_at: periodEnd,
-              ...(isLive ? { trial_ends_at: null } : {}),
-              ...(customerId ? { stripe_customer_id: customerId } : {}),
-            })
-            .eq("id", clientId);
-          didRepair = true;
-        }
-
-        // Paying client never assigned to the coach → invisible in dashboard/analytics
-        if (isLive && coachId && !dbLink) {
-          await admin.from("coach_clients").upsert(
-            { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
-            { onConflict: "coach_id,client_id,assigned_role" },
-          );
-          didRepair = true;
-        }
-
-        if (didRepair) report.repaired++;
+        const { changed, errors } = await syncSubscription(admin, {
+          subscription,
+          clientId,
+          coachId,
+        });
+        if (errors.length) report.errors.push(`${subscription.id}: ${errors.join("; ")}`);
+        if (changed) report.repaired++;
       } catch (e) {
         report.errors.push(`${subscription.id}: ${e instanceof Error ? e.message : String(e)}`);
       }
@@ -256,7 +184,49 @@ export async function GET(req: NextRequest) {
     report.errors.push(`stale-sweep: ${e instanceof Error ? e.message : String(e)}`);
   }
 
-  if (report.repaired || report.unmatched.length || report.stale.length || report.errors.length) {
+  // ── Is the webhook actually alive? ──────────────────────────────────────────
+  // A misconfigured endpoint URL or signing secret fails silently: Stripe marks
+  // the deliveries as failed on its own dashboard and the app never hears a
+  // thing. The only symptom is that renewals take up to a day to show, which
+  // reads as "the app is buggy" rather than "the webhook is down".
+  try {
+    const { data: lastEvent } = await admin
+      .from("stripe_processed_events")
+      .select("processed_at")
+      .order("processed_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const lastAt = lastEvent?.processed_at ?? null;
+    report.webhook.lastEventAt = lastAt;
+
+    if (report.scanned > 0) {
+      const silentMs = lastAt ? Date.now() - new Date(lastAt).getTime() : Infinity;
+      const silentDays = Number.isFinite(silentMs) ? Math.floor(silentMs / 86400000) : null;
+      report.webhook.silentDays = silentDays;
+      // Monthly subscriptions mean a healthy webhook can legitimately be quiet
+      // for a few days; a week of silence with live subscriptions is not normal.
+      report.webhook.healthy = silentMs < 7 * 86400000;
+
+      if (!report.webhook.healthy) {
+        console.error(
+          "[reconcile-billing] STRIPE WEBHOOK SILENT —",
+          lastAt ? `last event ${silentDays} days ago` : "no event has EVER been received",
+          "— billing is running on this nightly job alone. Check the endpoint URL and signing secret in the Stripe dashboard.",
+        );
+      }
+    }
+  } catch (e) {
+    report.errors.push(`webhook-health: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  if (
+    report.repaired ||
+    report.unmatched.length ||
+    report.stale.length ||
+    report.errors.length ||
+    !report.webhook.healthy
+  ) {
     console.log("[reconcile-billing]", JSON.stringify(report));
   }
 

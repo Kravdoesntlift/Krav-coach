@@ -3,82 +3,57 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
 import { sendPushToUser } from "@/lib/push";
 import { getLang } from "@/lib/i18n/getLang";
+import { getStripe, syncSubscription } from "@/lib/billing/sync";
+import type Stripe from "stripe";
 
 // ─── Post-payment activation ──────────────────────────────────────────────────
 // Called when client lands here with ?session_id= from Stripe.
 // Verifies the session, activates the profile, sends welcome message + push.
 async function activateAfterPayment(userId: string, sessionId: string) {
-  if (!process.env.STRIPE_SECRET_KEY) return;
+  const stripe = getStripe();
+  if (!stripe) return;
 
-  // Retrieve session via raw fetch — bypass Stripe SDK networking issues
-  type StripeSession = {
-    metadata?: Record<string, string>;
-    payment_status?: string;
-    subscription?: {
-      id: string;
-      status: string;
-      items?: { data: Array<{ price?: { unit_amount: number | null }; current_period_end?: number }> };
-    } | string | null;
-  };
-
-  let session: StripeSession;
+  let session: Stripe.Checkout.Session;
   try {
-    const resp = await fetch(
-      `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}?expand[]=subscription`,
-      {
-        headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` },
-        signal: AbortSignal.timeout(10000),
-      }
-    );
-    if (!resp.ok) return;
-    session = await resp.json() as StripeSession;
+    session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ["subscription"] });
   } catch {
-    return; // Network error — ignore
+    return; // Network error — the webhook and the nightly job both still cover this
   }
 
   const clientId = session.metadata?.client_id;
-  const coachId = session.metadata?.coach_id;
+  const coachId = session.metadata?.coach_id ?? null;
 
   if (!clientId || clientId !== userId) return;
   if (session.payment_status !== "paid") return;
 
   const admin = createAdminClient();
 
-  // 1. Activate profile
-  await admin.from("profiles").update({ status: "active" }).eq("id", clientId);
+  // Provision through the shared path so this page cannot disagree with the
+  // webhook. It previously set `status` but left `subscription_renews_at` null
+  // and never cleared `trial_ends_at`, so a client who paid could still be
+  // treated as a lapsed trial until the nightly job repaired them.
+  const sub =
+    typeof session.subscription === "object" && session.subscription !== null
+      ? (session.subscription as Stripe.Subscription)
+      : null;
 
-  // 2. Store subscription in DB (if not already there)
-  const sub = typeof session.subscription === "object" && session.subscription !== null
-    ? session.subscription
-    : null;
-  if (sub && coachId) {
-    const item = sub.items?.data[0];
-    const amountCents = item?.price?.unit_amount ?? null;
-    const periodEndTs = item?.current_period_end ?? null;
-    const periodEnd = periodEndTs ? new Date(periodEndTs * 1000).toISOString() : null;
-
-    await admin.from("stripe_subscriptions").upsert(
-      {
-        id: sub.id,
-        client_id: clientId,
-        coach_id: coachId,
-        status: sub.status,
-        amount_cents: amountCents,
-        current_period_end: periodEnd,
-      },
-      { onConflict: "id" }
-    );
+  if (sub) {
+    await syncSubscription(admin, { subscription: sub, clientId, coachId });
+  } else {
+    // Paid, but the subscription object did not come back — at least unlock the
+    // account rather than leaving a paying client staring at this page.
+    await admin.from("profiles").update({ status: "active" }).eq("id", clientId);
   }
 
   if (!coachId) return;
 
-  // 3. Ensure coach assignment
+  // Ensure coach assignment even when there was no subscription object above
   await admin.from("coach_clients").upsert(
     { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
     { onConflict: "coach_id,client_id,assigned_role" }
   );
 
-  // 4. Send welcome message (only once)
+  // Send welcome message (only once)
   const { data: existingMsg } = await admin
     .from("messages")
     .select("id")

@@ -2,18 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPushToUser } from "@/lib/push";
 import { sendInvoiceEmail, sendPaymentFailedEmail, sendSubscriptionCancelledEmail } from "@/lib/email";
+import { syncSubscription, getStripe as getStripeClient } from "@/lib/billing/sync";
 import Stripe from "stripe";
 
 export const runtime = "nodejs";
 export const preferredRegion = "auto";
 export const dynamic = "force-dynamic";
 
-function getStripe() {
-  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2026-04-22.dahlia" as "2026-04-22.dahlia",
-    httpClient: Stripe.createFetchHttpClient(),
-    maxNetworkRetries: 1,
-  });
+function getStripe(): Stripe {
+  const stripe = getStripeClient();
+  if (!stripe) throw new Error("STRIPE_SECRET_KEY not configured");
+  return stripe;
 }
 
 type Admin = ReturnType<typeof createAdminClient>;
@@ -95,29 +94,13 @@ async function resolveCoachId(
   return coach?.id ?? null;
 }
 
-/** Map a Stripe subscription status onto a profiles.status value. */
-function profileStatusFor(stripeStatus: string): string | null {
-  switch (stripeStatus) {
-    case "active":
-    case "trialing":
-      return "active";
-    case "past_due":
-    case "unpaid":
-      return "past_due";
-    case "canceled":
-    case "incomplete_expired":
-      return "cancelled";
-    default:
-      return null;
-  }
-}
-
 /**
  * Provision a paying client: subscription row, profile state, coach assignment.
  *
  * This is the critical path — it must always run to completion. Callers keep
  * notifications out of here so a push/email failure can never leave the client
- * unprovisioned.
+ * unprovisioned. The write itself lives in @/lib/billing/sync so the webhook,
+ * the nightly reconcile and the post-checkout page cannot drift apart.
  */
 async function provisionSubscription(
   admin: Admin,
@@ -127,49 +110,7 @@ async function provisionSubscription(
     coachId: string | null;
   },
 ): Promise<void> {
-  const { subscription, clientId, coachId } = args;
-  const item = subscription.items.data[0];
-  const amountCents = item?.price?.unit_amount ?? null;
-  const periodEndTs = item?.current_period_end ?? null;
-  const periodEnd = periodEndTs ? new Date(periodEndTs * 1000).toISOString() : null;
-
-  const { error: subErr } = await admin.from("stripe_subscriptions").upsert(
-    {
-      id: subscription.id,
-      client_id: clientId,
-      ...(coachId ? { coach_id: coachId } : {}),
-      status: subscription.status,
-      amount_cents: amountCents,
-      current_period_end: periodEnd,
-    },
-    { onConflict: "id" },
-  );
-  if (subErr) console.error("[webhook] stripe_subscriptions upsert failed:", subErr);
-
-  const status = profileStatusFor(subscription.status);
-  const isLive = subscription.status === "active" || subscription.status === "trialing";
-
-  const { error: profErr } = await admin
-    .from("profiles")
-    .update({
-      ...(status ? { status } : {}),
-      subscription_renews_at: periodEnd,
-      // A paid subscription supersedes any trial countdown
-      ...(isLive ? { trial_ends_at: null } : {}),
-      ...(subscription.customer
-        ? { stripe_customer_id: typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id }
-        : {}),
-    })
-    .eq("id", clientId);
-  if (profErr) console.error("[webhook] profiles update failed:", profErr);
-
-  if (coachId) {
-    const { error: ccErr } = await admin.from("coach_clients").upsert(
-      { coach_id: coachId, client_id: clientId, assigned_role: "coach" },
-      { onConflict: "coach_id,client_id,assigned_role" },
-    );
-    if (ccErr) console.error("[webhook] coach_clients upsert failed:", ccErr);
-  }
+  await syncSubscription(admin, args);
 }
 
 /** Welcome message + push. Never throws — notifications must not block provisioning. */
@@ -401,6 +342,29 @@ export async function POST(req: NextRequest) {
         const invoiceClientId = await resolveClientId(admin, { customerId });
         if (!invoiceClientId) break;
 
+        const invSubRef = invoice.parent?.subscription_details?.subscription;
+        const invSubId = typeof invSubRef === "string" ? invSubRef : invSubRef?.id ?? null;
+
+        // A renewal *is* an invoice being paid. Advancing the period only on
+        // `customer.subscription.updated` made every renewal depend on that one
+        // event type being enabled on the Stripe endpoint; when it wasn't, a
+        // client who had just been charged kept the old period end and showed
+        // up as overdue until the nightly job caught it. Sync here too — both
+        // events now independently do the right thing, and doing it twice is
+        // harmless because the sync only writes on a real difference.
+        if (invSubId) {
+          try {
+            const subscription = await getStripe().subscriptions.retrieve(invSubId);
+            const coachId = await resolveCoachId(admin, {
+              metadataCoachId: subscription.metadata?.coach_id,
+              clientId: invoiceClientId,
+            });
+            await syncSubscription(admin, { subscription, clientId: invoiceClientId, coachId });
+          } catch (e) {
+            console.error("[webhook] invoice.paid subscription sync failed:", e);
+          }
+        }
+
         const { data: profile } = await admin
           .from("profiles")
           .select("id, full_name, lang")
@@ -415,16 +379,15 @@ export async function POST(req: NextRequest) {
         const invoiceLang: "pt" | "en" = profile.lang === "en" ? "en" : "pt";
         const amountCents = invoice.amount_paid ?? 0;
         const amountEur = `€ ${(amountCents / 100).toFixed(2).replace(".", ",")}`;
-        const subRef = invoice.parent?.subscription_details?.subscription;
-        const subscriptionId = typeof subRef === "string" ? subRef : subRef?.id ?? null;
 
-        // Fetch period end from DB
+        // Read back the period the sync above just wrote, so the receipt quotes
+        // the *next* renewal rather than the one that was already paid.
         let nextRenewal = "";
-        if (subscriptionId) {
+        if (invSubId) {
           const { data: sub } = await admin
             .from("stripe_subscriptions")
             .select("current_period_end")
-            .eq("id", subscriptionId)
+            .eq("id", invSubId)
             .maybeSingle();
           if (sub?.current_period_end) {
             nextRenewal = new Date(sub.current_period_end).toLocaleDateString(

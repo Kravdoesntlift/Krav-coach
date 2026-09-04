@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { healStaleSubscriptions } from "@/lib/billing/sync";
 import { logout } from "@/app/auth/actions";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import PushPrompt from "@/components/PushPrompt";
@@ -79,13 +80,33 @@ export default async function ClientLayout({
 
   if (!user) redirect("/auth/login");
 
-  const { data: profile } = await supabase
+  let { data: profile } = await supabase
     .from("profiles")
     .select("*")
     .eq("id", user.id)
     .single();
 
   if (!profile || profile.role !== "client") redirect("/coach/dashboard");
+
+  // Before this page can lock anyone out, make sure the billing state it is
+  // about to judge them on is current. Locking a paying client behind a paywall
+  // because a webhook was missed is the single worst outcome here, and until
+  // now it could persist until the nightly job ran.
+  const wouldBeBlocked =
+    profile.status === "cancelled" ||
+    (profile.trial_ends_at !== null && new Date(profile.trial_ends_at as string) <= new Date());
+
+  if (wouldBeBlocked) {
+    const healed = await healStaleSubscriptions({ clientId: user.id }).catch(() => 0);
+    if (healed > 0) {
+      const { data: fresh } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+      if (fresh) profile = fresh;
+    }
+  }
 
   // ── Trial check ─────────────────────────────────────────────────────────
   let trialDaysLeft: number | null = null;

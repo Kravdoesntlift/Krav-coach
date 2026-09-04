@@ -7,11 +7,18 @@ import NotifyButton from "@/components/coach/NotifyButton";
 import PushNotificationToggle from "@/components/PushNotificationToggle";
 import CoachClientList, { type ClientData } from "@/components/coach/CoachClientList";
 import SuggestPlanButton from "@/components/coach/SuggestPlanButton";
+import { healStaleSubscriptions } from "@/lib/billing/sync";
 
 export default async function CoachDashboard() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
+
+  // If any subscription's stored period has already elapsed, ask Stripe before
+  // drawing the page. Without this the coach sees yesterday's billing state
+  // until the nightly job runs — a client charged at lunchtime looks unpaid all
+  // afternoon. No-op when every period is still in the future.
+  await healStaleSubscriptions({ coachId: user.id }).catch(() => {});
 
   // Current week
   const today = new Date();
@@ -74,6 +81,25 @@ export default async function CoachDashboard() {
     .select("client_id, profiles!coach_clients_client_id_fkey(id, full_name, status, subscription_renews_at, avatar_url, created_at, trial_ends_at)")
     .eq("coach_id", user!.id)
     .eq("assigned_role", "coach");
+
+  // Billing status straight from the subscription rows. `subscription_renews_at`
+  // alone cannot tell "renewing right now" apart from "payment failed" — both
+  // are simply a date in the past — so the dashboard used to accuse a client
+  // Stripe had already charged of being in arrears.
+  const { data: subRows } = await supabase
+    .from("stripe_subscriptions")
+    .select("client_id, status")
+    .eq("coach_id", user!.id);
+
+  const subStatusByClient = new Map<string, string>();
+  for (const s of subRows ?? []) {
+    // A client may have older cancelled rows alongside the live one; the live
+    // one is what governs.
+    const current = subStatusByClient.get(s.client_id);
+    if (!current || s.status === "active" || s.status === "trialing") {
+      subStatusByClient.set(s.client_id, s.status);
+    }
+  }
 
   // Unread messages per sender (client)
   const { data: unreadMsgs } = await supabase
@@ -195,12 +221,22 @@ export default async function CoachDashboard() {
     const name = client.full_name;
     const id = client.id;
 
-    // Overdue renewal
+    // Renewal. Stripe's status is the authority on whether money is actually
+    // owed — a period end in the past only means the renewal is being processed,
+    // and Stripe retries a failed card for days before giving up. Only flag
+    // arrears when Stripe itself says the payment failed.
     const renewsAt = client.subscription_renews_at;
-    if (renewsAt) {
+    const subStatus = subStatusByClient.get(id);
+
+    if (subStatus === "past_due" || subStatus === "unpaid") {
+      alerts.push({ type: "overdue_renewal", clientId: id, clientName: name, detail: "Pagamento recusado — cartão a precisar de atenção", urgency: "high" });
+    } else if (renewsAt) {
       const diff = Math.ceil((new Date(renewsAt + "T00:00:00").getTime() - todayMidnight.getTime()) / 86400000);
       if (diff < 0) {
-        alerts.push({ type: "overdue_renewal", clientId: id, clientName: name, detail: `Renovação em atraso (${Math.abs(diff)} dia${Math.abs(diff) !== 1 ? "s" : ""})`, urgency: "high" });
+        // Charged and waiting on Stripe to confirm, not late.
+        if (subStatus !== "cancelled" && subStatus !== "canceled") {
+          alerts.push({ type: "renewal", clientId: id, clientName: name, detail: "Renovação a processar", urgency: "low" });
+        }
       } else if (diff <= 3) {
         alerts.push({ type: "renewal", clientId: id, clientName: name, detail: `Renovação em ${diff} dia${diff !== 1 ? "s" : ""}`, urgency: "high" });
       } else if (diff <= 7) {
