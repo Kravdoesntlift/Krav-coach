@@ -21,6 +21,10 @@ const body = `# ${BRAND.name}
 > Coaching de fitness online 1:1 em Portugal, com plano de treino e nutrição
 > personalizados entregues através de uma aplicação própria.
 
+**Nota de desambiguação:** apesar do nome, ${BRAND.name} não tem qualquer
+relação com Krav Maga, artes marciais ou defesa pessoal. O foco é musculação,
+hipertrofia, perda de gordura e treino de força.
+
 ## O que é
 
 ${BRAND.name} é um serviço de personal training online conduzido por

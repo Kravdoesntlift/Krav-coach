@@ -49,6 +49,13 @@ export function organizationJsonLd() {
     "@id": `${SITE_URL}/#organization`,
     name: BRAND.name,
     legalName: BRAND.legalName,
+    // "Krav" reads as Krav Maga to search engines, and Google's AI Overview for
+    // "Krav coach" currently explains Israeli self-defence rather than this
+    // business. disambiguatingDescription exists precisely to separate an entity
+    // from a similarly named one, so it says plainly what this is and is not.
+    alternateName: ["KRAV Coaching", "Krav Coach"],
+    disambiguatingDescription:
+      "KRAV Coach é um serviço de personal training online focado em musculação, hipertrofia, perda de gordura e treino de força. Não tem qualquer relação com Krav Maga nem com artes marciais ou defesa pessoal.",
     url: SITE_URL,
     logo: {
       "@type": "ImageObject",
