@@ -26,13 +26,21 @@ export const metadata: Metadata = {
     title: "Online Personal Trainer | KRAV Coach",
     description:
       "Personalised plan, nutrition and direct coaching — all in the app. Free 7-day trial.",
-    url: "https://kravcoaching.com/online-personal-trainer",
+    url: "https://www.kravcoaching.com/online-personal-trainer",
     siteName: "KRAV Coach",
     locale: "en_US",
     type: "website",
   },
+  // The PT and EN pages are the same offer in two languages. Without hreflang
+  // they compete with each other for the same intent instead of Google serving
+  // whichever matches the searcher. Relative — metadataBase resolves the host.
   alternates: {
-    canonical: "https://kravcoaching.com/online-personal-trainer",
+    canonical: "/online-personal-trainer",
+    languages: {
+      "pt-PT": "/personal-trainer-online",
+      en: "/online-personal-trainer",
+      "x-default": "/personal-trainer-online",
+    },
   },
 };
 

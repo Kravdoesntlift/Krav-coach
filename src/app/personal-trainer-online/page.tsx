@@ -26,13 +26,21 @@ export const metadata: Metadata = {
     title: "Personal Trainer Online Portugal | KRAV Coach",
     description:
       "Plano personalizado, nutrição e coaching direto — tudo na app. Trial grátis de 7 dias.",
-    url: "https://kravcoaching.com/personal-trainer-online",
+    url: "https://www.kravcoaching.com/personal-trainer-online",
     siteName: "KRAV Coach",
     locale: "pt_PT",
     type: "website",
   },
+  // The PT and EN pages are the same offer in two languages. Without hreflang
+  // they compete with each other for the same intent instead of Google serving
+  // whichever matches the searcher. Relative — metadataBase resolves the host.
   alternates: {
-    canonical: "https://kravcoaching.com/personal-trainer-online",
+    canonical: "/personal-trainer-online",
+    languages: {
+      "pt-PT": "/personal-trainer-online",
+      en: "/online-personal-trainer",
+      "x-default": "/personal-trainer-online",
+    },
   },
 };
 

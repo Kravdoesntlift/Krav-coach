@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
+import { SITE_URL, SOCIAL_PROFILES, aggregateRatingJsonLd } from "@/lib/seo";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const t = {
@@ -204,26 +205,41 @@ export default async function LandingPage({
     ? coach.full_name.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()
     : "K";
 
+  // Aggregate rating is emitted only once enough genuine reviews exist — see
+  // aggregateRatingJsonLd. Publishing a rating built from one or two entries is
+  // against Google's structured-data guidelines and risks a manual action, so
+  // the markup stays off until the data earns it and then appears by itself.
+  const aggregateRating = aggregateRatingJsonLd(publicTestimonials ?? []);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
+    // Ties this page to the sitewide entity in the root layout instead of
+    // declaring a second, competing business node.
+    "@id": `${SITE_URL}/#localbusiness`,
+    "parentOrganization": { "@id": `${SITE_URL}/#organization` },
     "name": "KRAV Coach",
     "description": isEN
       ? "Premium online fitness coaching with personalised weekly training plans, nutrition tracking and direct coach access via app."
       : "Coaching fitness online com planos de treino semanais personalizados, acompanhamento nutricional e acesso direto ao coach via app.",
-    "url": "https://kravcoaching.com",
-    "image": "https://kravcoaching.com/andre-bg.jpg",
+    "url": SITE_URL,
+    "image": `${SITE_URL}/andre-bg.jpg`,
     "priceRange": "€127/mês",
+    "areaServed": { "@type": "Country", "name": "Portugal" },
+    "sameAs": SOCIAL_PROFILES,
     "founder": {
       "@type": "Person",
       "name": coach?.full_name ?? "André Kravchuk",
       "jobTitle": "Personal Trainer & Fitness Coach",
     },
+    ...(aggregateRating ? { aggregateRating } : {}),
     "offers": {
       "@type": "Offer",
       "name": isEN ? "Online Coaching 1:1" : "Coaching Online 1:1",
       "price": "127",
       "priceCurrency": "EUR",
+      "url": `${SITE_URL}/start`,
+      "availability": "https://schema.org/InStock",
       "description": isEN ? "7-day free trial included" : "Trial grátis de 7 dias incluído",
     },
   };
