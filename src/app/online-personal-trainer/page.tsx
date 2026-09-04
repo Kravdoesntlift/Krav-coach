@@ -171,7 +171,11 @@ export default async function OnlinePersonalTrainerPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
       />
 
-      <div className="min-h-screen bg-black text-white overflow-x-hidden">
+      {/* The root layout hardcodes <html lang="pt">, and only a root layout can
+          set that in the App Router. Marking this subtree as English is the
+          standard HTML way to override it for a section, and it is what screen
+          readers actually use to pick a voice. */}
+      <div lang="en" className="min-h-screen bg-black text-white overflow-x-hidden">
         {/* Ambient glow */}
         <div
           className="fixed inset-0 pointer-events-none z-0"
