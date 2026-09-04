@@ -16,7 +16,10 @@ export const BRAND = {
   legalName: "KRAV Coach",
   founder: "André Kravchuk",
   jobTitle: "Personal Trainer & Fitness Coach",
-  email: "geral@kravcoaching.com",
+  // The address the Terms and Privacy pages already give clients. It must be a
+  // mailbox that actually receives, since it is published in the site's
+  // structured data and in llms.txt where an assistant may hand it to someone.
+  email: "kravdoesntlift@gmail.com",
   priceEur: 127,
   currency: "EUR",
   areaServed: "PT",
