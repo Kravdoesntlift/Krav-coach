@@ -3,6 +3,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import BillingClient from "./BillingClient";
+import BillingHealthCard from "@/components/coach/BillingHealthCard";
+import { getWebhookHealth } from "@/lib/billing/reconcile";
 
 export default async function BillingPage() {
   const supabase = await createClient();
@@ -70,6 +72,14 @@ export default async function BillingPage() {
     }
   }
 
+  // Is Stripe actually reaching this app? A dead webhook is otherwise invisible:
+  // Stripe records the failed delivery on its own dashboard and the app hears
+  // nothing, so the only symptom is renewals showing up a day late.
+  const hasLiveSubscriptions = (subscriptions ?? []).some(
+    (s) => s.status === "active" || s.status === "trialing",
+  );
+  const webhook = await getWebhookHealth(hasLiveSubscriptions);
+
   const clients = (clientProfiles ?? []).map((cp) => ({
     id: cp.id,
     full_name: cp.full_name ?? "—",
@@ -94,6 +104,13 @@ export default async function BillingPage() {
             Gere subscrições e pagamentos dos teus clientes via Stripe.
           </p>
         </div>
+
+        <BillingHealthCard
+          lastEventAt={webhook.lastEventAt}
+          healthy={webhook.healthy}
+          neverReceived={webhook.neverReceived}
+          hasSubscriptions={hasLiveSubscriptions}
+        />
 
         <BillingClient clients={clients} coachId={user.id} />
       </div>
