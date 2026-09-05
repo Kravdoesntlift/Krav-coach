@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { WorkoutPlan, WorkoutDay, Exercise } from "@/lib/supabase/types";
-import { DAY_NAMES_FULL } from "@/lib/supabase/types";
+import { DAY_NAMES_FULL, byWeekOrder } from "@/lib/supabase/types";
 import ProgressRing from "@/components/ui/ProgressRing";
 import Confetti from "@/components/ui/Confetti";
 import LiveWorkout, { getActiveWorkoutDayId } from "@/components/client/LiveWorkout";
@@ -78,7 +78,7 @@ export default function WorkoutWeek({ plan, clientId, coachId }: Props) {
   const { t, lang } = useLang();
   useOfflineSync(); // drain offline queue when connection returns
   const days = plan.workout_days ?? [];
-  const sortedDays = [...days].sort((a, b) => a.day_of_week - b.day_of_week);
+  const sortedDays = [...days].sort(byWeekOrder);
   const today = new Date().getDay();
 
   const trainDays = days.filter((d) => !d.is_rest);

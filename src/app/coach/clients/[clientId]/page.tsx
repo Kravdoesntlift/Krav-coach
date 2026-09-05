@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { DAY_NAMES, DAY_NAMES_FULL, WEEK_ORDER_MON_FIRST } from "@/lib/supabase/types";
+import { DAY_NAMES, DAY_NAMES_FULL, WEEK_ORDER_MON_FIRST, byWeekOrder } from "@/lib/supabase/types";
 import { signPhotoUrls } from "@/lib/storage";
 import { deletePlan, duplicatePlan } from "@/app/coach/plans/actions";
 import DeletePlanButton from "@/components/coach/DeletePlanButton";
@@ -560,7 +560,7 @@ export default async function ClientDetailPage({
                   {/* Days list */}
                   <div className="space-y-1.5 mb-4">
                     {[...days]
-                      .sort((a: { day_of_week: number }, b: { day_of_week: number }) => a.day_of_week - b.day_of_week)
+                      .sort(byWeekOrder)
                       .map((day: { id: string; day_of_week: number; label: string | null; is_rest?: boolean; exercises?: { id: string }[]; workout_completions?: { client_id: string; feeling?: string | null; note?: string | null }[] }) => {
                         const completion = day.workout_completions?.find((c) => c.client_id === clientId);
                         const done = !!completion;

@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { DAY_NAMES_FULL } from "@/lib/supabase/types";
+import { DAY_NAMES_FULL, byWeekOrder } from "@/lib/supabase/types";
 import type { WorkoutPlan } from "@/lib/supabase/types";
 import { t } from "@/lib/i18n";
 import { getLang } from "@/lib/i18n/getLang";
@@ -309,7 +309,7 @@ export default async function ClientDashboard() {
   // Build cache payload for offline page
   const weekDaysCache = plan
     ? (plan.workout_days as WorkoutPlan["workout_days"])
-        ?.sort((a, b) => a.day_of_week - b.day_of_week)
+        ?.sort(byWeekOrder)
         .map((d) => ({
           label: d.label ?? "",
           exercises: (d.exercises ?? []).map((e: { name: string }) => e.name),

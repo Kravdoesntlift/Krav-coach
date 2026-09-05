@@ -339,6 +339,26 @@ export const DAY_NAMES_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 /** Display order for a training week (Monday first), as JS day numbers. */
 export const WEEK_ORDER_MON_FIRST = [1, 2, 3, 4, 5, 6, 0] as const;
+
+/**
+ * Position of a JS weekday within a Monday-first training week: Mon = 0 ... Sun = 6.
+ *
+ * A training week runs Monday to Sunday, but `day_of_week` follows
+ * Date.getDay(), where Sunday is 0. Sorting on the raw number therefore lists
+ * Sunday before Monday, at the top of a week it actually ends. This is the same
+ * conversion the dashboard already applies when it maps a day onto a date.
+ */
+export function weekPosition(dayOfWeek: number): number {
+  return (dayOfWeek + 6) % 7;
+}
+
+/** Sort comparator for workout days, Monday first and Sunday last. */
+export function byWeekOrder(
+  a: { day_of_week: number },
+  b: { day_of_week: number },
+): number {
+  return weekPosition(a.day_of_week) - weekPosition(b.day_of_week);
+}
 export const DAY_NAMES_FULL = [
   "Domingo",
   "Segunda",

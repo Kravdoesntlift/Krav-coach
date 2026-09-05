@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { DAY_NAMES_FULL } from "@/lib/supabase/types";
+import { DAY_NAMES_FULL, byWeekOrder } from "@/lib/supabase/types";
 import Link from "next/link";
 import { t } from "@/lib/i18n";
 import { getLang } from "@/lib/i18n/getLang";
@@ -90,7 +90,7 @@ export default async function HistoryPage() {
                 {/* Days */}
                 <div className="grid grid-cols-2 gap-1.5">
                   {[...days]
-                    .sort((a: { day_of_week: number }, b: { day_of_week: number }) => a.day_of_week - b.day_of_week)
+                    .sort(byWeekOrder)
                     .map((day: { id: string; day_of_week: number; label: string | null; exercises?: { id: string }[]; workout_completions?: { client_id: string }[] }) => {
                       const done = day.workout_completions?.some((c) => c.client_id === user!.id);
                       return (

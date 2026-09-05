@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Profile, WorkoutPlan } from "@/lib/supabase/types";
-import { DAY_NAMES_FULL } from "@/lib/supabase/types";
+import { DAY_NAMES_FULL, byWeekOrder } from "@/lib/supabase/types";
 
 interface ExerciseInput {
   name: string;
@@ -165,7 +165,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
     if (days.some((d) => d.day_of_week === dayOfWeek)) return;
     setDays((prev) =>
       [...prev, { day_of_week: dayOfWeek, label: "", is_rest: false, exercises: [] }].sort(
-        (a, b) => a.day_of_week - b.day_of_week
+        byWeekOrder
       )
     );
   }
