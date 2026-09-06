@@ -6,7 +6,7 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookieOptions: {
-        // Keep session alive for 400 days — prevents PWA logout on mobile
+        // Keep session alive for 400 days: prevents PWA logout on mobile
         maxAge: 400 * 24 * 60 * 60,
         sameSite: "lax",
         secure: true,

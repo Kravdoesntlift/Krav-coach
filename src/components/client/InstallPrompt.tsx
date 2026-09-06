@@ -87,13 +87,13 @@ export default function InstallPrompt() {
         "Open this site in Safari (not another browser)",
         'Tap the  icon (Safari bottom bar)',
         '"Add to Home Screen"',
-        'Tap "Add" — it appears on your screen like an app!',
+        'Tap "Add", it appears on your screen like an app!',
       ]
     : [
         "Abre este site no Safari (não noutro browser)",
         'Toca no ícone  (barra inferior do Safari)',
         '"Adicionar ao ecrã de início"',
-        'Toca "Adicionar" — fica no teu ecrã como uma app!',
+        'Toca "Adicionar", fica no teu ecrã como uma app!',
       ];
 
   return (

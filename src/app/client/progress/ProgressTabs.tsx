@@ -396,7 +396,7 @@ function MeasuresTab({ measurements, biometric }: { measurements: Measurement[];
               <div>
                 <p className="text-gray-400 text-sm font-medium">{guide.label}</p>
                 <p className="text-gray-600 text-xs">
-                  {isEN ? "No data — fill in your weekly check-in" : "Sem dados — preenche no check-in semanal"}
+                  {isEN ? "No data, fill in your weekly check-in" : "Sem dados, preenche no check-in semanal"}
                 </p>
               </div>
             </div>

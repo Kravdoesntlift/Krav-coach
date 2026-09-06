@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Stripe não configurado." }, { status: 503 });
   }
 
-  // 1. Auth — must be a coach
+  // 1. Auth: must be a coach
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
 
   if (!sub) {
-    // No Stripe subscription — just cancel in DB (free/manual client)
+    // No Stripe subscription: just cancel in DB (free/manual client)
     await admin.from("profiles").update({ status: "cancelled" }).eq("id", clientId);
     return NextResponse.json({ cancelled: true, refunded: false, message: "Conta cancelada (sem subscrição Stripe ativa)." });
   }
@@ -102,11 +102,11 @@ export async function POST(req: NextRequest) {
       }
     }
   } catch (err) {
-    // Refund failed (e.g. already refunded) — subscription is still cancelled
+    // Refund failed (e.g. already refunded): subscription is still cancelled
     refundError = err instanceof Error ? err.message : "Erro no reembolso";
   }
 
-  // 7. Update DB — profile status + subscription status
+  // 7. Update DB: profile status + subscription status
   await Promise.all([
     admin.from("profiles").update({ status: "cancelled" }).eq("id", clientId),
     admin.from("stripe_subscriptions").update({ status: "cancelled" }).eq("id", sub.id),

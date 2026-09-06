@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Groq API não configurada." }, { status: 503 });
   }
 
-  // Auth — must be a coach
+  // Auth: must be a coach
   const supabase = await createClient();
   const {
     data: { user },

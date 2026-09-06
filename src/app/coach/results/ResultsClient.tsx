@@ -117,7 +117,7 @@ export default function ResultsClient({ items }: Props) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="label">URL da foto — Antes</label>
+              <label className="label">URL da foto, Antes</label>
               <input
                 className="input w-full"
                 name="before_url"
@@ -127,7 +127,7 @@ export default function ResultsClient({ items }: Props) {
               />
             </div>
             <div>
-              <label className="label">URL da foto — Depois</label>
+              <label className="label">URL da foto, Depois</label>
               <input
                 className="input w-full"
                 name="after_url"

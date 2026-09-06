@@ -166,7 +166,7 @@ export default function TwoFactorSettings() {
         <p className="text-zinc-500 text-xs">{c("loading")}</p>
       )}
 
-      {/* IDLE — show Enable button */}
+      {/* IDLE: show Enable button */}
       {!loading && stage === "idle" && (
         <button
           onClick={handleEnable}
@@ -177,7 +177,7 @@ export default function TwoFactorSettings() {
         </button>
       )}
 
-      {/* VERIFYING — show QR + code input */}
+      {/* VERIFYING: show QR + code input */}
       {!loading && stage === "verifying" && enrollData && (
         <div className="space-y-4">
           <p className="text-zinc-400 text-xs">{c("scan_hint")}</p>
@@ -231,7 +231,7 @@ export default function TwoFactorSettings() {
         </div>
       )}
 
-      {/* ACTIVE — show Disable button (2-step) */}
+      {/* ACTIVE: show Disable button (2-step) */}
       {!loading && (stage === "active" || stage === "confirming-disable") && (
         <>
           {stage === "active" && (

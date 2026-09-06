@@ -17,7 +17,7 @@ async function activateAfterPayment(userId: string, sessionId: string) {
   try {
     session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ["subscription"] });
   } catch {
-    return; // Network error — the webhook and the nightly job both still cover this
+    return; // Network error, the webhook and the nightly job both still cover this
   }
 
   const clientId = session.metadata?.client_id;
@@ -40,7 +40,7 @@ async function activateAfterPayment(userId: string, sessionId: string) {
   if (sub) {
     await syncSubscription(admin, { subscription: sub, clientId, coachId });
   } else {
-    // Paid, but the subscription object did not come back — at least unlock the
+    // Paid, but the subscription object did not come back: at least unlock the
     // account rather than leaving a paying client staring at this page.
     await admin.from("profiles").update({ status: "active" }).eq("id", clientId);
   }
@@ -109,7 +109,7 @@ export default async function PendingPage({
 
   const { welcome, session_id } = await searchParams;
 
-  // If Stripe redirected here after payment — activate immediately
+  // If Stripe redirected here after payment: activate immediately
   if (welcome === "true" && session_id) {
     await activateAfterPayment(user.id, session_id);
   }

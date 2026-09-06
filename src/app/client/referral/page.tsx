@@ -32,17 +32,17 @@ const extra = {
     pt: [
       "Partilhas o teu link com um amigo que queira transformar o corpo",
       "O amigo entra, paga e começa o programa de coaching",
-      "Tu ganhas 1 mês grátis assim que ele ficar activo — o coach aplica automaticamente",
+      "Tu ganhas 1 mês grátis assim que ele ficar activo. O coach aplica automaticamente",
     ],
     en: [
       "Share your link with a friend who wants to transform their body",
       "Your friend joins, pays, and starts the coaching programme",
-      "You get 1 free month once they go active — the coach applies it automatically",
+      "You get 1 free month once they go active, the coach applies it automatically",
     ],
   },
   tip: {
-    pt: "O amigo convidado não recebe desconto automático — o incentivo dele é acesso a um coaching premium. Para ele também ganhar um mês grátis, basta convidar alguém.",
-    en: "The invited friend doesn't get an automatic discount — their incentive is access to premium coaching. For them to also earn a free month, they just need to invite someone.",
+    pt: "O amigo convidado não recebe desconto automático. O incentivo dele é acesso a um coaching premium. Para ele também ganhar um mês grátis, basta convidar alguém.",
+    en: "The invited friend doesn't get an automatic discount, their incentive is access to premium coaching. For them to also earn a free month, they just need to invite someone.",
   },
   your_refs:      { pt: "As tuas referências", en: "Your referrals" },
   anonymous:      { pt: "Anónimo", en: "Anonymous" },

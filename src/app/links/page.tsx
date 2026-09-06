@@ -71,7 +71,7 @@ function GuiaBg() {
 function MyProteinBg() {
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: "#06080a" }}>
-      {/* Radial gold glow — center */}
+      {/* Radial gold glow: center */}
       <div className="absolute inset-0" style={{
         background: "radial-gradient(ellipse at 50% 60%, rgba(201,168,76,0.13) 0%, transparent 68%)"
       }}/>
@@ -99,7 +99,7 @@ function MyProteinBg() {
           <div className="h-px w-6" style={{ background: "rgba(201,168,76,0.35)" }}/>
         </div>
 
-        {/* THE CODE — hero element */}
+        {/* THE CODE: hero element */}
         <p
           className="font-black tracking-[0.25em] leading-none"
           style={{
@@ -150,7 +150,7 @@ const CARDS: CardData[] = [
     badge: "✓ GRÁTIS",
     badgeColor: "green",
     title: "Guia de Treino",
-    sub: "Download — enviado para o teu email",
+    sub: "Download, enviado para o teu email",
     cta: "Quero o guia",
     ctaStyle: "gold",
     href: "/guia",
@@ -173,7 +173,7 @@ const CARDS: CardData[] = [
     bgStyle: { background: "#1a1200" },
     modal: {
       title: "Coaching Online 1:1",
-      desc: "Treino e nutrição 100% feitos para ti — plano semanal personalizado, check-ins de evolução, nutrição adaptada ao teu objetivo e acesso direto a mim via chat. Um cliente ganhou +20kg de massa. Sem planos genéricos. Sem desculpas.",
+      desc: "Treino e nutrição 100% feitos para ti, plano semanal personalizado, check-ins de evolução, nutrição adaptada ao teu objetivo e acesso direto a mim via chat. Um cliente ganhou +20kg de massa. Sem planos genéricos. Sem desculpas.",
       cta: "Começar trial grátis de 7 dias",
       href: "/start",
     },
@@ -323,7 +323,7 @@ function Card({ card, onOpen }: { card: CardData; onOpen?: () => void }) {
           background: "linear-gradient(to bottom, transparent 20%, rgba(0,0,0,0.3) 55%, #0f0c08 100%)"
         }} />
 
-        {/* Badge + title overlaid — bottom left (like richard) */}
+        {/* Badge + title overlaid: bottom left (like richard) */}
         {card.id !== "myprotein" && (
           <div className="absolute bottom-4 left-4 right-4 z-10 space-y-1.5">
             <Badge text={card.badge} color={card.disabled ? "white" : card.badgeColor} />
@@ -433,7 +433,7 @@ export default function LinksPage() {
 
           {/* Bio */}
           <p className="text-xs leading-relaxed max-w-[240px] text-center" style={{ color: "rgba(255,255,255,0.38)" }}>
-            De 59kg a estético — sem genética.<br />
+            De 59kg a estético, sem genética.<br />
             <span style={{ color: "rgba(201,168,76,0.7)" }}>Cliente ganhou +20kg de massa.</span>
           </p>
 

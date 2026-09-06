@@ -111,7 +111,7 @@ export default function WorkoutWeek({ plan, clientId, coachId }: Props) {
     <>
       {showConfetti && <Confetti onDone={() => setShowConfetti(false)} />}
       <div className="space-y-4">
-        {/* Weekly progress ring — clickable header */}
+        {/* Weekly progress ring: clickable header */}
         {trainDays.length > 0 && (
           <button
             onClick={() => setWeekOpen((o) => !o)}
@@ -154,7 +154,7 @@ export default function WorkoutWeek({ plan, clientId, coachId }: Props) {
           </button>
         )}
 
-        {/* Day cards — collapsible */}
+        {/* Day cards: collapsible */}
         <div
           style={{
             display: "grid",
@@ -320,7 +320,7 @@ function WorkoutDayCard({
             {isToday && <span className="ml-2 text-xs text-brand-gold">{t("today")}</span>}
           </p>
           <p className="text-gray-600 text-xs mt-0.5">
-            {day.label || extra.rest_day_label[lang]} — {extra.rest_recover[lang]}
+            {day.label || extra.rest_day_label[lang]}, {extra.rest_recover[lang]}
           </p>
         </div>
       </div>
@@ -354,7 +354,7 @@ function WorkoutDayCard({
             <p className="font-semibold text-white">
               {DAY_NAMES_FULL[day.day_of_week]}
               {isToday && <span className="ml-2 text-xs text-brand-gold font-normal">{t("today")}</span>}
-              {/* A missed session is not lost — it can be ticked whenever it
+              {/* A missed session is not lost, it can be ticked whenever it
                   gets done. Without saying so, the dimmed card reads as locked. */}
               {isPast && !completed && (
                 <span className="ml-2 text-xs text-zinc-500 font-normal">{extra.catch_up[lang]}</span>
@@ -580,7 +580,7 @@ function makeDefaultSets(type: SetType, exSets: number, exReps: number | string)
   if (type === "warmup") {
     return Array.from({ length: 2 }, () => ({ weight_kg: "", reps: String(exReps), done: false }));
   }
-  // dropset — starts empty, user adds
+  // dropset: starts empty, user adds
   return [];
 }
 
@@ -949,7 +949,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
                     "focus:border-brand-gold"
                   }`}
                 />
-                {/* Remove button — always on warmup/dropset, only if >1 set on working */}
+                {/* Remove button: always on warmup/dropset, only if >1 set on working */}
                 {(activeTab !== "working" || currentSets.length > 1) && (
                   <button
                     onClick={() => removeSet(activeTab, i)}

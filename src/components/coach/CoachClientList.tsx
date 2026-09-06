@@ -20,7 +20,7 @@ export interface ClientData {
   status: string;
   avatar_url?: string | null;
   subscription_renews_at?: string | null;
-  // This week (optional — only present if client has a plan this week)
+  // This week (optional: only present if client has a plan this week)
   totalDays?: number;
   completedDays?: number;
   checkin?: { energy_level: number | null; sleep_quality: number | null; stress_level: number | null } | null;
@@ -175,7 +175,7 @@ export default function CoachClientList({ clients, coachId, coachName }: Props) 
                   </div>
                 </Link>
 
-                {/* Quick message — outside Link */}
+                {/* Quick message: outside Link */}
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
                   <QuickMessage coachId={coachId} coachName={coachName} clientId={client.id} clientName={client.full_name} />
                 </div>

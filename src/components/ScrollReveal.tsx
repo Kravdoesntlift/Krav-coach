@@ -44,7 +44,7 @@ export default function ScrollReveal({
           el.style.transitionDelay = `${delay}ms`;
           el.style.opacity = "1";
           el.style.transform = "none";
-          // Animate in only once — stop observing after reveal
+          // Animate in only once: stop observing after reveal
           observer.disconnect();
         }
       },

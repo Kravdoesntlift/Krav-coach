@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Política de Privacidade — KRAV Coach",
+  title: "Política de Privacidade · KRAV Coach",
   description: "Como recolhemos, usamos e protegemos os seus dados pessoais.",
 };
 
@@ -41,7 +41,7 @@ export default function PrivacyPage() {
               <li><strong className="text-white">Saúde e progresso:</strong> peso corporal, medidas (cintura, peito, braço), fotografias de progresso e registos pessoais de exercício</li>
               <li><strong className="text-white">Treino:</strong> planos de treino, conclusões de sessões e histórico de exercícios</li>
               <li><strong className="text-white">Check-ins semanais:</strong> notas, nível de energia e peso reportado</li>
-              <li><strong className="text-white">Pagamento:</strong> processado integralmente pela Stripe — não armazenamos dados de cartão</li>
+              <li><strong className="text-white">Pagamento:</strong> processado integralmente pela Stripe. Não armazenamos dados de cartão</li>
               <li><strong className="text-white">Notificações:</strong> subscrição push (endpoint do dispositivo), armazenada para envio de alertas de treino</li>
             </ul>
           </section>
@@ -55,7 +55,7 @@ export default function PrivacyPage() {
                 style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
               >
                 <p className="text-white font-semibold text-xs">Execução do contrato (Art. 6.º, n.º 1, al. b) RGPD)</p>
-                <p className="text-zinc-400 text-xs">Prestação do serviço de coaching — planos de treino, acompanhamento, check-ins e notificações.</p>
+                <p className="text-zinc-400 text-xs">Prestação do serviço de coaching, planos de treino, acompanhamento, check-ins e notificações.</p>
               </div>
               <div
                 className="p-4 rounded-xl space-y-1"
@@ -69,7 +69,7 @@ export default function PrivacyPage() {
                 style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
               >
                 <p className="text-white font-semibold text-xs">Consentimento (Art. 6.º, n.º 1, al. a) RGPD)</p>
-                <p className="text-zinc-400 text-xs">Envio de notificações push — revogável a qualquer momento nas definições do perfil.</p>
+                <p className="text-zinc-400 text-xs">Envio de notificações push, revogável a qualquer momento nas definições do perfil.</p>
               </div>
             </div>
           </section>
@@ -79,10 +79,10 @@ export default function PrivacyPage() {
             <h2 className="text-white font-bold text-base">4. Subprocessadores e partilha de dados</h2>
             <p>Não vendemos nem partilhamos os teus dados com terceiros para fins comerciais. Utilizamos os seguintes subprocessadores para operar a plataforma:</p>
             <ul className="space-y-1 pl-4 list-disc list-outside marker:text-zinc-600">
-              <li><strong className="text-white">Supabase Inc.</strong> — base de dados e autenticação (servidores na UE)</li>
-              <li><strong className="text-white">Stripe Inc.</strong> — processamento de pagamentos (certificação PCI DSS nível 1)</li>
-              <li><strong className="text-white">Resend Inc.</strong> — envio de e-mails transacionais</li>
-              <li><strong className="text-white">Vercel Inc.</strong> — alojamento da plataforma</li>
+              <li><strong className="text-white">Supabase Inc.</strong>, base de dados e autenticação (servidores na UE)</li>
+              <li><strong className="text-white">Stripe Inc.</strong>, processamento de pagamentos (certificação PCI DSS nível 1)</li>
+              <li><strong className="text-white">Resend Inc.</strong>, envio de e-mails transacionais</li>
+              <li><strong className="text-white">Vercel Inc.</strong>, alojamento da plataforma</li>
             </ul>
             <p className="text-zinc-500 text-xs mt-2">
               Todos os subprocessadores estão sujeitos a acordos de tratamento de dados compatíveis com o RGPD.
@@ -102,12 +102,12 @@ export default function PrivacyPage() {
             <h2 className="text-white font-bold text-base">6. Os teus direitos (RGPD)</h2>
             <p>Tens direito a:</p>
             <ul className="space-y-1 pl-4 list-disc list-outside marker:text-zinc-600">
-              <li><strong className="text-white">Acesso</strong> — receber uma cópia dos dados que tratamos sobre ti</li>
-              <li><strong className="text-white">Retificação</strong> — corrigir dados inexatos</li>
-              <li><strong className="text-white">Apagamento</strong> — solicitar a eliminação da tua conta e dados (&ldquo;direito a ser esquecido&rdquo;)</li>
-              <li><strong className="text-white">Portabilidade</strong> — exportar os teus dados em formato estruturado</li>
-              <li><strong className="text-white">Oposição</strong> — opor-te ao tratamento baseado em interesse legítimo</li>
-              <li><strong className="text-white">Limitação</strong> — solicitar a suspensão do tratamento em determinadas circunstâncias</li>
+              <li><strong className="text-white">Acesso</strong>, receber uma cópia dos dados que tratamos sobre ti</li>
+              <li><strong className="text-white">Retificação</strong>, corrigir dados inexatos</li>
+              <li><strong className="text-white">Apagamento</strong>, solicitar a eliminação da tua conta e dados (&ldquo;direito a ser esquecido&rdquo;)</li>
+              <li><strong className="text-white">Portabilidade</strong>, exportar os teus dados em formato estruturado</li>
+              <li><strong className="text-white">Oposição</strong>, opor-te ao tratamento baseado em interesse legítimo</li>
+              <li><strong className="text-white">Limitação</strong>, solicitar a suspensão do tratamento em determinadas circunstâncias</li>
             </ul>
             <p className="mt-2">
               Para exercer qualquer direito, contacta{" "}
@@ -130,7 +130,7 @@ export default function PrivacyPage() {
           <section className="space-y-2">
             <h2 className="text-white font-bold text-base">8. Segurança</h2>
             <p>
-              Os dados são transmitidos por HTTPS e armazenados com Row-Level Security (RLS) — cada utilizador só acede aos seus próprios dados. As passwords são armazenadas com hashing seguro pelo Supabase Auth.
+              Os dados são transmitidos por HTTPS e armazenados com Row-Level Security (RLS). Cada utilizador só acede aos seus próprios dados. As passwords são armazenadas com hashing seguro pelo Supabase Auth.
             </p>
           </section>
 

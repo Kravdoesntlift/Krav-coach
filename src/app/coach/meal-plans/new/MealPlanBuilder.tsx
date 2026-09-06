@@ -214,7 +214,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
             <label className="label">Nome do plano *</label>
             <input
               className="input w-full"
-              placeholder="Ex: Plano de definição — Semana 1"
+              placeholder="Ex: Plano de definição, Semana 1"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />

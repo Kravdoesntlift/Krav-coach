@@ -1202,7 +1202,7 @@ export const PT_FOODS: LocalFood[] = [
   { id: "barra_special_k",             name: "Barra Special K",                    per100g: { calories: 380, protein: 8.0, carbs: 70.0, fat: 7.5 } },
   { id: "barra_oat_nut",               name: "Barra Oat Nut",                      per100g: { calories: 450, protein: 9.0, carbs: 55.0, fat: 21.0 } },
   { id: "barra_trek_protein",          name: "Barra Trek Protein",                 per100g: { calories: 395, protein: 17.0, carbs: 45.0, fat: 14.0 } },
-  // Barras proteicas — marcas vendidas em ginásios e supermercados
+  // Barras proteicas: marcas vendidas em ginásios e supermercados
   { id: "barra_grenade_carb_killa",    name: "Grenade Carb Killa Bar",             servingSize: 60, per100g: { calories: 380, protein: 35.0, carbs: 26.0, fat: 13.0 } },
   { id: "barra_barebells",             name: "Barebells Protein Bar",              servingSize: 55, per100g: { calories: 370, protein: 36.0, carbs: 27.0, fat: 12.0 } },
   { id: "barra_fulfil",                name: "Fulfil Vitamin & Protein Bar",       servingSize: 55, per100g: { calories: 385, protein: 33.0, carbs: 30.0, fat: 13.0 } },
@@ -1219,7 +1219,7 @@ export const PT_FOODS: LocalFood[] = [
   { id: "barra_nature_valley_protein", name: "Nature Valley Protein Bar",          servingSize: 40, per100g: { calories: 450, protein: 18.0, carbs: 42.0, fat: 22.0 } },
   { id: "barra_special_k_protein",     name: "Special K Protein Bar",              servingSize: 45, per100g: { calories: 395, protein: 16.0, carbs: 55.0, fat: 10.0 } },
 
-  // Marcas próprias de supermercados — linha fitness/proteína
+  // Marcas próprias de supermercados: linha fitness/proteína
   { id: "continente_barra_proteina",   name: "Continente Barra de Proteína",       servingSize: 60, per100g: { calories: 382, protein: 31.0, carbs: 38.0, fat: 11.0 } },
   { id: "continente_whey",             name: "Continente Whey Protein",            servingSize: 30, per100g: { calories: 383, protein: 76.0, carbs: 10.0, fat: 5.5 } },
   { id: "pingo_doce_barra_proteina",   name: "Pingo Doce Barra de Proteína",       servingSize: 60, per100g: { calories: 380, protein: 30.0, carbs: 40.0, fat: 11.0 } },
@@ -1227,14 +1227,14 @@ export const PT_FOODS: LocalFood[] = [
   { id: "lidl_whey",                   name: "Lidl W5 Whey Protein",               servingSize: 30, per100g: { calories: 380, protein: 75.0, carbs: 11.0, fat: 5.0 } },
   { id: "aldi_proteina_bar",           name: "Aldi Barra de Proteína",             servingSize: 55, per100g: { calories: 382, protein: 31.0, carbs: 38.0, fat: 11.0 } },
 
-  // Bebidas proteicas RTD (prontas a beber) — vendidas em supermercados
+  // Bebidas proteicas RTD (prontas a beber): vendidas em supermercados
   { id: "arla_protein_shake",          name: "Arla Protein Shake",                 servingSize: 500, per100g: { calories: 60, protein: 8.0, carbs: 4.5, fat: 0.2 } },
   { id: "grenade_shake_rtd",           name: "Grenade Carb Killa Shake (RTD)",     servingSize: 330, per100g: { calories: 56, protein: 7.6, carbs: 2.8, fat: 1.3 } },
   { id: "premier_protein_rtd",         name: "Premier Protein Shake (RTD)",        servingSize: 325, per100g: { calories: 86, protein: 9.5, carbs: 6.2, fat: 2.5 } },
 
   { id: "gel_energia_carb",            name: "Gel de energia (carboidratos)",      per100g: { calories: 285, protein: 0.0, carbs: 72.0, fat: 0.0 } },
 
-  // ── MYPROTEIN — PROTEÍNAS EM PÓ ──────────────────────────────────────────────
+  // ── MYPROTEIN: PROTEÍNAS EM PÓ ──────────────────────────────────────────────
   // Valores baseados no rótulo EU variante natural/sem sabor. Podem variar ±5% por sabor.
   { id: "mp_impact_whey",              name: "MyProtein Impact Whey Protein",       servingSize: 25, per100g: { calories: 400, protein: 83.0, carbs: 5.5, fat: 7.5 } },
   { id: "mp_whey_isolate",             name: "MyProtein Impact Whey Isolate",       servingSize: 25, per100g: { calories: 375, protein: 90.0, carbs: 3.5, fat: 1.0 } },
@@ -1245,26 +1245,26 @@ export const PT_FOODS: LocalFood[] = [
   { id: "mp_plant_protein",            name: "MyProtein Impact Plant Protein",      servingSize: 25, per100g: { calories: 360, protein: 72.0, carbs: 10.0, fat: 5.5 } },
   { id: "mp_soy_isolate",              name: "MyProtein Soy Protein Isolate",       servingSize: 30, per100g: { calories: 355, protein: 90.0, carbs: 0.5, fat: 1.5 } },
 
-  // ── MYPROTEIN — GAINERS E OUTROS PÓS ─────────────────────────────────────────
+  // ── MYPROTEIN: GAINERS E OUTROS PÓS ─────────────────────────────────────────
   { id: "mp_hard_gainer",              name: "MyProtein Hard Gainer Extreme",       servingSize: 150, per100g: { calories: 378, protein: 28.0, carbs: 58.0, fat: 4.0 } },
   { id: "mp_oat_powder",               name: "MyProtein Oat Powder",                per100g: { calories: 373, protein: 11.0, carbs: 60.0, fat: 7.5 } },
   { id: "mp_creatine",                 name: "MyProtein Creatine Monohydrate",      servingSize: 5,  per100g: { calories: 0, protein: 0.0, carbs: 0.0, fat: 0.0 } },
   { id: "mp_glutamine",                name: "MyProtein Glutamine",                 servingSize: 5,  per100g: { calories: 380, protein: 95.0, carbs: 0.0, fat: 0.0 } },
 
-  // ── MYPROTEIN — BARRAS ────────────────────────────────────────────────────────
+  // ── MYPROTEIN: BARRAS ────────────────────────────────────────────────────────
   { id: "mp_layered_bar",              name: "MyProtein Layered Protein Bar",       servingSize: 64, per100g: { calories: 389, protein: 31.0, carbs: 34.0, fat: 14.0 } },
   { id: "mp_crisp_bar",                name: "MyProtein Protein Crisp Bar",         servingSize: 65, per100g: { calories: 362, protein: 33.0, carbs: 30.0, fat: 11.0 } },
   { id: "mp_brownie",                  name: "MyProtein Protein Brownie",           servingSize: 75, per100g: { calories: 367, protein: 29.0, carbs: 40.0, fat: 11.0 } },
   { id: "mp_milk_tea_bar",             name: "MyProtein Milk Tea Bar",              servingSize: 50, per100g: { calories: 370, protein: 30.0, carbs: 37.0, fat: 11.0 } },
 
-  // ── PROZIS — PROTEÍNAS EM PÓ ─────────────────────────────────────────────────
+  // ── PROZIS: PROTEÍNAS EM PÓ ─────────────────────────────────────────────────
   { id: "prozis_whey",                 name: "Prozis 100% Whey Protein",            servingSize: 30, per100g: { calories: 383, protein: 78.0, carbs: 10.0, fat: 5.0 } },
   { id: "prozis_whey_isolate",         name: "Prozis Whey Isolate 90",              servingSize: 30, per100g: { calories: 363, protein: 86.0, carbs: 4.5, fat: 1.5 } },
   { id: "prozis_casein",               name: "Prozis Casein Pro",                   servingSize: 40, per100g: { calories: 358, protein: 71.0, carbs: 16.0, fat: 2.5 } },
   { id: "prozis_vegan",                name: "Prozis Vegan Protein",                servingSize: 30, per100g: { calories: 375, protein: 72.0, carbs: 14.0, fat: 5.0 } },
   { id: "prozis_creatine",             name: "Prozis Creatine Monohydrate",         servingSize: 5,  per100g: { calories: 0, protein: 0.0, carbs: 0.0, fat: 0.0 } },
 
-  // ── PROZIS — BARRAS ───────────────────────────────────────────────────────────
+  // ── PROZIS: BARRAS ───────────────────────────────────────────────────────────
   { id: "prozis_nitrobar",             name: "Prozis NitroBar",                     servingSize: 46, per100g: { calories: 402, protein: 43.0, carbs: 33.0, fat: 11.0 } },
   { id: "prozis_zero_bar",             name: "Prozis Zero Bar",                     servingSize: 35, per100g: { calories: 406, protein: 43.0, carbs: 38.0, fat: 9.0 } },
   { id: "prozis_wafer_bar",            name: "Prozis Protein Wafer Bar",            servingSize: 40, per100g: { calories: 423, protein: 33.0, carbs: 33.0, fat: 18.0 } },

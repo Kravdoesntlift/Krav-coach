@@ -241,7 +241,7 @@ export default function TestimonialsClient({ testimonials, clients }: Props) {
                           month: "short",
                           year: "numeric",
                         })
-                      : "—"}
+                      : "-"}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">

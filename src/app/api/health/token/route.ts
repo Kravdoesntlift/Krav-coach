@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 
-// GET — return (or create) the client's unique sync token
+// GET: return (or create) the client's unique sync token
 export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -33,7 +33,7 @@ export async function GET() {
   return NextResponse.json({ token: data.sync_token });
 }
 
-// POST — regenerate token (invalidates old one)
+// POST: regenerate token (invalidates old one)
 export async function POST() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

@@ -12,7 +12,7 @@ interface ExerciseInput {
   reps: string;
   notes: string;
   video_url: string;
-  superset_group?: string; // e.g. "A", "B", "C" — exercises with same letter are done back-to-back
+  superset_group?: string; // e.g. "A", "B", "C", exercises with same letter are done back-to-back
 }
 
 interface DayInput {
@@ -235,7 +235,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
         .single();
 
       // Skipping silently here loses a whole training day with no sign that
-      // anything went wrong — the plan just opens short.
+      // anything went wrong: the plan just opens short.
       if (dayErr || !dayRow) {
         return `Não foi possível guardar ${dayName}: ${dayErr?.message ?? "erro desconhecido"}`;
       }
@@ -303,13 +303,13 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
       if (updateErr) { setError("Erro ao atualizar plano."); setLoading(false); return; }
 
       // Editing replaces the days wholesale, so a failed re-insert leaves the
-      // plan empty. Surface it immediately — the coach still has the form filled
+      // plan empty. Surface it immediately: the coach still has the form filled
       // in and can retry, instead of finding out when the client opens the app.
       await supabase.from("workout_days").delete().eq("plan_id", existingPlan.id);
       const saveErr = await saveDaysAndExercises(supabase, existingPlan.id);
       if (saveErr) { setError(saveErr); setLoading(false); return; }
 
-      // Notify client — plan updated
+      // Notify client: plan updated
       fetch("/api/push/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -340,7 +340,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
         return;
       }
 
-      // Notify client — new plan assigned
+      // Notify client: new plan assigned
       fetch("/api/push/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -386,7 +386,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
         </div>
 
         <div>
-          <label className="label">Semana (início — Segunda-feira)</label>
+          <label className="label">Semana (início, Segunda-feira)</label>
           <input type="date" value={weekStart} onChange={(e) => setWeekStart(e.target.value)} className="input" />
         </div>
 

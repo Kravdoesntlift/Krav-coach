@@ -12,7 +12,7 @@ const t = {
   pt: {
     login:        "Entrar →",
     hero_title:   <>O teu treino.<br /><span style={{ background: "linear-gradient(90deg,#E8C96B,#C9A84C,#A8893A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Personalizado.</span></>,
-    hero_tagline: "Coaching fitness premium com acompanhamento real — no teu telemóvel, 24/7.",
+    hero_tagline: "Coaching fitness premium com acompanhamento real. No teu telemóvel, 24/7.",
     cta_primary:  "Trial grátis de 7 dias →",
     cta_secondary: "Depois €127/mês · Sem contratos",
     cta_login:    "Já tenho conta",
@@ -20,7 +20,7 @@ const t = {
     section_features: "Tudo o que está incluído",
     section_how:  "Como funciona",
     section_install: "Instala a app no teu telemóvel",
-    install_sub:  "Funciona como uma app nativa — sem precisar de ir à App Store.",
+    install_sub:  "Funciona como uma app nativa, sem precisar de ir à App Store.",
     install_hint: "💡 Depois de instalada, a app funciona offline e recebe notificações de treino.",
     ios_title:    "iPhone / iPad",
     ios_browser:  "Safari",
@@ -28,7 +28,7 @@ const t = {
       "Abre kravcoaching.com no Safari",
       "Toca no ícone ⎋ (barra inferior)",
       '"Adicionar ao ecrã de início"',
-      'Toca "Adicionar" — pronto! 🎉',
+      'Toca "Adicionar". Pronto! 🎉',
     ],
     android_title:   "Android",
     android_browser: "Chrome",
@@ -36,7 +36,7 @@ const t = {
       "Abre kravcoaching.com no Chrome",
       'Toca nos "⋮" (canto superior direito)',
       '"Adicionar ao ecrã inicial"',
-      'Toca "Instalar" — pronto! 🎉',
+      'Toca "Instalar". Pronto! 🎉',
     ],
     price_label:    "Plano Premium",
     price_sub:      "Tudo incluído. Sem surpresas.",
@@ -52,12 +52,12 @@ const t = {
       { icon: "💬", title: "Chat direto com o coach",   desc: "Tira dúvidas, partilha resultados e mantém-te motivado em tempo real." },
       { icon: "📊", title: "Acompanhamento semanal",    desc: "Check-ins, feedback e ajustes contínuos ao plano conforme a tua evolução." },
       { icon: "🏆", title: "Registo de progresso",      desc: "Peso, medidas, recordes pessoais e conquistas. Compara fotos antes/depois com slider interativo." },
-      { icon: "⚡", title: "Modo de treino ao vivo",    desc: "Timer de descanso com beep, registo de séries e pesos — tudo durante o treino." },
+      { icon: "⚡", title: "Modo de treino ao vivo",    desc: "Timer de descanso com beep, registo de séries e pesos, tudo durante o treino." },
     ],
     steps: [
       { n: "1", title: "Inscreve-te",        desc: "Preenche o questionário em 2 minutos. O coach recebe as tuas respostas de imediato." },
       { n: "2", title: "Recebe o teu plano", desc: "Nas primeiras 24 horas úteis o coach cria e envia o teu plano personalizado na app." },
-      { n: "3", title: "Treina com suporte", desc: "Segue o plano, regista os treinos e acompanha a tua evolução — o coach está sempre disponível." },
+      { n: "3", title: "Treina com suporte", desc: "Segue o plano, regista os treinos e acompanha a tua evolução. O coach está sempre disponível." },
     ],
     included: [
       "Plano de treino semanal 100% personalizado",
@@ -76,7 +76,7 @@ const t = {
     faq: [
       { q: "Quando recebo o meu plano?", a: "Nas primeiras 24 horas úteis após o registo, o coach cria e envia o teu plano personalizado diretamente na app." },
       { q: "É realmente personalizado?", a: "100%. O teu coach cria o plano com base nas tuas respostas: objetivos, nível, dias disponíveis e equipamento. Não é um template genérico." },
-      { q: "Funciona para iniciantes?", a: "Sim. O plano é totalmente adaptado ao teu nível — seja iniciante, intermédio ou avançado." },
+      { q: "Funciona para iniciantes?", a: "Sim. O plano é totalmente adaptado ao teu nível, seja iniciante, intermédio ou avançado." },
       { q: "Posso cancelar quando quiser?", a: "Sim. Sem permanência, sem contratos. Cancelas a qualquer momento através da tua área de cliente no Stripe." },
       { q: "E se não ficar satisfeito?", a: "Tens 7 dias para experimentar. Se não estiveres satisfeito, contacta o coach e reembolsamos sem perguntas." },
     ],
@@ -86,7 +86,7 @@ const t = {
   en: {
     login:        "Log in →",
     hero_title:   <>Your training.<br /><span style={{ background: "linear-gradient(90deg,#E8C96B,#C9A84C,#A8893A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Personalised.</span></>,
-    hero_tagline: "Premium fitness coaching with real accountability — on your phone, 24/7.",
+    hero_tagline: "Premium fitness coaching with real accountability. On your phone, 24/7.",
     cta_primary:  "Start free 7-day trial →",
     cta_secondary: "Then €127/month · No contracts",
     cta_login:    "I already have an account",
@@ -94,7 +94,7 @@ const t = {
     section_features: "Everything that's included",
     section_how:  "How it works",
     section_install: "Install the app on your phone",
-    install_sub:  "Works like a native app — no need to visit the App Store.",
+    install_sub:  "Works like a native app, no need to visit the App Store.",
     install_hint: "💡 Once installed, the app works offline and receives workout notifications.",
     ios_title:    "iPhone / iPad",
     ios_browser:  "Safari",
@@ -102,7 +102,7 @@ const t = {
       "Open kravcoaching.com in Safari",
       "Tap the ⎋ share icon (bottom bar)",
       '"Add to Home Screen"',
-      'Tap "Add" — done! 🎉',
+      'Tap "Add". Done! 🎉',
     ],
     android_title:   "Android",
     android_browser: "Chrome",
@@ -110,7 +110,7 @@ const t = {
       "Open kravcoaching.com in Chrome",
       'Tap "⋮" (top right corner)',
       '"Add to Home Screen"',
-      'Tap "Install" — done! 🎉',
+      'Tap "Install". Done! 🎉',
     ],
     price_label:    "Premium Plan",
     price_sub:      "Everything included. No surprises.",
@@ -126,12 +126,12 @@ const t = {
       { icon: "💬", title: "Direct chat with your coach", desc: "Ask questions, share results and stay motivated in real time." },
       { icon: "📊", title: "Weekly check-ins",          desc: "Check-ins, feedback and continuous plan adjustments as you progress." },
       { icon: "🏆", title: "Progress tracking",         desc: "Weight, measurements, personal records and achievements. Compare before/after photos with an interactive slider." },
-      { icon: "⚡", title: "Live workout mode",         desc: "Rest timer with audio cue, set and weight tracking — all during your workout." },
+      { icon: "⚡", title: "Live workout mode",         desc: "Rest timer with audio cue, set and weight tracking, all during your workout." },
     ],
     steps: [
       { n: "1", title: "Sign up",           desc: "Fill in the questionnaire in 2 minutes. Your coach receives your answers immediately." },
       { n: "2", title: "Get your plan",     desc: "Within 24 working hours your coach creates and sends your personalised plan in the app." },
-      { n: "3", title: "Train with support", desc: "Follow the plan, log your workouts and track your progress — your coach is always available." },
+      { n: "3", title: "Train with support", desc: "Follow the plan, log your workouts and track your progress. Your coach is always available." },
     ],
     included: [
       "100% personalised weekly training plan",
@@ -150,7 +150,7 @@ const t = {
     faq: [
       { q: "When do I get my plan?", a: "Within 24 working hours of signing up, your coach creates and sends your personalised plan directly in the app." },
       { q: "Is it really personalised?", a: "100%. Your coach builds the plan based on your answers: goals, level, available days and equipment. Not a generic template." },
-      { q: "Does it work for beginners?", a: "Yes. The plan is fully adapted to your current level — beginner, intermediate or advanced." },
+      { q: "Does it work for beginners?", a: "Yes. The plan is fully adapted to your current level: beginner, intermediate or advanced." },
       { q: "Can I cancel anytime?", a: "Yes. No commitment, no contracts. Cancel anytime through your Stripe customer portal." },
       { q: "What if I'm not satisfied?", a: "You have 7 days to try it out. If you're not happy, contact your coach and we'll refund you, no questions asked." },
     ],
@@ -198,14 +198,14 @@ export default async function LandingPage({
       .limit(6),
   ]);
 
-  // Self-service funnel — always /start (quiz + stripe)
+  // Self-service funnel: always /start (quiz + stripe)
   const signupUrl = "/start";
   const signupUrlWithLang = signupUrl;
   const initials = coach?.full_name
     ? coach.full_name.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()
     : "K";
 
-  // Aggregate rating is emitted only once enough genuine reviews exist — see
+  // Aggregate rating is emitted only once enough genuine reviews exist: see
   // aggregateRatingJsonLd. Publishing a rating built from one or two entries is
   // against Google's structured-data guidelines and risks a manual action, so
   // the markup stays off until the data earns it and then appears by itself.
@@ -594,7 +594,7 @@ export default async function LandingPage({
                     )}
                     {/* Quote */}
                     <p className="text-zinc-300 text-sm leading-relaxed flex-1">
-                      {t.content?.replace(/ — /g, " ")}
+                      {t.content?.replace(/\s+—\s+/g, ", ")}
                     </p>
                     {/* Meta */}
                     <div className="flex items-center justify-between gap-2 pt-1 border-t border-zinc-800/60">

@@ -87,20 +87,20 @@ export default function PrintReport(props: Props) {
           </div>
           <div className="stat-card">
             <p className="stat-num" style={{ color: adherence && adherence >= 80 ? "#4ade80" : adherence && adherence >= 50 ? "#C9A84C" : "#f87171" }}>
-              {adherence !== null ? `${adherence}%` : "—"}
+              {adherence !== null ? `${adherence}%` : "-"}
             </p>
             <p className="stat-label">{isEN ? "Adherence" : "Adesão"}</p>
             <p className="stat-sub">{isEN ? "to plan" : "ao plano"}</p>
           </div>
           <div className="stat-card">
             <p className="stat-num" style={{ color: weightChange === null ? "#888" : weightChange < 0 ? "#4ade80" : weightChange > 0 ? "#f87171" : "#888" }}>
-              {weightChange === null ? "—" : `${weightChange > 0 ? "+" : ""}${weightChange} kg`}
+              {weightChange === null ? "-" : `${weightChange > 0 ? "+" : ""}${weightChange} kg`}
             </p>
             <p className="stat-label">{isEN ? "Weight" : "Peso"}</p>
             <p className="stat-sub">{checkins.length} check-ins</p>
           </div>
           <div className="stat-card">
-            <p className="stat-num" style={{ color: "#C9A84C" }}>{totalPRs > 0 ? totalPRs : "—"}</p>
+            <p className="stat-num" style={{ color: "#C9A84C" }}>{totalPRs > 0 ? totalPRs : "-"}</p>
             <p className="stat-label">{isEN ? "Records" : "Recordes"}</p>
             <p className="stat-sub">{isEN ? "personal" : "pessoais"}</p>
           </div>
@@ -173,12 +173,12 @@ export default function PrintReport(props: Props) {
                 {checkins.map((c) => (
                   <tr key={c.week_start}>
                     <td>{new Date(c.week_start + "T00:00:00").toLocaleDateString(locale, { day: "numeric", month: "short" })}</td>
-                    <td className="td-bold">{c.weight_kg ? `${c.weight_kg} kg` : "—"}</td>
-                    <td>{c.energy_level ? `${c.energy_level}/5 · ${ENERGY_LABELS[c.energy_level]}` : "—"}</td>
+                    <td className="td-bold">{c.weight_kg ? `${c.weight_kg} kg` : "-"}</td>
+                    <td>{c.energy_level ? `${c.energy_level}/5 · ${ENERGY_LABELS[c.energy_level]}` : "-"}</td>
                     <td>
-                      {[(c as unknown as Record<string, unknown>).waist_cm ? `${isEN ? "W" : "C"}: ${(c as unknown as Record<string, unknown>).waist_cm}cm` : null, (c as unknown as Record<string, unknown>).chest_cm ? `${isEN ? "Ch" : "P"}: ${(c as unknown as Record<string, unknown>).chest_cm}cm` : null, (c as unknown as Record<string, unknown>).arm_cm ? `${isEN ? "A" : "B"}: ${(c as unknown as Record<string, unknown>).arm_cm}cm` : null].filter(Boolean).join(" · ") || "—"}
+                      {[(c as unknown as Record<string, unknown>).waist_cm ? `${isEN ? "W" : "C"}: ${(c as unknown as Record<string, unknown>).waist_cm}cm` : null, (c as unknown as Record<string, unknown>).chest_cm ? `${isEN ? "Ch" : "P"}: ${(c as unknown as Record<string, unknown>).chest_cm}cm` : null, (c as unknown as Record<string, unknown>).arm_cm ? `${isEN ? "A" : "B"}: ${(c as unknown as Record<string, unknown>).arm_cm}cm` : null].filter(Boolean).join(" · ") || "-"}
                     </td>
-                    <td className="td-notes">{c.notes || "—"}</td>
+                    <td className="td-notes">{c.notes || "-"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -194,7 +194,7 @@ export default function PrintReport(props: Props) {
               {prs.map((pr) => (
                 <div key={pr.exercise_name + pr.recorded_at} className="pr-card">
                   <p className="pr-exercise">{pr.exercise_name}</p>
-                  <p className="pr-value">{pr.weight_kg ? `${pr.weight_kg} kg` : "—"}{pr.reps ? <span className="pr-reps"> × {pr.reps}</span> : ""}</p>
+                  <p className="pr-value">{pr.weight_kg ? `${pr.weight_kg} kg` : "-"}{pr.reps ? <span className="pr-reps"> × {pr.reps}</span> : ""}</p>
                   <p className="pr-date">{new Date(pr.recorded_at + "T00:00:00").toLocaleDateString(locale, { day: "numeric", month: "short" })}</p>
                 </div>
               ))}

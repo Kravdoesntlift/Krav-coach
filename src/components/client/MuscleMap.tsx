@@ -30,7 +30,7 @@ export function getMusclesFromExercises(names: string[]): Set<string> {
   return active;
 }
 
-// ─── Muscle overlay ellipses — viewBox "0 0 599 745" ─────────────────────────
+// ─── Muscle overlay ellipses: viewBox "0 0 599 745" ─────────────────────────
 //  Front figure: x=19-271, centre≈145   Back figure: x=333-600, centre≈460
 const OVERLAYS: Record<string, Overlay> = {
   chest:      { front: [{ cx:152, cy:192, rx:54, ry:33 }], back: [] },
@@ -166,7 +166,7 @@ export default function MuscleMap({ exerciseNames, loggedNames = [], lang = "pt"
       */}
       <div className="block md:hidden mx-3 mb-2 rounded-2xl overflow-hidden" style={{ background:"#0a0a0a" }}>
         {/*
-          Mobile figure layout — key insight:
+          Mobile figure layout, key insight:
           The anatomy SVG has viewBox "0 0 599 745" (aspect ratio 0.803:1).
           We display it at 200% of container width (= 2W), so img height = 2W × (745/599).
           The overlay SVG uses the SAME viewBox "0 0 599 745" → it scales identically to

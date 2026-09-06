@@ -16,7 +16,7 @@ export default async function CoachDashboard() {
 
   // If any subscription's stored period has already elapsed, ask Stripe before
   // drawing the page. Without this the coach sees yesterday's billing state
-  // until the nightly job runs — a client charged at lunchtime looks unpaid all
+  // until the nightly job runs: a client charged at lunchtime looks unpaid all
   // afternoon. No-op when every period is still in the future.
   await healStaleSubscriptions({ coachId: user.id }).catch(() => {});
 
@@ -69,7 +69,7 @@ export default async function CoachDashboard() {
     .single();
   const coachName = coachProfile?.full_name ?? "Coach";
 
-  // All clients (with status) — from workout plans
+  // All clients (with status): from workout plans
   const { data: allPlans } = await supabase
     .from("workout_plans")
     .select("client_id, client:profiles!workout_plans_client_id_fkey(id, full_name, status, subscription_renews_at, avatar_url)")
@@ -83,8 +83,8 @@ export default async function CoachDashboard() {
     .eq("assigned_role", "coach");
 
   // Billing status straight from the subscription rows. `subscription_renews_at`
-  // alone cannot tell "renewing right now" apart from "payment failed" — both
-  // are simply a date in the past — so the dashboard used to accuse a client
+  // alone cannot tell "renewing right now" apart from "payment failed": both
+  // are simply a date in the past: so the dashboard used to accuse a client
   // Stripe had already charged of being in arrears.
   const { data: subRows } = await supabase
     .from("stripe_subscriptions")
@@ -114,7 +114,7 @@ export default async function CoachDashboard() {
     unreadByClient.set(m.sender_id, (unreadByClient.get(m.sender_id) ?? 0) + 1);
   }
 
-  // All client IDs — from plans AND explicit assignments
+  // All client IDs: from plans AND explicit assignments
   const allClientIds = [
     ...new Set([
       ...(allPlans ?? []).map((p) => p.client_id),
@@ -190,7 +190,7 @@ export default async function CoachDashboard() {
     }
   }
 
-  // All clients deduplicated — union of plan clients + explicitly assigned clients
+  // All clients deduplicated: union of plan clients + explicitly assigned clients
   type AllClientEntry = { id: string; full_name: string; status: string; subscription_renews_at: string | null; avatar_url?: string | null; trial_ends_at?: string | null };
   const allClientMap = new Map<string, AllClientEntry>();
   for (const p of allPlans ?? []) {
@@ -222,14 +222,14 @@ export default async function CoachDashboard() {
     const id = client.id;
 
     // Renewal. Stripe's status is the authority on whether money is actually
-    // owed — a period end in the past only means the renewal is being processed,
+    // owed: a period end in the past only means the renewal is being processed,
     // and Stripe retries a failed card for days before giving up. Only flag
     // arrears when Stripe itself says the payment failed.
     const renewsAt = client.subscription_renews_at;
     const subStatus = subStatusByClient.get(id);
 
     if (subStatus === "past_due" || subStatus === "unpaid") {
-      alerts.push({ type: "overdue_renewal", clientId: id, clientName: name, detail: "Pagamento recusado — cartão a precisar de atenção", urgency: "high" });
+      alerts.push({ type: "overdue_renewal", clientId: id, clientName: name, detail: "Pagamento recusado, cartão a precisar de atenção", urgency: "high" });
     } else if (renewsAt) {
       const diff = Math.ceil((new Date(renewsAt + "T00:00:00").getTime() - todayMidnight.getTime()) / 86400000);
       if (diff < 0) {
@@ -261,7 +261,7 @@ export default async function CoachDashboard() {
 
     // Perfect week
     if (weekClient && weekClient.totalDays > 0 && weekClient.completedDays >= weekClient.totalDays) {
-      alerts.push({ type: "perfect_week", clientId: id, clientName: name, detail: "Semana perfeita — envia parabéns!", urgency: "low" });
+      alerts.push({ type: "perfect_week", clientId: id, clientName: name, detail: "Semana perfeita, envia parabéns!", urgency: "low" });
     }
 
     // PR esta semana
@@ -320,7 +320,7 @@ export default async function CoachDashboard() {
           </div>
         </div>
 
-        {/* Mobile actions — scrollable row */}
+        {/* Mobile actions: scrollable row */}
         <div className="flex sm:hidden items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none">
           <PushNotificationToggle />
           <NotifyButton label="Notificar" />

@@ -38,12 +38,12 @@ function StatusBadge({ status }: { status: string | null | undefined }) {
 }
 
 function formatAmount(cents: number | null, currency = "EUR") {
-  if (!cents) return "—";
+  if (!cents) return "-";
   return new Intl.NumberFormat("pt-PT", { style: "currency", currency }).format(cents / 100);
 }
 
 function formatDate(iso: string | null) {
-  if (!iso) return "—";
+  if (!iso) return "-";
   return new Date(iso).toLocaleDateString("pt-PT");
 }
 
@@ -202,7 +202,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...`}
         {/* Generated link */}
         {generatedLink && (
           <div className="mt-4 rounded-2xl p-4 space-y-3" style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.25)" }}>
-            <p className="text-brand-gold text-sm font-bold">✅ Link gerado — partilha com o cliente:</p>
+            <p className="text-brand-gold text-sm font-bold">✅ Link gerado, partilha com o cliente:</p>
             <div className="flex items-center gap-2">
               <input
                 readOnly
@@ -228,7 +228,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...`}
                 📱 Partilhar no WhatsApp
               </a>
               <a
-                href={`mailto:${selectedClient?.email ?? ""}?subject=KRAV Premium Coaching — Link de Pagamento&body=${encodeURIComponent(`Olá!\n\nAqui está o teu link de pagamento para o KRAV Premium Coaching (€${amount}/mês):\n\n${generatedLink}\n\nQualquer dúvida, fala comigo.\n\nKrav`)}`}
+                href={`mailto:${selectedClient?.email ?? ""}?subject=KRAV Premium Coaching, Link de Pagamento&body=${encodeURIComponent(`Olá!\n\nAqui está o teu link de pagamento para o KRAV Premium Coaching (€${amount}/mês):\n\n${generatedLink}\n\nQualquer dúvida, fala comigo.\n\nKrav`)}`}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-300 transition-all"
                 style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
               >

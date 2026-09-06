@@ -18,7 +18,7 @@ export async function submitGuiaForm(formData: FormData) {
     return { error: "Preenche todos os campos corretamente." };
   }
 
-  // Save lead to Supabase — ignore duplicate emails, never block the user
+  // Save lead to Supabase: ignore duplicate emails, never block the user
   const supabase = await createClient();
   const { error: dbError } = await supabase
     .from("leads")
@@ -82,7 +82,7 @@ export async function submitGuiaForm(formData: FormData) {
           <td bgcolor="#ffffff" style="background-color:#ffffff;border-radius:20px;overflow:hidden;border:1px solid #e8e0d0;">
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
 
-              <!-- Header — rich dark -->
+              <!-- Header: rich dark -->
               <tr>
                 <td bgcolor="#0f0a00" style="background-color:#0f0a00;padding:40px 36px 36px;text-align:center;">
                   <p style="margin:0 0 10px 0;font-size:10px;font-weight:700;letter-spacing:0.24em;text-transform:uppercase;color:#C9A84C;font-family:Helvetica,Arial,sans-serif;">

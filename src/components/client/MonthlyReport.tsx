@@ -56,7 +56,7 @@ export default function MonthlyReport({ month, year, totalWorkouts, totalPRs, we
 
       <p className="text-gray-300 text-sm">
         {totalWorkouts >= 16
-          ? "Mês incrível — és imparável! 🔥"
+          ? "Mês incrível, és imparável! 🔥"
           : totalWorkouts >= 10
           ? "Excelente consistência! Continua assim 💪"
           : totalWorkouts >= 4

@@ -144,7 +144,7 @@ export function computeAchievements(data: AchievementData, lang: Lang = "pt"): A
     {
       id: "week_5", icon: "💪", category: "consistencia",
       title:       isEN ? "5 weeks in a row"      : "5 semanas seguidas",
-      description: isEN ? "Elite dedication — 5 consecutive weeks" : "Dedicação de elite — 5 semanas consecutivas",
+      description: isEN ? "Elite dedication: 5 consecutive weeks" : "Dedicação de elite: 5 semanas consecutivas",
       unlocked: streak >= 5,
       progress: pct(streak, 5), progressLabel: `${streak} / 5 ${weeks}`,
     },
@@ -158,7 +158,7 @@ export function computeAchievements(data: AchievementData, lang: Lang = "pt"): A
     {
       id: "week_20", icon: "👑", category: "consistencia",
       title:       isEN ? "20 weeks"              : "20 semanas",
-      description: isEN ? "Legendary — almost half a year of training" : "Lendário — quase meio ano de treino",
+      description: isEN ? "Legendary, almost half a year of training" : "Lendário, quase meio ano de treino",
       unlocked: totalWeeksWithCompletion >= 20,
       progress: pct(totalWeeksWithCompletion, 20), progressLabel: `${totalWeeksWithCompletion} / 20`,
     },
@@ -181,7 +181,7 @@ export function computeAchievements(data: AchievementData, lang: Lang = "pt"): A
     {
       id: "pr_10", icon: "🎯", category: "recordes",
       title:       isEN ? "10 records"            : "10 recordes",
-      description: isEN ? "10 personal records — you're unstoppable" : "10 recordes pessoais — és imparável",
+      description: isEN ? "10 personal records, you're unstoppable" : "10 recordes pessoais, és imparável",
       unlocked: totalPRs >= 10,
       progress: pct(totalPRs, 10), progressLabel: `${totalPRs} / 10`,
     },
@@ -197,7 +197,7 @@ export function computeAchievements(data: AchievementData, lang: Lang = "pt"): A
     {
       id: "vol_10t", icon: "🚛", category: "volume_kg",
       title:       isEN ? "10 tonnes"             : "10 toneladas",
-      description: isEN ? "10,000 kg lifted — truck level" : "10 000 kg levantados — nível caminhão",
+      description: isEN ? "10,000 kg lifted, truck level" : "10 000 kg levantados, nível caminhão",
       unlocked: totalVolumeKg >= 10_000,
       progress: pct(totalVolumeKg, 10_000), progressLabel: `${volLabel(totalVolumeKg)} / 10t`,
     },
@@ -211,7 +211,7 @@ export function computeAchievements(data: AchievementData, lang: Lang = "pt"): A
     {
       id: "vol_100t", icon: "🏗️", category: "volume_kg",
       title:       isEN ? "100 tonnes"            : "100 toneladas",
-      description: isEN ? "100,000 kg — you're a machine" : "100 000 kg — és uma máquina",
+      description: isEN ? "100,000 kg, you're a machine" : "100 000 kg, és uma máquina",
       unlocked: totalVolumeKg >= 100_000,
       progress: pct(totalVolumeKg, 100_000), progressLabel: `${volLabel(totalVolumeKg)} / 100t`,
     },
@@ -227,14 +227,14 @@ export function computeAchievements(data: AchievementData, lang: Lang = "pt"): A
     {
       id: "workouts_50", icon: "🔰", category: "total_treinos",
       title:       isEN ? "50 workouts"           : "50 treinos",
-      description: isEN ? "Fifty workouts — real dedication" : "Cinquenta treinos — dedicação real",
+      description: isEN ? "Fifty workouts, real dedication" : "Cinquenta treinos, dedicação real",
       unlocked: totalWorkouts >= 50,
       progress: pct(totalWorkouts, 50), progressLabel: `${totalWorkouts} / 50`,
     },
     {
       id: "workouts_100", icon: "💯", category: "total_treinos",
       title:       isEN ? "100 workouts"          : "100 treinos",
-      description: isEN ? "One hundred workouts — legendary" : "Centena de treinos — lendário",
+      description: isEN ? "One hundred workouts, legendary" : "Centena de treinos, lendário",
       unlocked: totalWorkouts >= 100,
       progress: pct(totalWorkouts, 100), progressLabel: `${totalWorkouts} / 100`,
     },

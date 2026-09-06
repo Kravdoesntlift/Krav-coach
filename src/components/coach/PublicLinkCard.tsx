@@ -23,7 +23,7 @@ export default function PublicLinkCard({ coachId, slug }: { coachId: string; slu
       <div>
         <p className="text-white font-semibold text-sm">Página pública</p>
         <p className="text-zinc-500 text-xs mt-0.5">
-          Partilha este link com potenciais clientes — vêem o teu perfil e podem registar-se
+          Partilha este link com potenciais clientes, vêem o teu perfil e podem registar-se
         </p>
       </div>
 

@@ -76,7 +76,7 @@ export default function GuiaPage() {
           <div className="mt-5 mb-4 h-[2px] w-10 rounded-full" style={{ background: "linear-gradient(90deg,#E8C96B,#A8893A)" }} />
 
           <p className="text-sm text-zinc-500 leading-relaxed max-w-[280px]">
-            O essencial para treinares certo — sem planos genéricos, sem perder tempo.
+            O essencial para treinares certo, sem planos genéricos, sem perder tempo.
           </p>
         </div>
 

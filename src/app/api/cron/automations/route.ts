@@ -20,10 +20,10 @@ export async function GET(req: NextRequest) {
   }
   const authHeader = req.headers.get("authorization");
   if (authHeader !== `Bearer ${cronSecret}`) {
-    console.error("[cron/automations] auth failed — header did not match CRON_SECRET");
+    console.error("[cron/automations] auth failed, header did not match CRON_SECRET");
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  console.log("[cron/automations] starting —", new Date().toISOString());
+  console.log("[cron/automations] starting at", new Date().toISOString());
 
   const admin = createAdminClient();
 
@@ -338,7 +338,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // ── Trial end — day 0 (expired today) ────────────────────────────────────────
+  // ── Trial end: day 0 (expired today) ────────────────────────────────────────
   // Window: trial_ends_at fell within the last 24h UTC window (i.e., expired today)
   {
     const expiredWindowStart = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
@@ -373,8 +373,8 @@ export async function GET(req: NextRequest) {
               c.id,
               cLang === "en" ? "⏰ Your KRAV trial has ended" : "⏰ O teu trial KRAV terminou",
               cLang === "en"
-                ? "Subscribe to keep your plan, history and coach access. Or leave us feedback — it takes 2 minutes."
-                : "Subscreve para manter o teu plano, histórico e acesso ao coach. Ou deixa-nos o teu feedback — são 2 minutos.",
+                ? "Subscribe to keep your plan, history and coach access. Or leave us feedback, it takes 2 minutes."
+                : "Subscreve para manter o teu plano, histórico e acesso ao coach. Ou deixa-nos o teu feedback, são 2 minutos.",
               "/client/dashboard",
             ),
             (async () => {

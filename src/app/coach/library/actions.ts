@@ -17,7 +17,7 @@ const DEFAULT_EXERCISES: { name: string; muscle_groups: string[]; description: s
   { name: "Flexões", muscle_groups: ["Peito", "Deltóide anterior", "Tríceps"], description: "Mãos no chão à largura dos ombros, corpo em linha reta. Desce o peito ao chão e empurra até extensão dos braços." },
   { name: "Flexões com Pés Elevados", muscle_groups: ["Peito superior", "Deltóide anterior", "Tríceps"], description: "Igual às flexões normais mas com os pés em cima de uma cadeira ou sofá. Aumenta a ênfase no peito superior." },
   { name: "Flexões com Diamante", muscle_groups: ["Tríceps", "Peito"], description: "Mãos juntas em forma de diamante no chão. Maior ênfase nos tríceps." },
-  { name: "Mergulhos em Paralelas — Peito", muscle_groups: ["Peito inferior", "Tríceps", "Deltóide anterior"], description: "Nas paralelas, inclina o corpo ligeiramente para a frente ao descer. Desce até os ombros ficarem abaixo dos cotovelos." },
+  { name: "Mergulhos em Paralelas, Peito", muscle_groups: ["Peito inferior", "Tríceps", "Deltóide anterior"], description: "Nas paralelas, inclina o corpo ligeiramente para a frente ao descer. Desce até os ombros ficarem abaixo dos cotovelos." },
   // COSTAS
   { name: "Peso Morto (Deadlift)", muscle_groups: ["Costas", "Glúteos", "Isquiotibiais", "Trapézio", "Core"], description: "Barra no chão, pés à largura dos ombros. Agarra a barra com as mãos fora dos joelhos. Levanta empurrando o chão com os pés, não puxando com as costas. Corpo em linha reta ao topo." },
   { name: "Remada com Barra", muscle_groups: ["Dorsais", "Rombóides", "Trapézio médio", "Bíceps"], description: "Corpo inclinado a 45°, barra nas mãos. Puxa a barra em direção ao abdómen baixo mantendo os cotovelos perto do corpo." },
@@ -30,8 +30,8 @@ const DEFAULT_EXERCISES: { name: string; muscle_groups: string[]; description: s
   { name: "Remada na Máquina", muscle_groups: ["Dorsais", "Rombóides", "Bíceps"], description: "Peito apoiado no suporte da máquina. Puxa os manípulos para trás apertando as omoplatas." },
   { name: "Face Pull", muscle_groups: ["Deltóide posterior", "Trapézio", "Rombóides"], description: "Polia alta com corda. Puxa em direção à cara, separando as mãos no final do movimento. Cotovelos ao nível dos ombros ou acima." },
   { name: "Pullover com Halter", muscle_groups: ["Dorsais", "Peito", "Tríceps"], description: "Deitado no banco, um halter segurado com as duas mãos acima do peito. Baixa o halter para trás da cabeça com os braços semi-estendidos." },
-  { name: "Dominadas — Pega Pronada (Pullup)", muscle_groups: ["Dorsais", "Bíceps", "Trapézio"], description: "Agarrar a barra com as palmas viradas para fora, mãos largas. Puxa o corpo até o queixo ultrapassar a barra. Descer de forma controlada." },
-  { name: "Chin-Up — Pega Supinada", muscle_groups: ["Dorsais", "Bíceps"], description: "Igual às dominadas mas com as palmas viradas para dentro. Maior ativação do bíceps." },
+  { name: "Dominadas, Pega Pronada (Pullup)", muscle_groups: ["Dorsais", "Bíceps", "Trapézio"], description: "Agarrar a barra com as palmas viradas para fora, mãos largas. Puxa o corpo até o queixo ultrapassar a barra. Descer de forma controlada." },
+  { name: "Chin-Up, Pega Supinada", muscle_groups: ["Dorsais", "Bíceps"], description: "Igual às dominadas mas com as palmas viradas para dentro. Maior ativação do bíceps." },
   { name: "Dominadas com Pega Neutra", muscle_groups: ["Dorsais", "Bíceps"], description: "Palmas viradas uma para a outra. Versão mais suave nos ombros." },
   // OMBROS
   { name: "Press Militar com Barra", muscle_groups: ["Deltóide anterior", "Deltóide médio", "Trapézio", "Tríceps"], description: "Em pé, barra ao nível das clavículas. Empurra acima da cabeça até extensão completa. Não bloquear os joelhos." },
@@ -60,7 +60,7 @@ const DEFAULT_EXERCISES: { name: string; muscle_groups: string[]; description: s
   { name: "Extensão Acima da Cabeça com Halter", muscle_groups: ["Tríceps (cabeça longa)"], description: "Sentado ou em pé. Halter com as duas mãos atrás da cabeça. Estende os braços para cima mantendo os cotovelos apontados para a frente." },
   { name: "Skull Crusher (Extensão Francesa)", muscle_groups: ["Tríceps"], description: "Deitado no banco, barra ou halteres. Desce o peso em direção à testa dobrando apenas os cotovelos. Extensão completa no topo." },
   { name: "Supino Fechado (Close Grip Bench)", muscle_groups: ["Tríceps", "Peito", "Deltóide anterior"], description: "Supino com pega estreita (mãos à largura dos ombros). Cotovelos perto do corpo ao descer." },
-  { name: "Mergulhos em Paralelas — Tríceps", muscle_groups: ["Tríceps", "Peito", "Deltóide anterior"], description: "Nas paralelas com o corpo vertical (não inclinado). Desce até 90° nos cotovelos e empurra até extensão." },
+  { name: "Mergulhos em Paralelas, Tríceps", muscle_groups: ["Tríceps", "Peito", "Deltóide anterior"], description: "Nas paralelas com o corpo vertical (não inclinado). Desce até 90° nos cotovelos e empurra até extensão." },
   { name: "Kickback com Halter", muscle_groups: ["Tríceps"], description: "Corpo inclinado, cotovelo junto ao corpo fixo a 90°. Estende o braço para trás até ficar paralelo ao chão." },
   { name: "Mergulhos na Cadeira", muscle_groups: ["Tríceps"], description: "Mãos apoiadas na borda de uma cadeira, pés no chão ou elevados. Desce e sobe dobrando os cotovelos." },
   // QUADRÍCEPS

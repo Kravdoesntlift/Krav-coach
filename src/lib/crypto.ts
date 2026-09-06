@@ -34,6 +34,6 @@ export function decrypt(value: string): string {
     decipher.setAuthTag(tag);
     return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString("utf8");
   } catch {
-    return value; // tampered or wrong key — caller should treat as invalid
+    return value; // tampered or wrong key, caller should treat as invalid
   }
 }

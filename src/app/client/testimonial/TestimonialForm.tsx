@@ -23,8 +23,8 @@ const copy = {
   weeks_label:  { pt: "Semanas de acompanhamento", en: "Weeks of coaching" },
   content_label:{ pt: "O teu testemunho", en: "Your testimonial" },
   placeholder:  {
-    pt: "Conta como foi a tua experiência com o teu coach — os resultados que alcançaste, o que mudou na tua vida, o que mais valorizaste...",
-    en: "Tell us about your experience with your coach — the results you achieved, what changed in your life, what you valued most...",
+    pt: "Conta como foi a tua experiência com o teu coach, os resultados que alcançaste, o que mudou na tua vida, o que mais valorizaste...",
+    en: "Tell us about your experience with your coach, the results you achieved, what changed in your life, what you valued most...",
   },
   submit:       { pt: "Enviar testemunho", en: "Submit testimonial" },
   submitting:   { pt: "A enviar...", en: "Submitting..." },

@@ -27,7 +27,7 @@ const extra = {
   tagline_pt:       { pt: "Tagline", en: "Tagline" },
   tagline_pt_hint:  { pt: "🇵🇹 Frase curta de impacto", en: "🇵🇹 Short impact phrase" },
   tagline_en_label: { pt: "Tagline em inglês", en: "Tagline in English" },
-  about_section:    { pt: "Sobre ti — landing page", en: "About you — landing page" },
+  about_section:    { pt: "Sobre ti, landing page", en: "About you, landing page" },
   years_exp:        { pt: "Anos de experiência", en: "Years of experience" },
   years_hint:       { pt: "Aparece como badge na landing", en: "Appears as badge on landing page" },
   bio_pt:           { pt: "Bio 🇵🇹", en: "Bio 🇵🇹" },
@@ -35,10 +35,10 @@ const extra = {
   bio_en_label:     { pt: "Bio 🇬🇧", en: "Bio 🇬🇧" },
   bio_en_hint:      { pt: "Versão em inglês", en: "English version" },
   credentials:      { pt: "Credenciais / Diplomas", en: "Credentials / Certifications" },
-  credentials_hint: { pt: "Uma por linha — aparecem como badges", en: "One per line — shown as badges" },
+  credentials_hint: { pt: "Uma por linha, aparecem como badges", en: "One per line, shown as badges" },
   credentials_note: { pt: "Cada linha = 1 badge na landing page", en: "Each line = 1 badge on landing page" },
   slug_label:       { pt: "URL público (slug)", en: "Public URL (slug)" },
-  slug_hint:        { pt: "Letras minúsculas, números e hífens — ex: andre-kravchuk", en: "Lowercase letters, numbers and hyphens — e.g. andre-kravchuk" },
+  slug_hint:        { pt: "Letras minúsculas, números e hífens, ex: andre-kravchuk", en: "Lowercase letters, numbers and hyphens, e.g. andre-kravchuk" },
 } as const;
 
 interface Props {

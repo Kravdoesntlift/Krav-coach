@@ -115,7 +115,7 @@ export default async function ClientLayout({
   if (profile.trial_ends_at) {
     const now      = new Date();
     const trialEnd = new Date(profile.trial_ends_at);
-    // Calendar-day difference — updates at midnight UTC, not every 24h
+    // Calendar-day difference: updates at midnight UTC, not every 24h
     const todayUTC = Date.UTC(now.getUTCFullYear(),      now.getUTCMonth(),      now.getUTCDate());
     const endUTC   = Date.UTC(trialEnd.getUTCFullYear(), trialEnd.getUTCMonth(), trialEnd.getUTCDate());
     trialDaysLeft  = Math.max(0, Math.round((endUTC - todayUTC) / 86_400_000));
@@ -125,7 +125,7 @@ export default async function ClientLayout({
   if (trialExpired) {
     // A client can legitimately hold more than one subscription row (a resubscribe,
     // or a stale row for a subscription that no longer exists in Stripe), so this
-    // must not use maybeSingle() — that errors on multiple rows and would paywall
+    // must not use maybeSingle(): that errors on multiple rows and would paywall
     // a paying client. Take any live row.
     const { data: liveSubs } = await supabase
       .from("stripe_subscriptions")

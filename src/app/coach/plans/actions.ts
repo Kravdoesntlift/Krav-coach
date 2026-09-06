@@ -63,7 +63,7 @@ async function clonePlanWeeks(
 ): Promise<{ planId: string } | { error: string }> {
   // All UTC. A "YYYY-MM-DD" string parses as UTC midnight, so mixing in local
   // getters/setters shifts the result by a day whenever the span crosses a DST
-  // change — 2026-03-23 + 1 week came out as Sunday the 29th instead of Monday
+  // change: 2026-03-23 + 1 week came out as Sunday the 29th instead of Monday
   // the 30th, and a week_start that isn't a Monday never matches the dashboard.
   const newDate = new Date(plan.week_start + "T00:00:00Z");
   newDate.setUTCDate(newDate.getUTCDate() + weeksOffset * 7);
@@ -92,7 +92,7 @@ async function clonePlanWeeks(
     })))
     .select("id, day_of_week, order_index");
 
-  // A plan whose days failed to copy is worse than no plan — it looks complete
+  // A plan whose days failed to copy is worse than no plan: it looks complete
   // in the list but opens empty. Remove it and report instead.
   if (daysErr || !insertedDays?.length) {
     await supabase.from("workout_plans").delete().eq("id", newPlan.id);

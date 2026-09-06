@@ -206,7 +206,7 @@ function ClientCard({
             )
           )}
 
-          {/* ⋯ menu — archive / delete */}
+          {/* ⋯ menu: archive / delete */}
           <div className="relative">
             <button
               onClick={() => { setShowMenu((v) => !v); setConfirmDelete(false); }}
@@ -255,7 +255,7 @@ function ClientCard({
 
                 <div className="h-px mx-3" style={{ background: "rgba(255,255,255,0.06)" }} />
 
-                {/* Delete — 2-step confirm */}
+                {/* Delete: 2-step confirm */}
                 {confirmDelete ? (
                   <div className="px-3 py-2.5 space-y-2">
                     <p className="text-[11px] text-red-400 leading-snug">Apaga a conta permanentemente. Sem recuperação.</p>

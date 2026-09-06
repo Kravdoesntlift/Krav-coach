@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   if (!message?.trim()) return NextResponse.json({ error: "Empty message." }, { status: 400 });
   if (message.length > 2000) return NextResponse.json({ error: "Message too long." }, { status: 400 });
 
-  // Validate and sanitize history — only allow known roles, cap content length
+  // Validate and sanitize history: only allow known roles, cap content length
   const history = (Array.isArray(rawHistory) ? rawHistory : [])
     .filter((h) => h.role === "user" || h.role === "assistant")
     .map((h) => ({ role: h.role as "user" | "assistant", content: String(h.content).slice(0, 2000) }))
@@ -80,8 +80,8 @@ export async function POST(req: NextRequest) {
 
   const checkinSummary = checkin
     ? isEN
-      ? `Last check-in: ${checkin.week_start} | Weight: ${checkin.weight_kg ?? "—"}kg | Energy: ${checkin.energy_level ?? "—"}/5 | Note: "${checkin.notes ?? "none"}"`
-      : `Último check-in: ${checkin.week_start} | Peso: ${checkin.weight_kg ?? "—"}kg | Energia: ${checkin.energy_level ?? "—"}/5 | Nota: "${checkin.notes ?? "nenhuma"}"`
+      ? `Last check-in: ${checkin.week_start} | Weight: ${checkin.weight_kg ?? "-"}kg | Energy: ${checkin.energy_level ?? "-"}/5 | Note: "${checkin.notes ?? "none"}"`
+      : `Último check-in: ${checkin.week_start} | Peso: ${checkin.weight_kg ?? "-"}kg | Energia: ${checkin.energy_level ?? "-"}/5 | Nota: "${checkin.notes ?? "nenhuma"}"`
     : isEN ? "No check-ins logged yet." : "Sem check-ins registados ainda.";
 
   const systemPrompt = isEN
@@ -97,7 +97,7 @@ CLIENT CONTEXT:
 
 HOW TO RESPOND:
 - Always reply in English, informal and motivating tone
-- Be specific and practical — give concrete advice, not vague generalities
+- Be specific and practical, give concrete advice, not vague generalities
 - Use the client's plan and history to personalise your response
 - For exercise substitutions, suggest alternatives suited to their level and equipment
 - For nutrition questions, give general guidance and note that the coach can provide a personalised plan
@@ -116,7 +116,7 @@ CONTEXTO DO CLIENTE:
 
 COMO RESPONDER:
 - Responde sempre em português de Portugal, informal e motivador
-- Sê específico e prático — dá conselhos concretos, não vaguidades
+- Sê específico e prático, dá conselhos concretos, não vaguidades
 - Usa o plano e o histórico do cliente para personalizar a resposta
 - Se perguntarem sobre substituições de exercícios, sugere alternativas adequadas ao nível e equipamento
 - Se perguntarem sobre nutrição, dá orientações gerais mas recorda que o coach pode dar um plano personalizado

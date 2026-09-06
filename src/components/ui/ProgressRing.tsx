@@ -30,7 +30,7 @@ export default function ProgressRing({
   const isPerfect = value >= 100;
   const color = isPerfect ? "#4ade80" : "#C9A84C";
 
-  // Glow filter id — unique per instance to avoid conflicts
+  // Glow filter id: unique per instance to avoid conflicts
   const glowId = `ring-glow-${size}`;
 
   return (

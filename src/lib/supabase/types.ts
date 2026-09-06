@@ -333,7 +333,7 @@ export interface MealPlanFood {
 // Day numbering follows JavaScript's Date.getDay(): 0 = Sunday … 6 = Saturday.
 // Everything that stores a weekday (workout_days.day_of_week,
 // client_onboarding.available_days) uses this and only this. Index these arrays
-// directly with the stored number — never re-base it.
+// directly with the stored number: never re-base it.
 export const DAY_NAMES = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 export const DAY_NAMES_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 

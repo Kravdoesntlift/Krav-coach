@@ -149,7 +149,7 @@ export default function MessagesClient({ convos }: { convos: Convo[] }) {
                   )}
                 </div>
 
-                {/* Content — links to chat */}
+                {/* Content: links to chat */}
                 <Link
                   href={`/coach/clients/${c.clientId}/chat`}
                   className="flex-1 min-w-0 group"
@@ -167,8 +167,8 @@ export default function MessagesClient({ convos }: { convos: Convo[] }) {
                   </div>
                   <p className={`text-xs mt-0.5 truncate ${c.unread > 0 ? "text-zinc-400" : "text-zinc-600"}`}>
                     {c.hasMessages
-                      ? (c.lastMessage || "—")
-                      : <span className="italic text-zinc-700">Sem mensagens — clica para iniciar</span>
+                      ? (c.lastMessage || "-")
+                      : <span className="italic text-zinc-700">Sem mensagens, clica para iniciar</span>
                     }
                   </p>
                 </Link>

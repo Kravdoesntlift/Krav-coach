@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 /**
  * GET /api/unsubscribe?id=<lead_id>
  *
- * GDPR Art.º 21 — one-click unsubscribe from drip emails.
+ * GDPR Art.º 21: one-click unsubscribe from drip emails.
  * Sets unsubscribed_at on the lead row; leads-drip cron skips these.
  */
 export async function GET(req: NextRequest) {
@@ -45,7 +45,7 @@ function unsubPage(message: string, success: boolean) {
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>KRAV Coach — Subscrição</title>
+  <title>KRAV Coach, Subscrição</title>
 </head>
 <body style="margin:0;padding:40px 16px;background:#09090b;font-family:system-ui,sans-serif;color:#e4e4e7;text-align:center;">
   <p style="font-size:20px;font-weight:900;letter-spacing:-0.5px;color:#C9A84C;margin:0 0 32px">KRAV.</p>

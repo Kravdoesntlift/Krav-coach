@@ -28,7 +28,7 @@ export const SIGNED_URL_TTL = 60 * 60; // 1 hour
  *
  * Call this on the server, only after establishing that the caller may see these
  * photos. Anything that cannot be signed comes back as null rather than falling
- * back to a public URL — a broken image is the correct outcome for a photo we
+ * back to a public URL: a broken image is the correct outcome for a photo we
  * could not authorise.
  */
 export async function signPhotoUrls<T extends { photo_url: string }>(

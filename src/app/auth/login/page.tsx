@@ -26,7 +26,7 @@ export default function LoginPage() {
     try {
       result = await login(formData);
     } catch {
-      // Throttled or network failure — the action never returned a value.
+      // Throttled or network failure: the action never returned a value.
       // Without this the button would stay stuck on "A entrar...".
       setError("Não foi possível entrar agora. Espera um minuto e tenta outra vez.");
       setLoading(false);

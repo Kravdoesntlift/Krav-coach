@@ -32,7 +32,7 @@ export default function TodayCard({ day, clientId, isCompleted, completedCount, 
         <div className="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center text-2xl shrink-0">😴</div>
         <div>
           <p className="text-white font-bold">{isEN ? "Rest day" : "Dia de descanso"}</p>
-          <p className="text-zinc-500 text-sm mt-0.5">{day.label || (isEN ? "Rest well — your body needs it" : "Recupera bem — o teu corpo precisa")}</p>
+          <p className="text-zinc-500 text-sm mt-0.5">{day.label || (isEN ? "Rest well, your body needs it" : "Recupera bem: o teu corpo precisa")}</p>
         </div>
       </div>
     );

@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 
-// GET /api/nutrition/goals?clientId=xxx — coach fetches client's current goals
+// GET /api/nutrition/goals?clientId=xxx: coach fetches client's current goals
 export async function GET(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ goals: data ?? null });
 }
 
-// POST /api/nutrition/goals — coach sets macro targets for a client
+// POST /api/nutrition/goals: coach sets macro targets for a client
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Valores de macros inválidos." }, { status: 400 });
   }
 
-  // Verify coach–client relationship
+  // Verify coach-client relationship
   const { data: rel } = await supabase
     .from("coach_clients")
     .select("id")

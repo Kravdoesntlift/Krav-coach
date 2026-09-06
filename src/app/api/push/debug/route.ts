@@ -12,7 +12,7 @@ async function getCoach() {
   return user;
 }
 
-// GET /api/push/debug — push status for a given client (coach only)
+// GET /api/push/debug: push status for a given client (coach only)
 export async function GET(req: Request) {
   const coach = await getCoach();
   if (!coach) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -50,13 +50,13 @@ export async function GET(req: Request) {
              !vapidPublic  ? "NEXT_PUBLIC_VAPID_PUBLIC_KEY missing" :
              !vapidPrivate ? "VAPID_PRIVATE_KEY missing" :
              (!vapidSubject.startsWith("mailto:") && !vapidSubject.startsWith("https://"))
-               ? `VAPID_SUBJECT must start with 'mailto:' or 'https://' — got: ${vapidSubject}`
+               ? `VAPID_SUBJECT must start with 'mailto:' or 'https://', got: ${vapidSubject}`
                : null,
     },
   });
 }
 
-// POST /api/push/debug — send test notification to the current user (any role)
+// POST /api/push/debug: send test notification to the current user (any role)
 export async function POST() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 /**
- * Auth callback — exchanges the PKCE code Supabase sends in the email link
+ * Auth callback: exchanges the PKCE code Supabase sends in the email link
  * for a real session, then redirects to `next` (or /client/dashboard).
  *
  * Used by:
@@ -24,6 +24,6 @@ export async function GET(request: Request) {
     console.error("[auth/callback] code exchange error:", error.message);
   }
 
-  // Something went wrong — send back to login with a hint
+  // Something went wrong: send back to login with a hint
   return NextResponse.redirect(`${origin}/auth/login?error=link_expirado`);
 }

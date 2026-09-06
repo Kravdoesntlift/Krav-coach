@@ -32,7 +32,7 @@ export default function ResetPasswordPage() {
       if (err.message.includes("same password")) {
         setError("A nova password não pode ser igual à anterior.");
       } else {
-        setError("Erro ao atualizar a password. O link pode ter expirado — pede um novo.");
+        setError("Erro ao atualizar a password. O link pode ter expirado, pede um novo.");
       }
       return;
     }

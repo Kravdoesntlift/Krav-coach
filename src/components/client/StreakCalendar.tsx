@@ -121,8 +121,8 @@ export default function StreakCalendar({ completedDates, currentStreak, longestS
       {currentStreak >= 3 && (
         <p className="text-center text-brand-gold text-sm font-semibold">
           🔥 {lang === "en"
-            ? `${currentStreak} days in a row — keep it up!`
-            : `${currentStreak} dias seguidos — continua assim!`}
+            ? `${currentStreak} days in a row, keep it up!`
+            : `${currentStreak} dias seguidos, continua assim!`}
         </p>
       )}
     </div>

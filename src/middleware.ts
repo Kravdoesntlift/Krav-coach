@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// ── In-process rate limiter (resets per cold start — good enough for serverless) ──
+// ── In-process rate limiter (resets per cold start: good enough for serverless) ──
 // Maps "ip:route_prefix" → [timestamps]
 const rateLimitStore = new Map<string, number[]>();
 
@@ -48,7 +48,7 @@ export async function middleware(request: NextRequest) {
   // Never throttle GETs here. Loading /auth/login costs several requests on its
   // own (the document, plus Next.js prefetching the "forgot password" and
   // "/start" links), so a GET-inclusive limit burns through in two page views
-  // and then serves a raw JSON body in place of the login page — indistinguishable
+  // and then serves a raw JSON body in place of the login page: indistinguishable
   // from the app being down. Brute-force protection only needs to cover POSTs.
   if (request.method === "POST" && (pathname.startsWith("/auth") || pathname === "/start")) {
     if (isRateLimited(ip, "/auth", 20, 60_000)) {

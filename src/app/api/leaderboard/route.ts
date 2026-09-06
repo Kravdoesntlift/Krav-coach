@@ -103,7 +103,7 @@ export async function GET(req: NextRequest) {
     { data: healthLogs },
   ] = await Promise.all([
     admin.from("profiles").select("id, full_name, status, trial_ends_at, subscription_renews_at").in("id", clientIds),
-    // workout completions — join to get week_start for filtering
+    // workout completions: join to get week_start for filtering
     admin
       .from("workout_completions")
       .select("client_id, completed_at")

@@ -9,7 +9,7 @@ export function haptic(pattern: number | number[] = 10): void {
   }
 }
 
-// Preset patterns — defined as plain objects (not readonly) for VibratePattern compat
+// Preset patterns: defined as plain objects (not readonly) for VibratePattern compat
 export const HAPTIC = {
   tap:     10              as number,
   light:   [8, 20, 8]     as number[],

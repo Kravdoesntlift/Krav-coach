@@ -1,4 +1,4 @@
-// Premium SVG icon set — clean geometric line icons
+// Premium SVG icon set: clean geometric line icons
 // All icons: 24×24 viewBox, strokeWidth 1.8, strokeLinecap/Join round
 
 type IconProps = { size?: number; className?: string };

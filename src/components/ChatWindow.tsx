@@ -33,7 +33,7 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // ── Supabase Realtime — mensagens instantâneas ────────────────────────────
+  // ── Supabase Realtime: mensagens instantâneas ────────────────────────────
   useEffect(() => {
     const supabase = createClient();
     const channel  = supabase

@@ -73,7 +73,7 @@ export async function sendInvoiceEmail({
 
   await sendEmail({
     from: FROM, to,
-    subject: isEN ? `KRAV Coaching Receipt — ${amountEur}` : `Recibo KRAV Coaching — ${amountEur}`,
+    subject: isEN ? `KRAV Coaching Receipt: ${amountEur}` : `Recibo KRAV Coaching: ${amountEur}`,
     html,
   });
 }
@@ -120,7 +120,7 @@ export async function sendPaymentFailedEmail({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Welcome email — sent on first signup
+// Welcome email: sent on first signup
 // ─────────────────────────────────────────────────────────────────────────────
 export async function sendWelcomeEmail({
   to, clientName, coachName, siteUrl, lang = "pt",
@@ -217,7 +217,7 @@ export async function sendWelcomeEmail({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Trial reminder email — sent day 5 and day 6 of trial
+// Trial reminder email: sent day 5 and day 6 of trial
 // ─────────────────────────────────────────────────────────────────────────────
 export async function sendTrialReminderEmail({
   to, clientName, daysLeft, siteUrl, lang = "pt",
@@ -354,7 +354,7 @@ export async function sendSubscriptionCancelledEmail({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Renewal reminder email — sent 3 days before subscription renews
+// Renewal reminder email: sent 3 days before subscription renews
 // ─────────────────────────────────────────────────────────────────────────────
 export async function sendRenewalReminderEmail({
   to, clientName, renewalDate, siteUrl, lang = "pt",
@@ -399,7 +399,7 @@ export async function sendRenewalReminderEmail({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Weekly summary email — sent Sunday evenings
+// Weekly summary email: sent Sunday evenings
 // ─────────────────────────────────────────────────────────────────────────────
 export async function sendWeeklySummaryEmail({
   to, clientName, weekStart, weekEnd, workouts, didCheckin, steps, didNutrition, score, siteUrl, lang = "pt",
@@ -421,19 +421,19 @@ export async function sendWeeklySummaryEmail({
     ? [
         { label: "Workouts completed", value: workouts > 0 ? `${workouts} ✅` : "0", ok: workouts > 0 },
         { label: "Weekly check-in",    value: didCheckin ? "Done ✅" : "Missing", ok: didCheckin },
-        { label: "Total steps",        value: steps > 0 ? `${(steps/1000).toFixed(1)}k 👟` : "—", ok: steps >= 10000 },
-        { label: "Nutrition logged",   value: didNutrition ? "Yes ✅" : "—", ok: didNutrition },
+        { label: "Total steps",        value: steps > 0 ? `${(steps/1000).toFixed(1)}k 👟` : "-", ok: steps >= 10000 },
+        { label: "Nutrition logged",   value: didNutrition ? "Yes ✅" : "-", ok: didNutrition },
       ]
     : [
         { label: "Treinos concluídos", value: workouts > 0 ? `${workouts} ✅` : "0", ok: workouts > 0 },
         { label: "Check-in semanal",   value: didCheckin ? "Feito ✅" : "Em falta", ok: didCheckin },
-        { label: "Passos totais",      value: steps > 0 ? `${(steps/1000).toFixed(1)}k 👟` : "—", ok: steps >= 10000 },
-        { label: "Nutrição registada", value: didNutrition ? "Sim ✅" : "—", ok: didNutrition },
+        { label: "Passos totais",      value: steps > 0 ? `${(steps/1000).toFixed(1)}k 👟` : "-", ok: steps >= 10000 },
+        { label: "Nutrição registada", value: didNutrition ? "Sim ✅" : "-", ok: didNutrition },
       ];
 
   const subject = isEN
-    ? (isGreat ? `🔥 Amazing week, ${firstName}! Summary ${fmt(weekStart)}–${fmt(weekEnd)}` : `📊 Weekly summary — ${fmt(weekStart)}–${fmt(weekEnd)}`)
-    : (isGreat ? `🔥 Semana incrível, ${firstName}! Resumo ${fmt(weekStart)}–${fmt(weekEnd)}` : `📊 Resumo da semana — ${fmt(weekStart)}–${fmt(weekEnd)}`);
+    ? (isGreat ? `🔥 Amazing week, ${firstName}! Summary ${fmt(weekStart)}–${fmt(weekEnd)}` : `📊 Weekly summary: ${fmt(weekStart)}–${fmt(weekEnd)}`)
+    : (isGreat ? `🔥 Semana incrível, ${firstName}! Resumo ${fmt(weekStart)}–${fmt(weekEnd)}` : `📊 Resumo da semana: ${fmt(weekStart)}–${fmt(weekEnd)}`);
 
   await sendEmail({
     from: FROM, to, subject,
@@ -479,8 +479,8 @@ export async function sendWeeklySummaryEmail({
     <div style="background:#111113;border:1px solid #27272a;border-radius:14px;padding:20px;text-align:center;margin-bottom:24px">
       <p style="color:#a1a1aa;font-size:14px;line-height:1.6;margin:0">
         ${isEN
-          ? (isGreat ? "Keep it up! Consistency is the key to lasting results. 💪" : "A weaker week happens — the important thing is to start again. Next week is a new opportunity! 💪")
-          : (isGreat ? "Continua assim! Consistência é a chave para resultados duradouros. 💪" : "Uma semana mais fraca acontece — o importante é recomeçar. A próxima semana é uma nova oportunidade! 💪")}
+          ? (isGreat ? "Keep it up! Consistency is the key to lasting results. 💪" : "A weaker week happens, the important thing is to start again. Next week is a new opportunity! 💪")
+          : (isGreat ? "Continua assim! Consistência é a chave para resultados duradouros. 💪" : "Uma semana mais fraca acontece. O importante é recomeçar. A próxima semana é uma nova oportunidade! 💪")}
       </p>
     </div>
     <p style="text-align:center;color:#3f3f46;font-size:11px;margin:0">
@@ -494,7 +494,7 @@ export async function sendWeeklySummaryEmail({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Trial end email — sent on the day the trial expires (day 0)
+// Trial end email: sent on the day the trial expires (day 0)
 // Two CTAs: subscribe + leave feedback
 // ─────────────────────────────────────────────────────────────────────────────
 export async function sendTrialEndEmail({
@@ -534,8 +534,8 @@ export async function sendTrialEndEmail({
         <h1 style="color:#fff;font-size:22px;font-weight:900;margin:0 0 12px">${isEN ? `${firstName}, your 7 days have ended` : `${firstName}, os teus 7 dias terminaram`}</h1>
         <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0">
           ${isEN
-            ? "Your trial is over, but everything you logged is saved — workouts, check-ins, progress, records. They will be waiting if you subscribe."
-            : "O teu trial terminou, mas tudo o que registaste fica guardado — treinos, check-ins, progresso, recordes. Está à tua espera se subscreveres."}
+            ? "Your trial is over, but everything you logged is saved, workouts, check-ins, progress, records. They will be waiting if you subscribe."
+            : "O teu trial terminou, mas tudo o que registaste fica guardado, treinos, check-ins, progresso, recordes. Está à tua espera se subscreveres."}
         </p>
       </div>
       <div style="background:#0a0a0c;border:1px solid #1f1f23;border-radius:12px;padding:16px 20px;margin-bottom:24px">
@@ -562,12 +562,12 @@ export async function sendTrialEndEmail({
         ${isEN ? "Not subscribing for now?" : "Não vais subscrever por agora?"}
       </p>
       <p style="color:#fff;font-size:15px;font-weight:700;margin:0 0 10px">
-        ${isEN ? "Leave your feedback — it means a lot 🙏" : "Deixa o teu feedback — significa muito 🙏"}
+        ${isEN ? "Leave your feedback, it means a lot 🙏" : "Deixa o teu feedback, significa muito 🙏"}
       </p>
       <p style="color:#71717a;font-size:13px;line-height:1.6;margin:0 0 18px">
         ${isEN
-          ? "2 minutes. Completely optional. Your opinion directly helps improve the coaching experience for future clients — and your testimonial may appear on the website."
-          : "2 minutos. Completamente opcional. A tua opinião ajuda directamente a melhorar a experiência de coaching para futuros clientes — e o teu testemunho poderá aparecer no site."}
+          ? "2 minutes. Completely optional. Your opinion directly helps improve the coaching experience for future clients, and your testimonial may appear on the website."
+          : "2 minutos. Completamente opcional. A tua opinião ajuda directamente a melhorar a experiência de coaching para futuros clientes, e o teu testemunho poderá aparecer no site."}
       </p>
       <a href="${siteUrl}/client/dashboard"
          style="display:inline-block;border:1px solid #3f3f46;color:#a1a1aa;font-weight:600;font-size:13px;padding:11px 24px;border-radius:12px;text-decoration:none">

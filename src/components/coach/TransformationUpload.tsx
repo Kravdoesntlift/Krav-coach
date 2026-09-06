@@ -87,7 +87,7 @@ export default function TransformationUpload({ currentBeforeUrl, currentAfterUrl
       <div>
         <p className="text-white text-sm font-semibold">A tua transformação</p>
         <p className="text-zinc-500 text-xs mt-0.5">
-          Aparece como slider antes/depois na landing page — motiva novos clientes a aderir.
+          Aparece como slider antes/depois na landing page, motiva novos clientes a aderir.
         </p>
       </div>
       <div className="flex gap-3">

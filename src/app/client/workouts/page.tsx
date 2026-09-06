@@ -140,7 +140,7 @@ export default function MyWorkoutsPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
 
-            {/* Type selector — pill grid */}
+            {/* Type selector: pill grid */}
             <div>
               <label className="label mb-2 block">{isEN ? "Type" : "Tipo"}</label>
               <div className="grid grid-cols-3 gap-2">

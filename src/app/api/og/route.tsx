@@ -135,7 +135,7 @@ export async function GET() {
             lineHeight: 1.5,
           }}
         >
-          Coaching fitness premium com acompanhamento real — no teu telemóvel, 24/7.
+          Coaching fitness premium com acompanhamento real, no teu telemóvel, 24/7.
         </div>
 
         {/* CTA pill */}

@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
   const admin = createAdminClient();
 
-  // Week boundaries (Mon–Sun)
+  // Week boundaries (Mon-Sun)
   const now = new Date();
   const dayOfWeek = now.getUTCDay(); // 0=Sun … 6=Sat
   const monday = new Date(now);
@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
       if (users.length < 1000) break;
       page++;
     }
-  } catch { /* non-critical — push still works without email */ }
+  } catch { /* non-critical, push still works without email */ }
 
   // Fetch all data for the week in parallel
   const [

@@ -35,7 +35,7 @@ export async function sendPushToUser(
 
   // VAPID_SUBJECT must start with mailto: or https://
   if (!vapidSubject.startsWith("mailto:") && !vapidSubject.startsWith("https://")) {
-    return { ok: false, error: `VAPID_SUBJECT must start with 'mailto:' or 'https://' — got: ${vapidSubject}` };
+    return { ok: false, error: `VAPID_SUBJECT must start with 'mailto:' or 'https://', got: ${vapidSubject}` };
   }
 
   webpush.default.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
@@ -55,7 +55,7 @@ export async function sendPushToUser(
       } catch (err: unknown) {
         const error = err as { statusCode?: number; message?: string };
         if (error.statusCode === 410 || error.statusCode === 404) {
-          // Subscription expired or invalid — mark for cleanup
+          // Subscription expired or invalid: mark for cleanup
           staleIds.push(row.id);
         } else {
           console.error(`[push] sendNotification failed for user ${userId}:`, error.message);

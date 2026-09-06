@@ -48,7 +48,7 @@ export async function syncBillingAction(): Promise<SyncResult> {
 
   const plural = result.scanned === 1 ? "subscrição" : "subscrições";
   if (result.repaired === 0) {
-    return { ok: true, message: `Tudo certo — ${result.scanned} ${plural} já estavam em dia.` };
+    return { ok: true, message: `Tudo certo: ${result.scanned} ${plural} já estavam em dia.` };
   }
   return {
     ok: true,

@@ -23,7 +23,7 @@ export default function ObrigadoPage() {
         <div className="space-y-2">
           <h1 className="text-2xl font-black text-white tracking-tight">Guia enviado!</h1>
           <p className="text-sm text-zinc-400 leading-relaxed">
-            Verifica o teu email — o guia já está na tua caixa de entrada.
+            Verifica o teu email. O guia já está na tua caixa de entrada.
             <br />
             Não te esqueças de verificar o spam.
           </p>

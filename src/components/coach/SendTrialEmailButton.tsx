@@ -35,7 +35,7 @@ export default function SendTrialEmailButton({
           : { borderColor: "rgba(201,168,76,0.3)", color: "#C9A84C", background: "rgba(201,168,76,0.07)" }
       }
     >
-      {state === "sending" ? "A enviar..." : state === "sent" ? "✓ Email enviado!" : state === "error" ? "Erro — tenta de novo" : `📧 Enviar aviso de trial (${daysLeft}d)`}
+      {state === "sending" ? "A enviar..." : state === "sent" ? "✓ Email enviado!" : state === "error" ? "Erro, tenta de novo" : `📧 Enviar aviso de trial (${daysLeft}d)`}
     </button>
   );
 }

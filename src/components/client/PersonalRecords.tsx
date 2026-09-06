@@ -200,7 +200,7 @@ export default function PersonalRecords({ clientId, initialRecords }: Props) {
                     <div key={r.id} className="flex items-center justify-between py-1.5 border-b border-zinc-800 last:border-0">
                       <div>
                         <span className="text-gray-300 text-sm">
-                          {r.weight_kg ? `${r.weight_kg} ${t("kg")}` : "—"}
+                          {r.weight_kg ? `${r.weight_kg} ${t("kg")}` : "-"}
                           {r.reps ? ` × ${r.reps}` : ""}
                         </span>
                         {r.notes && <span className="text-gray-600 text-xs ml-2">{r.notes}</span>}

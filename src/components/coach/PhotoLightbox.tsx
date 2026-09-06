@@ -58,7 +58,7 @@ export default function PhotoLightbox({ photos }: Props) {
       role="dialog"
       aria-modal="true"
     >
-      {/* Header — always visible */}
+      {/* Header: always visible */}
       <div className="shrink-0 flex items-center justify-between px-4 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
         <div>
           <p className="text-white text-sm font-semibold">{currentPhoto.caption ?? "Foto de progresso"}</p>
@@ -87,7 +87,7 @@ export default function PhotoLightbox({ photos }: Props) {
         />
       </div>
 
-      {/* Footer nav — always visible */}
+      {/* Footer nav: always visible */}
       {photos.length > 1 && (
         <div className="shrink-0 flex items-center justify-between px-4 py-3" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
           <button onClick={prev} className="px-5 py-2.5 rounded-xl text-sm font-bold text-black" style={{ background: "#C9A84C" }}>← Anterior</button>

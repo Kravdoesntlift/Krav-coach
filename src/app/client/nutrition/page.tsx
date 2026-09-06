@@ -272,7 +272,7 @@ function FoodSearch({
     debounce.current = setTimeout(async () => {
       setSearching(true); setSearchErr(null);
       try {
-        // PT local database only for Portuguese users — skip for English to avoid
+        // PT local database only for Portuguese users: skip for English to avoid
         // returning Portuguese food names when the user searches in English
         const localMatches = lang === "en" ? [] : searchLocalFoods(query).map((f) => ({
           id: f.id,
@@ -706,7 +706,7 @@ function FoodSearch({
                           { label: t("fat").slice(0, 4),      val: scaled.fat     != null ? `${scaled.fat}g`     : null,  color: "text-pink-400" },
                         ].map(({ label, val, color }) => (
                           <div key={label} className="text-center rounded-xl py-2" style={{ background: "rgba(255,255,255,0.03)" }}>
-                            <p className={`text-sm font-bold ${color}`}>{val ?? "—"}</p>
+                            <p className={`text-sm font-bold ${color}`}>{val ?? "-"}</p>
                             <p className="text-zinc-600 text-[9px]">{label}</p>
                           </div>
                         ))}
@@ -1236,7 +1236,7 @@ export default function NutritionPage() {
     delete_confirm:      { pt: "Apagar este registo?",                            en: "Delete this entry?" },
     no_logs_title:       { pt: "Sem registos para este dia",                      en: "No entries for this day" },
     no_logs_sub:         { pt: "Clica numa refeição acima para pesquisar alimentos", en: "Tap a meal above to search foods" },
-    day_total_micro:     { pt: "Total do dia — Micronutrientes",                  en: "Daily total — Micronutrients" },
+    day_total_micro:     { pt: "Total do dia, Micronutrientes",                  en: "Daily total, Micronutrients" },
     fiber_label:         { pt: "Fibra",                                           en: "Fiber" },
     sodium_label:        { pt: "Sódio",                                           en: "Sodium" },
     vit_c_label:         { pt: "Vitamina C",                                      en: "Vitamin C" },
@@ -1454,7 +1454,7 @@ export default function NutritionPage() {
             ].map(({ label, val, set, color }) => (
               <div key={label}>
                 <label className={`text-[10px] font-semibold uppercase tracking-widest ${color} block mb-1`}>{label}</label>
-                <input type="number" min="0" value={val} onChange={(e) => set(e.target.value)} placeholder="—" className="input text-sm" />
+                <input type="number" min="0" value={val} onChange={(e) => set(e.target.value)} placeholder="-" className="input text-sm" />
               </div>
             ))}
           </div>

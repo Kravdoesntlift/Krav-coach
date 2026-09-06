@@ -94,7 +94,7 @@ export default async function CoachSetupPage() {
     {
       done: hasTagline,
       label: "Tagline / especialidade definida",
-      description: "Aparece na página de registo dos clientes — ex. \"Personal trainer · Força & Nutrição\".",
+      description: "Aparece na página de registo dos clientes, ex. \"Personal trainer · Força & Nutrição\".",
       action: { href: "/coach/profile", label: "Adicionar" },
     },
     {
@@ -106,7 +106,7 @@ export default async function CoachSetupPage() {
     {
       done: stripeOk,
       label: "Pagamentos Stripe ativos",
-      description: "A chave Stripe está configurada corretamente — podes aceitar pagamentos.",
+      description: "A chave Stripe está configurada corretamente. Podes aceitar pagamentos.",
       action: { href: "/api/stripe/health", label: "Verificar" },
     },
     {

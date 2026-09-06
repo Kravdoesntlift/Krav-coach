@@ -21,7 +21,7 @@ type Admin = ReturnType<typeof createAdminClient>;
  * Resolve the KRAV client behind a Stripe object without trusting metadata.
  *
  * Metadata is only present on checkouts our own app created. Payments made from
- * a reused payment link, the Stripe dashboard, or an older checkout carry none —
+ * a reused payment link, the Stripe dashboard, or an older checkout carry none -
  * and the old code bailed out entirely in that case, leaving the client
  * unprovisioned. Falls back to the customer mapping, then the customer's email.
  */
@@ -42,7 +42,7 @@ async function resolveClientId(
     .maybeSingle();
   if (byCustomer?.id) return byCustomer.id;
 
-  // 2. Ask Stripe — the customer may carry our metadata, or match a user by email
+  // 2. Ask Stripe: the customer may carry our metadata, or match a user by email
   try {
     const stripe = getStripe();
     const customer = await stripe.customers.retrieve(customerId);
@@ -97,7 +97,7 @@ async function resolveCoachId(
 /**
  * Provision a paying client: subscription row, profile state, coach assignment.
  *
- * This is the critical path — it must always run to completion. Callers keep
+ * This is the critical path: it must always run to completion. Callers keep
  * notifications out of here so a push/email failure can never leave the client
  * unprovisioned. The write itself lives in @/lib/billing/sync so the webhook,
  * the nightly reconcile and the post-checkout page cannot drift apart.
@@ -113,7 +113,7 @@ async function provisionSubscription(
   await syncSubscription(admin, args);
 }
 
-/** Welcome message + push. Never throws — notifications must not block provisioning. */
+/** Welcome message + push. Never throws: notifications must not block provisioning. */
 async function notifyNewSubscriber(
   admin: Admin,
   args: { clientId: string; coachId: string | null },
@@ -349,7 +349,7 @@ export async function POST(req: NextRequest) {
         // `customer.subscription.updated` made every renewal depend on that one
         // event type being enabled on the Stripe endpoint; when it wasn't, a
         // client who had just been charged kept the old period end and showed
-        // up as overdue until the nightly job caught it. Sync here too — both
+        // up as overdue until the nightly job caught it. Sync here too: both
         // events now independently do the right thing, and doing it twice is
         // harmless because the sync only writes on a real difference.
         if (invSubId) {

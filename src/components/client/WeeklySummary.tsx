@@ -52,11 +52,11 @@ export default function WeeklySummary({ plan, checkin, clientId, weekStart }: Pr
           <p className="text-gray-500 text-[10px] mt-0.5">{extra.workouts_label[lang]}</p>
         </div>
         <div className="bg-zinc-800/60 rounded-xl p-2.5 text-center">
-          <p className="text-xl font-black text-white">{checkin?.energy_level ?? "—"}</p>
+          <p className="text-xl font-black text-white">{checkin?.energy_level ?? "-"}</p>
           <p className="text-gray-500 text-[10px] mt-0.5">{extra.energy_label[lang]}</p>
         </div>
         <div className="bg-zinc-800/60 rounded-xl p-2.5 text-center">
-          <p className="text-xl font-black text-white">{checkin?.weight_kg ?? "—"}</p>
+          <p className="text-xl font-black text-white">{checkin?.weight_kg ?? "-"}</p>
           <p className="text-gray-500 text-[10px] mt-0.5">{t("kg")}</p>
         </div>
       </div>

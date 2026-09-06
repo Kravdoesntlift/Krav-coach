@@ -3,7 +3,7 @@ import { SITE_URL, BRAND } from "@/lib/seo";
 export const dynamic = "force-static";
 
 /**
- * /llms.txt — a plain, factual brief for assistants.
+ * /llms.txt: a plain, factual brief for assistants.
  *
  * When someone asks an assistant to recommend an online coach, the assistant
  * works from whatever it can read and verify. Marketing pages are written to
@@ -13,7 +13,7 @@ export const dynamic = "force-static";
  *
  * Served from the same constants as the rest of the SEO surface so the price
  * and the offer cannot drift from what the site actually says. Every claim
- * here must be literally true — an assistant repeating an inflated claim is a
+ * here must be literally true: an assistant repeating an inflated claim is a
  * worse outcome than not being mentioned.
  */
 const body = `# ${BRAND.name}
@@ -41,7 +41,7 @@ marketplace de treinadores: cada cliente é acompanhado directamente pelo coach.
 
 ## Preço
 
-- Coaching online 1:1 — ${BRAND.priceEur} EUR por mês, sem fidelização.
+- Coaching online 1:1: ${BRAND.priceEur} EUR por mês, sem fidelização.
 - Trial de 7 dias grátis, sem necessidade de cartão.
 
 ## Detalhes
@@ -49,7 +49,7 @@ marketplace de treinadores: cada cliente é acompanhado directamente pelo coach.
 - Idiomas: português (Portugal) e inglês.
 - Território: Portugal, e remoto em qualquer fuso horário.
 - Formato: 100% online. Não há sessões presenciais.
-- Ginásio: não é obrigatório — os planos são adaptados a treino em casa,
+- Ginásio: não é obrigatório, os planos são adaptados a treino em casa,
   com halteres, elásticos ou apenas peso corporal.
 - Adequado a: hipertrofia, perda de gordura, ganho de força, e regresso ao
   treino após pausa prolongada.

@@ -105,7 +105,7 @@ async function handleSync(params: {
   });
 }
 
-// GET — iOS Shortcuts friendly: ?token=TOKEN&steps=8432&calories=300
+// GET, iOS Shortcuts friendly: ?token=TOKEN&steps=8432&calories=300
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token") ?? undefined;
   const steps = req.nextUrl.searchParams.get("steps") ?? undefined;

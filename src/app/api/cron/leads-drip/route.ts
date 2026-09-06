@@ -107,7 +107,7 @@ export async function GET(req: NextRequest) {
 }
 
 /* ─── Email templates ─────────────────────────────────────────────────────────
-   Intentionally plain — look like a personal email, not a newsletter.
+   Intentionally plain, look like a personal email, not a newsletter.
    Short paragraphs, no images, no big headers.
 ────────────────────────────────────────────────────────────────────────────── */
 

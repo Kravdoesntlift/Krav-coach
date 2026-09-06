@@ -92,7 +92,7 @@ async function _signupAndTrial(
   // 4. Save onboarding data
   // Store the days actually picked, as JS day numbers (0=Sun…6=Sat) to match
   // workout_days.day_of_week. If the caller sent no selection we genuinely don't
-  // know which days — record none rather than inventing 0..n-1, which would read
+  // know which days: record none rather than inventing 0..n-1, which would read
   // as a real (and wrong) set of weekdays. The count still lives in `availability`.
   const days = selectedDays ?? [];
   await admin.from("client_onboarding").upsert(
@@ -116,7 +116,7 @@ async function _signupAndTrial(
     { onConflict: "client_id" }
   );
 
-  // 5. Assign coach — without this the client is invisible in the dashboard,
+  // 5. Assign coach: without this the client is invisible in the dashboard,
   // analytics and every coach-side query, so a failure here needs to be loud.
   const { error: assignErr } = await admin.from("coach_clients").upsert(
     { coach_id: coachId, client_id: clientId, assigned_role: "coach" },

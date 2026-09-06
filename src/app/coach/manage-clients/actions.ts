@@ -12,7 +12,7 @@ export async function assignClient(clientId: string, role: string = "coach") {
   // Verify current user is a coach
   const { data: profile } = await supabase
     .from("profiles").select("role").eq("id", user.id).single();
-  if (profile?.role !== "coach") return { error: "Sem permissão — conta não é coach." };
+  if (profile?.role !== "coach") return { error: "Sem permissão, conta não é coach." };
 
   // Use admin client so RLS never blocks a valid coach inserting their own record
   const admin = createAdminClient();
@@ -23,7 +23,7 @@ export async function assignClient(clientId: string, role: string = "coach") {
   if (error) {
     if (error.code === "23505") return { error: "Cliente já está atribuído com este papel." };
     if (error.message?.includes("does not exist")) {
-      return { error: "Tabela coach_clients não existe — executa a migração SQL no Supabase." };
+      return { error: "Tabela coach_clients não existe, executa a migração SQL no Supabase." };
     }
     console.error("[assignClient] error:", error);
     return { error: error.message };
@@ -46,7 +46,7 @@ export async function assignClient(clientId: string, role: string = "coach") {
         content: `Olá ${clientFirstName}! 👋 Sou o ${coachFirstName}, o teu coach na KRAV. Bem-vindo ao teu programa personalizado! Estou aqui para te ajudar a atingir os teus objetivos. Qualquer dúvida ou feedback, fala comigo por aqui. Vamos a isso! 💪`,
       });
     } catch (msgErr) {
-      // Non-critical — assignment succeeded, but log the error clearly
+      // Non-critical: assignment succeeded, but log the error clearly
       console.error("[assignClient] welcome message failed:", msgErr);
     }
   }
@@ -198,7 +198,7 @@ export async function deleteClient(clientId: string) {
 
   const admin = createAdminClient();
 
-  // Delete auth user — cascades to profile and all related data
+  // Delete auth user: cascades to profile and all related data
   const { error } = await admin.auth.admin.deleteUser(clientId);
   if (error) return { error: error.message };
 

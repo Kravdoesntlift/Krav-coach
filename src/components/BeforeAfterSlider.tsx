@@ -41,10 +41,10 @@ export default function BeforeAfterSlider({
       onTouchStart={(e) => updatePos(e.touches[0].clientX)}
       onTouchMove={(e) => { e.preventDefault(); updatePos(e.touches[0].clientX); }}
     >
-      {/* After image — full width base */}
+      {/* After image: full width base */}
       <Image src={afterUrl} alt={afterLabel} fill className="object-cover pointer-events-none" />
 
-      {/* Before image — clipped to left portion */}
+      {/* Before image: clipped to left portion */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}

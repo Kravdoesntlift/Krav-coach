@@ -71,7 +71,7 @@ export default async function ClientDetailPage({
     .order("week_start", { ascending: false })
     .limit(8);
 
-  // Current week feedback — pure UTC to match client dashboard
+  // Current week feedback: pure UTC to match client dashboard
   const today = new Date();
   const dow = today.getUTCDay();
   const mon = new Date(today);
@@ -119,7 +119,7 @@ export default async function ClientDetailPage({
   const lastCheckin = checkins?.[0];
   const needsAttention = !lastCheckin || new Date(lastCheckin.week_start) < twoWeeksAgo;
 
-  // Trial badge — only show if client has no active subscription
+  // Trial badge: only show if client has no active subscription
   let trialDaysLeft: number | null = null;
   if (client.trial_ends_at && !client.subscription_renews_at) {
     const now = new Date(); const te = new Date(client.trial_ends_at);
@@ -352,7 +352,7 @@ export default async function ClientDetailPage({
         </div>
       </section>
 
-      {/* Macro goals — coach sets precision nutrition targets for this client */}
+      {/* Macro goals: coach sets precision nutrition targets for this client */}
       <MacroGoalsCoach clientId={clientId} />
 
       {/* Coach notes (private) */}
@@ -367,7 +367,7 @@ export default async function ClientDetailPage({
               <div key={name} className="card p-3">
                 <p className="text-gray-400 text-xs truncate mb-1">{name}</p>
                 <p className="text-white font-bold">
-                  {pr.weight_kg ? `${pr.weight_kg} kg` : "—"}
+                  {pr.weight_kg ? `${pr.weight_kg} kg` : "-"}
                   {pr.reps ? <span className="text-gray-500 font-normal text-xs ml-1">× {pr.reps}</span> : null}
                 </p>
               </div>
@@ -617,7 +617,7 @@ export default async function ClientDetailPage({
       {/* ── Nutrition this week ────────────────────────────────────────── */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-white font-bold text-base">Nutrição — esta semana</h2>
+          <h2 className="text-white font-bold text-base">Nutrição, esta semana</h2>
           {totalNutritionLogs > 0 && (
             <span className="text-zinc-500 text-xs">{totalNutritionLogs} registos</span>
           )}
@@ -683,7 +683,7 @@ export default async function ClientDetailPage({
                             {items.map((item, i) => (
                               <div key={i} className="flex items-center justify-between gap-2">
                                 <p className="text-zinc-400 text-xs flex-1 truncate">
-                                  {item.description || "—"}
+                                  {item.description || "-"}
                                   {item.serving_g && (
                                     <span className="text-zinc-600 ml-1">· {item.serving_g}g</span>
                                   )}

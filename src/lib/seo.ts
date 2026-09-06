@@ -3,7 +3,7 @@
  * to the AI crawlers that increasingly answer "recommend me a coach".
  *
  * Everything here used to be scattered as string literals across the layout,
- * the sitemap, robots.txt and three JSON-LD blocks — and they had drifted onto
+ * the sitemap, robots.txt and three JSON-LD blocks: and they had drifted onto
  * two different hostnames. The apex redirects to www, so every URL we publish
  * must already be the www one: a canonical that points at a redirect splits the
  * ranking signals between two addresses for no reason.
@@ -107,7 +107,7 @@ export function organizationJsonLd() {
  *
  * Deliberately gated. Google treats invented or thin review markup as spam and
  * it carries a manual-action risk, so this returns null until real clients have
- * actually left reviews — the markup switches itself on when the data earns it,
+ * actually left reviews: the markup switches itself on when the data earns it,
  * and never before.
  */
 export const MIN_REVIEWS_FOR_AGGREGATE = 5;

@@ -41,7 +41,7 @@ export default async function ClientDashboard() {
   monday.setUTCDate(today.getUTCDate() - ((dayOfWeek + 6) % 7));
   const weekStart = monday.toISOString().split("T")[0];
 
-  // End of this week (Sunday) — computed before queries, no DB dependency
+  // End of this week (Sunday): computed before queries, no DB dependency
   const weekEnd = new Date(monday);
   weekEnd.setUTCDate(monday.getUTCDate() + 6);
   const weekEndStr = weekEnd.toISOString().split("T")[0];
@@ -49,7 +49,7 @@ export default async function ClientDashboard() {
   // ── PHASE 1: All independent queries in one parallel batch ────────────────
   // Previously: allPlans ran alone, then 15 queries, then nutrition + testimonial
   // = 3 sequential round-trips. Now everything is one round-trip.
-  // allLogs (sets JSON) and allPhotos removed from critical path — their
+  // allLogs (sets JSON) and allPhotos removed from critical path: their
   // achievement badges now trigger only from the dedicated achievements page.
   const [
     { data: allPlans },
@@ -90,7 +90,7 @@ export default async function ClientDashboard() {
       .eq("client_id", user!.id)
       .eq("week_start", weekStart)
       .maybeSingle(),
-    // Profile — merged into one query (was two separate queries to same table)
+    // Profile: merged into one query (was two separate queries to same table)
     supabase.from("profiles")
       .select("full_name, tagline, welcomed_at, seen_achievements, avatar_url, subscription_renews_at")
       .eq("id", user!.id)
@@ -106,7 +106,7 @@ export default async function ClientDashboard() {
     // Exercises logged this week (muscle map)
     supabase.from("workout_logs").select("exercise_name").eq("client_id", user!.id)
       .gte("logged_at", weekStart).lte("logged_at", weekEndStr),
-    // Achievement counters (lightweight — just IDs/names)
+    // Achievement counters (lightweight: just IDs/names)
     supabase.from("weekly_checkins").select("id").eq("client_id", user!.id),
     supabase.from("personal_records").select("exercise_name").eq("client_id", user!.id),
     // Setup checklist + testimonial (was sequential after Promise.all)
@@ -116,7 +116,7 @@ export default async function ClientDashboard() {
     // Latest weekly report link
     supabase.from("weekly_reports").select("id, week_start").eq("client_id", user!.id)
       .order("week_start", { ascending: false }).limit(1).maybeSingle(),
-    // Manual workouts (own sessions) — for streak + calendar overlay
+    // Manual workouts (own sessions): for streak + calendar overlay
     supabase.from("client_workouts").select("date").eq("client_id", user!.id)
       .order("date", { ascending: false }).limit(200),
   ]);
@@ -125,7 +125,7 @@ export default async function ClientDashboard() {
   const clientProfile = mergedProfile;
   const fullProfile   = mergedProfile;
 
-  // Build date → status map (streak + calendar) — computed after allPlans resolves
+  // Build date → status map (streak + calendar): computed after allPlans resolves
   type PlanDay = { day_of_week: number; is_rest?: boolean; workout_completions: { client_id: string }[] };
   const dayStatuses: Record<string, DayStatus> = {};
   for (const plan of allPlans ?? []) {
@@ -139,7 +139,7 @@ export default async function ClientDashboard() {
       dayStatuses[ds] =
         d.is_rest           ? "rest"      :
         done                ? "completed" :
-        // Today is still open — you haven't missed a session you can still do.
+        // Today is still open: you haven't missed a session you can still do.
         // Marking it missed reset the streak to zero every training-day morning
         // and painted today red on the calendar before the day was over.
         ds >= todayStr      ? "future"    :
@@ -147,7 +147,7 @@ export default async function ClientDashboard() {
     }
   }
 
-  // Overlay manual workouts — any day with a self-logged workout counts as completed
+  // Overlay manual workouts: any day with a self-logged workout counts as completed
   for (const w of manualWorkouts ?? []) {
     const d = w.date as string;
     if (!dayStatuses[d] || dayStatuses[d] === "missed") {
@@ -155,13 +155,13 @@ export default async function ClientDashboard() {
     }
   }
 
-  // Daily streak — rest days are free passes, missed training days break it
+  // Daily streak: rest days are free passes, missed training days break it
   let streak = 0;
   for (const ds of Object.keys(dayStatuses).sort().reverse()) {
     const s = dayStatuses[ds];
     if (s === "rest" || s === "future") continue;
     if (s === "completed") { streak++; continue; }
-    break; // "missed" always breaks — including today
+    break; // "missed" always breaks, including today
   }
 
   // Fallback: if no plan for this week, show the most recent plan
@@ -180,7 +180,7 @@ export default async function ClientDashboard() {
     isCurrentWeek = false;
   }
 
-  // Get coach info — from plan first, then from explicit assignment (coach_clients)
+  // Get coach info: from plan first, then from explicit assignment (coach_clients)
   let coachId: string | null | undefined = plan?.coach_id ?? null;
   if (!coachId) {
     const { data: assignment } = await supabase
@@ -198,7 +198,7 @@ export default async function ClientDashboard() {
   const DAY_NAMES_EN = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   const todayName = lang === "en" ? DAY_NAMES_EN[today.getDay()] : DAY_NAMES_FULL[today.getDay()];
 
-  // All exercise names this week (for muscle map) — from plan
+  // All exercise names this week (for muscle map): from plan
   const weekExerciseNames = plan
     ? (plan.workout_days as WorkoutPlan["workout_days"])
         ?.flatMap((d) => (d.exercises ?? []).map((e: { name: string }) => e.name)) ?? []
@@ -370,7 +370,7 @@ export default async function ClientDashboard() {
 
           {/* Right side: streak + weekly progress */}
           <div className="flex items-center gap-2 shrink-0">
-            {/* Weekly workouts pill — only show if there's a plan */}
+            {/* Weekly workouts pill: only show if there's a plan */}
             {plan && trainDays.length > 0 && (
               <div className="flex items-center gap-1 rounded-full px-2.5 py-1.5" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
                 {Array.from({ length: trainDays.length }).map((_, i) => (
@@ -391,7 +391,7 @@ export default async function ClientDashboard() {
           </div>
         </div>
 
-        {/* ── 2. TODAY'S WORKOUT — the main reason they opened the app ── */}
+        {/* ── 2. TODAY'S WORKOUT: the main reason they opened the app ── */}
         {plan && todayDay && !todayDay.is_rest && (
           <TodayCard
             day={todayDay as Parameters<typeof TodayCard>[0]["day"]}
@@ -414,12 +414,12 @@ export default async function ClientDashboard() {
           </div>
         )}
 
-        {/* ── 3. COACH MESSAGE — personal touch, right after the workout ── */}
+        {/* ── 3. COACH MESSAGE: personal touch, right after the workout ── */}
         {feedback?.message && (
           <CoachFeedbackBanner message={feedback.message} weekStart={weekStart} />
         )}
 
-        {/* ── 4. WEEKLY WORKOUT VIEW — collapsible ── */}
+        {/* ── 4. WEEKLY WORKOUT VIEW: collapsible ── */}
         {plan && (
           <>
             {!isCurrentWeek && (
@@ -460,10 +460,10 @@ export default async function ClientDashboard() {
           weekStart={weekStart}
         />
 
-        {/* ── 8. MUSCLE MAP — collapsible, for curious athletes ── */}
+        {/* ── 8. MUSCLE MAP: collapsible, for curious athletes ── */}
         <CollapsibleMuscleMap exerciseNames={weekExerciseNames} loggedNames={weekLoggedNames} />
 
-        {/* ── 9. INSIGHT CARDS — contextual, non-intrusive ── */}
+        {/* ── 9. INSIGHT CARDS: contextual, non-intrusive ── */}
         {latestWeeklyReport && (
           <Link href="/client/weekly-report" className="block">
             <div className="rounded-2xl px-4 py-3.5 flex items-center gap-3 border transition-all active:scale-[0.98]" style={{ background: "rgba(18,18,20,0.85)", borderColor: "rgba(201,168,76,0.22)" }}>
@@ -478,9 +478,9 @@ export default async function ClientDashboard() {
         )}
         {monthlyData && <MonthlyReport {...monthlyData} />}
 
-        {/* ── 10. SECONDARY / ONCE-OFF — below the fold, unobtrusive ── */}
+        {/* ── 10. SECONDARY / ONCE-OFF: below the fold, unobtrusive ── */}
 
-        {/* Setup guide — visible until complete, but never above the workout */}
+        {/* Setup guide: visible until complete, but never above the workout */}
         <SetupChecklist
           clientId={user!.id}
           hasCompletedOnboarding={isOnboardingComplete}
@@ -508,7 +508,7 @@ export default async function ClientDashboard() {
                   {lang === "en" ? "Your coach wants your feedback" : "O teu coach quer o teu testemunho"}
                 </p>
                 <p className="text-zinc-400 text-xs mt-0.5">
-                  {lang === "en" ? "Share your experience — takes 2 min" : "Partilha a tua experiência — 2 min"}
+                  {lang === "en" ? "Share your experience, takes 2 min" : "Partilha a tua experiência: 2 min"}
                 </p>
               </div>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 opacity-70">
@@ -518,10 +518,10 @@ export default async function ClientDashboard() {
           </Link>
         )}
 
-        {/* Install PWA — only if not yet installed, at the very bottom */}
+        {/* Install PWA: only if not yet installed, at the very bottom */}
         <InstallPrompt />
 
-        {/* Payment warning — only when urgent (≤ 3 days) */}
+        {/* Payment warning: only when urgent (≤ 3 days) */}
         {daysUntilRenewal !== null && daysUntilRenewal <= 3 && (
           <div className={`flex items-center justify-between px-4 py-3 rounded-2xl border ${
             daysUntilRenewal <= 0 ? "border-red-500/30 bg-red-500/5" : "border-yellow-500/30 bg-yellow-500/5"

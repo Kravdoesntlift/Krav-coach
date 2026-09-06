@@ -61,14 +61,14 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
   }
 
   const dayLabel = isEN
-    ? availability === 1 ? "1 day — effective minimum"
-      : availability <= 3 ? `${availability} days — great to start`
-      : availability <= 5 ? `${availability} days — excellent commitment`
-      : `${availability} days — dedicated athlete!`
-    : availability === 1 ? "1 dia — mínimo eficaz"
-      : availability <= 3 ? `${availability} dias — ótimo para começar`
-      : availability <= 5 ? `${availability} dias — excelente comprometimento`
-      : `${availability} dias — atleta dedicado!`;
+    ? availability === 1 ? "1 day, effective minimum"
+      : availability <= 3 ? `${availability} days, great to start`
+      : availability <= 5 ? `${availability} days, excellent commitment`
+      : `${availability} days, dedicated athlete!`
+    : availability === 1 ? "1 dia, mínimo eficaz"
+      : availability <= 3 ? `${availability} dias, ótimo para começar`
+      : availability <= 5 ? `${availability} dias, excelente comprometimento`
+      : `${availability} dias, atleta dedicado!`;
 
   const steps = [
     {
@@ -95,7 +95,7 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
     },
     {
       title: isEN ? "What's your goal?" : "Qual é o teu objetivo?",
-      subtitle: isEN ? "Be specific — the more detail, the better the plan" : "Sê específico — quanto mais detalhe, melhor o plano",
+      subtitle: isEN ? "Be specific: the more detail, the better the plan" : "Sê específico: quanto mais detalhe, melhor o plano",
       content: (
         <div className="space-y-3">
           <textarea
@@ -127,8 +127,8 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
             value={injuries}
             onChange={(e) => setInjuries(e.target.value)}
             placeholder={isEN
-              ? "E.g. Right knee — ACL surgery in 2022. No high-impact exercises..."
-              : "Ex: Joelho direito — ligamento cruzado operado em 2022. Sem exercícios de impacto..."}
+              ? "E.g. Right knee, ACL surgery in 2022. No high-impact exercises..."
+              : "Ex: Joelho direito, ligamento cruzado operado em 2022. Sem exercícios de impacto..."}
             rows={3}
             className="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-gold resize-none"
             maxLength={500}
@@ -146,7 +146,7 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
     },
     {
       title: isEN ? "How many days a week can you train?" : "Quantos dias por semana podes treinar?",
-      subtitle: isEN ? "Be realistic — consistency beats intensity" : "Sê realista — consistência supera intensidade",
+      subtitle: isEN ? "Be realistic: consistency beats intensity" : "Sê realista: consistência supera intensidade",
       content: (
         <div className="space-y-4">
           <div className="flex justify-center">

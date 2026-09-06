@@ -4,7 +4,7 @@ import { syncSubscription, getStripe } from "@/lib/billing/sync";
 /**
  * Walk every Stripe subscription and make the database match it.
  *
- * Safety net for the Stripe webhook. Webhooks get missed — a deploy window, a
+ * Safety net for the Stripe webhook. Webhooks get missed: a deploy window, a
  * signature mismatch, an endpoint URL that redirects, a payment made outside
  * our checkout. This runs nightly so a missed event self-heals instead of
  * needing someone to notice a client is stuck, and it is also what the
@@ -28,7 +28,7 @@ export interface WebhookHealth {
   silentDays: number | null;
   /** False once live subscriptions exist but no event has arrived in a week. */
   healthy: boolean;
-  /** True when no event has *ever* been received — a never-configured endpoint. */
+  /** True when no event has *ever* been received: a never-configured endpoint. */
   neverReceived: boolean;
 }
 
@@ -79,7 +79,7 @@ export async function reconcileBilling(): Promise<ReconcileReport | { error: str
   };
   const seenInStripe = new Set<string>();
 
-  // The platform's coach — used when a subscription has no assignment yet
+  // The platform's coach: used when a subscription has no assignment yet
   const { data: coachRow } = await admin
     .from("profiles")
     .select("id")
@@ -88,7 +88,7 @@ export async function reconcileBilling(): Promise<ReconcileReport | { error: str
     .maybeSingle();
   const fallbackCoachId = coachRow?.id ?? null;
 
-  // Cache auth users once — matching by email is the last-resort lookup
+  // Cache auth users once: matching by email is the last-resort lookup
   let authUsers: { id: string; email?: string }[] = [];
   try {
     const { data } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
@@ -177,7 +177,7 @@ export async function reconcileBilling(): Promise<ReconcileReport | { error: str
     }
   } catch (e) {
     report.errors.push(`list: ${e instanceof Error ? e.message : String(e)}`);
-    // The Stripe listing is incomplete — skip the stale sweep entirely rather
+    // The Stripe listing is incomplete: skip the stale sweep entirely rather
     // than mistake "not fetched" for "no longer exists" and revoke live access.
     return report;
   }
@@ -205,11 +205,11 @@ export async function reconcileBilling(): Promise<ReconcileReport | { error: str
     report.webhook = await getWebhookHealth(report.scanned > 0);
     if (!report.webhook.healthy) {
       console.error(
-        "[reconcile-billing] STRIPE WEBHOOK SILENT —",
+        "[reconcile-billing] STRIPE WEBHOOK SILENT:",
         report.webhook.neverReceived
           ? "no event has EVER been received"
           : `last event ${report.webhook.silentDays} days ago`,
-        "— billing is running on the nightly job alone. Check the endpoint URL and signing secret in the Stripe dashboard.",
+        "Billing is running on the nightly job alone. Check the endpoint URL and signing secret in the Stripe dashboard.",
       );
     }
   } catch (e) {

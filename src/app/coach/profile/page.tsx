@@ -36,7 +36,7 @@ export default async function CoachProfilePage() {
         </div>
         <div className="flex items-center gap-2">
           <PushNotificationToggle />
-          {/* Logout icon — always visible at the top */}
+          {/* Logout icon: always visible at the top */}
           <form action={logout}>
             <button
               type="submit"

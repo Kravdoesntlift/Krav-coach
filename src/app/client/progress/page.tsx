@@ -61,7 +61,7 @@ export default async function ProgressPage() {
       .limit(500),
   ]);
 
-  // Group logs by exercise name — compute per-session volume and top set
+  // Group logs by exercise name: compute per-session volume and top set
   const byExercise = new Map<string, { date: string; topSet: number; volume: number; doneSets: number }[]>();
   for (const log of logs ?? []) {
     const sets = (log.sets ?? []) as { weight_kg: number | null; reps: number; done: boolean }[];
@@ -87,7 +87,7 @@ export default async function ProgressPage() {
     arm_cm:   (c as Record<string, unknown>).arm_cm as number ?? null,
   }));
 
-  // Streak calculation — merge coach plan completions + own logged workouts
+  // Streak calculation: merge coach plan completions + own logged workouts
   const completedDates = [...new Set([
     ...(completions ?? []).map((c) => (c.completed_at as string).slice(0, 10)),
     ...(ownWorkouts ?? []).map((w) => w.date as string),
@@ -138,7 +138,7 @@ export default async function ProgressPage() {
     });
   }
 
-  // Own workouts — add to timeline (deduplicate dates already covered by coach completions)
+  // Own workouts: add to timeline (deduplicate dates already covered by coach completions)
   const coachCompletionDates = new Set((completionDays ?? []).map((c) => (c.completed_at as string).slice(0, 10)));
   for (const w of ownWorkouts ?? []) {
     const date = w.date as string;

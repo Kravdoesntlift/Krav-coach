@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 /**
  * The guide page is a client component, so it cannot export metadata itself.
- * Without this it was shipping with no title and no description at all —
+ * Without this it was shipping with no title and no description at all -
  * crawlable, linked from robots.txt, and completely unpresentable in results.
  */
 export const metadata: Metadata = {

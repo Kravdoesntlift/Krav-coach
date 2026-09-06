@@ -51,7 +51,7 @@ const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(COMBINING_M
  * Append the brand unless the name already carries it.
  *
  * Open Food Facts stores the brand separately from the product name, so much of
- * a range comes back as a bare descriptor — Nestum's products list as
+ * a range comes back as a bare descriptor: Nestum's products list as
  * "Chocolate", "Cereal", "5 Cereais". Searching "nestum" then returns a list in
  * which nothing looks like Nestum.
  */
@@ -60,7 +60,7 @@ function withBrand(name: string, brands?: string[] | string): string {
   const brand = first?.trim();
   if (!brand) return name;
   if (norm(name).includes(norm(brand))) return name;
-  return `${name} — ${brand}`;
+  return `${name}: ${brand}`;
 }
 
 /** Characters that carry meaning in the Search-a-licious query syntax. */
@@ -95,8 +95,8 @@ async function offRequest(query: string): Promise<OFFHit[]> {
  *
  * Two passes, because neither alone is good enough:
  *   - Restricted to products sold in Portugal, so local supermarket items
- *     surface. Its query parser only copes with `<one term> AND field:"value"`
- *     — parentheses or a second word silently return zero — so this pass uses
+ *     surface. Its query parser only copes with `<one term> AND field:"value"`.
+ *     Parentheses or a second word silently return zero, so this pass uses
  *     just the leading token.
  *   - Plain full text, which reaches everything else.
  *
@@ -179,7 +179,7 @@ export async function GET(req: NextRequest) {
 
   const lang = req.nextUrl.searchParams.get("lang") === "en" ? "en" : "pt";
 
-  // Always search local DB — for EN queries the search function translates terms internally
+  // Always search local DB: for EN queries the search function translates terms internally
   const localFoods = searchLocalFoods(q, lang).map((f) => ({
     id: f.id,
     name: f.name,
@@ -204,7 +204,7 @@ export async function GET(req: NextRequest) {
 
   // Always consult Open Food Facts, even when the local list looks full. The
   // local table only holds generic foods, so short-circuiting on "aveia" or
-  // "arroz" meant a branded supermarket product could never be found — which is
+  // "arroz" meant a branded supermarket product could never be found: which is
   // the whole reason someone types a brand name. Local hits still rank first.
   const localIds = new Set(localFoods.map((f) => f.id));
 

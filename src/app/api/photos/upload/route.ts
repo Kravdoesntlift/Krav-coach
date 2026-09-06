@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 
   const admin = createAdminClient();
 
-  // Ensure bucket exists and is public — both calls are idempotent
+  // Ensure bucket exists and is public: both calls are idempotent
 
   const path = `${user.id}/${Date.now()}.${ext}`;
   const bytes = await file.arrayBuffer();
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     .from("progress_photos")
     .insert({
       client_id: user.id,
-      photo_url: path,   // object path — signed on read; the bucket is private
+      photo_url: path,   // object path, signed on read; the bucket is private
       caption,
       taken_at,
       ...(angle ? { angle } : {}),
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (dbErr) {
-    // Storage succeeded but DB failed — clean up orphan file
+    // Storage succeeded but DB failed: clean up orphan file
     await admin.storage.from("progress-photos").remove([path]);
     return NextResponse.json({ error: dbErr.message }, { status: 500 });
   }

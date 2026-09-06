@@ -38,7 +38,7 @@ export default async function CoachLayout({
   const unread    = unreadCount ?? 0;
   const newLeads  = newLeadsCount ?? 0;
 
-  // Desktop navbar — clean grouped structure
+  // Desktop navbar: clean grouped structure
   const coachNav = [
     { href: "/coach/dashboard", label: "Clientes" },
     { href: "/coach/messages",  label: "Mensagens", badge: unread },
@@ -61,7 +61,7 @@ export default async function CoachLayout({
     },
   ];
 
-  // Bottom nav — 5 clean items, no more drawer
+  // Bottom nav: 5 clean items, no more drawer
   const coachBottomNav = [
     { href: "/coach/dashboard", label: "Clientes",  icon: "👥",                   badge: 0        },
     { href: "/coach/messages",  label: "Chat",      icon: <ChatIcon size={22} />,  badge: unread   },

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Termos de Serviço — KRAV Coach",
+  title: "Termos de Serviço · KRAV Coach",
   description: "Termos e condições de utilização da plataforma KRAV Coach.",
 };
 
@@ -60,7 +60,7 @@ export default function TermsPage() {
           <section className="space-y-2">
             <h2 className="text-white font-bold text-base">4. Subscrição e pagamento</h2>
             <p>
-              A subscrição é mensal, renovada automaticamente na data de aniversário do pagamento. O valor e a periodicidade são apresentados no momento da compra. Os pagamentos são processados pela <strong className="text-white">Stripe</strong> com segurança PCI DSS nível 1 — não armazenamos dados de cartão.
+              A subscrição é mensal, renovada automaticamente na data de aniversário do pagamento. O valor e a periodicidade são apresentados no momento da compra. Os pagamentos são processados pela <strong className="text-white">Stripe</strong> com segurança PCI DSS nível 1. Não armazenamos dados de cartão.
             </p>
             <p>
               Em caso de falha no pagamento, a renovação é tentada automaticamente. Após falha definitiva, o acesso é suspenso. O cliente é notificado por e-mail em todos os casos.
@@ -73,7 +73,7 @@ export default function TermsPage() {
               Podes cancelar a subscrição a qualquer momento contactando{" "}
               <a href="mailto:kravdoesntlift@gmail.com" className="text-brand-gold underline">
                 kravdoesntlift@gmail.com
-              </a>. O cancelamento tem efeito no fim do período já pago — o acesso mantém-se ativo até essa data.
+              </a>. O cancelamento tem efeito no fim do período já pago. O acesso mantém-se ativo até essa data.
             </p>
             <p>
               Ao abrigo do direito europeu (Diretiva 2011/83/UE), tens direito a desistir do contrato no prazo de <strong className="text-white">14 dias</strong> a partir da primeira compra, com reembolso integral, desde que não tenhas utilizado o serviço de forma significativa nesse período.
@@ -120,7 +120,7 @@ export default function TermsPage() {
           <section className="space-y-2">
             <h2 className="text-white font-bold text-base">9. Propriedade intelectual</h2>
             <p>
-              Todos os planos de treino, conteúdos e materiais disponibilizados na plataforma são propriedade de André Kravchuk e estão protegidos por direitos de autor. A sua utilização é exclusivamente pessoal — qualquer reprodução ou distribuição não autorizada é proibida.
+              Todos os planos de treino, conteúdos e materiais disponibilizados na plataforma são propriedade de André Kravchuk e estão protegidos por direitos de autor. A sua utilização é exclusivamente pessoal. Qualquer reprodução ou distribuição não autorizada é proibida.
             </p>
           </section>
 

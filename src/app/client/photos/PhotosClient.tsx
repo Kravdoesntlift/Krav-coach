@@ -30,7 +30,7 @@ const extra = {
   after:            { pt: "Depois", en: "After" },
   new_session:      { pt: "Nova sessão de fotos", en: "New photo session" },
   clear:            { pt: "Limpar", en: "Clear" },
-  optional_angles:  { pt: "Podes adicionar 1, 2 ou as 3 vistas — não é obrigatório fazer todas", en: "You can add 1, 2, or all 3 angles — not all are required" },
+  optional_angles:  { pt: "Podes adicionar 1, 2 ou as 3 vistas. Não é obrigatório fazer todas", en: "You can add 1, 2, or all 3 angles, not all are required" },
   upload_error:     { pt: (angle: string, msg: string) => `Erro ao enviar ${angle}: ${msg}`, en: (angle: string, msg: string) => `Error uploading ${angle}: ${msg}` },
   try_again:        { pt: "tenta novamente", en: "please try again" },
   saving:           { pt: "A guardar...", en: "Saving..." },
@@ -60,7 +60,7 @@ function groupBySessions(photos: ProgressPhoto[]): Session[] {
     const angle = p.angle as Angle | null;
     if (angle) map.get(p.taken_at)![angle] = p;
     else {
-      // Legacy unstructured photos — slot as "front" if empty
+      // Legacy unstructured photos: slot as "front" if empty
       const slot = map.get(p.taken_at)!;
       if (!slot.front) slot.front = p;
     }
@@ -170,7 +170,7 @@ function AngleSlider({
   if (!beforeUrl && !afterUrl) {
     return (
       <div className="rounded-xl overflow-hidden bg-zinc-950 relative flex items-center justify-center text-zinc-800 text-xs" style={{ aspectRatio: "3/4" }}>
-        —
+        <span className="opacity-40">📷</span>
         <div className="absolute bottom-1 left-0 right-0 text-center">
           <span className="text-[9px] text-zinc-700 bg-black/60 px-1.5 py-0.5 rounded-full">{label}</span>
         </div>
@@ -355,7 +355,7 @@ function SessionCard({
                 </button>
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-zinc-800 text-xs">
-                  —
+                  <span className="opacity-40">📷</span>
                 </div>
               )}
               <div className="absolute bottom-1 left-0 right-0 text-center">
@@ -427,7 +427,7 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
       for (const [angle, file] of Object.entries(files) as [Angle, File][]) {
         const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
 
-        // Step 1 — Get a signed upload URL (tiny request, no file)
+        // Step 1: Get a signed upload URL (tiny request, no file)
         let signJson: { signedUrl?: string; path?: string; error?: string };
         try {
           const signRes = await fetch(`/api/photos/sign?angle=${angle}&ext=${ext}`);
@@ -438,7 +438,7 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
           return;
         }
 
-        // Step 2 — Upload file directly to Supabase Storage (bypasses Vercel 4.5MB limit)
+        // Step 2: Upload file directly to Supabase Storage (bypasses Vercel 4.5MB limit)
         try {
           const putRes = await fetch(signJson.signedUrl!, {
             method: "PUT",
@@ -451,7 +451,7 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
           return;
         }
 
-        // Step 3 — Record in DB + notify coach (tiny JSON request)
+        // Step 3: Record in DB + notify coach (tiny JSON request)
         let recordJson: { photo?: ProgressPhoto; error?: string };
         try {
           const recordRes = await fetch("/api/photos/record", {

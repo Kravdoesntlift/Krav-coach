@@ -6,9 +6,9 @@ import ScrollReveal from "@/components/ScrollReveal";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 
 export const metadata: Metadata = {
-  title: "Personal Trainer Online Portugal | KRAV Coach — Trial Grátis 7 Dias",
+  title: "Personal Trainer Online Portugal | KRAV Coach · Trial Grátis 7 Dias",
   description:
-    "Personal trainer online com plano 100% personalizado, acompanhamento semanal e chat direto com o coach. Resultados reais — sem ginásio obrigatório. Trial grátis de 7 dias, sem cartão.",
+    "Personal trainer online com plano 100% personalizado, acompanhamento semanal e chat direto com o coach. Resultados reais, sem ginásio obrigatório. Trial grátis de 7 dias, sem cartão.",
   keywords: [
     "personal trainer online",
     "personal trainer online portugal",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Personal Trainer Online Portugal | KRAV Coach",
     description:
-      "Plano personalizado, nutrição e coaching direto — tudo na app. Trial grátis de 7 dias.",
+      "Plano personalizado, nutrição e coaching direto, tudo na app. Trial grátis de 7 dias.",
     url: "https://www.kravcoaching.com/personal-trainer-online",
     siteName: "KRAV Coach",
     locale: "pt_PT",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   },
   // The PT and EN pages are the same offer in two languages. Without hreflang
   // they compete with each other for the same intent instead of Google serving
-  // whichever matches the searcher. Relative — metadataBase resolves the host.
+  // whichever matches the searcher. Relative: metadataBase resolves the host.
   alternates: {
     canonical: "/personal-trainer-online",
     languages: {
@@ -47,15 +47,15 @@ export const metadata: Metadata = {
 const faqItems = [
   {
     q: "O que é um personal trainer online?",
-    a: "É um coach que cria e ajusta o teu plano de treino e nutrição à distância — via app. Tens acompanhamento semanal, chat direto e feedback contínuo, sem precisar de marcar sessões presenciais.",
+    a: "É um coach que cria e ajusta o teu plano de treino e nutrição à distância, via app. Tens acompanhamento semanal, chat direto e feedback contínuo, sem precisar de marcar sessões presenciais.",
   },
   {
     q: "É realmente personalizado ou é um plano genérico?",
-    a: "100% personalizado. Antes de criares a conta respondes a um questionário sobre os teus objetivos, nível, equipamento e dias disponíveis. O coach cria o plano com base nessas respostas — não é um template.",
+    a: "100% personalizado. Antes de criares a conta respondes a um questionário sobre os teus objetivos, nível, equipamento e dias disponíveis. O coach cria o plano com base nessas respostas. Não é um template.",
   },
   {
     q: "Preciso de ginásio?",
-    a: "Não. O plano adapta-se ao teu equipamento — ginásio completo, ginásio básico, treino em casa com pesos, ou apenas com o peso do corpo. Diz o que tens disponível e o coach cria o plano à medida.",
+    a: "Não. O plano adapta-se ao teu equipamento, ginásio completo, ginásio básico, treino em casa com pesos, ou apenas com o peso do corpo. Diz o que tens disponível e o coach cria o plano à medida.",
   },
   {
     q: "Quando recebo o meu plano?",
@@ -63,7 +63,7 @@ const faqItems = [
   },
   {
     q: "Quanto custa um personal trainer online?",
-    a: "A KRAV Coach custa €127/mês com tudo incluído — plano de treino, nutrição, AI Coach 24/7, check-ins semanais e chat direto com o coach. Podes experimentar gratuitamente durante 7 dias, sem cartão de crédito.",
+    a: "A KRAV Coach custa €127/mês com tudo incluído, plano de treino, nutrição, AI Coach 24/7, check-ins semanais e chat direto com o coach. Podes experimentar gratuitamente durante 7 dias, sem cartão de crédito.",
   },
   {
     q: "Posso cancelar quando quiser?",
@@ -71,7 +71,7 @@ const faqItems = [
   },
   {
     q: "Funciona para iniciantes?",
-    a: "Sim. O plano é adaptado ao teu nível — seja iniciante, intermédio ou avançado. Se nunca treinaste, o coach começa do zero contigo.",
+    a: "Sim. O plano é adaptado ao teu nível, seja iniciante, intermédio ou avançado. Se nunca treinaste, o coach começa do zero contigo.",
   },
   {
     q: "Como é o acompanhamento semanal?",
@@ -92,7 +92,7 @@ const faqSchema = {
 const serviceSchema = {
   "@context": "https://schema.org",
   "@type": "Service",
-  name: "Personal Trainer Online — KRAV Coach",
+  name: "Personal Trainer Online, KRAV Coach",
   description:
     "Coaching fitness personalizado com plano de treino semanal, nutrição e acompanhamento real pelo coach.",
   provider: {
@@ -124,13 +124,13 @@ const features = [
   { icon: "💬", title: "Chat direto com o coach",   desc: "Tira dúvidas, partilha resultados e mantém-te motivado em tempo real." },
   { icon: "📊", title: "Acompanhamento semanal",    desc: "Check-ins, feedback e ajustes contínuos ao plano conforme a tua evolução." },
   { icon: "🏆", title: "Registo de progresso",      desc: "Peso, medidas, recordes pessoais e conquistas. Compara fotos antes/depois com slider interativo." },
-  { icon: "⚡", title: "Modo de treino ao vivo",    desc: "Timer de descanso com beep, registo de séries e pesos — tudo durante o treino." },
+  { icon: "⚡", title: "Modo de treino ao vivo",    desc: "Timer de descanso com beep, registo de séries e pesos · tudo durante o treino." },
 ];
 
 const steps = [
   { n: "1", title: "Inscreve-te",        desc: "Preenche o questionário em 2 minutos. O coach recebe as tuas respostas de imediato." },
   { n: "2", title: "Recebe o teu plano", desc: "Nas primeiras 24 horas úteis o coach cria e envia o teu plano personalizado na app." },
-  { n: "3", title: "Treina com suporte", desc: "Segue o plano, regista os treinos e acompanha a tua evolução — o coach está sempre disponível." },
+  { n: "3", title: "Treina com suporte", desc: "Segue o plano, regista os treinos e acompanha a tua evolução · o coach está sempre disponível." },
 ];
 
 const included = [
@@ -232,7 +232,7 @@ export default async function PersonalTrainerOnlinePage() {
                     </span>
                   </h1>
                   <p className="text-zinc-400 text-lg leading-relaxed max-w-sm mx-auto">
-                    {coach?.tagline || "Coaching fitness premium com acompanhamento real — no teu telemóvel, 24/7."}
+                    {coach?.tagline || "Coaching fitness premium com acompanhamento real, no teu telemóvel, 24/7."}
                   </p>
                 </div>
 
@@ -411,7 +411,7 @@ export default async function PersonalTrainerOnlinePage() {
                 <p className="text-zinc-500 text-xs font-bold tracking-[0.18em] uppercase">
                   Instala a app no teu telemóvel
                 </p>
-                <p className="text-zinc-500 text-sm">Funciona como uma app nativa — sem precisar de ir à App Store.</p>
+                <p className="text-zinc-500 text-sm">Funciona como uma app nativa, sem precisar de ir à App Store.</p>
               </div>
             </ScrollReveal>
 
@@ -435,7 +435,7 @@ export default async function PersonalTrainerOnlinePage() {
                       "Abre kravcoaching.com no Safari",
                       "Toca no ícone ⎋ (barra inferior)",
                       '"Adicionar ao ecrã de início"',
-                      'Toca "Adicionar" — pronto! 🎉',
+                      'Toca "Adicionar", pronto! 🎉',
                     ].map((text, i) => (
                       <li key={i} className="flex items-start gap-3 text-xs text-zinc-400">
                         <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
@@ -464,7 +464,7 @@ export default async function PersonalTrainerOnlinePage() {
                       "Abre kravcoaching.com no Chrome",
                       'Toca nos "⋮" (canto superior direito)',
                       '"Adicionar ao ecrã inicial"',
-                      'Toca "Instalar" — pronto! 🎉',
+                      'Toca "Instalar", pronto! 🎉',
                     ].map((text, i) => (
                       <li key={i} className="flex items-start gap-3 text-xs text-zinc-400">
                         <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"

@@ -129,8 +129,8 @@ export default function NotificationPrompt() {
                   </p>
                   <p className="text-zinc-400 text-sm leading-relaxed">
                     {isEN
-                      ? "Get coach messages, workout reminders and important alerts — directly on your phone."
-                      : "Recebe mensagens do teu coach, lembretes de treino e avisos importantes — diretamente no teu telemóvel."}
+                      ? "Get coach messages, workout reminders and important alerts, directly on your phone."
+                      : "Recebe mensagens do teu coach, lembretes de treino e avisos importantes, diretamente no teu telemóvel."}
                   </p>
                 </div>
               </div>

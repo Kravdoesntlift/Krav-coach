@@ -25,7 +25,7 @@ export default async function CoachPublicPage({
       .maybeSingle();
     coach = data;
   } else {
-    // Slug lookup — try with slug column; if column missing (migration not run) fall back gracefully
+    // Slug lookup: try with slug column; if column missing (migration not run) fall back gracefully
     const { data, error } = await admin
       .from("profiles")
       .select("id, full_name, avatar_url, tagline, role, slug")
@@ -34,7 +34,7 @@ export default async function CoachPublicPage({
       .maybeSingle();
 
     if (error && error.message?.includes("column") && error.message?.includes("slug")) {
-      // Migration not run yet — slug column doesn't exist
+      // Migration not run yet: slug column doesn't exist
       notFound();
     }
     coach = data ?? null;
@@ -122,7 +122,7 @@ export default async function CoachPublicPage({
           </div>
         </div>
 
-        {/* Stats — only show if there's real data */}
+        {/* Stats: only show if there's real data */}
         {(clientCount > 0 || (completionCount ?? 0) > 0) && (
           <div
             className="grid grid-cols-2 gap-3 rounded-2xl p-5"

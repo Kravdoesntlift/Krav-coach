@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     .from("progress_photos")
     .insert({
       client_id: user.id,
-      photo_url: path,   // object path — signed on read; the bucket is private
+      photo_url: path,   // object path, signed on read; the bucket is private
       caption: caption?.trim() || null,
       taken_at,
       ...(angle ? { angle } : {}),

@@ -42,7 +42,7 @@ export default function PushNotificationToggle() {
       return;
     }
 
-    // Use ready (not register) — ServiceWorkerRegister in layout handles registration
+    // Use ready (not register): ServiceWorkerRegister in layout handles registration
     navigator.serviceWorker.ready.then(async (reg) => {
       const sub = await reg.pushManager.getSubscription();
 
@@ -51,7 +51,7 @@ export default function PushNotificationToggle() {
         return;
       }
 
-      // Subscription missing but permission is granted — likely lost after a SW update.
+      // Subscription missing but permission is granted: likely lost after a SW update.
       // Re-subscribe silently so the user doesn't have to do anything.
       if (Notification.permission === "granted") {
         try {
@@ -62,7 +62,7 @@ export default function PushNotificationToggle() {
           await saveSubscription(newSub);
           setSubscribed(true);
         } catch {
-          // Silent fail — user can manually re-enable from the toggle
+          // Silent fail: user can manually re-enable from the toggle
           setSubscribed(false);
         }
       }
@@ -83,7 +83,7 @@ export default function PushNotificationToggle() {
         return;
       }
 
-      // Request permission explicitly — required on iOS after SW update resets it
+      // Request permission explicitly: required on iOS after SW update resets it
       if (Notification.permission !== "granted") {
         const result = await Notification.requestPermission();
         if (result !== "granted") {
@@ -91,7 +91,7 @@ export default function PushNotificationToggle() {
           setPermDenied(denied);
           setStatus(
             denied
-              ? "❌ Bloqueado — vai a Definições > Notificações > KRAV Coach e ativa."
+              ? "❌ Bloqueado, vai a Definições > Notificações > KRAV Coach e ativa."
               : "❌ Permissão não concedida."
           );
           return;
@@ -119,8 +119,8 @@ export default function PushNotificationToggle() {
       const isPermError = raw.toLowerCase().includes("notallowed") || raw.toLowerCase().includes("permission");
       const msg = isPermError
         ? isIOS()
-          ? "❌ Bloqueado — vai a Definições > Notificações > KRAV Coach e ativa."
-          : "❌ Permissão negada — verifica as definições de notificação do browser."
+          ? "❌ Bloqueado, vai a Definições > Notificações > KRAV Coach e ativa."
+          : "❌ Permissão negada, verifica as definições de notificação do browser."
         : `❌ ${raw}`;
       setStatus(msg);
       console.error("[push] Toggle failed:", err);
@@ -189,7 +189,7 @@ export default function PushNotificationToggle() {
 
       {permDenied && !status && (
         <p className="text-xs px-1 text-red-400 leading-snug">
-          Notificações bloqueadas — vai a <strong>Definições &gt; Notificações &gt; KRAV Coach</strong> para ativar.
+          Notificações bloqueadas, vai a <strong>Definições &gt; Notificações &gt; KRAV Coach</strong> para ativar.
         </p>
       )}
     </div>

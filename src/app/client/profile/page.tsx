@@ -77,7 +77,7 @@ export default async function ClientProfilePage() {
         </div>
         <div className="flex items-center gap-2">
           <PushNotificationToggle />
-          {/* Logout icon — always visible at the top */}
+          {/* Logout icon: always visible at the top */}
           <form action={logout}>
             <button
               type="submit"
@@ -114,7 +114,7 @@ export default async function ClientProfilePage() {
       {/* Language selector */}
       <LanguageSelector />
 
-      {/* Trial info — only shown when on trial and no paid subscription yet */}
+      {/* Trial info: only shown when on trial and no paid subscription yet */}
       {profile?.trial_ends_at && !subscription && (() => {
         const msLeft = new Date(profile.trial_ends_at!).getTime() - Date.now();
         const daysLeft = Math.ceil(msLeft / 86_400_000);
@@ -161,7 +161,7 @@ export default async function ClientProfilePage() {
         <TwoFactorSettings />
       </div>
 
-      {/* Logout — also at bottom for discoverability */}
+      {/* Logout: also at bottom for discoverability */}
       <form action={logout}>
         <button
           type="submit"

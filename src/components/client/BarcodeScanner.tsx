@@ -132,7 +132,7 @@ export default function BarcodeScanner({ onFound, onClose }: Props) {
           if (result) {
             lookup(result.getText());
           } else if (err && !(err instanceof NotFoundException)) {
-            // Ignore NotFoundException — just means no barcode in this frame
+            // Ignore NotFoundException: just means no barcode in this frame
             console.warn("[BarcodeScanner]", err.message);
           }
         }
@@ -242,7 +242,7 @@ export default function BarcodeScanner({ onFound, onClose }: Props) {
           className="absolute inset-0 w-full h-full object-cover"
         />
 
-        {/* Viewfinder — visible while scanning */}
+        {/* Viewfinder: visible while scanning */}
         {isScanning && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             {/* Vignette */}
@@ -423,7 +423,7 @@ export default function BarcodeScanner({ onFound, onClose }: Props) {
         </div>
       )}
 
-      {/* Manual input — bottom sheet when scanning */}
+      {/* Manual input: bottom sheet when scanning */}
       {isScanning && showManual && (
         <div className="absolute inset-x-0 bottom-0 z-30 px-5 pb-10 pt-6 space-y-3 rounded-t-3xl"
           style={{ background: "rgba(15,15,17,0.97)", border: "1px solid rgba(255,255,255,0.08)", borderBottom: "none" }}>

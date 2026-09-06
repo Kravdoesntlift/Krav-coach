@@ -69,7 +69,7 @@ export function ClientShell({
     { href: "/client/profile",   label: t("nav_profile"),   icon: <UserIcon size={22} />,      badge: 0 },
   ];
 
-  // "Mais" drawer — 9 items, 3×3 grid, no duplicates with other tabs
+  // "Mais" drawer: 9 items, 3×3 grid, no duplicates with other tabs
   const clientMoreNav = [
     { href: "/client/workouts",     label: isEN ? "My Workouts" : "Meus Treinos",   icon: <DumbbellIcon size={24} /> },
     { href: "/client/checkin",      label: "Check-in",                               icon: <ClipboardIcon size={24} /> },

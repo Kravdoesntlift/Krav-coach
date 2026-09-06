@@ -90,7 +90,7 @@ export async function signup(formData: FormData) {
       // before the client ever opens the app (which is where LangProvider normally saves it)
       await admin.from("profiles").update({ lang }).eq("id", data.user.id);
 
-      // Resolve coachId — use param if valid, otherwise find first coach
+      // Resolve coachId: use param if valid, otherwise find first coach
       let resolvedCoachId = coachId;
       if (resolvedCoachId) {
         const { data: check } = await admin
@@ -114,7 +114,7 @@ export async function signup(formData: FormData) {
           assigned_role: "coach",
         });
 
-        // 2. Set active with 7-day trial — client gets immediate access
+        // 2. Set active with 7-day trial: client gets immediate access
         const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
         await admin
           .from("profiles")
@@ -174,7 +174,7 @@ export async function signup(formData: FormData) {
         }).catch((e) => console.warn("[signup] Welcome email failed:", e));
       }
     } catch {
-      // Non-critical — user is created, assignment just didn't happen
+      // Non-critical: user is created, assignment just didn't happen
       console.warn("[signup] Failed to auto-assign coach:", coachId);
     }
   }

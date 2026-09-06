@@ -60,7 +60,7 @@ export default function BillingHealthCard({
             <p className="text-sm text-zinc-300">
               {lastEventAt
                 ? <>A receber pagamentos em tempo real. Último evento {relativeTime(lastEventAt)}.</>
-                : <>Sem subscrições ainda — nada para sincronizar.</>}
+                : <>Sem subscrições ainda, nada para sincronizar.</>}
             </p>
           ) : (
             <p className="text-sm text-orange-200 leading-relaxed">
@@ -87,7 +87,7 @@ export default function BillingHealthCard({
           <span className="text-zinc-300 font-semibold">Como corrigir:</span> no Stripe, em
           Developers → Webhooks, confirma que o URL do destino é exactamente{" "}
           <code className="text-zinc-200">https://www.kravcoaching.com/api/stripe/webhook</code>{" "}
-          — com <span className="text-zinc-200 font-semibold">www</span>. Sem ele o Stripe
+, com <span className="text-zinc-200 font-semibold">www</span>. Sem ele o Stripe
           apanha um redireccionamento e marca a entrega como falhada.
         </div>
       )}

@@ -26,7 +26,7 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
 
   return (
     <section>
-      {/* Category header — clickable */}
+      {/* Category header: clickable */}
       <button
         onClick={() => setOpen((v) => !v)}
         className="w-full text-left"
@@ -79,7 +79,7 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
         </div>
       </button>
 
-      {/* Achievement grid — collapsible */}
+      {/* Achievement grid: collapsible */}
       <div
         style={{
           display: "grid",

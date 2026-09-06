@@ -37,7 +37,7 @@ const RECENT_SWAPS_KEY = "krav_recent_swaps_v1";
  *
  * Everything used to live in React state and only reached the database on
  * "Terminar". Tapping another tab or refreshing threw away every set logged so
- * far — mid-workout, with no warning. Sets are written here as they are entered
+ * far: mid-workout, with no warning. Sets are written here as they are entered
  * so the session survives leaving the screen, and works when the gym has no
  * signal.
  */
@@ -89,7 +89,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
 
   // Start blank so the first client render matches the server's. Reading storage
   // during render makes the two disagree, and React does not patch up attribute
-  // mismatches — the values came back but the ticked rows silently did not.
+  // mismatches: the values came back but the ticked rows silently did not.
   // The saved session is applied in an effect below instead.
   const [step, setStep]           = useState(0);
   const [setLogs, setSetLogs]     = useState<SetLog[][]>(
@@ -133,7 +133,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
   const completedSets = setLogs.reduce((s, e) => s + e.filter((r) => r.done).length, 0);
   const progress      = totalSets > 0 ? completedSets / totalSets : 0;
 
-  /** What the client is actually doing for step `i` — the swap if there is one. */
+  /** What the client is actually doing for step `i`: the swap if there is one. */
   const nameFor = (i: number) => swaps[i] ?? sorted[i]?.name ?? "";
   const curName = nameFor(step);
   const swapped = swaps[step] != null;
@@ -220,7 +220,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
         dayId, startedAt: startedAt.current, step, setLogs, swaps, restDur,
       };
       localStorage.setItem(ACTIVE_WORKOUT_KEY, JSON.stringify(snapshot));
-    } catch { /* private mode or quota — the session still works in memory */ }
+    } catch { /* private mode or quota, the session still works in memory */ }
   }, [hydrated, dayId, step, setLogs, swaps, restDur, finishing]);
 
   // ── Remembered substitutions ──────────────────────────────
@@ -228,7 +228,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
     try {
       const raw = localStorage.getItem(RECENT_SWAPS_KEY);
       if (raw) setRecentSwaps(JSON.parse(raw) as Record<string, string[]>);
-    } catch { /* unreadable or private mode — just offer no history */ }
+    } catch { /* unreadable or private mode, just offer no history */ }
   }, []);
 
   // ── Wake Lock ──────────────────────────────────────────────
@@ -244,7 +244,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
     return () => { document.removeEventListener("visibilitychange", onVis); wlRef.current?.release().catch(() => {}); };
   }, []);
 
-  // ── Silent audio — keeps Media Session alive on lock screen ─
+  // ── Silent audio: keeps Media Session alive on lock screen ─
   useEffect(() => {
     try {
       const C = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -265,7 +265,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
     return () => { if (elapsedRef.current) clearInterval(elapsedRef.current); };
   }, []);
 
-  // ── Media Session — atualiza quando muda de exercício ────────
+  // ── Media Session: atualiza quando muda de exercício ────────
   // Não dispara em cada série para evitar spam de notificações.
   // O áudio silencioso mantém a sessão ativa para aparecer no ecrã de bloqueio.
   useEffect(() => {
@@ -424,14 +424,14 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
           {restSet && setLogs[restSet.ex]?.[restSet.si] && (
             <div className="w-full max-w-[280px]">
               <p className="text-zinc-600 text-[10px] font-semibold tracking-widest uppercase text-center mb-2">
-                {isEN ? `Set ${restSet.si + 1} — what you did` : `Série ${restSet.si + 1} — o que fizeste`}
+                {isEN ? `Set ${restSet.si + 1} · what you did` : `Série ${restSet.si + 1} · o que fizeste`}
               </p>
               <div className="flex items-center gap-2">
                 <div className="flex-1">
                   <label className="block text-zinc-700 text-[10px] uppercase mb-1 text-center">
                     {isEN ? "Weight kg" : "Peso kg"}
                   </label>
-                  <input type="number" inputMode="decimal" placeholder="—"
+                  <input type="number" inputMode="decimal" placeholder="-"
                     value={setLogs[restSet.ex][restSet.si].weight}
                     onChange={(e) => updateLog(restSet.ex, restSet.si, "weight", e.target.value)}
                     className="bg-zinc-800 border border-zinc-700/50 rounded-xl text-white text-base text-center w-full py-2.5 focus:outline-none focus:border-brand-gold/50" />
@@ -576,7 +576,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
           )}
         </div>
 
-        {/* Swap — the planned machine is often taken, and someone training at
+        {/* Swap, the planned machine is often taken, and someone training at
             home may have no way to do it at all. Always available: 124 exercises
             in the library carry no listed alternatives, and gating on that left
             those with no way out. */}
@@ -635,7 +635,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                   );
                 })}
 
-                {/* Free text, for anyone whose gym — or living room — simply
+                {/* Free text, for anyone whose gym, or living room, simply
                     doesn't have the listed options. */}
                 {customOpen ? (
                   <form
@@ -712,7 +712,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
             <span className="text-xs font-black text-center" style={{ color: s.done ? "#C9A84C" : "#52525b" }}>
               {si + 1}
             </span>
-            <input type="number" inputMode="decimal" placeholder="—" value={s.weight}
+            <input type="number" inputMode="decimal" placeholder="-" value={s.weight}
               onChange={(e) => updateLog(step, si, "weight", e.target.value)}
               className="bg-zinc-800 border border-zinc-700/40 rounded-xl text-white text-sm text-center w-full focus:outline-none focus:border-brand-gold/40"
               style={{ padding: "0.5rem 0.25rem" }} />

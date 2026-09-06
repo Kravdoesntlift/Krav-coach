@@ -18,7 +18,7 @@ export default async function CoachMessagesPage() {
     .select("client_id, profiles!workout_plans_client_id_fkey(id, full_name, avatar_url, status)")
     .eq("coach_id", user!.id);
 
-  // De-duped map — skip archived
+  // De-duped map: skip archived
   type ClientProfile = { id: string; full_name: string; avatar_url: string | null; status: string | null };
   const clientMap = new Map<string, ClientProfile>();
 

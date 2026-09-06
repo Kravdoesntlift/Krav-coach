@@ -20,7 +20,7 @@ export default function ServiceWorkerRegister() {
           if (!newWorker) return;
           newWorker.addEventListener("statechange", () => {
             if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-              // Old SW is still controlling — new SW installed and waiting.
+              // Old SW is still controlling: new SW installed and waiting.
               // Post SKIP_WAITING so it activates on next page navigation.
               newWorker.postMessage({ type: "SKIP_WAITING" });
             }

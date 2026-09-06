@@ -4,8 +4,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 /**
  * One place that knows how to make the database agree with Stripe.
  *
- * This logic used to exist three times — in the webhook, in the nightly
- * reconcile, and in the post-checkout landing page — and the three copies had
+ * This logic used to exist three times: in the webhook, in the nightly
+ * reconcile, and in the post-checkout landing page: and the three copies had
  * drifted: the landing page set `status` but never `subscription_renews_at`,
  * and only the webhook cleared `trial_ends_at`. Which fields a paying client
  * ended up with depended on which path happened to run first.
@@ -73,7 +73,7 @@ export function customerIdOf(subscription: Stripe.Subscription): string | null {
  * client's profile, and the coach assignment.
  *
  * Returns whether anything actually changed, so callers can tell a real repair
- * from a no-op. Never throws — billing sync failing loudly in a page render is
+ * from a no-op. Never throws: billing sync failing loudly in a page render is
  * worse than it failing quietly and being retried by the nightly job.
  */
 export async function syncSubscription(
@@ -106,7 +106,7 @@ export async function syncSubscription(
     !dbSub ||
     dbSub.status !== subscription.status ||
     dbSub.amount_cents !== amountCents ||
-    // timestamptz comes back as "+00:00", toISOString() ends in "Z" — compare instants
+    // timestamptz comes back as "+00:00", toISOString() ends in "Z": compare instants
     (dbSub.current_period_end ? new Date(dbSub.current_period_end).getTime() : null) !==
       (periodEnd ? new Date(periodEnd).getTime() : null);
 
@@ -194,7 +194,7 @@ const lastChecked = new Map<string, number>();
  * Refresh any subscription whose stored period has already elapsed.
  *
  * The nightly reconcile is the backstop, but it leaves a window of up to 24
- * hours in which a client who has just been charged still looks unpaid — which
+ * hours in which a client who has just been charged still looks unpaid: which
  * is exactly what the coach sees when they open the dashboard the morning
  * after a renewal. This closes that window: if the stored period end is in the
  * past, ask Stripe before drawing anything.
@@ -214,7 +214,7 @@ export async function healStaleSubscriptions(
   let query = admin
     .from("stripe_subscriptions")
     .select("id, client_id, coach_id")
-    // A cancelled row is not "stale", it is settled — re-asking Stripe about it
+    // A cancelled row is not "stale", it is settled: re-asking Stripe about it
     // on every render would be pure noise.
     .in("status", ["active", "trialing", "past_due"])
     .lt("current_period_end", nowIso)

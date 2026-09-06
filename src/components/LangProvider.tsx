@@ -32,7 +32,7 @@ async function persistLangToProfile(lang: Lang) {
       await supabase.from("profiles").update({ lang }).eq("id", user.id);
     }
   } catch {
-    // Non-critical — cookie/localStorage are the source of truth for the UI
+    // Non-critical: cookie/localStorage are the source of truth for the UI
   }
 }
 

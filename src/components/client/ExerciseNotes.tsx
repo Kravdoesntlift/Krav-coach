@@ -7,7 +7,7 @@ import { parseExerciseNote } from "@/lib/exercise-notes";
  * Renders a structured exercise note: prescription as chips, the intensity
  * technique as a badge, cues as body text, and substitutions behind a toggle.
  *
- * `hideAlternatives` is for screens that offer swapping themselves — the live
+ * `hideAlternatives` is for screens that offer swapping themselves: the live
  * workout lists them as buttons, so repeating them here would be noise.
  */
 export default function ExerciseNotes({
@@ -21,7 +21,7 @@ export default function ExerciseNotes({
   hideAlternatives?: boolean;
   /**
    * Drop the coaching cues. Sets, rest and RPE carry over to a substitute, but
-   * the cue describes the planned movement — "start with the cable low" is wrong
+   * the cue describes the planned movement: "start with the cable low" is wrong
    * once you've swapped a crossover for a pec deck.
    */
   hideCues?: boolean;

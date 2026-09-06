@@ -158,7 +158,7 @@ export default function SuggestPlanButton({ clientId }: { clientId: string }) {
                           </span>
                           <span>
                             <span className="text-zinc-200 font-semibold">{ex.name}</span>
-                            {" — "}
+                            {", "}
                             {ex.sets} séries × {ex.reps}
                             {ex.notes ? ` · ${ex.notes}` : ""}
                           </span>

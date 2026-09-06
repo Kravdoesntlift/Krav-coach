@@ -30,8 +30,8 @@ const extra = {
     ],
   },
   greeting: {
-    pt: "Olá! 👋 Sou o teu assistente de coaching KRAV. Estou aqui para responder às tuas dúvidas sobre treino, nutrição e recuperação — sempre com base no teu plano e histórico. Em que posso ajudar?",
-    en: "Hi! 👋 I'm your KRAV coaching assistant. I'm here to answer your questions about training, nutrition, and recovery — always based on your plan and history. How can I help?",
+    pt: "Olá! 👋 Sou o teu assistente de coaching KRAV. Estou aqui para responder às tuas dúvidas sobre treino, nutrição e recuperação, sempre com base no teu plano e histórico. Em que posso ajudar?",
+    en: "Hi! 👋 I'm your KRAV coaching assistant. I'm here to answer your questions about training, nutrition, and recovery, always based on your plan and history. How can I help?",
   },
 } as const;
 

@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
   const admin = createAdminClient();
 
-  // Week that just ended (Mon–Sun)
+  // Week that just ended (Mon-Sun)
   const today = new Date();
   const dow = today.getUTCDay(); // 0=Sun
   const mon = new Date(today);
@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
         admin.from("weekly_checkins").select("weight_kg, waist_cm")
           .eq("client_id", clientId).neq("week_start", weekStart)
           .order("week_start", { ascending: false }).limit(1).maybeSingle(),
-        // Workout completions this week (Mon–Sun only)
+        // Workout completions this week (Mon-Sun only)
         admin.from("workout_completions").select("id, day_id")
           .eq("client_id", clientId)
           .gte("completed_at", weekStart)

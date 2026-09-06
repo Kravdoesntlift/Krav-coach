@@ -23,7 +23,7 @@ export async function GET() {
   } else if (secretKey.startsWith("sk_live_")) {
     results.secret_key = { ok: true, detail: "sk_live_... ✓ (modo produção)" };
   } else if (secretKey.startsWith("sk_test_")) {
-    results.secret_key = { ok: false, detail: "sk_test_... ✗ — ainda em modo teste! Muda para sk_live_ no Vercel." };
+    results.secret_key = { ok: false, detail: "sk_test_... ✗, ainda em modo teste! Muda para sk_live_ no Vercel." };
   } else {
     results.secret_key = { ok: false, detail: `Formato desconhecido: ${secretKey.slice(0, 8)}...` };
   }
@@ -35,10 +35,10 @@ export async function GET() {
   } else if (webhookSecret.startsWith("whsec_")) {
     results.webhook_secret = { ok: true, detail: "whsec_... ✓ está definida" };
   } else {
-    results.webhook_secret = { ok: false, detail: "Formato inválido — deve começar com whsec_" };
+    results.webhook_secret = { ok: false, detail: "Formato inválido, deve começar com whsec_" };
   }
 
-  // ── 3. Raw fetch test — bypass SDK entirely ──────────────────────────────────
+  // ── 3. Raw fetch test: bypass SDK entirely ──────────────────────────────────
   if (secretKey) {
     try {
       const rawResp = await fetch("https://api.stripe.com/v1/balance", {
@@ -48,18 +48,18 @@ export async function GET() {
       const rawBody = await rawResp.json() as Record<string, unknown>;
 
       if (!rawResp.ok) {
-        // HTTP error from Stripe — key invalid, account restricted, etc.
+        // HTTP error from Stripe: key invalid, account restricted, etc.
         const errMsg = (rawBody.error as Record<string, unknown>)?.message ?? JSON.stringify(rawBody);
         results.stripe_api = {
           ok: false,
-          detail: `HTTP ${rawResp.status} — ${errMsg}`,
+          detail: `HTTP ${rawResp.status}: ${errMsg}`,
         };
       } else {
-        // Success — now also check webhooks using SDK
+        // Success: now also check webhooks using SDK
         const isLive = rawBody.livemode as boolean;
         results.stripe_api = {
           ok: true,
-          detail: `Chave válida ✓ — livemode: ${isLive}. ${!isLive ? "⚠️ ATENÇÃO: a chave é de TEST mode, não live!" : ""}`,
+          detail: `Chave válida ✓, livemode: ${isLive}. ${!isLive ? "⚠️ ATENÇÃO: a chave é de TEST mode, não live!" : ""}`,
         };
 
         // ── 4. Check webhooks registered in Stripe ──────────────────────────
@@ -93,7 +93,7 @@ export async function GET() {
           } else {
             results.webhook_registered = {
               ok: true,
-              detail: `Webhook ✓ — ${match.url} (status: ${match.status})`,
+              detail: `Webhook ✓: ${match.url} (status: ${match.status})`,
             };
           }
         }
@@ -102,7 +102,7 @@ export async function GET() {
         if (match && webhookSecret) {
           results.webhook_secret_mode = {
             ok: true,
-            detail: "Signing secret está definido — verifica que copiaste do webhook live (não do test)",
+            detail: "Signing secret está definido, verifica que copiaste do webhook live (não do test)",
           };
         }
       }
@@ -121,11 +121,11 @@ export async function GET() {
   results.vapid_push = {
     ok: vapidOk,
     detail: vapidOk
-      ? `VAPID ✓ — subject: ${vapidSubject}`
+      ? `VAPID ✓, subject: ${vapidSubject}`
       : !vapidSubject ? "VAPID_SUBJECT em falta"
       : !vapidPublic ? "NEXT_PUBLIC_VAPID_PUBLIC_KEY em falta"
       : !vapidPrivate ? "VAPID_PRIVATE_KEY em falta"
-      : `VAPID_SUBJECT inválido — deve começar com mailto: ou https://`,
+      : `VAPID_SUBJECT inválido, deve começar com mailto: ou https://`,
   };
 
   const allOk = Object.values(results).every((r) => r.ok);

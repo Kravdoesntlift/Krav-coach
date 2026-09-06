@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 
-// POST /api/challenges — upsert monthly challenge (coach only)
+// POST /api/challenges: upsert monthly challenge (coach only)
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ challenge: data });
 }
 
-// PATCH /api/challenges — announce winner
+// PATCH /api/challenges: announce winner
 export async function PATCH(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

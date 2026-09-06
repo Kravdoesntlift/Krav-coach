@@ -112,7 +112,7 @@ export default function HabitTracker({
     if (loading[key]) return;
     setLoading((p) => ({ ...p, [key]: true }));
 
-    // Optimistic update — today logs only
+    // Optimistic update: today logs only
     const wasChecked = isTodayChecked(habitId);
     const existing = logs.find(
       (l) => l.habit_id === habitId && l.logged_date === today

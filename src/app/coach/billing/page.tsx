@@ -82,7 +82,7 @@ export default async function BillingPage() {
 
   const clients = (clientProfiles ?? []).map((cp) => ({
     id: cp.id,
-    full_name: cp.full_name ?? "—",
+    full_name: cp.full_name ?? "-",
     email: emailMap.get(cp.id) ?? "",
     status: cp.status ?? "",
     stripe_customer_id: cp.stripe_customer_id ?? null,

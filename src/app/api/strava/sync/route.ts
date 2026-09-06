@@ -73,7 +73,7 @@ async function refreshStravaToken(
   return data.access_token;
 }
 
-// POST — sync Strava activities: steps into daily_health_logs + workouts into client_workouts
+// POST: sync Strava activities, steps into daily_health_logs + workouts into client_workouts
 export async function POST() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -120,7 +120,7 @@ export async function POST() {
 
   const activities: StravaActivity[] = await activitiesRes.json();
 
-  // 1. Steps — group by date and sum
+  // 1. Steps: group by date and sum
   const byDate = new Map<string, number>();
   for (const act of activities) {
     const date = act.start_date.slice(0, 10);
@@ -140,7 +140,7 @@ export async function POST() {
       .upsert(stepUpserts, { onConflict: "client_id,log_date" });
   }
 
-  // 2. Workouts — upsert each activity into client_workouts (deduplicated by external_id)
+  // 2. Workouts: upsert each activity into client_workouts (deduplicated by external_id)
   const workoutUpserts = activities.map((act) => ({
     client_id: user.id,
     date: act.start_date.slice(0, 10),
@@ -174,7 +174,7 @@ export async function POST() {
   });
 }
 
-// DELETE — disconnect Strava
+// DELETE: disconnect Strava
 export async function DELETE() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

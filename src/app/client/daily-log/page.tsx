@@ -428,7 +428,7 @@ export default function DailyLogPage() {
             const isToday = date === today;
             const dayLabel = d.toLocaleDateString(locale, { weekday: "short" });
             const dayNum = d.getDate();
-            const emoji = log ? ENERGY_OPTIONS.find((e) => e.value === log.energy)?.emoji ?? "—" : null;
+            const emoji = log ? ENERGY_OPTIONS.find((e) => e.value === log.energy)?.emoji ?? "-" : null;
 
             return (
               <div
@@ -439,7 +439,7 @@ export default function DailyLogPage() {
               >
                 <span className="text-gray-500 text-[9px] uppercase leading-none">{dayLabel}</span>
                 <span className="text-gray-400 text-[11px] font-semibold">{dayNum}</span>
-                <span className="text-lg leading-none">{emoji ?? <span className="text-gray-700 text-xs">—</span>}</span>
+                <span className="text-lg leading-none">{emoji ?? <span className="text-gray-700 text-xs">-</span>}</span>
                 {health && health.steps >= GOAL_STEPS && (
                   <span className="text-[8px] text-green-400 font-bold leading-none">10k</span>
                 )}

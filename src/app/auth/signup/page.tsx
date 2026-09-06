@@ -141,7 +141,7 @@ export default function SignupPage() {
               {refCode && <input type="hidden" name="ref_code" value={refCode} />}
               <input type="hidden" name="lang" value={detectedLang} />
 
-              {/* Invite banner — coach invite */}
+              {/* Invite banner: coach invite */}
               {coachId && (
                 <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl"
                   style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}

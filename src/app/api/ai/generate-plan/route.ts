@@ -83,7 +83,7 @@ Regras:
 
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    return NextResponse.json({ error: "GROQ_API_KEY não configurada — vai a console.groq.com e cria uma key grátis" }, { status: 500 });
+    return NextResponse.json({ error: "GROQ_API_KEY não configurada, vai a console.groq.com e cria uma key grátis" }, { status: 500 });
   }
 
   try {

@@ -8,7 +8,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://kravcoaching.com";
 
 // Generates a personalised iOS .shortcut file for the authenticated client.
 // The shortcut reads today's step count from Apple Health and sends it to
-// the client's unique sync URL via a GET request — no JSON body, no POST.
+// the client's unique sync URL via a GET request: no JSON body, no POST.
 export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -32,7 +32,7 @@ export async function GET() {
   // Magic variable that captures the output of the health action
   const stepsVar = actionOutput("Steps");
 
-  // Action 1 — Read Health Data: Steps count for today (sum)
+  // Action 1: Read Health Data, steps count for today (sum)
   const healthAction = {
     WFWorkflowActionIdentifier: "is.workflow.actions.health.quantity.requestrecent",
     WFWorkflowActionParameters: {
@@ -51,7 +51,7 @@ export async function GET() {
     },
   };
 
-  // Action 2 — URL: base URL + steps magic variable appended
+  // Action 2: URL, base URL + steps magic variable appended
   // withVariables called as a function: strings array + variable args
   const urlWithSteps = withVariables([syncUrlBase, ""], stepsVar);
 
@@ -62,7 +62,7 @@ export async function GET() {
     },
   };
 
-  // Action 3 — Get Contents of URL (GET, uses the URL from action 2)
+  // Action 3: Get Contents of URL (GET, uses the URL from action 2)
   const getAction = {
     WFWorkflowActionIdentifier: "is.workflow.actions.downloadurl",
     WFWorkflowActionParameters: {
@@ -79,7 +79,7 @@ export async function GET() {
     { icon: { color: 4274264319, glyph: 59613 } } // gold-ish, heart-activity glyph
   );
 
-  // Buffer from bplist-creator — cast to avoid TS body type mismatch
+  // Buffer from bplist-creator: cast to avoid TS body type mismatch
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return new NextResponse(buffer as any, {
     headers: {

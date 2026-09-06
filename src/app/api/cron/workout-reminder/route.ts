@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
     // No workout scheduled today for this client
     if (!todayDay) { skipped++; continue; }
 
-    // Already completed — don't spam
+    // Already completed: don't spam
     const alreadyDone = (todayDay.workout_completions).some(
       (c) => c.client_id === plan.client_id
     );

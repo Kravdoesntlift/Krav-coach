@@ -269,9 +269,9 @@ export const translations = {
   days:                { pt: "dias",                 en: "days" },
   see_weekly_report:   { pt: "Ver relatório desta semana",              en: "See this week's report" },
   report_subtitle:     { pt: "Treinos, métricas e mensagem do coach",   en: "Workouts, metrics and coach message" },
-  rest_day_sub:        { pt: "Recupera bem — o músculo cresce no descanso", en: "Rest well — muscle grows during recovery" },
-  no_plan_coach_note:  { pt: "O teu coach ainda não criou o plano — fala com ele se tiveres dúvidas", en: "Your coach hasn't created the plan yet — contact them if you have questions" },
-  showing_recent:      { pt: "A mostrar o plano mais recente — o teu coach ainda não criou o plano desta semana.", en: "Showing the most recent plan — your coach hasn't created this week's plan yet." },
+  rest_day_sub:        { pt: "Recupera bem: o músculo cresce no descanso", en: "Rest well, muscle grows during recovery" },
+  no_plan_coach_note:  { pt: "O teu coach ainda não criou o plano, fala com ele se tiveres dúvidas", en: "Your coach hasn't created the plan yet, contact them if you have questions" },
+  showing_recent:      { pt: "A mostrar o plano mais recente. O teu coach ainda não criou o plano desta semana.", en: "Showing the most recent plan, your coach hasn't created this week's plan yet." },
 
   // ── Habits ────────────────────────────────────────────────────────────────
   nav_habits:           { pt: "🎯 Hábitos",            en: "🎯 Habits" },

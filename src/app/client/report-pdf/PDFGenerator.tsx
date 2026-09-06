@@ -87,7 +87,7 @@ function ReportDocument({ data }: { data: ReportData }) {
             </View>
             <View style={s.statBox}>
               <Text style={data.avgEnergy ? s.statGold : s.statValue}>
-                {data.avgEnergy ? `${data.avgEnergy}/5` : "—"}
+                {data.avgEnergy ? `${data.avgEnergy}/5` : "-"}
               </Text>
               <Text style={s.statLabel}>Energia{"\n"}média</Text>
             </View>
@@ -104,11 +104,11 @@ function ReportDocument({ data }: { data: ReportData }) {
             <Text style={s.sectionTitle}>Evolução de Peso</Text>
             <View style={s.row}>
               <Text style={s.rowLabel}>Peso inicial</Text>
-              <Text style={s.rowValue}>{data.firstWeight ? `${data.firstWeight} kg` : "—"}</Text>
+              <Text style={s.rowValue}>{data.firstWeight ? `${data.firstWeight} kg` : "-"}</Text>
             </View>
             <View style={s.row}>
               <Text style={s.rowLabel}>Peso final</Text>
-              <Text style={s.rowValue}>{data.lastWeight ? `${data.lastWeight} kg` : "—"}</Text>
+              <Text style={s.rowValue}>{data.lastWeight ? `${data.lastWeight} kg` : "-"}</Text>
             </View>
             {data.weightDelta !== null && (
               <View style={s.row}>
@@ -201,7 +201,7 @@ export default function PDFGenerator({ month }: { month: string }) {
       {status === "idle"    && "⬇ Descarregar PDF"}
       {status === "loading" && "A gerar PDF..."}
       {status === "done"    && "✓ PDF descarregado!"}
-      {status === "error"   && "Erro — tenta novamente"}
+      {status === "error"   && "Erro, tenta novamente"}
     </button>
   );
 }

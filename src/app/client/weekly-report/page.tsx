@@ -118,7 +118,7 @@ export default async function WeeklyReportPage() {
       {/* Header */}
       <div className="space-y-1 pt-1">
         <p className="text-zinc-600 text-xs font-semibold tracking-[0.15em] uppercase">
-          {typedReport ? formatWeekRange(typedReport.week_start, lang) : "—"}
+          {typedReport ? formatWeekRange(typedReport.week_start, lang) : "-"}
         </p>
         <h1 className="text-[1.75rem] font-black tracking-tight leading-[1.1]">
           {extra.title_report[lang]}{" "}

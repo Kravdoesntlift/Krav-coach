@@ -34,7 +34,7 @@ const TOTAL_STEPS = 7;
 const T = {
   step_of:          { pt: (s: number, t: number) => `Passo ${s} de ${t}`,        en: (s: number, t: number) => `Step ${s} of ${t}` },
 
-  // Step 1 — Goal
+  // Step 1: Goal
   step1_title:      { pt: "Qual é o teu objetivo principal?",                     en: "What is your main goal?" },
   lose_weight:      { pt: "Perder peso e definir",                                en: "Lose weight & get lean" },
   lose_weight_sub:  { pt: "Eliminar gordura e ganhar definição muscular",          en: "Burn fat and gain muscle definition" },
@@ -43,7 +43,7 @@ const T = {
   athletic:         { pt: "Melhorar condição física",                             en: "Improve fitness" },
   athletic_sub:     { pt: "Resistência, saúde e energia no dia a dia",            en: "Endurance, health, and daily energy" },
 
-  // Step 2 — Body profile
+  // Step 2: Body profile
   step2_title:      { pt: "O teu perfil físico",                                  en: "Your body profile" },
   step2_sub:        { pt: "Estes dados ajudam o coach a criar um plano 100% adaptado a ti.", en: "This data helps your coach create a plan tailored specifically to you." },
   sex_label:        { pt: "Sexo biológico",                                       en: "Biological sex" },
@@ -55,7 +55,7 @@ const T = {
   height_label:     { pt: "Altura",                                               en: "Height" },
   weight_label:     { pt: "Peso atual",                                           en: "Current weight" },
 
-  // Step 3 — Level
+  // Step 3: Level
   step3_title:      { pt: "Qual é o teu nível de treino?",                        en: "What is your training level?" },
   beginner:         { pt: "Iniciante",                                            en: "Beginner" },
   beginner_sub:     { pt: "Menos de 6 meses de treino regular",                   en: "Less than 6 months of regular training" },
@@ -64,19 +64,19 @@ const T = {
   advanced:         { pt: "Avançado",                                             en: "Advanced" },
   advanced_sub:     { pt: "Mais de 2 anos de treino consistente",                 en: "More than 2 years of consistent training" },
 
-  // Step 4 — Schedule
+  // Step 4: Schedule
   step4_title:      { pt: "O teu horário de treino",                              en: "Your training schedule" },
   days_label:       { pt: "Que dias da semana podes treinar?",                    en: "Which days of the week can you train?" },
   days_sub:         { pt: (n: number) => n === 0 ? "Seleciona pelo menos 1 dia" : n === 1 ? "1 dia selecionado" : `${n} dias selecionados`,
                       en: (n: number) => n === 0 ? "Select at least 1 day" : n === 1 ? "1 day selected" : `${n} days selected` },
   duration_label:   { pt: "Quanto tempo tens por sessão?",                        en: "How long do you have per session?" },
 
-  // Step 5 — Injuries
+  // Step 5: Injuries
   step5_title:      { pt: "Tens alguma lesão ou limitação física?",               en: "Do you have any injuries or physical limitations?" },
   injuries_placeholder: { pt: "Ex: dor no joelho direito, hérnia lombar...",      en: "E.g.: right knee pain, herniated disc..." },
   no_injuries:      { pt: "Não tenho lesões nem limitações físicas",              en: "I have no injuries or physical limitations" },
 
-  // Step 6 — Equipment
+  // Step 6: Equipment
   step6_title:      { pt: "Onde vais treinar?",                                   en: "Where will you train?" },
   gym_full:         { pt: "Ginásio completo",                                     en: "Full gym" },
   gym_full_sub:     { pt: "Pesos livres, máquinas, cabos e mais",                 en: "Free weights, machines, cables and more" },
@@ -89,7 +89,7 @@ const T = {
   outdoor:          { pt: "Ar livre",                                             en: "Outdoors" },
   outdoor_sub:      { pt: "Parques, campos ou corrida ao exterior",               en: "Parks, fields or outdoor running" },
 
-  // Step 7 — Account
+  // Step 7: Account
   step7_title:      { pt: "Cria a tua conta",                                     en: "Create your account" },
   full_name:        { pt: "Nome completo",                                        en: "Full name" },
   name_ph:          { pt: "João Silva",                                           en: "John Smith" },
@@ -386,7 +386,7 @@ export default function StartPage() {
 
         <div className="flex-1">
 
-          {/* STEP 1 — Goal */}
+          {/* STEP 1: Goal */}
           {step === 1 && (
             <StepWrapper title={tx(T.step1_title, lang)}>
               <OptionCard selected={quiz.goal === "lose_weight"} onClick={() => set("goal", "lose_weight")}
@@ -398,7 +398,7 @@ export default function StartPage() {
             </StepWrapper>
           )}
 
-          {/* STEP 2 — Body profile */}
+          {/* STEP 2: Body profile */}
           {step === 2 && (
             <StepWrapper title={tx(T.step2_title, lang)} sub={tx(T.step2_sub, lang)}>
               {/* Sex */}
@@ -432,7 +432,7 @@ export default function StartPage() {
             </StepWrapper>
           )}
 
-          {/* STEP 3 — Level */}
+          {/* STEP 3: Level */}
           {step === 3 && (
             <StepWrapper title={tx(T.step3_title, lang)}>
               <OptionCard selected={quiz.level === "beginner"} onClick={() => set("level", "beginner")}
@@ -444,7 +444,7 @@ export default function StartPage() {
             </StepWrapper>
           )}
 
-          {/* STEP 4 — Schedule (days + duration) */}
+          {/* STEP 4: Schedule (days + duration) */}
           {step === 4 && (
             <StepWrapper title={tx(T.step4_title, lang)}>
               {/* Day picker */}
@@ -479,7 +479,7 @@ export default function StartPage() {
             </StepWrapper>
           )}
 
-          {/* STEP 5 — Injuries */}
+          {/* STEP 5: Injuries */}
           {step === 5 && (
             <StepWrapper title={tx(T.step5_title, lang)}>
               <div className="space-y-4">
@@ -503,7 +503,7 @@ export default function StartPage() {
             </StepWrapper>
           )}
 
-          {/* STEP 6 — Equipment */}
+          {/* STEP 6: Equipment */}
           {step === 6 && (
             <StepWrapper title={tx(T.step6_title, lang)}>
               <OptionCard selected={quiz.equipment === "gym_full"} onClick={() => set("equipment", "gym_full")}
@@ -519,7 +519,7 @@ export default function StartPage() {
             </StepWrapper>
           )}
 
-          {/* STEP 7 — Create account */}
+          {/* STEP 7: Create account */}
           {step === 7 && (
             <StepWrapper title={tx(T.step7_title, lang)}>
               <div className="space-y-3">

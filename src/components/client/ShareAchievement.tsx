@@ -153,7 +153,7 @@ export default function ShareAchievement({ title, description, icon, clientName 
       }}
       onClick={(e) => { if (e.target === e.currentTarget) close(); }}
     >
-      {/* Close button — always visible */}
+      {/* Close button: always visible */}
       <button
         onClick={close}
         className="fixed top-5 right-5 w-10 h-10 rounded-full flex items-center justify-center text-zinc-400 hover:text-white transition-colors"

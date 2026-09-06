@@ -7,7 +7,7 @@ export default function OnboardingWrapper({ clientId, isComplete }: { clientId: 
   // Key is per-client so different clients on same device each see the modal
   const lsKey = `krav_onboarding_done_${clientId}`;
 
-  // Start as "done" to avoid flash — we'll reveal the modal only after
+  // Start as "done" to avoid flash: we'll reveal the modal only after
   // confirming localStorage doesn't have the key
   const [show, setShow] = useState(false);
 
@@ -18,7 +18,7 @@ export default function OnboardingWrapper({ clientId, isComplete }: { clientId: 
       const done = localStorage.getItem(lsKey);
       if (!done) setShow(true);
     } catch {
-      // localStorage blocked (private browsing etc.) — don't show modal
+      // localStorage blocked (private browsing etc.): don't show modal
     }
   }, [lsKey, isComplete]);
 

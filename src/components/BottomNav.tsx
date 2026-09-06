@@ -23,7 +23,7 @@ interface Props {
 export default function BottomNav({ items, moreItems, userId, showLogout = true }: Props) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  // Live unread count — null means "use server-rendered value"
+  // Live unread count: null means "use server-rendered value"
   const [liveUnread, setLiveUnread] = useState<number | null>(null);
 
   useEffect(() => { setDrawerOpen(false); }, [pathname]);
@@ -33,7 +33,7 @@ export default function BottomNav({ items, moreItems, userId, showLogout = true 
     i.href.includes("chat") || i.href.includes("messages")
   );
 
-  // Subscribe to messages table — recalculate real unread count on every change
+  // Subscribe to messages table: recalculate real unread count on every change
   useEffect(() => {
     if (!userId || !msgItem) return;
     const supabase = createClient();
@@ -50,7 +50,7 @@ export default function BottomNav({ items, moreItems, userId, showLogout = true 
     // Initial fetch
     fetchUnread();
 
-    // Realtime — fires on INSERT (new msg) and UPDATE (msg marked read)
+    // Realtime: fires on INSERT (new msg) and UPDATE (msg marked read)
     const channel = supabase
       .channel(`unread-nav:${userId}`)
       .on(

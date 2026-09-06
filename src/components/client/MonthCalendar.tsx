@@ -1,4 +1,4 @@
-// Server component — recebe dados pré-computados do dashboard
+// Server component: recebe dados pré-computados do dashboard
 export type DayStatus = "completed" | "missed" | "rest" | "future" | "none";
 
 const MONTH_NAMES_PT = [

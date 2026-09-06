@@ -215,7 +215,7 @@ export default function AutomationsClient({ initialAutomations }: Props) {
             </select>
           </div>
 
-          {/* Trigger value (days) — only for time-based triggers */}
+          {/* Trigger value (days): only for time-based triggers */}
           {needsValue && (
             <div>
               <label className="label">Número de dias</label>
@@ -236,7 +236,7 @@ export default function AutomationsClient({ initialAutomations }: Props) {
             <label className="label">
               Mensagem{" "}
               <span className="text-zinc-500 font-normal">
-                — usa{" "}
+, usa{" "}
                 <code className="text-brand-gold bg-zinc-800 px-1 rounded text-xs">
                   {"{{nome}}"}
                 </code>{" "}

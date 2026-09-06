@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-// Coach-only diagnostic endpoint — shows what the cron would find
+// Coach-only diagnostic endpoint: shows what the cron would find
 // without sending any emails. Remove this route in production when done debugging.
 export async function GET(req: NextRequest) {
   void req;

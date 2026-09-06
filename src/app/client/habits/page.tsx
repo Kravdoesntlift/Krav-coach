@@ -125,7 +125,7 @@ export default async function HabitsPage() {
       </div>
 
       <div className="max-w-md mx-auto px-4 pt-5 space-y-6">
-        {/* Stats row — streaks overview */}
+        {/* Stats row: streaks overview */}
         {streaks.length > 0 && (
           <div className="grid grid-cols-3 gap-3">
             {streaks.slice(0, 3).map((h) => (
@@ -147,7 +147,7 @@ export default async function HabitsPage() {
 
         {/* Today section label */}
         <p className="text-xs text-zinc-500 uppercase tracking-widest font-medium">
-          {lang === "en" ? "Today" : "Hoje"} — {today}
+          {lang === "en" ? "Today" : "Hoje"}, {today}
         </p>
 
         {/* Main tracker */}

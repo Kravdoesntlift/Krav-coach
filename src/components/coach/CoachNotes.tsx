@@ -57,7 +57,7 @@ export default function CoachNotes({ coachId, clientId, existing }: Props) {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             className="input min-h-[100px] resize-none text-sm"
-            placeholder="Observações internas sobre este cliente — objetivos, limitações físicas, estratégias..."
+            placeholder="Observações internas sobre este cliente, objetivos, limitações físicas, estratégias..."
           />
           <div className="flex items-center gap-3">
             <button type="submit" disabled={loading} className="btn-primary text-sm py-2 px-4">
