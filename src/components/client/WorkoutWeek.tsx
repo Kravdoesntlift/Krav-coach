@@ -22,7 +22,7 @@ const extra = {
   exercise_singular:  { pt: "exercício",                  en: "exercise" },
   exercise_plural:    { pt: "exercícios",                 en: "exercises" },
   start_btn:          { pt: "▶ Iniciar",                  en: "▶ Start" },
-  catch_up:           { pt: "· ainda podes fazer",        en: "· you can still do it" },
+  catch_up:           { pt: "ainda podes fazer",          en: "you can still do it" },
   resume_btn:         { pt: "▶ Retomar",                  en: "▶ Resume" },
   rest_timer_lbl:     { pt: "⏱ Timer de descanso",       en: "⏱ Rest timer" },
   how_was_workout:    { pt: "Como correu o treino?",      en: "How did the workout go?" },
@@ -145,12 +145,7 @@ export default function WorkoutWeek({ plan, clientId, coachId }: Props) {
               ) : null}
             </div>
             {/* Toggle arrow */}
-            <span
-              className="text-zinc-600 text-sm shrink-0 transition-transform duration-300"
-              style={{ transform: weekOpen ? "rotate(180deg)" : "rotate(0deg)", display: "inline-block" }}
-            >
-              ▼
-            </span>
+            <Chevron open={weekOpen} className="shrink-0" />
           </button>
         )}
 
@@ -183,6 +178,19 @@ export default function WorkoutWeek({ plan, clientId, coachId }: Props) {
         </div>
       </div>
     </>
+  );
+}
+
+/** One chevron that rotates, rather than two glyphs that swap. */
+function Chevron({ open, className = "" }: { open: boolean; className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+      className={`w-4 h-4 text-zinc-600 transition-transform duration-300 ease-smooth ${open ? "rotate-180" : ""} ${className}`}
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
   );
 }
 
@@ -348,25 +356,42 @@ function WorkoutDayCard({
         onKeyDown={(e) => e.key === "Enter" && setOpen((o) => !o)}
         className="w-full flex items-center justify-between p-4 md:p-5 text-left cursor-pointer select-none"
       >
-        <div className="flex items-center gap-3">
+        {/* The day name owns the first line and the rest is metadata on the
+            second. Previously the session label, the exercise count and the
+            catch-up hint all competed with the button for the same row, and at
+            375px the phrase wrapped mid-sentence and pushed every card to a
+            different height. */}
+        <div className="flex items-center gap-3 flex-1 min-w-0">
           <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${completed ? "bg-green-500" : isToday ? "bg-brand-gold" : "bg-zinc-700"}`} />
-          <div>
-            <p className="font-semibold text-white">
+          <div className="min-w-0">
+            <p className="font-semibold text-white truncate">
               {DAY_NAMES_FULL[day.day_of_week]}
               {isToday && <span className="ml-2 text-xs text-brand-gold font-normal">{t("today")}</span>}
-              {/* A missed session is not lost, it can be ticked whenever it
-                  gets done. Without saying so, the dimmed card reads as locked. */}
+            </p>
+            {/* The session label yields space before the status does. Letting
+                the whole line truncate uniformly cut the reassurance mid-word
+                ("ainda po..."), which is the one part a client needs to read:
+                a missed session is not lost, it can be ticked whenever it gets
+                done, and without saying so the dimmed card reads as locked. */}
+            <p className="text-xs text-gray-500 mt-0.5 flex items-baseline min-w-0">
+              <span className="truncate">
+                {[
+                  day.label,
+                  // A truncated count reads as "7 ...", which says nothing. On a
+                  // missed day the status is the useful half of the line and the
+                  // count is one tap away in the card itself.
+                  isPast && !completed
+                    ? null
+                    : `${exercises.length} ${exercises.length !== 1 ? extra.exercise_plural[lang] : extra.exercise_singular[lang]}`,
+                ].filter(Boolean).join(" · ")}
+              </span>
               {isPast && !completed && (
-                <span className="ml-2 text-xs text-zinc-500 font-normal">{extra.catch_up[lang]}</span>
+                <span className="shrink-0 whitespace-nowrap">&nbsp;· {extra.catch_up[lang]}</span>
               )}
             </p>
-            {day.label && <p className="text-xs text-gray-500 mt-0.5">{day.label}</p>}
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-500">
-            {exercises.length} {exercises.length !== 1 ? extra.exercise_plural[lang] : extra.exercise_singular[lang]}
-          </span>
+        <div className="flex items-center gap-2.5 shrink-0 ml-3">
           {!completed && exercises.length > 0 && (
             <button
               onClick={(e) => { e.stopPropagation(); setLiveMode(true); }}
@@ -379,7 +404,7 @@ function WorkoutDayCard({
               {hasUnfinished ? extra.resume_btn[lang] : extra.start_btn[lang]}
             </button>
           )}
-          <span className="text-gray-600 text-xs">{open ? "▲" : "▼"}</span>
+          <Chevron open={open} />
         </div>
       </div>
 
