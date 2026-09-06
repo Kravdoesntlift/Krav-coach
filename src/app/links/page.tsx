@@ -56,7 +56,7 @@ function GuiaBg() {
       }}/>
       {/* Gold glow */}
       <div className="absolute bottom-0 left-0 right-0 h-32" style={{
-        background: "radial-gradient(ellipse at 30% 100%, rgba(201,168,76,0.12) 0%, transparent 65%)"
+        background: "radial-gradient(ellipse at 30% 100%, rgba(201,168,76,0.1) 0%, transparent 65%)"
       }}/>
       {/* Big faded checkmark */}
       <div className="absolute right-6 top-1/2 -translate-y-1/2 opacity-[0.07]">
@@ -73,30 +73,30 @@ function MyProteinBg() {
     <div className="absolute inset-0 overflow-hidden" style={{ background: "#06080a" }}>
       {/* Radial gold glow: center */}
       <div className="absolute inset-0" style={{
-        background: "radial-gradient(ellipse at 50% 60%, rgba(201,168,76,0.13) 0%, transparent 68%)"
+        background: "radial-gradient(ellipse at 50% 60%, rgba(201,168,76,0.1) 0%, transparent 68%)"
       }}/>
       {/* Top-left corner accent */}
       <div className="absolute -top-6 -left-6 w-28 h-28 rounded-full" style={{
-        background: "radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%)"
+        background: "radial-gradient(circle, rgba(201,168,76,0.05) 0%, transparent 70%)"
       }}/>
       {/* Horizontal rule top */}
       <div className="absolute top-5 left-5 right-5 h-px" style={{
-        background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent)"
+        background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.22), transparent)"
       }}/>
       {/* Horizontal rule bottom */}
       <div className="absolute bottom-5 left-5 right-5 h-px" style={{
-        background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent)"
+        background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.16), transparent)"
       }}/>
 
       {/* Main content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 select-none px-4">
         {/* Tag label */}
         <div className="flex items-center gap-1.5">
-          <div className="h-px w-6" style={{ background: "rgba(201,168,76,0.35)" }}/>
+          <div className="h-px w-6" style={{ background: "rgba(201,168,76,0.4)" }}/>
           <p className="text-[9px] font-black tracking-[0.32em] uppercase" style={{ color: "rgba(201,168,76,0.55)" }}>
             código exclusivo
           </p>
-          <div className="h-px w-6" style={{ background: "rgba(201,168,76,0.35)" }}/>
+          <div className="h-px w-6" style={{ background: "rgba(201,168,76,0.4)" }}/>
         </div>
 
         {/* THE CODE: hero element */}
@@ -105,7 +105,7 @@ function MyProteinBg() {
           style={{
             fontSize: 38,
             color: "#fff",
-            textShadow: "0 0 40px rgba(201,168,76,0.35), 0 0 80px rgba(201,168,76,0.15)",
+            textShadow: "0 0 40px rgba(201,168,76,0.4), 0 0 80px rgba(201,168,76,0.16)",
           }}
         >
           MPKRAV
@@ -113,7 +113,7 @@ function MyProteinBg() {
 
         {/* Instruction */}
         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
-          style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}>
+          style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)" }}>
           <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
           </svg>
@@ -213,9 +213,9 @@ function CtaButton({ style, disabled, children }: { style: "gold" | "green" | "o
   );
 
   const styles = {
-    gold: { background: "linear-gradient(135deg,#E8C96B,#C9A84C,#A8893A)", color: "#000", boxShadow: "0 2px 16px rgba(201,168,76,0.3)" },
+    gold: { background: "linear-gradient(135deg,#E8C96B,#C9A84C,#A8893A)", color: "#000", boxShadow: "0 2px 16px rgba(201,168,76,0.28)" },
     green: { background: "#22c55e", color: "#000", boxShadow: "0 2px 12px rgba(34,197,94,0.3)" },
-    outline: { background: "transparent", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.35)" },
+    outline: { background: "transparent", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.4)" },
   };
 
   return (
@@ -230,7 +230,7 @@ function CtaButton({ style, disabled, children }: { style: "gold" | "green" | "o
 /* ─── Badge ──────────────────────────────────────────────────────────────────── */
 function Badge({ text, color }: { text: string; color?: "gold" | "green" | "white" }) {
   const styles = {
-    gold: { background: "rgba(201,168,76,0.18)", border: "1px solid rgba(201,168,76,0.4)", color: "#C9A84C" },
+    gold: { background: "rgba(201,168,76,0.16)", border: "1px solid rgba(201,168,76,0.4)", color: "#C9A84C" },
     green: { background: "rgba(34,197,94,0.18)", border: "1px solid rgba(34,197,94,0.45)", color: "#4ade80" },
     white: { background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)", color: "rgba(255,255,255,0.65)" },
   };
@@ -273,7 +273,7 @@ function Modal({ card, onClose }: { card: CardData; onClose: () => void }) {
           <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>{m.desc}</p>
           <a href={m.href} target="_blank" rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl font-black text-sm active:scale-[0.98] transition-all"
-            style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C,#A8893A)", color: "#000", boxShadow: "0 4px 28px rgba(201,168,76,0.2)" }}>
+            style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C,#A8893A)", color: "#000", boxShadow: "0 4px 28px rgba(201,168,76,0.22)" }}>
             {m.cta} <ArrowRight />
           </a>
           <p className="text-center text-xs" style={{ color: "rgba(255,255,255,0.18)" }}>Sem contratos. Cancela quando quiseres.</p>
@@ -289,9 +289,9 @@ function Card({ card, onOpen }: { card: CardData; onOpen?: () => void }) {
     <div className="rounded-2xl overflow-hidden"
       style={{
         background: "#0f0c08",
-        border: card.featured ? "1.5px solid rgba(201,168,76,0.35)" : "1px solid rgba(255,255,255,0.07)",
+        border: card.featured ? "1.5px solid rgba(201,168,76,0.4)" : "1px solid rgba(255,255,255,0.07)",
         opacity: card.disabled ? 0.45 : 1,
-        boxShadow: card.featured ? "0 0 40px rgba(201,168,76,0.07), inset 0 1px 0 rgba(201,168,76,0.1)" : "none",
+        boxShadow: card.featured ? "0 0 40px rgba(201,168,76,0.05), inset 0 1px 0 rgba(201,168,76,0.1)" : "none",
       }}>
 
       {/* ── Image area ── */}
@@ -426,7 +426,7 @@ export default function LinksPage() {
           {/* Name + handle */}
           <div>
             <h1 className="text-[1.15rem] font-black text-white tracking-tight">André Kravchuk</h1>
-            <p className="text-xs font-semibold mt-0.5" style={{ color: "rgba(201,168,76,0.65)" }}>
+            <p className="text-xs font-semibold mt-0.5" style={{ color: "rgba(201,168,76,0.7)" }}>
               @kravdoesntlift
             </p>
           </div>
@@ -440,7 +440,7 @@ export default function LinksPage() {
           {/* Trial pill */}
           <a href="/start"
             className="flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-black active:scale-95 transition-transform"
-            style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C)", color: "#000", boxShadow: "0 2px 20px rgba(201,168,76,0.25)" }}>
+            style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C)", color: "#000", boxShadow: "0 2px 20px rgba(201,168,76,0.28)" }}>
             <span>7 dias grátis</span>
             <span style={{ opacity: 0.6 }}>·</span>
             <span>sem cartão</span>
@@ -451,7 +451,7 @@ export default function LinksPage() {
           <div className="flex gap-2">
             {["Treino", "Nutrição", "Resultados"].map((t) => (
               <span key={t} className="text-[10px] font-bold px-3 py-1 rounded-full"
-                style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)", color: "rgba(201,168,76,0.65)" }}>
+                style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)", color: "rgba(201,168,76,0.7)" }}>
                 {t}
               </span>
             ))}
@@ -459,7 +459,7 @@ export default function LinksPage() {
         </div>
 
         {/* ── Divider ── */}
-        <div className="h-px w-full mb-5" style={{ background: "linear-gradient(90deg,transparent,rgba(201,168,76,0.18),transparent)" }} />
+        <div className="h-px w-full mb-5" style={{ background: "linear-gradient(90deg,transparent,rgba(201,168,76,0.16),transparent)" }} />
 
         {/* ── Cards ── */}
         <div className="w-full flex flex-col gap-3 pb-6">
@@ -472,7 +472,7 @@ export default function LinksPage() {
 
         {/* Footer */}
         <p className="text-[10px] pb-8 tracking-widest uppercase text-center"
-          style={{ color: "rgba(201,168,76,0.12)" }}>
+          style={{ color: "rgba(201,168,76,0.1)" }}>
           powered by <span className="font-black" style={{ color: "rgba(201,168,76,0.28)" }}>KRAV</span>
         </p>
       </div>

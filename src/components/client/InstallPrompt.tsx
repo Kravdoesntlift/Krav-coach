@@ -99,7 +99,7 @@ export default function InstallPrompt() {
   return (
     <div
       className="rounded-2xl p-4 space-y-3 border border-brand-gold/20"
-      style={{ background: "rgba(201,168,76,0.06)" }}
+      style={{ background: "rgba(201,168,76,0.05)" }}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-3">

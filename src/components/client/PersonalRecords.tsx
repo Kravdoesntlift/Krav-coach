@@ -157,7 +157,7 @@ export default function PersonalRecords({ clientId, initialRecords }: Props) {
         >
           <div
             className="w-20 h-20 rounded-full flex items-center justify-center mx-auto"
-            style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)" }}
+            style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)" }}
           >
             <span className="text-4xl">🏆</span>
           </div>

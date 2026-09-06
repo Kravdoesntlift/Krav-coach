@@ -42,8 +42,8 @@ function EmojiScale({ opts, value, onChange }: {
           <button key={v} type="button" onClick={() => onChange(active ? 0 : v)}
             className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl transition-all active:scale-95"
             style={{
-              background: active ? "rgba(201,168,76,0.15)" : "rgba(39,39,42,0.6)",
-              border: active ? "1px solid rgba(201,168,76,0.5)" : "1px solid rgba(63,63,70,0.4)",
+              background: active ? "rgba(201,168,76,0.16)" : "rgba(39,39,42,0.6)",
+              border: active ? "1px solid rgba(201,168,76,0.55)" : "1px solid rgba(63,63,70,0.4)",
             }}>
             <span className={`text-xl transition-transform ${active ? "scale-110" : "grayscale opacity-50"}`}>{emoji}</span>
             <span className="text-[9px] font-semibold leading-tight text-center"
@@ -62,7 +62,7 @@ function NutritionButtons({ value, onChange, lang }: {
 }) {
   const opts: { v: NutritionAdherence; emoji: string; label: string; color: string; bg: string; border: string }[] = [
     { v: "yes",     emoji: "✅", label: lang === "pt" ? "Sim"     : "Yes",     color: "#4ade80", bg: "rgba(74,222,128,0.1)",  border: "rgba(74,222,128,0.3)"  },
-    { v: "partial", emoji: "⚡", label: lang === "pt" ? "Parcial" : "Partial", color: "#C9A84C", bg: "rgba(201,168,76,0.1)", border: "rgba(201,168,76,0.3)" },
+    { v: "partial", emoji: "⚡", label: lang === "pt" ? "Parcial" : "Partial", color: "#C9A84C", bg: "rgba(201,168,76,0.1)", border: "rgba(201,168,76,0.28)" },
     { v: "no",      emoji: "❌", label: lang === "pt" ? "Não"     : "No",      color: "#f87171", bg: "rgba(248,113,113,0.1)", border: "rgba(248,113,113,0.3)" },
   ];
   return (

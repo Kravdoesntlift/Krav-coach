@@ -232,7 +232,7 @@ export default async function WeeklyReportPage() {
               className="rounded-2xl p-5 border space-y-4"
               style={{
                 background: "rgba(18,18,20,0.85)",
-                borderColor: "rgba(201,168,76,0.18)",
+                borderColor: "rgba(201,168,76,0.16)",
               }}
             >
               <div className="flex items-center gap-3">
@@ -252,7 +252,7 @@ export default async function WeeklyReportPage() {
 
               <div
                 className="h-px"
-                style={{ background: "linear-gradient(90deg, rgba(201,168,76,0.3), transparent)" }}
+                style={{ background: "linear-gradient(90deg, rgba(201,168,76,0.28), transparent)" }}
               />
 
               <p className="text-zinc-200 text-sm leading-relaxed italic">

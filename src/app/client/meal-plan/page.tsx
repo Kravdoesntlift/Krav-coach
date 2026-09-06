@@ -196,7 +196,7 @@ export default async function MealPlanPage() {
             {dailyTotals && dailyTotals.calories > 0 && (
               <div
                 className="rounded-xl p-3"
-                style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.12)" }}
+                style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.1)" }}
               >
                 <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest mb-2">
                   {dailyLabel}

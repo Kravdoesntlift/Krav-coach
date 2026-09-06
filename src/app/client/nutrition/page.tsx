@@ -659,7 +659,7 @@ function FoodSearch({
                     {extra.back_to_search[lang]}
                   </button>
 
-                  <div className="rounded-xl p-3" style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}>
+                  <div className="rounded-xl p-3" style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.16)" }}>
                     <div className="flex items-center gap-2">
                       {selected.source === "custom" && (
                         <span className="text-[9px] bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded font-semibold">{extra.my_label[lang]}</span>
@@ -932,7 +932,7 @@ function FoodSearch({
                         )}
                       </div>
                     ) : (
-                      <div className="rounded-xl p-3 space-y-3" style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}>
+                      <div className="rounded-xl p-3 space-y-3" style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.16)" }}>
                         <div className="flex items-center justify-between">
                           <p className="text-white text-xs font-semibold">{ingSelected.name}</p>
                           <button onClick={() => setIngSelected(null)} className="text-zinc-600 text-xs">✕</button>
@@ -1403,7 +1403,7 @@ export default function NutritionPage() {
         <button
           onClick={() => setShowGoalsModal(true)}
           className="w-full py-3 rounded-xl text-sm transition-colors text-zinc-400 hover:text-white"
-          style={{ background: "rgba(201,168,76,0.06)", border: "1px dashed rgba(201,168,76,0.25)" }}
+          style={{ background: "rgba(201,168,76,0.05)", border: "1px dashed rgba(201,168,76,0.28)" }}
         >
           {extra.setup_goals_btn[lang]}
         </button>

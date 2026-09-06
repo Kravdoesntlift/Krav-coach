@@ -44,8 +44,8 @@ function Avatar({ name, url, size = 40 }: { name: string; url?: string | null; s
       className="rounded-full flex items-center justify-center shrink-0 font-bold text-sm"
       style={{
         width: size, height: size,
-        background: "linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.08))",
-        border: "1px solid rgba(201,168,76,0.2)", color: "#C9A84C",
+        background: "linear-gradient(135deg,rgba(201,168,76,0.22),rgba(201,168,76,0.1))",
+        border: "1px solid rgba(201,168,76,0.22)", color: "#C9A84C",
       }}
     >
       {initials}
@@ -374,8 +374,8 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
       {/* Invite link */}
       <div className="rounded-2xl p-4 flex items-center justify-between gap-4"
         style={{
-          background: "linear-gradient(135deg,rgba(201,168,76,0.08),rgba(201,168,76,0.03))",
-          border: "1px solid rgba(201,168,76,0.2)",
+          background: "linear-gradient(135deg,rgba(201,168,76,0.1),rgba(201,168,76,0.05))",
+          border: "1px solid rgba(201,168,76,0.22)",
         }}>
         <div className="min-w-0">
           <p className="text-brand-gold text-sm font-semibold">🔗 Link de convite</p>

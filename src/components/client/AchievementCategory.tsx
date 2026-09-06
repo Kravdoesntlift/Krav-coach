@@ -36,9 +36,9 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
             className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0"
             style={{
               background: allUnlocked
-                ? "linear-gradient(135deg,rgba(201,168,76,0.3),rgba(201,168,76,0.1))"
+                ? "linear-gradient(135deg,rgba(201,168,76,0.28),rgba(201,168,76,0.1))"
                 : "rgba(39,39,42,0.8)",
-              border: allUnlocked ? "1px solid rgba(201,168,76,0.5)" : "1px solid rgba(63,63,70,0.5)",
+              border: allUnlocked ? "1px solid rgba(201,168,76,0.55)" : "1px solid rgba(63,63,70,0.5)",
             }}
           >
             {meta.icon}
@@ -73,7 +73,7 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
               width: `${catPct}%`,
               background: allUnlocked
                 ? "linear-gradient(90deg,#A8893A,#C9A84C)"
-                : "rgba(201,168,76,0.5)",
+                : "rgba(201,168,76,0.55)",
             }}
           />
         </div>
@@ -97,7 +97,7 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
               }`}
               style={{
                 background: a.unlocked
-                  ? "linear-gradient(135deg,rgba(201,168,76,0.08),rgba(10,10,10,0.9))"
+                  ? "linear-gradient(135deg,rgba(201,168,76,0.1),rgba(10,10,10,0.9))"
                   : "rgba(18,18,20,0.8)",
               }}
             >
@@ -108,7 +108,7 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
                     a.unlocked ? "" : "grayscale opacity-35"
                   }`}
                   style={{
-                    background: a.unlocked ? "rgba(201,168,76,0.15)" : "rgba(39,39,42,0.8)",
+                    background: a.unlocked ? "rgba(201,168,76,0.16)" : "rgba(39,39,42,0.8)",
                   }}
                 >
                   {a.icon}
@@ -135,7 +135,7 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
                     />
                     <div
                       className="w-6 h-6 rounded-full flex items-center justify-center"
-                      style={{ background: "rgba(201,168,76,0.2)", border: "1px solid rgba(201,168,76,0.4)" }}
+                      style={{ background: "rgba(201,168,76,0.22)", border: "1px solid rgba(201,168,76,0.4)" }}
                     >
                       <span className="text-brand-gold text-xs">✓</span>
                     </div>
@@ -151,7 +151,7 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
                   <div className="h-0.5 bg-zinc-800 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full"
-                      style={{ width: `${a.progress}%`, background: "rgba(201,168,76,0.5)" }}
+                      style={{ width: `${a.progress}%`, background: "rgba(201,168,76,0.55)" }}
                     />
                   </div>
                   <div className="flex justify-between">

@@ -81,7 +81,7 @@ export default async function CoachPublicPage({
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.07) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.05) 0%, transparent 70%)",
         }}
       />
 
@@ -102,7 +102,7 @@ export default async function CoachPublicPage({
               width={96}
               height={96}
               className="w-24 h-24 rounded-full object-cover border-2"
-              style={{ borderColor: "rgba(201,168,76,0.5)" }}
+              style={{ borderColor: "rgba(201,168,76,0.55)" }}
             />
           ) : (
             <div
@@ -259,7 +259,7 @@ export default async function CoachPublicPage({
                 <div
                   key={i}
                   className="relative rounded-2xl p-5 space-y-3"
-                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.12)" }}
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.1)" }}
                 >
                   {/* Stars */}
                   <div className="flex gap-0.5">

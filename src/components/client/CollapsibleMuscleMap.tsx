@@ -30,7 +30,7 @@ export default function CollapsibleMuscleMap({ exerciseNames, loggedNames }: Pro
             ? "linear-gradient(160deg,#1a1a1a 0%,#111111 100%)"
             : "rgba(18,18,20,0.9)",
           border: open
-            ? "1px solid rgba(201,168,76,0.2)"
+            ? "1px solid rgba(201,168,76,0.22)"
             : "1px solid rgba(63,63,70,0.4)",
           borderBottomLeftRadius: open ? 0 : undefined,
           borderBottomRightRadius: open ? 0 : undefined,
@@ -59,9 +59,9 @@ export default function CollapsibleMuscleMap({ exerciseNames, loggedNames }: Pro
           overflow: "hidden",
           maxHeight: open ? "2000px" : "0px",
           transition: "max-height 0.4s cubic-bezier(0.4,0,0.2,1)",
-          borderLeft: "1px solid rgba(201,168,76,0.2)",
-          borderRight: "1px solid rgba(201,168,76,0.2)",
-          borderBottom: open ? "1px solid rgba(201,168,76,0.2)" : "none",
+          borderLeft: "1px solid rgba(201,168,76,0.22)",
+          borderRight: "1px solid rgba(201,168,76,0.22)",
+          borderBottom: open ? "1px solid rgba(201,168,76,0.22)" : "none",
           borderRadius: "0 0 1rem 1rem",
         }}
       >

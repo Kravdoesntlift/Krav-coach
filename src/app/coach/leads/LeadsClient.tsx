@@ -141,7 +141,7 @@ function LeadRow({ lead }: { lead: Lead }) {
           />
           <button onClick={handleNotesSave}
             className="text-[11px] font-bold px-3 py-2 rounded-xl transition-all"
-            style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", color: "#C9A84C" }}>
+            style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.28)", color: "#C9A84C" }}>
             Guardar
           </button>
         </div>

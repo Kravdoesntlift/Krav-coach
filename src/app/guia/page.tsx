@@ -24,23 +24,23 @@ export default function GuiaPage() {
       >
         {/* Fundo com glow dourado */}
         <div className="absolute inset-0" style={{
-          background: "radial-gradient(ellipse at 50% 80%, rgba(201,168,76,0.07) 0%, transparent 65%), #080808"
+          background: "radial-gradient(ellipse at 50% 80%, rgba(201,168,76,0.05) 0%, transparent 65%), #080808"
         }} />
 
         {/* Linhas decorativas */}
         <div className="absolute inset-0 overflow-hidden" aria-hidden>
           {/* Linha horizontal topo */}
-          <div className="absolute top-12 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg,transparent,rgba(201,168,76,0.12),transparent)" }} />
+          <div className="absolute top-12 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg,transparent,rgba(201,168,76,0.1),transparent)" }} />
           {/* Linha vertical esquerda */}
-          <div className="absolute top-0 bottom-0 left-8 w-px" style={{ background: "linear-gradient(180deg,transparent,rgba(201,168,76,0.07),transparent)" }} />
+          <div className="absolute top-0 bottom-0 left-8 w-px" style={{ background: "linear-gradient(180deg,transparent,rgba(201,168,76,0.05),transparent)" }} />
           {/* Linha vertical direita */}
-          <div className="absolute top-0 bottom-0 right-8 w-px" style={{ background: "linear-gradient(180deg,transparent,rgba(201,168,76,0.07),transparent)" }} />
+          <div className="absolute top-0 bottom-0 right-8 w-px" style={{ background: "linear-gradient(180deg,transparent,rgba(201,168,76,0.05),transparent)" }} />
           {/* Círculo decorativo */}
           <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full" style={{
             border: "1px solid rgba(201,168,76,0.05)",
           }} />
           <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full" style={{
-            border: "1px solid rgba(201,168,76,0.04)",
+            border: "1px solid rgba(201,168,76,0.05)",
           }} />
         </div>
 
@@ -52,7 +52,7 @@ export default function GuiaPage() {
               className="text-[10px] font-black tracking-[0.28em] uppercase px-3.5 py-1.5 rounded-full"
               style={{
                 background: "rgba(201,168,76,0.1)",
-                border: "1px solid rgba(201,168,76,0.25)",
+                border: "1px solid rgba(201,168,76,0.28)",
                 color: "#C9A84C",
               }}
             >
@@ -92,14 +92,14 @@ export default function GuiaPage() {
           className="w-full max-w-sm rounded-3xl p-6 flex flex-col gap-5"
           style={{
             background: "#0f0f0f",
-            border: "1px solid rgba(201,168,76,0.15)",
+            border: "1px solid rgba(201,168,76,0.16)",
             boxShadow: "0 0 60px rgba(0,0,0,0.5)",
           }}
         >
           <form action={formAction} className="flex flex-col gap-4">
 
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="name" className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: "rgba(201,168,76,0.5)" }}>
+              <label htmlFor="name" className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: "rgba(201,168,76,0.55)" }}>
                 Nome
               </label>
               <input
@@ -117,7 +117,7 @@ export default function GuiaPage() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="email" className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: "rgba(201,168,76,0.5)" }}>
+              <label htmlFor="email" className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: "rgba(201,168,76,0.55)" }}>
                 Email
               </label>
               <input
@@ -144,7 +144,7 @@ export default function GuiaPage() {
               className="w-full py-4 rounded-2xl font-black text-sm tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 mt-1"
               style={{
                 background: pending
-                  ? "rgba(201,168,76,0.25)"
+                  ? "rgba(201,168,76,0.28)"
                   : "linear-gradient(135deg,#E8C96B 0%,#C9A84C 55%,#A8893A 100%)",
                 color: "#000",
                 boxShadow: pending ? "none" : "0 6px 32px rgba(201,168,76,0.22)",

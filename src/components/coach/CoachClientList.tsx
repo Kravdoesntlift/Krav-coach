@@ -50,7 +50,7 @@ function Avatar({ name, avatarUrl }: { name: string; avatarUrl?: string | null }
   return (
     <div
       className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm text-black shrink-0"
-      style={{ background: "linear-gradient(135deg,rgba(201,168,76,0.65),rgba(168,137,58,0.45))", border: "1px solid rgba(201,168,76,0.2)" }}
+      style={{ background: "linear-gradient(135deg,rgba(201,168,76,0.7),rgba(168,137,58,0.45))", border: "1px solid rgba(201,168,76,0.22)" }}
     >
       {name.charAt(0).toUpperCase()}
     </div>

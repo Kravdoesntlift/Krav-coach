@@ -69,7 +69,7 @@ export default function ReportPDFPage() {
 
         <div
           className="rounded-xl px-4 py-3 space-y-1"
-          style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}
+          style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.16)" }}
         >
           <p className="text-brand-gold text-xs font-semibold">
             {isEN ? "The report includes:" : "O relatório inclui:"}

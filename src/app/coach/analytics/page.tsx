@@ -55,7 +55,7 @@ function MiniLineChart({
 
 function StatCard({ label, value, sub, highlight }: { label: string; value: string; sub?: string; highlight?: boolean }) {
   return (
-    <div className="rounded-2xl p-5" style={{ background: "rgba(18,18,20,0.8)", border: `1px solid ${highlight ? "rgba(201,168,76,0.3)" : "rgba(39,39,42,0.5)"}` }}>
+    <div className="rounded-2xl p-5" style={{ background: "rgba(18,18,20,0.8)", border: `1px solid ${highlight ? "rgba(201,168,76,0.28)" : "rgba(39,39,42,0.5)"}` }}>
       <p className="text-xs text-zinc-500 font-semibold uppercase tracking-widest mb-1">{label}</p>
       <p className={`text-3xl font-black ${highlight ? "text-brand-gold" : "text-white"}`}>{value}</p>
       {sub && <p className="text-zinc-600 text-xs mt-1">{sub}</p>}
@@ -202,14 +202,14 @@ export default async function AnalyticsPage() {
           </div>
           <a href="/coach/leads"
             className="text-[11px] font-bold px-3 py-1.5 rounded-xl"
-            style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", color: "#C9A84C" }}>
+            style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)", color: "#C9A84C" }}>
             Ver leads →
           </a>
         </div>
 
         {/* Funnel stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-          <div className="rounded-2xl p-4" style={{ background: "rgba(18,18,20,0.8)", border: "1px solid rgba(201,168,76,0.25)" }}>
+          <div className="rounded-2xl p-4" style={{ background: "rgba(18,18,20,0.8)", border: "1px solid rgba(201,168,76,0.28)" }}>
             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Total leads</p>
             <p className="text-3xl font-black text-brand-gold">{leadsTotal}</p>
             <p className="text-zinc-600 text-[10px] mt-0.5">pediram o guia</p>

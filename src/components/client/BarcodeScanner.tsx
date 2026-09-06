@@ -302,7 +302,7 @@ export default function BarcodeScanner({ onFound, onClose }: Props) {
         {state === "requesting" && (
           <div className="absolute inset-0 bg-black flex flex-col items-center justify-center gap-6 px-8">
             <div className="w-20 h-20 rounded-3xl flex items-center justify-center"
-              style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.25)" }}>
+              style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.28)" }}>
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
                 <circle cx="12" cy="13" r="4"/>
@@ -323,8 +323,8 @@ export default function BarcodeScanner({ onFound, onClose }: Props) {
           <div className="absolute inset-0 bg-black/92 flex flex-col items-center justify-center gap-6 px-7">
             <div className="w-20 h-20 rounded-full flex items-center justify-center"
               style={{
-                background: state === "notfound" ? "rgba(201,168,76,0.08)" : "rgba(248,113,113,0.08)",
-                border: `1px solid ${state === "notfound" ? "rgba(201,168,76,0.25)" : "rgba(248,113,113,0.25)"}`,
+                background: state === "notfound" ? "rgba(201,168,76,0.1)" : "rgba(248,113,113,0.08)",
+                border: `1px solid ${state === "notfound" ? "rgba(201,168,76,0.28)" : "rgba(248,113,113,0.25)"}`,
               }}>
               {state === "notfound" ? (
                 <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">

@@ -47,7 +47,7 @@ export default function ResetPasswordPage() {
       className="min-h-screen flex items-center justify-center px-4"
       style={{
         background:
-          "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.08) 0%, transparent 70%), #000",
+          "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.1) 0%, transparent 70%), #000",
       }}
     >
       {/* Grain */}
@@ -66,9 +66,9 @@ export default function ResetPasswordPage() {
           <div
             className="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4"
             style={{
-              background: "linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))",
-              border: "1px solid rgba(201,168,76,0.2)",
-              boxShadow: "0 0 32px rgba(201,168,76,0.12)",
+              background: "linear-gradient(135deg, rgba(201,168,76,0.16), rgba(201,168,76,0.05))",
+              border: "1px solid rgba(201,168,76,0.22)",
+              boxShadow: "0 0 32px rgba(201,168,76,0.1)",
             }}
           >
             <span className="text-brand-gold font-black text-lg tracking-tighter">K</span>
@@ -145,8 +145,8 @@ export default function ResetPasswordPage() {
                   <div
                     className="flex items-start gap-2.5 px-4 py-3 rounded-xl text-sm"
                     style={{
-                      background: "rgba(201,168,76,0.07)",
-                      border: "1px solid rgba(201,168,76,0.2)",
+                      background: "rgba(201,168,76,0.05)",
+                      border: "1px solid rgba(201,168,76,0.22)",
                     }}
                   >
                     <span className="text-brand-gold mt-0.5 shrink-0">⚠</span>

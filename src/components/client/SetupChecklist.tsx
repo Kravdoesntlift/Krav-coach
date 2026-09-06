@@ -112,7 +112,7 @@ export default function SetupChecklist({
   return (
     <div
       className="card p-4 space-y-3 border"
-      style={{ borderColor: "rgba(201,168,76,0.2)", background: "rgba(201,168,76,0.03)" }}
+      style={{ borderColor: "rgba(201,168,76,0.22)", background: "rgba(201,168,76,0.05)" }}
     >
       {/* Header */}
       <div className="flex items-center justify-between">

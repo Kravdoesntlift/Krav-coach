@@ -123,7 +123,7 @@ export default function ReferralPage() {
             <div className="flex items-center gap-2">
               <div
                 className="w-9 h-9 rounded-xl flex items-center justify-center text-lg"
-                style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.2)" }}
+                style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)" }}
               >
                 🔗
               </div>
@@ -136,12 +136,12 @@ export default function ReferralPage() {
             {/* Code display */}
             <div
               className="rounded-xl px-4 py-3 flex items-center gap-3"
-              style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}
+              style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.16)" }}
             >
               <code className="flex-1 text-brand-gold text-sm font-mono truncate">{referralUrl}</code>
               <span
                 className="shrink-0 text-[10px] font-bold px-2 py-1 rounded-lg"
-                style={{ background: "rgba(201,168,76,0.15)", color: "#C9A84C" }}
+                style={{ background: "rgba(201,168,76,0.16)", color: "#C9A84C" }}
               >
                 {code?.code}
               </span>
@@ -154,7 +154,7 @@ export default function ReferralPage() {
                 style={
                   copied
                     ? { background: "rgba(34,197,94,0.15)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.3)" }
-                    : { background: "rgba(201,168,76,0.1)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }
+                    : { background: "rgba(201,168,76,0.1)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.22)" }
                 }
               >
                 {copied ? extra.copied[lang] : extra.copy_link[lang]}
@@ -186,7 +186,7 @@ export default function ReferralPage() {
             </div>
             <div
               className="rounded-xl px-3 py-2.5 flex items-start gap-2.5"
-              style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}
+              style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.16)" }}
             >
               <span className="text-brand-gold text-base shrink-0">💡</span>
               <p className="text-zinc-400 text-xs leading-relaxed">

@@ -65,8 +65,8 @@ function ClientAvatar({ name, url }: { name: string | null; url?: string | null 
     <div
       className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
       style={{
-        background: "linear-gradient(135deg,rgba(201,168,76,0.2),rgba(201,168,76,0.08))",
-        border: "1px solid rgba(201,168,76,0.2)",
+        background: "linear-gradient(135deg,rgba(201,168,76,0.22),rgba(201,168,76,0.1))",
+        border: "1px solid rgba(201,168,76,0.22)",
         color: "#C9A84C",
       }}
     >

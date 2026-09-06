@@ -156,14 +156,14 @@ export default async function PendingPage({
         <div
           className="rounded-3xl p-8 space-y-6"
           style={{
-            background: "linear-gradient(160deg, rgba(201,168,76,0.08) 0%, rgba(10,10,12,0.95) 100%)",
-            border: "1px solid rgba(201,168,76,0.2)",
+            background: "linear-gradient(160deg, rgba(201,168,76,0.1) 0%, rgba(10,10,12,0.95) 100%)",
+            border: "1px solid rgba(201,168,76,0.22)",
           }}
         >
           {/* Icon */}
           <div
             className="w-16 h-16 rounded-full flex items-center justify-center mx-auto text-3xl"
-            style={{ background: "rgba(201,168,76,0.10)", border: "1px solid rgba(201,168,76,0.2)" }}
+            style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)" }}
           >
             {isWelcome ? "🎉" : "⏳"}
           </div>

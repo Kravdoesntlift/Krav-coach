@@ -13,7 +13,26 @@ const config: Config = {
           gold:        "#C9A84C",
           "gold-dark": "#A8893A",
           "gold-light":"#E8C96B",
-          "gold-muted":"rgba(201,168,76,0.12)",
+          "gold-muted":"rgba(201,168,76,0.1)",
+        },
+        /**
+         * The accent at the eight opacities the interface actually needs.
+         *
+         * Before this existed the same gold appeared at 27 different opacities,
+         * including 0.1 and 0.10 written side by side, which is what happens
+         * when every component picks its own number instead of a step. Each
+         * step here has one job, so a new surface has an obvious choice to make
+         * rather than a value to invent.
+         */
+        gold: {
+          ghost:  "rgba(201,168,76,0.05)", // ambient glow, hairlines
+          wash:   "rgba(201,168,76,0.1)",  // tinted card surface
+          line:   "rgba(201,168,76,0.16)", // quiet border
+          border: "rgba(201,168,76,0.22)", // default accent border
+          edge:   "rgba(201,168,76,0.28)", // hover, active border
+          glow:   "rgba(201,168,76,0.4)",  // glows, focus rings
+          strong: "rgba(201,168,76,0.55)", // selected state, gradient stops
+          text:   "rgba(201,168,76,0.7)",  // muted gold text, needs the contrast
         },
       },
       fontFamily: {

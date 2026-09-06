@@ -316,7 +316,7 @@ export default async function ClientDetailPage({
                         style={{
                           background: on ? "linear-gradient(160deg,#E8C96B,#C9A84C)" : "rgba(255,255,255,0.04)",
                           color: on ? "#000" : "#52525b",
-                          border: `1px solid ${on ? "rgba(201,168,76,0.5)" : "rgba(255,255,255,0.06)"}`,
+                          border: `1px solid ${on ? "rgba(201,168,76,0.55)" : "rgba(255,255,255,0.06)"}`,
                         }}>
                         {name}
                       </div>

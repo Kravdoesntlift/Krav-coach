@@ -30,7 +30,7 @@ export async function GET() {
             height: 500,
             borderRadius: "50%",
             background:
-              "radial-gradient(ellipse at center, rgba(201,168,76,0.18) 0%, transparent 70%)",
+              "radial-gradient(ellipse at center, rgba(201,168,76,0.16) 0%, transparent 70%)",
           }}
         />
 
@@ -40,7 +40,7 @@ export async function GET() {
             position: "absolute",
             inset: 0,
             backgroundImage:
-              "linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px)",
+              "linear-gradient(rgba(201,168,76,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.05) 1px, transparent 1px)",
             backgroundSize: "60px 60px",
           }}
         />

@@ -109,7 +109,7 @@ export default function TermsPage() {
             <h2 className="text-white font-bold text-base">8. Aviso de saúde</h2>
             <div
               className="p-4 rounded-xl"
-              style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)" }}
+              style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.22)" }}
             >
               <p className="text-zinc-300">
                 O coaching online não substitui aconselhamento médico. Antes de iniciar qualquer programa de treino, consulta um médico se tiveres condições de saúde pré-existentes, lesões ou dúvidas sobre a tua capacidade física. O coach e a plataforma KRAV não são responsáveis por lesões resultantes da prática desportiva.

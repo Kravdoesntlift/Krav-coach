@@ -467,7 +467,7 @@ export default async function ClientDashboard() {
         {latestWeeklyReport && (
           <Link href="/client/weekly-report" className="block">
             <div className="rounded-2xl px-4 py-3.5 flex items-center gap-3 border transition-all active:scale-[0.98]" style={{ background: "rgba(18,18,20,0.85)", borderColor: "rgba(201,168,76,0.22)" }}>
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ background: "linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))" }}>📊</div>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ background: "linear-gradient(135deg, rgba(201,168,76,0.16), rgba(201,168,76,0.05))" }}>📊</div>
               <div className="flex-1 min-w-0">
                 <p className="text-white font-bold text-sm">{t("see_weekly_report", lang)}</p>
                 <p className="text-zinc-500 text-xs mt-0.5 truncate">{t("report_subtitle", lang)}</p>
@@ -496,11 +496,11 @@ export default async function ClientDashboard() {
             <div
               className="flex items-center gap-3.5 px-4 py-4 rounded-2xl"
               style={{
-                background: "linear-gradient(135deg, rgba(201,168,76,0.1) 0%, rgba(201,168,76,0.04) 100%)",
-                border: "1px solid rgba(201,168,76,0.3)",
+                background: "linear-gradient(135deg, rgba(201,168,76,0.1) 0%, rgba(201,168,76,0.05) 100%)",
+                border: "1px solid rgba(201,168,76,0.28)",
               }}
             >
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ background: "rgba(201,168,76,0.15)" }}>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ background: "rgba(201,168,76,0.16)" }}>
                 ⭐
               </div>
               <div className="flex-1 min-w-0">

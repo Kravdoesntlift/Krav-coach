@@ -58,8 +58,8 @@ export default function ExerciseNotes({
         <div
           className="inline-flex items-center gap-1.5 text-[10px] leading-none px-2 py-1 rounded-md font-bold"
           style={{
-            background: "rgba(201,168,76,0.12)",
-            border: "1px solid rgba(201,168,76,0.3)",
+            background: "rgba(201,168,76,0.1)",
+            border: "1px solid rgba(201,168,76,0.28)",
             color: "#E8C96B",
           }}
         >

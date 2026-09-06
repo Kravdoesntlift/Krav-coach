@@ -133,7 +133,7 @@ export default function BillingClient({ clients }: Props) {
       {!stripeConfigured && (
         <div
           className="rounded-2xl p-5 space-y-3"
-          style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.25)" }}
+          style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.28)" }}
         >
           <p className="text-brand-gold font-bold text-sm">Stripe não configurado</p>
           <p className="text-zinc-400 text-sm">
@@ -201,7 +201,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...`}
 
         {/* Generated link */}
         {generatedLink && (
-          <div className="mt-4 rounded-2xl p-4 space-y-3" style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.25)" }}>
+          <div className="mt-4 rounded-2xl p-4 space-y-3" style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.28)" }}>
             <p className="text-brand-gold text-sm font-bold">✅ Link gerado, partilha com o cliente:</p>
             <div className="flex items-center gap-2">
               <input
@@ -212,7 +212,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...`}
               <button
                 onClick={copyLink}
                 className="shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition-all"
-                style={{ background: copied ? "rgba(34,197,94,0.15)" : "rgba(201,168,76,0.15)", color: copied ? "#4ade80" : "#C9A84C", border: `1px solid ${copied ? "rgba(34,197,94,0.3)" : "rgba(201,168,76,0.3)"}` }}
+                style={{ background: copied ? "rgba(34,197,94,0.15)" : "rgba(201,168,76,0.16)", color: copied ? "#4ade80" : "#C9A84C", border: `1px solid ${copied ? "rgba(34,197,94,0.3)" : "rgba(201,168,76,0.28)"}` }}
               >
                 {copied ? "Copiado ✓" : "Copiar"}
               </button>

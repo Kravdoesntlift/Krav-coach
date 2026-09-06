@@ -260,9 +260,9 @@ export default function MuscleMap({ exerciseNames, loggedNames = [], lang = "pt"
                   key={muscle}
                   className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold"
                   style={{
-                    background: isDone ? "rgba(201,168,76,0.18)" : "rgba(201,168,76,0.07)",
+                    background: isDone ? "rgba(201,168,76,0.16)" : "rgba(201,168,76,0.05)",
                     color: isDone ? "#C9A84C" : "#7a6a32",
-                    border:`1px solid ${isDone ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.15)"}`,
+                    border:`1px solid ${isDone ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.16)"}`,
                   }}
                 >
                   <span className="w-1.5 h-1.5 rounded-full" style={{ background: isDone ? "#C9A84C" : "#5a4e26" }} />

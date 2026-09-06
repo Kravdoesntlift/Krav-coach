@@ -57,7 +57,7 @@ export default function SignupPage() {
       className="min-h-screen flex items-center justify-center px-4 py-10"
       style={{
         background:
-          "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.08) 0%, transparent 70%), #000",
+          "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.1) 0%, transparent 70%), #000",
       }}
     >
       {/* Grain */}
@@ -76,9 +76,9 @@ export default function SignupPage() {
           <div
             className="inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4"
             style={{
-              background: "linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05))",
-              border: "1px solid rgba(201,168,76,0.2)",
-              boxShadow: "0 0 32px rgba(201,168,76,0.12)",
+              background: "linear-gradient(135deg, rgba(201,168,76,0.16), rgba(201,168,76,0.05))",
+              border: "1px solid rgba(201,168,76,0.22)",
+              boxShadow: "0 0 32px rgba(201,168,76,0.1)",
             }}
           >
             <span className="text-brand-gold font-black text-lg tracking-tighter">K</span>
@@ -104,7 +104,7 @@ export default function SignupPage() {
               className="w-14 h-14 rounded-full flex items-center justify-center mx-auto"
               style={{
                 background: "rgba(201,168,76,0.1)",
-                border: "1px solid rgba(201,168,76,0.25)",
+                border: "1px solid rgba(201,168,76,0.28)",
               }}
             >
               <span className="text-2xl">📧</span>
@@ -144,7 +144,7 @@ export default function SignupPage() {
               {/* Invite banner: coach invite */}
               {coachId && (
                 <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl"
-                  style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}
+                  style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)" }}
                 >
                   <span className="text-brand-gold text-lg shrink-0">🎯</span>
                   <p className="text-brand-gold/90 text-xs leading-relaxed">
@@ -156,7 +156,7 @@ export default function SignupPage() {
               {/* Referral banner */}
               {refCode && !coachId && (
                 <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-xl"
-                  style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}
+                  style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)" }}
                 >
                   <span className="text-brand-gold text-lg shrink-0 mt-0.5">🤝</span>
                   <div>

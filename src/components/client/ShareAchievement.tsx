@@ -60,7 +60,7 @@ export default function ShareAchievement({ title, description, icon, clientName 
     ctx.stroke();
 
     // Inner subtle border
-    ctx.strokeStyle = "rgba(201,168,76,0.12)";
+    ctx.strokeStyle = "rgba(201,168,76,0.1)";
     ctx.lineWidth = 1;
     roundRect(ctx, 50, 50, size - 100, size - 100, 32);
     ctx.stroke();
@@ -172,15 +172,15 @@ export default function ShareAchievement({ title, description, icon, clientName 
             className="relative w-full rounded-3xl p-8 flex flex-col items-center gap-5 overflow-hidden"
             style={{
               background: "linear-gradient(160deg, #1a1505 0%, #0d0d0d 100%)",
-              border: "1px solid rgba(201,168,76,0.35)",
-              boxShadow: "0 0 60px rgba(201,168,76,0.12), 0 32px 64px rgba(0,0,0,0.8)",
+              border: "1px solid rgba(201,168,76,0.4)",
+              boxShadow: "0 0 60px rgba(201,168,76,0.1), 0 32px 64px rgba(0,0,0,0.8)",
             }}
           >
             {/* Gold glow behind icon */}
             <div
               className="absolute inset-x-0 top-0 h-48 pointer-events-none"
               style={{
-                background: "radial-gradient(ellipse 80% 60% at 50% 20%, rgba(201,168,76,0.15), transparent)",
+                background: "radial-gradient(ellipse 80% 60% at 50% 20%, rgba(201,168,76,0.16), transparent)",
               }}
             />
 
@@ -192,7 +192,7 @@ export default function ShareAchievement({ title, description, icon, clientName 
             {/* Icon */}
             <span
               className="relative z-10 leading-none select-none"
-              style={{ fontSize: "100px", filter: "drop-shadow(0 4px 24px rgba(201,168,76,0.3))" }}
+              style={{ fontSize: "100px", filter: "drop-shadow(0 4px 24px rgba(201,168,76,0.28))" }}
             >
               {icon}
             </span>
@@ -204,7 +204,7 @@ export default function ShareAchievement({ title, description, icon, clientName 
             </div>
 
             {/* Divider */}
-            <div className="w-full h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent)" }} />
+            <div className="w-full h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.28), transparent)" }} />
 
             {/* Client name */}
             <p className="text-brand-gold text-sm font-bold tracking-wide relative z-10">{clientName}</p>
@@ -223,7 +223,7 @@ export default function ShareAchievement({ title, description, icon, clientName 
               onClick={generateImage}
               disabled={generating}
               className="flex-1 py-3 rounded-2xl text-black text-sm font-bold transition-all disabled:opacity-50"
-              style={{ background: "linear-gradient(135deg, #E8C96B, #C9A84C)", boxShadow: "0 4px 20px rgba(201,168,76,0.3)" }}
+              style={{ background: "linear-gradient(135deg, #E8C96B, #C9A84C)", boxShadow: "0 4px 20px rgba(201,168,76,0.28)" }}
             >
               {generating ? (
                 <span className="flex items-center justify-center gap-2">
@@ -260,7 +260,7 @@ export default function ShareAchievement({ title, description, icon, clientName 
             <button
               onClick={shareNative}
               className="flex-1 py-3 rounded-2xl text-black text-sm font-bold"
-              style={{ background: "linear-gradient(135deg, #E8C96B, #C9A84C)", boxShadow: "0 4px 20px rgba(201,168,76,0.3)" }}
+              style={{ background: "linear-gradient(135deg, #E8C96B, #C9A84C)", boxShadow: "0 4px 20px rgba(201,168,76,0.28)" }}
             >
               Partilhar
             </button>

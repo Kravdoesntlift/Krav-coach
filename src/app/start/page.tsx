@@ -125,7 +125,7 @@ function OptionCard({ selected, onClick, icon, label, sub }: {
     <button type="button" onClick={onClick}
       className="w-full flex items-center gap-4 p-4 rounded-2xl transition-all text-left active:scale-[0.98]"
       style={{
-        background: selected ? "rgba(201,168,76,0.10)" : "rgba(255,255,255,0.03)",
+        background: selected ? "rgba(201,168,76,0.1)" : "rgba(255,255,255,0.03)",
         border: selected ? "1.5px solid #C9A84C" : "1.5px solid rgba(255,255,255,0.08)",
       }}>
       <span className="text-2xl">{icon}</span>
@@ -148,7 +148,7 @@ function SexCard({ selected, onClick, icon, label }: {
     <button type="button" onClick={onClick}
       className="flex-1 flex flex-col items-center gap-2 py-5 rounded-2xl transition-all active:scale-95"
       style={{
-        background: selected ? "rgba(201,168,76,0.12)" : "rgba(255,255,255,0.03)",
+        background: selected ? "rgba(201,168,76,0.1)" : "rgba(255,255,255,0.03)",
         border: selected ? "1.5px solid #C9A84C" : "1.5px solid rgba(255,255,255,0.08)",
       }}>
       <span className="text-3xl">{icon}</span>
@@ -259,11 +259,11 @@ function DayPicker({ selected, onChange, lang }: {
                 ? "rgba(255,255,255,0.03)"
                 : "rgba(255,255,255,0.04)",
               border: isSelected
-                ? "1.5px solid rgba(201,168,76,0.6)"
+                ? "1.5px solid rgba(201,168,76,0.55)"
                 : isWeekend
                 ? "1.5px solid rgba(255,255,255,0.05)"
                 : "1.5px solid rgba(255,255,255,0.07)",
-              boxShadow: isSelected ? "0 0 12px rgba(201,168,76,0.25), inset 0 1px 0 rgba(255,255,255,0.15)" : "none",
+              boxShadow: isSelected ? "0 0 12px rgba(201,168,76,0.28), inset 0 1px 0 rgba(255,255,255,0.15)" : "none",
             }}
           >
             <span
@@ -369,7 +369,7 @@ export default function StartPage() {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
       <div className="fixed inset-0 pointer-events-none z-0"
-        style={{ background: "radial-gradient(ellipse 70% 40% at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%)" }} />
+        style={{ background: "radial-gradient(ellipse 70% 40% at 50% 0%, rgba(201,168,76,0.1) 0%, transparent 70%)" }} />
 
       <div className="relative z-10 flex flex-col min-h-screen max-w-sm mx-auto w-full px-5">
         {/* Logo + lang toggle */}
@@ -468,7 +468,7 @@ export default function StartPage() {
                         background: quiz.sessionDuration === d ? "linear-gradient(135deg,#E8C96B,#C9A84C)" : "rgba(255,255,255,0.04)",
                         border: `1px solid ${quiz.sessionDuration === d ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.07)"}`,
                         color: quiz.sessionDuration === d ? "#000" : "#71717a",
-                        boxShadow: quiz.sessionDuration === d ? "0 0 16px rgba(201,168,76,0.2)" : "none",
+                        boxShadow: quiz.sessionDuration === d ? "0 0 16px rgba(201,168,76,0.22)" : "none",
                       }}>
                       {d === 90 ? "90+" : d}<br />
                       <span className="text-[10px] font-medium opacity-70">min</span>

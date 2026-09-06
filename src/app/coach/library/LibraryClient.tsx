@@ -181,7 +181,7 @@ function ExerciseCard({
         {item.muscle_groups.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-1.5">
             {item.muscle_groups.slice(0, 3).map((mg) => (
-              <span key={mg} className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.2)", color: "#C9A84C" }}>
+              <span key={mg} className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)", color: "#C9A84C" }}>
                 {mg}
               </span>
             ))}
@@ -282,7 +282,7 @@ export default function LibraryClient({ items, coachId }: Props) {
             onClick={() => { setSeedMsg(null); startTransition(async () => { const res = await seedDefaultLibrary(); setSeedMsg(res.error ? res.error : `✅ ${res.count} exercícios importados!`); }); }}
             disabled={pending}
             className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-semibold border transition-all"
-            style={{ borderColor: "rgba(201,168,76,0.3)", color: "#C9A84C", background: "rgba(201,168,76,0.07)" }}
+            style={{ borderColor: "rgba(201,168,76,0.28)", color: "#C9A84C", background: "rgba(201,168,76,0.05)" }}
           >
             {pending ? "A importar..." : "⬇ Importar biblioteca padrão"}
           </button>
@@ -345,7 +345,7 @@ export default function LibraryClient({ items, coachId }: Props) {
                     <span className="font-bold text-white">{cat}</span>
                     <span className="text-xs text-zinc-500">{exs.length} exercício{exs.length !== 1 ? "s" : ""}</span>
                     {withVideo > 0 && (
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(201,168,76,0.12)", color: "#C9A84C" }}>
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(201,168,76,0.1)", color: "#C9A84C" }}>
                         {withVideo} vídeo{withVideo !== 1 ? "s" : ""}
                       </span>
                     )}

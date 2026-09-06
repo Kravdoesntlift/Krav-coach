@@ -116,10 +116,10 @@ export default function MessagesClient({ convos }: { convos: Convo[] }) {
                 className="flex items-center gap-3 p-3 rounded-2xl transition-all"
                 style={{
                   background: c.unread > 0
-                    ? "linear-gradient(135deg,rgba(201,168,76,0.07),rgba(10,10,10,0.9))"
+                    ? "linear-gradient(135deg,rgba(201,168,76,0.05),rgba(10,10,10,0.9))"
                     : "rgba(18,18,20,0.8)",
                   border: c.unread > 0
-                    ? "1px solid rgba(201,168,76,0.2)"
+                    ? "1px solid rgba(201,168,76,0.22)"
                     : "1px solid rgba(39,39,42,0.5)",
                 }}
               >

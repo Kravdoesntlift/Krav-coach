@@ -32,7 +32,7 @@ export default function SendTrialEmailButton({
           ? { borderColor: "rgba(74,222,128,0.3)", color: "#4ade80", background: "rgba(74,222,128,0.07)" }
           : state === "error"
           ? { borderColor: "rgba(239,68,68,0.3)", color: "#f87171", background: "rgba(239,68,68,0.07)" }
-          : { borderColor: "rgba(201,168,76,0.3)", color: "#C9A84C", background: "rgba(201,168,76,0.07)" }
+          : { borderColor: "rgba(201,168,76,0.28)", color: "#C9A84C", background: "rgba(201,168,76,0.05)" }
       }
     >
       {state === "sending" ? "A enviar..." : state === "sent" ? "✓ Email enviado!" : state === "error" ? "Erro, tenta de novo" : `📧 Enviar aviso de trial (${daysLeft}d)`}

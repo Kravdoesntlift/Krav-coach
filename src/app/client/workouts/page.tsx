@@ -151,7 +151,7 @@ export default function MyWorkoutsPage() {
                     onClick={() => setType(opt.value)}
                     className="flex flex-col items-center gap-1 py-3 rounded-xl border transition-all active:scale-95"
                     style={type === opt.value
-                      ? { background: "rgba(201,168,76,0.15)", border: "1px solid rgba(201,168,76,0.5)" }
+                      ? { background: "rgba(201,168,76,0.16)", border: "1px solid rgba(201,168,76,0.55)" }
                       : { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }
                     }
                   >
@@ -301,7 +301,7 @@ export default function MyWorkoutsPage() {
       {/* Strava tip */}
       <div
         className="rounded-xl px-4 py-3 flex items-center gap-3"
-        style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.12)" }}
+        style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.1)" }}
       >
         <span className="text-brand-gold text-base shrink-0">⚡</span>
         <p className="text-zinc-400 text-xs leading-relaxed">

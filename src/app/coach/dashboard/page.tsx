@@ -367,7 +367,7 @@ export default async function CoachDashboard() {
                 className="flex items-center justify-between gap-3 rounded-2xl p-4"
                 style={{
                   background: "rgba(201,168,76,0.05)",
-                  border: "1px solid rgba(201,168,76,0.18)",
+                  border: "1px solid rgba(201,168,76,0.16)",
                 }}
               >
                 <div>

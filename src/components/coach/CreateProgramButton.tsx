@@ -46,7 +46,7 @@ export default function CreateProgramButton({ planId }: { planId: string }) {
         >
           <div
             className="w-full max-w-sm rounded-3xl p-6 space-y-5"
-            style={{ background: "#111113", border: "1px solid rgba(201,168,76,0.25)" }}
+            style={{ background: "#111113", border: "1px solid rgba(201,168,76,0.28)" }}
           >
             <div>
               <p className="text-xs text-zinc-500 font-semibold tracking-widest uppercase mb-1">Criar Programa</p>

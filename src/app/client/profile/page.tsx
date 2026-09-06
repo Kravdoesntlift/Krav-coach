@@ -123,7 +123,7 @@ export default async function ClientProfilePage() {
           { day: "numeric", month: "long" }
         );
         return (
-          <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(18,18,22,0.8)", border: "1px solid rgba(201,168,76,0.2)" }}>
+          <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(18,18,22,0.8)", border: "1px solid rgba(201,168,76,0.22)" }}>
             <h2 className="text-white font-bold text-base">{extra.subscription[lang]}</h2>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">

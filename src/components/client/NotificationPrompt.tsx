@@ -92,8 +92,8 @@ export default function NotificationPrompt() {
         <div
           className="rounded-3xl overflow-hidden"
           style={{
-            background: "linear-gradient(160deg, rgba(201,168,76,0.12) 0%, #0a0a0c 60%)",
-            border: "1px solid rgba(201,168,76,0.25)",
+            background: "linear-gradient(160deg, rgba(201,168,76,0.1) 0%, #0a0a0c 60%)",
+            border: "1px solid rgba(201,168,76,0.28)",
           }}
         >
           {done ? (

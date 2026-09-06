@@ -61,16 +61,16 @@ export default function AchievementUnlockModal({ achievements, seenAchievements 
             <div
               className="absolute w-40 h-40 rounded-full"
               style={{
-                background: "radial-gradient(circle, rgba(201,168,76,0.35) 0%, transparent 70%)",
+                background: "radial-gradient(circle, rgba(201,168,76,0.4) 0%, transparent 70%)",
                 filter: "blur(16px)",
               }}
             />
             <div
               className="relative w-28 h-28 rounded-3xl flex items-center justify-center text-6xl"
               style={{
-                background: "linear-gradient(135deg,rgba(201,168,76,0.25),rgba(201,168,76,0.05))",
-                border: "1px solid rgba(201,168,76,0.5)",
-                boxShadow: "0 0 40px rgba(201,168,76,0.3)",
+                background: "linear-gradient(135deg,rgba(201,168,76,0.28),rgba(201,168,76,0.05))",
+                border: "1px solid rgba(201,168,76,0.55)",
+                boxShadow: "0 0 40px rgba(201,168,76,0.28)",
               }}
             >
               {a.icon}
@@ -97,7 +97,7 @@ export default function AchievementUnlockModal({ achievements, seenAchievements 
                 <div
                   key={i}
                   className="w-1.5 h-1.5 rounded-full transition-all"
-                  style={{ background: i === idx ? "#C9A84C" : "rgba(201,168,76,0.25)" }}
+                  style={{ background: i === idx ? "#C9A84C" : "rgba(201,168,76,0.28)" }}
                 />
               ))}
             </div>

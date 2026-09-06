@@ -13,7 +13,7 @@ export default function ObrigadoPage() {
           className="w-16 h-16 rounded-full flex items-center justify-center text-2xl"
           style={{
             background: "linear-gradient(135deg, #E8C96B, #A8893A)",
-            boxShadow: "0 0 40px rgba(201,168,76,0.2)",
+            boxShadow: "0 0 40px rgba(201,168,76,0.22)",
           }}
         >
           ✓
@@ -30,14 +30,14 @@ export default function ObrigadoPage() {
         </div>
 
         {/* Divider */}
-        <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent)" }} />
+        <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.22), transparent)" }} />
 
         {/* Upsell */}
         <div
           className="w-full p-5 rounded-2xl space-y-3 text-left"
-          style={{ background: "#0f0f0f", border: "1px solid rgba(201,168,76,0.15)" }}
+          style={{ background: "#0f0f0f", border: "1px solid rgba(201,168,76,0.16)" }}
         >
-          <p className="text-xs font-black tracking-[0.18em] uppercase" style={{ color: "rgba(201,168,76,0.6)" }}>
+          <p className="text-xs font-black tracking-[0.18em] uppercase" style={{ color: "rgba(201,168,76,0.55)" }}>
             Próximo passo
           </p>
           <p className="text-sm text-zinc-300 leading-relaxed">
@@ -51,7 +51,7 @@ export default function ObrigadoPage() {
             style={{
               background: "linear-gradient(135deg, #E8C96B 0%, #C9A84C 60%, #A8893A 100%)",
               color: "#000",
-              boxShadow: "0 4px 20px rgba(201,168,76,0.2)",
+              boxShadow: "0 4px 20px rgba(201,168,76,0.22)",
             }}
           >
             Ver Coaching Online →

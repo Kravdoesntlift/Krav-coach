@@ -54,8 +54,8 @@ export default function TodayCard({ day, clientId, isCompleted, completedCount, 
       <div
         className="relative rounded-3xl overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, rgba(201,168,76,0.12) 0%, rgba(10,10,12,0.95) 60%)",
-          border: "1px solid rgba(201,168,76,0.25)",
+          background: "linear-gradient(135deg, rgba(201,168,76,0.1) 0%, rgba(10,10,12,0.95) 60%)",
+          border: "1px solid rgba(201,168,76,0.28)",
         }}
       >
         {/* Ambient glow */}

@@ -66,7 +66,7 @@ export default function PushPrompt() {
         className="rounded-2xl p-4 shadow-2xl flex gap-4 items-start"
         style={{
           background: "linear-gradient(160deg,#1a1a1a,#111)",
-          border: "1px solid rgba(201,168,76,0.25)",
+          border: "1px solid rgba(201,168,76,0.28)",
         }}
       >
         {/* Icon */}

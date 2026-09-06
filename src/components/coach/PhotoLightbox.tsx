@@ -67,7 +67,7 @@ export default function PhotoLightbox({ photos }: Props) {
         <button
           onClick={close}
           className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-colors"
-          style={{ background: "rgba(201,168,76,0.2)", border: "1px solid rgba(201,168,76,0.4)" }}
+          style={{ background: "rgba(201,168,76,0.22)", border: "1px solid rgba(201,168,76,0.4)" }}
           aria-label="Fechar"
         >
           ✕

@@ -104,7 +104,7 @@ export default function SuggestPlanButton({ clientId }: { clientId: string }) {
             className="w-full max-w-lg rounded-3xl p-6 space-y-5 max-h-[85vh] overflow-y-auto"
             style={{
               background: "#111113",
-              border: "1px solid rgba(201,168,76,0.25)",
+              border: "1px solid rgba(201,168,76,0.28)",
               boxShadow: "0 0 40px rgba(0,0,0,0.8)",
             }}
           >
@@ -137,7 +137,7 @@ export default function SuggestPlanButton({ clientId }: { clientId: string }) {
                       : "rgba(201,168,76,0.05)",
                     border: day.is_rest
                       ? "1px solid rgba(255,255,255,0.06)"
-                      : "1px solid rgba(201,168,76,0.15)",
+                      : "1px solid rgba(201,168,76,0.16)",
                   }}
                 >
                   <div className="flex items-center justify-between">

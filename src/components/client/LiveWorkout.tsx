@@ -536,7 +536,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                 style={active
                   ? { background: "linear-gradient(135deg,#E8C96B,#A8893A)", color: "#000" }
                   : done
-                  ? { background: "rgba(201,168,76,0.12)", color: "#C9A84C" }
+                  ? { background: "rgba(201,168,76,0.1)", color: "#C9A84C" }
                   : { background: "#18181b", color: "#52525b" }}>
                 {done && !active ? "✓" : i + 1}
               </button>
@@ -593,8 +593,8 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
               className="inline-flex items-center gap-1.5 rounded-lg text-[11px] font-bold transition-all active:scale-95"
               style={{
                 padding: "6px 10px",
-                background: swapped ? "rgba(201,168,76,0.12)" : "rgba(255,255,255,0.04)",
-                border: `1px solid ${swapped ? "rgba(201,168,76,0.3)" : "rgba(255,255,255,0.08)"}`,
+                background: swapped ? "rgba(201,168,76,0.1)" : "rgba(255,255,255,0.04)",
+                border: `1px solid ${swapped ? "rgba(201,168,76,0.28)" : "rgba(255,255,255,0.08)"}`,
                 color: swapped ? "#E8C96B" : "#a1a1aa",
               }}
             >
@@ -614,8 +614,8 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                       className="w-full text-left rounded-xl text-xs transition-all active:scale-[0.98]"
                       style={{
                         padding: "10px 12px",
-                        background: active ? "rgba(201,168,76,0.12)" : "rgba(255,255,255,0.03)",
-                        border: `1px solid ${active ? "rgba(201,168,76,0.35)" : "rgba(255,255,255,0.06)"}`,
+                        background: active ? "rgba(201,168,76,0.1)" : "rgba(255,255,255,0.03)",
+                        border: `1px solid ${active ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.06)"}`,
                         color: active ? "#E8C96B" : "#d4d4d8",
                       }}
                     >
@@ -706,8 +706,8 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
             style={{
               display: "grid", gridTemplateColumns: "1.5rem 1fr 1fr 2.5rem", gap: "0.5rem",
               alignItems: "center", borderRadius: 16, padding: "0.375rem 0.5rem", flexShrink: 0,
-              background: s.done ? "rgba(201,168,76,0.07)" : "rgba(255,255,255,0.02)",
-              border:     s.done ? "1px solid rgba(201,168,76,0.2)" : "1px solid rgba(255,255,255,0.05)",
+              background: s.done ? "rgba(201,168,76,0.05)" : "rgba(255,255,255,0.02)",
+              border:     s.done ? "1px solid rgba(201,168,76,0.22)" : "1px solid rgba(255,255,255,0.05)",
             }}>
             <span className="text-xs font-black text-center" style={{ color: s.done ? "#C9A84C" : "#52525b" }}>
               {si + 1}
@@ -742,7 +742,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
               className="flex-1 rounded-xl text-xs font-bold transition-all active:scale-95"
               style={{ paddingTop: 8, paddingBottom: 8,
                 ...(restDur === s
-                  ? { background: "rgba(201,168,76,0.12)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.25)" }
+                  ? { background: "rgba(201,168,76,0.1)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.28)" }
                   : { background: "#18181b", color: "#52525b", border: "1px solid #27272a" }) }}>
               {s}s
             </button>

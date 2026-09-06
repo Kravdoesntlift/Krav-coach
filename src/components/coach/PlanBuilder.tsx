@@ -398,7 +398,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
               onClick={generateWithAI}
               disabled={aiGenerating || !clientId}
               className="w-full py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-40 flex items-center justify-center gap-2"
-              style={{ background: "linear-gradient(135deg,rgba(201,168,76,0.15),rgba(201,168,76,0.08))", border: "1px solid rgba(201,168,76,0.3)", color: "#C9A84C" }}
+              style={{ background: "linear-gradient(135deg,rgba(201,168,76,0.16),rgba(201,168,76,0.1))", border: "1px solid rgba(201,168,76,0.28)", color: "#C9A84C" }}
             >
               {aiGenerating ? (
                 <>
@@ -585,7 +585,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                       type="button"
                       onClick={() => { setLibraryPicker(day.day_of_week); setLibrarySearch(""); }}
                       className="px-4 py-2.5 rounded-lg border text-sm font-semibold transition-colors"
-                      style={{ borderColor: "rgba(201,168,76,0.35)", color: "#C9A84C", background: "rgba(201,168,76,0.07)" }}
+                      style={{ borderColor: "rgba(201,168,76,0.4)", color: "#C9A84C", background: "rgba(201,168,76,0.05)" }}
                     >
                       📚 Da biblioteca
                     </button>
@@ -661,7 +661,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {ex.video_url && (
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(201,168,76,0.12)", color: "#C9A84C" }}>
+                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(201,168,76,0.1)", color: "#C9A84C" }}>
                         vídeo
                       </span>
                     )}

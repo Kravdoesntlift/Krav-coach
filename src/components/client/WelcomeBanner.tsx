@@ -65,8 +65,8 @@ export default function WelcomeBanner({ clientName, coachName, coachTagline, coa
         <div
           className="rounded-2xl p-4 mb-5"
           style={{
-            background: "rgba(201,168,76,0.07)",
-            border: "1px solid rgba(201,168,76,0.2)",
+            background: "rgba(201,168,76,0.05)",
+            border: "1px solid rgba(201,168,76,0.22)",
           }}
         >
           <p className="text-zinc-500 text-xs mb-1 uppercase tracking-widest font-semibold">{extra.your_coach[lang]}</p>

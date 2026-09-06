@@ -58,7 +58,7 @@ export default function OfflinePage() {
       {queueLen > 0 && (
         <div
           className="rounded-2xl px-4 py-3 mb-6"
-          style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}
+          style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)" }}
         >
           <p className="text-brand-gold text-sm font-bold">
             {queueLen} {queueLen === 1 ? "ação pendente" : "ações pendentes"}
@@ -133,10 +133,10 @@ export default function OfflinePage() {
                     style={{
                       background: d.isRest
                         ? "rgba(255,255,255,0.02)"
-                        : "rgba(201,168,76,0.08)",
+                        : "rgba(201,168,76,0.1)",
                       border: d.isRest
                         ? "1px solid rgba(255,255,255,0.05)"
-                        : "1px solid rgba(201,168,76,0.2)",
+                        : "1px solid rgba(201,168,76,0.22)",
                     }}
                   >
                     <span>{d.isRest ? "💤" : "💪"}</span>
@@ -162,7 +162,7 @@ export default function OfflinePage() {
       {/* Motivational quote */}
       <div
         className="mt-8 px-5 py-4 rounded-2xl text-center"
-        style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.12)" }}
+        style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.1)" }}
       >
         <p className="text-brand-gold text-sm font-semibold italic">
           &ldquo;A disciplina não precisa de wi-fi.&rdquo;

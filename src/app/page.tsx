@@ -254,7 +254,7 @@ export default async function LandingPage({
       {/* Ambient glow */}
       <div
         className="fixed inset-0 pointer-events-none z-0"
-        style={{ background: "radial-gradient(ellipse 70% 40% at 50% 0%, rgba(201,168,76,0.10) 0%, transparent 70%)" }}
+        style={{ background: "radial-gradient(ellipse 70% 40% at 50% 0%, rgba(201,168,76,0.1) 0%, transparent 70%)" }}
       />
 
       <div className="relative z-10">
@@ -295,7 +295,7 @@ export default async function LandingPage({
               {coach && (
                 <div>
                   <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full"
-                    style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}>
+                    style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)" }}>
                     {coach.avatar_url ? (
                       <Image src={coach.avatar_url} alt={coach.full_name} width={28} height={28} className="rounded-full object-cover" />
                     ) : (
@@ -343,7 +343,7 @@ export default async function LandingPage({
 
         {/* ── DIVIDER ──────────────────────────────────────────── */}
         <div className="max-w-2xl mx-auto px-5 pb-6">
-          <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.18), transparent)" }} />
+          <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(201,168,76,0.16), transparent)" }} />
         </div>
 
         {/* ── COACH BIO ────────────────────────────────────────── */}
@@ -400,7 +400,7 @@ export default async function LandingPage({
                       <span
                         key={c}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-300"
-                        style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.2)" }}
+                        style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)" }}
                       >
                         <span style={{ color: "#C9A84C" }}>✓</span>
                         {c}
@@ -626,8 +626,8 @@ export default async function LandingPage({
             <div
               className="rounded-3xl p-7 space-y-6"
               style={{
-                background: "linear-gradient(160deg, rgba(201,168,76,0.10) 0%, rgba(10,10,12,0.95) 100%)",
-                border: "1px solid rgba(201,168,76,0.25)",
+                background: "linear-gradient(160deg, rgba(201,168,76,0.1) 0%, rgba(10,10,12,0.95) 100%)",
+                border: "1px solid rgba(201,168,76,0.28)",
               }}
             >
               <div className="text-center space-y-1">

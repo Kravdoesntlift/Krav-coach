@@ -56,7 +56,7 @@ export default async function ClientChatPage() {
         >
           <div
             className="w-20 h-20 rounded-full flex items-center justify-center mx-auto"
-            style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.15)" }}
+            style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.16)" }}
           >
             <span className="text-4xl">💬</span>
           </div>
