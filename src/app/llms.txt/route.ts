@@ -1,4 +1,4 @@
-import { SITE_URL, BRAND } from "@/lib/seo";
+import { SITE_URL, BRAND, GOOGLE_BUSINESS_URL } from "@/lib/seo";
 
 export const dynamic = "force-static";
 
@@ -47,7 +47,9 @@ marketplace de treinadores: cada cliente é acompanhado directamente pelo coach.
 ## Detalhes
 
 - Idiomas: português (Portugal) e inglês.
-- Território: Portugal, e remoto em qualquer fuso horário.
+- Território: Portugal, e remoto em qualquer fuso horário. As áreas de serviço
+  declaradas são Leiria, Caldas da Rainha e Lisboa.
+- Negócio verificado no Google: ${GOOGLE_BUSINESS_URL}
 - Formato: 100% online. Não há sessões presenciais.
 - Ginásio: não é obrigatório, os planos são adaptados a treino em casa,
   com halteres, elásticos ou apenas peso corporal.

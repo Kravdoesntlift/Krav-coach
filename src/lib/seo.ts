@@ -26,11 +26,20 @@ export const BRAND = {
   languages: ["pt-PT", "en"],
 } as const;
 
+/**
+ * The verified Google Business Profile, addressed by its Knowledge Graph id
+ * (/g/11nvv2h6db) rather than by the share link, which carries tracking
+ * parameters and is not guaranteed to survive. Resolved from the profile's own
+ * share URL, not guessed.
+ */
+export const GOOGLE_BUSINESS_URL = "https://www.google.com/search?kgmid=/g/11nvv2h6db";
+
 /** Profiles that prove this is one real business, not a parked domain. */
 export const SOCIAL_PROFILES = [
   "https://www.instagram.com/kravdoesntlift",
   "https://www.tiktok.com/@kravdoesntlift",
   "https://www.youtube.com/@kravdoesntlift",
+  GOOGLE_BUSINESS_URL,
 ];
 
 export function absoluteUrl(path = "/"): string {
@@ -73,10 +82,14 @@ export function organizationJsonLd() {
     email: BRAND.email,
     priceRange: "€€",
     currenciesAccepted: BRAND.currency,
-    areaServed: {
-      "@type": "Country",
-      name: "Portugal",
-    },
+    areaServed: [
+      { "@type": "Country", name: "Portugal" },
+      // Mirrors the service areas declared on the Google Business Profile, so
+      // the site and the listing describe the same reach.
+      { "@type": "City", name: "Leiria" },
+      { "@type": "City", name: "Caldas da Rainha" },
+      { "@type": "City", name: "Lisboa" },
+    ],
     availableLanguage: [
       { "@type": "Language", name: "Portuguese", alternateName: "pt" },
       { "@type": "Language", name: "English", alternateName: "en" },
