@@ -283,3 +283,67 @@
   .badge-red    { @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/15 text-red-400 border border-red-500/25; }
   .badge-zinc   { @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-400 border border-zinc-700/50; }
 }
+
+/* ── Keyboard focus ──────────────────────────────────────────
+   The codebase clears the outline in 55 places, mostly on inputs that then
+   style their own focus ring, but on buttons and links nothing replaced it:
+   tabbing through the app showed no indication of where you were.
+
+   :focus-visible only fires for keyboard and assistive navigation, so this
+   never appears on a mouse click. `!important` is deliberate and is the one
+   place it is warranted here: an accessibility guarantee must not be silently
+   removed by a utility class somewhere else. */
+*:focus-visible {
+  outline: 2px solid rgba(201, 168, 76, 0.8) !important;
+  outline-offset: 2px !important;
+}
+
+/* Dark-on-gold controls need the ring outside the fill to stay legible. */
+.btn-primary:focus-visible {
+  outline-color: #ffffff !important;
+  outline-offset: 3px !important;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────
+   Four animations here loop forever: the skeleton shimmer, the floating hero
+   badges, the gold sweep and the ambient glow. For anyone with vestibular
+   sensitivity, perpetual movement is not a flourish, it is a symptom trigger.
+
+   Movement is what causes the problem, not opacity, so fades are kept and
+   anything that travels, scales, spins or never stops is removed. The
+   interface still confirms every action, it just stops moving to do it. */
+@media (prefers-reduced-motion: reduce) {
+  .float,
+  .gold-sweep,
+  .glow-breathe,
+  .shimmer,
+  .pulse-gold {
+    animation: none !important;
+  }
+
+  /* Entrance animations keep the fade and drop the travel. */
+  .page-enter,
+  .stagger > *,
+  .pop,
+  .scale-in,
+  .slide-up-enter,
+  .stat-enter,
+  .num-tick {
+    animation-name: fade-in-fast !important;
+    animation-duration: 0.15s !important;
+  }
+
+  /* Colour and opacity transitions stay; nothing should slide or spring. */
+  *,
+  *::before,
+  *::after {
+    transition-property: opacity, color, background-color, border-color, box-shadow !important;
+    transition-duration: 0.12s !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
