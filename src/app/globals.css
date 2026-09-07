@@ -284,6 +284,33 @@
   .badge-zinc   { @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-400 border border-zinc-700/50; }
 }
 
+/* ── Testimonial marquee ─────────────────────────────────────
+   The track holds the list twice, so translating by exactly half its width
+   lands on an identical frame and the loop has no visible seam. */
+@keyframes testimonial-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Hover pause lives in CSS rather than in React state. onMouseEnter is
+   synthesised from mouseover and depends on relatedTarget containment, which
+   makes it both harder to reason about and easy to miss; :hover cannot miss. */
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Nothing should move on its own. The row stays swipeable by hand, which is
+     how it already behaves on a phone. */
+  .marquee-track {
+    animation: none !important;
+  }
+  .marquee {
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory;
+  }
+}
+
 /* ── Keyboard focus ──────────────────────────────────────────
    The codebase clears the outline in 55 places, mostly on inputs that then
    style their own focus ring, but on buttons and links nothing replaced it:

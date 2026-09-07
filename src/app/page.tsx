@@ -6,6 +6,7 @@ import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import { SITE_URL, SOCIAL_PROFILES, aggregateRatingJsonLd } from "@/lib/seo";
+import TestimonialCarousel, { type PublicTestimonial } from "@/components/TestimonialCarousel";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const t = {
@@ -183,7 +184,7 @@ export default async function LandingPage({
   const c = isEN ? t.en : t.pt;
 
   const admin = createAdminClient();
-  const [{ data: coach }, { data: publicTestimonials }] = await Promise.all([
+  const [{ data: coach }, { data: publicTestimonials }, { data: allRatings }] = await Promise.all([
     admin
       .from("profiles")
       .select("id, full_name, avatar_url, tagline, tagline_en, bio, bio_en, years_experience, credentials, transformation_before_url, transformation_after_url")
@@ -194,8 +195,23 @@ export default async function LandingPage({
       .from("testimonials")
       .select("id, display_name, content, rating, result_highlight, duration_weeks")
       .eq("is_public", true)
+      // Only the positive ones reach the landing page. A rating is a whole
+      // number, so "4.5 or above" means 5, and 4 is included as the other
+      // clearly happy score. Anything below belongs in the coach's inbox, not
+      // in the shop window.
+      .gte("rating", 4)
+      .order("rating", { ascending: false })
       .order("submitted_at", { ascending: false })
-      .limit(6),
+      .limit(12),
+    // Every public rating, unfiltered. The carousel shows the happy ones, but
+    // the average has to be computed over all of them: displaying only the
+    // positives while publishing an average built from the same filtered set
+    // inflates the score, and that is precisely what the structured-data
+    // guidelines treat as review spam.
+    admin
+      .from("testimonials")
+      .select("rating")
+      .eq("is_public", true),
   ]);
 
   // Self-service funnel: always /start (quiz + stripe)
@@ -209,7 +225,7 @@ export default async function LandingPage({
   // aggregateRatingJsonLd. Publishing a rating built from one or two entries is
   // against Google's structured-data guidelines and risks a manual action, so
   // the markup stays off until the data earns it and then appears by itself.
-  const aggregateRating = aggregateRatingJsonLd(publicTestimonials ?? []);
+  const aggregateRating = aggregateRatingJsonLd(allRatings ?? []);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -583,48 +599,10 @@ export default async function LandingPage({
               <h2 className="text-center text-2xl font-black text-white mb-8">
                 {isEN ? "Real results, real people" : "Resultados reais, pessoas reais"}
               </h2>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {publicTestimonials.map((t) => (
-                  <div
-                    key={t.id}
-                    className="rounded-2xl p-5 flex flex-col gap-3"
-                    style={{
-                      background: "rgba(255,255,255,0.03)",
-                      border: "1px solid rgba(255,255,255,0.07)",
-                    }}
-                  >
-                    {/* Stars */}
-                    {t.rating && (
-                      <div className="flex gap-0.5">
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <span key={i} style={{ color: i < t.rating! ? "#C9A84C" : "#27272a", fontSize: 14 }}>★</span>
-                        ))}
-                      </div>
-                    )}
-                    {/* Quote */}
-                    <p className="text-zinc-300 text-sm leading-relaxed flex-1">
-                      {t.content?.replace(/\s+—\s+/g, ", ")}
-                    </p>
-                    {/* Meta */}
-                    <div className="flex items-center justify-between gap-2 pt-1 border-t border-zinc-800/60">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-black text-black shrink-0"
-                          style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
-                        >
-                          {(t.display_name?.[0] ?? "?").toUpperCase()}
-                        </div>
-                        <span className="text-white text-xs font-semibold">{t.display_name}</span>
-                      </div>
-                      {(t.result_highlight || t.duration_weeks) && (
-                        <span className="text-zinc-600 text-xs shrink-0">
-                          {t.result_highlight ?? `${t.duration_weeks}w`}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <TestimonialCarousel
+                testimonials={publicTestimonials as PublicTestimonial[]}
+                isEN={isEN}
+              />
             </ScrollReveal>
           </section>
         )}
