@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { submitTestimonial } from "./actions";
+import { GOOGLE_REVIEW_URL } from "@/lib/seo";
 import type { Lang } from "@/lib/i18n";
 
 interface Props {
@@ -30,6 +31,15 @@ const copy = {
   submitting:   { pt: "A enviar...", en: "Submitting..." },
   success:      { pt: "Testemunho enviado! Obrigado 🙏", en: "Testimonial submitted! Thank you 🙏" },
   min_chars:    { pt: "Escreve pelo menos 30 caracteres.", en: "Please write at least 30 characters." },
+  google_title: {
+    pt: "Ajudas-me com mais um minuto?",
+    en: "Can you spare one more minute?",
+  },
+  google_body:  {
+    pt: "O que acabaste de escrever fica comigo. Uma avaliação no Google fica pública e é o que ajuda outra pessoa a decidir se pode confiar em mim.",
+    en: "What you just wrote stays with me. A Google review is public, and that is what helps someone else decide whether they can trust me.",
+  },
+  google_cta:   { pt: "Avaliar no Google", en: "Review on Google" },
 } as const;
 
 export default function TestimonialForm({ testimonial, lang }: Props) {
@@ -57,9 +67,30 @@ export default function TestimonialForm({ testimonial, lang }: Props) {
 
   if (submitted) {
     return (
-      <div className="rounded-2xl bg-zinc-900 border border-zinc-800 p-10 text-center space-y-2">
-        <p className="text-4xl">✅</p>
-        <p className="text-white font-semibold">{copy.success[lang]}</p>
+      <div className="space-y-4">
+        <div className="rounded-2xl bg-zinc-900 border border-zinc-800 p-10 text-center space-y-2">
+          <p className="text-4xl">✅</p>
+          <p className="text-white font-semibold">{copy.success[lang]}</p>
+        </div>
+
+        {/* The moment right after someone writes something good about you is the
+            only moment they are certain to be willing. Asking later, by message,
+            reaches them while they are doing something else. Hidden entirely
+            until a real review link exists. */}
+        {GOOGLE_REVIEW_URL && (
+          <div className="card-gold p-6 text-center space-y-3">
+            <p className="text-white font-bold">{copy.google_title[lang]}</p>
+            <p className="text-zinc-400 text-sm leading-relaxed">{copy.google_body[lang]}</p>
+            <a
+              href={GOOGLE_REVIEW_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary inline-block px-6 py-3 mt-1"
+            >
+              {copy.google_cta[lang]}
+            </a>
+          </div>
+        )}
       </div>
     );
   }

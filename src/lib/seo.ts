@@ -34,6 +34,16 @@ export const BRAND = {
  */
 export const GOOGLE_BUSINESS_URL = "https://www.google.com/search?kgmid=/g/11nvv2h6db";
 
+/**
+ * The direct "write a review" link for the Business Profile.
+ *
+ * Copied from the profile's own "Ask for reviews" button rather than
+ * constructed, because a guessed review URL sends a willing client to an error
+ * page, which is worse than not asking. Empty until it is pasted here, and the
+ * prompt that uses it stays hidden while it is empty.
+ */
+export const GOOGLE_REVIEW_URL = "";
+
 /** Profiles that prove this is one real business, not a parked domain. */
 export const SOCIAL_PROFILES = [
   "https://www.instagram.com/kravdoesntlift",
