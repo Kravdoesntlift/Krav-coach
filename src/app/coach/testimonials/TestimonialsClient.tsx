@@ -6,6 +6,7 @@ import {
   toggleTestimonialPublic,
   deleteTestimonial,
 } from "./actions";
+import { GOOGLE_REVIEW_URL } from "@/lib/seo";
 
 interface Testimonial {
   id: string;
@@ -42,6 +43,7 @@ export default function TestimonialsClient({ testimonials, clients }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [copiado, setCopiado] = useState(false);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -105,8 +107,40 @@ export default function TestimonialsClient({ testimonials, clients }: Props) {
   const pending = testimonials.filter((t) => !t.submitted_at);
   const submitted = testimonials.filter((t) => t.submitted_at);
 
+  function copiarLink() {
+    navigator.clipboard.writeText(GOOGLE_REVIEW_URL).then(
+      () => { setCopiado(true); setTimeout(() => setCopiado(false), 2000); },
+      () => setError("Não foi possível copiar. Selecciona o link à mão."),
+    );
+  }
+
   return (
     <div className="space-y-8">
+      {/* A testimonial lands in the app; a Google review lands in public. The
+          app already asks for the second right after the first, but that only
+          reaches clients who fill the form. This is for asking by message. */}
+      {GOOGLE_REVIEW_URL && (
+        <div className="card-gold p-5 space-y-3">
+          <div>
+            <p className="text-white font-bold text-sm">Link de avaliação no Google</p>
+            <p className="text-zinc-400 text-xs mt-1 leading-relaxed">
+              Envia por mensagem para o cliente avaliar do telemóvel dele. Reviews deixadas na
+              tua rede ou no teu telemóvel são frequentemente filtradas pelo Google.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 min-w-0 truncate text-xs text-zinc-400 bg-black/40 rounded-lg px-3 py-2 border border-zinc-800">
+              {GOOGLE_REVIEW_URL}
+            </code>
+            <button
+              onClick={copiarLink}
+              className="shrink-0 px-3 py-2 rounded-lg text-xs font-bold bg-zinc-800 text-zinc-200 hover:bg-zinc-700 transition-colors"
+            >
+              {copiado ? "Copiado" : "Copiar"}
+            </button>
+          </div>
+        </div>
+      )}
       {/* Request new testimonial button */}
       {!showForm && (
         <button

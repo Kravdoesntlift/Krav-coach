@@ -42,7 +42,7 @@ export const GOOGLE_BUSINESS_URL = "https://www.google.com/search?kgmid=/g/11nvv
  * page, which is worse than not asking. Empty until it is pasted here, and the
  * prompt that uses it stays hidden while it is empty.
  */
-export const GOOGLE_REVIEW_URL = "";
+export const GOOGLE_REVIEW_URL = "https://g.page/r/CaRYxZ7-oz51EBM/review";
 
 /** Profiles that prove this is one real business, not a parked domain. */
 export const SOCIAL_PROFILES = [
