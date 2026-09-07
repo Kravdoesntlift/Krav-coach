@@ -16,6 +16,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: SITE_URL,                                  lastModified: LAST_CONTENT_UPDATE, changeFrequency: "weekly",  priority: 1 },
     { url: `${SITE_URL}/personal-trainer-online`,     lastModified: LAST_CONTENT_UPDATE, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE_URL}/online-personal-trainer`,     lastModified: LAST_CONTENT_UPDATE, changeFrequency: "monthly", priority: 0.9 },
+    // The coach is the product in a coaching business, so the page about him
+    // ranks alongside the offer rather than below it.
+    { url: `${SITE_URL}/sobre`,                       lastModified: LAST_CONTENT_UPDATE, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE_URL}/start`,                       lastModified: LAST_CONTENT_UPDATE, changeFrequency: "monthly", priority: 0.8 },
     // Lead magnet: was crawlable and linked, but missing from the sitemap
     { url: `${SITE_URL}/guia`,                        lastModified: LAST_CONTENT_UPDATE, changeFrequency: "monthly", priority: 0.7 },

@@ -409,6 +409,15 @@ export default async function LandingPage({
                   </div>
                 )}
 
+                {/* Anyone who has read this far is asking who he is. */}
+                <Link
+                  href="/sobre"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-gold hover:brightness-125 transition-all"
+                >
+                  {isEN ? "How I work" : "Como trabalho"}
+                  <span aria-hidden="true">→</span>
+                </Link>
+
                 {/* Coach transformation slider */}
                 {coach.transformation_before_url && coach.transformation_after_url && (
                   <div className="space-y-3 pt-2">

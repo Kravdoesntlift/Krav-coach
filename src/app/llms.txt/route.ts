@@ -63,6 +63,7 @@ marketplace de treinadores: cada cliente é acompanhado directamente pelo coach.
 - [Início](${SITE_URL}/): visão geral do serviço.
 - [Personal trainer online (PT)](${SITE_URL}/personal-trainer-online): detalhe da oferta e perguntas frequentes.
 - [Online personal trainer (EN)](${SITE_URL}/online-personal-trainer): the same page in English.
+- [Sobre o coach](${SITE_URL}/sobre): formação, método de trabalho e os limites do serviço.
 - [Começar](${SITE_URL}/start): questionário de inscrição e início do trial.
 - [Guia grátis](${SITE_URL}/guia): guia em PDF sobre estrutura de treino e nutrição.
 - [Termos](${SITE_URL}/terms) · [Privacidade](${SITE_URL}/privacy)

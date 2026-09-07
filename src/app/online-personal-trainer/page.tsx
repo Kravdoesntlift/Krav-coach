@@ -63,7 +63,7 @@ const faqItems = [
   },
   {
     q: "How much does an online personal trainer cost?",
-    a: "KRAV Coach is €127/month with everything included, workout plan, nutrition, AI Coach 24/7, weekly check-ins and direct chat with your coach. You can try it free for 7 days, no credit card required.",
+    a: "KRAV Coach is €127/month with everything included, workout plan, nutrition, AI Coach 24/7, weekly check-ins and direct chat with your coach. What you are paying for is not the exercise library, which is free everywhere, it is someone reviewing your logs every week and deciding what changes. You can try it free for 7 days, no credit card required.",
   },
   {
     q: "Can I cancel anytime?",

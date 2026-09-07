@@ -63,7 +63,7 @@ const faqItems = [
   },
   {
     q: "Quanto custa um personal trainer online?",
-    a: "A KRAV Coach custa €127/mês com tudo incluído, plano de treino, nutrição, AI Coach 24/7, check-ins semanais e chat direto com o coach. Podes experimentar gratuitamente durante 7 dias, sem cartão de crédito.",
+    a: "A KRAV Coach custa €127/mês com tudo incluído, plano de treino, nutrição, AI Coach 24/7, check-ins semanais e chat direto com o coach. O que estás a pagar não é a biblioteca de treinos, que encontras de graça, é o tempo de alguém a rever os teus registos todas as semanas e a decidir o que muda. Podes experimentar gratuitamente durante 7 dias, sem cartão de crédito.",
   },
   {
     q: "Posso cancelar quando quiser?",
