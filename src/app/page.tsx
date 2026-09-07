@@ -193,7 +193,7 @@ export default async function LandingPage({
       .maybeSingle(),
     admin
       .from("testimonials")
-      .select("id, display_name, content, rating, result_highlight, duration_weeks")
+      .select("id, display_name, content, rating, result_highlight, duration_weeks, source")
       .eq("is_public", true)
       // Only the positive ones reach the landing page. A rating is a whole
       // number, so "4.5 or above" means 5, and 4 is included as the other

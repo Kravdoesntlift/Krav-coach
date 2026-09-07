@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { GOOGLE_BUSINESS_URL } from "@/lib/seo";
 
 export interface PublicTestimonial {
   id: string;
@@ -9,6 +10,8 @@ export interface PublicTestimonial {
   rating: number | null;
   result_highlight: string | null;
   duration_weeks: number | null;
+  /** Where the words were written. "google" ones carry a link to verify them. */
+  source: string | null;
 }
 
 interface Props {
@@ -42,7 +45,22 @@ function Card({ t, isEN }: { t: PublicTestimonial; isEN: boolean }) {
           >
             {(t.display_name?.[0] ?? "?").toUpperCase()}
           </div>
-          <span className="text-white text-xs font-semibold truncate">{t.display_name}</span>
+          <div className="min-w-0">
+            <span className="block text-white text-xs font-semibold truncate">{t.display_name}</span>
+            {/* Words written on Google say so, and link to the place they can be
+                checked. A quote nobody can verify is worth less than one they
+                can, and claiming it was written here would be untrue. */}
+            {t.source === "google" && (
+              <a
+                href={GOOGLE_BUSINESS_URL}
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                className="text-[11px] text-zinc-500 hover:text-brand-gold transition-colors"
+              >
+                {isEN ? "Verified on Google ↗" : "Avaliação no Google ↗"}
+              </a>
+            )}
+          </div>
         </div>
         {(t.result_highlight || t.duration_weeks) && (
           <span className="text-zinc-600 text-xs shrink-0">
