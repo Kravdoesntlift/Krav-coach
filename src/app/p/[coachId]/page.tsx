@@ -2,6 +2,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import ReviewSummary from "@/components/ReviewSummary";
+import { GOOGLE_BUSINESS_URL } from "@/lib/seo";
 
 export default async function CoachPublicPage({
   params,
@@ -69,11 +71,22 @@ export default async function CoachPublicPage({
   // Public testimonials
   const { data: testimonials } = await admin
     .from("testimonials")
-    .select("display_name, content, result_highlight, duration_weeks")
+    .select("display_name, content, rating, source, result_highlight, duration_weeks")
     .eq("coach_id", coachId)
     .eq("is_public", true)
+    // Stars with no words have nothing to show in a card
+    .neq("content", "")
+    .or("rating.is.null,rating.gte.4")
     .order("submitted_at", { ascending: false })
     .limit(6);
+
+  // Same rule as the landing page: the score is every Google review on record,
+  // never an average of the handful picked to show.
+  const { data: googleReviews } = await admin
+    .from("testimonials")
+    .select("display_name, rating")
+    .eq("coach_id", coachId)
+    .eq("source", "google");
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
@@ -239,19 +252,13 @@ export default async function CoachPublicPage({
         {/* Testimonials */}
         {testimonials && testimonials.length > 0 && (
           <div className="space-y-5">
-            {/* Header with overall rating */}
-            <div className="text-center space-y-1.5">
+            {/* The score is computed, never typed. This used to read "5.0"
+                whatever the ratings were, next to a count of cards shown. */}
+            <div className="text-center space-y-3">
               <p className="text-zinc-500 text-xs font-semibold tracking-widest uppercase">
-                O que dizem os clientes
+                Avaliações
               </p>
-              <div className="flex items-center justify-center gap-1">
-                {"★★★★★".split("").map((s, i) => (
-                  <span key={i} className="text-lg" style={{ color: "#C9A84C" }}>{s}</span>
-                ))}
-                <span className="text-zinc-400 text-sm ml-2">
-                  5.0 · {testimonials.length} {testimonials.length === 1 ? "avaliação" : "avaliações"}
-                </span>
-              </div>
+              <ReviewSummary reviews={googleReviews ?? []} isEN={false} />
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -262,17 +269,36 @@ export default async function CoachPublicPage({
                   style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,168,76,0.1)" }}
                 >
                   {/* Stars */}
-                  <div className="flex gap-0.5">
-                    {"★★★★★".split("").map((s, si) => (
-                      <span key={si} className="text-sm" style={{ color: "#C9A84C" }}>{s}</span>
-                    ))}
-                  </div>
+                  {t.rating != null && (
+                    <div className="flex gap-0.5" aria-label={`${t.rating} em 5`}>
+                      {Array.from({ length: 5 }, (_, si) => (
+                        <span
+                          key={si}
+                          aria-hidden="true"
+                          className="text-sm"
+                          style={{ color: si < (t.rating as number) ? "#C9A84C" : "#27272a" }}
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                   <p className="text-zinc-200 text-sm leading-relaxed">&ldquo;{t.content}&rdquo;</p>
 
                   <div className="flex items-center justify-between pt-1 border-t" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
                     <div>
                       <p className="text-white text-xs font-bold">{t.display_name}</p>
+                      {t.source === "google" && (
+                        <a
+                          href={GOOGLE_BUSINESS_URL}
+                          target="_blank"
+                          rel="noopener noreferrer nofollow"
+                          className="text-[11px] text-zinc-500 hover:text-brand-gold transition-colors"
+                        >
+                          Avaliação no Google ↗
+                        </a>
+                      )}
                       {t.result_highlight && (
                         <p className="text-[11px] font-semibold mt-0.5" style={{ color: "#C9A84C" }}>{t.result_highlight}</p>
                       )}

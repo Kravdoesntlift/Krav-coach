@@ -7,6 +7,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import { SITE_URL, SOCIAL_PROFILES, aggregateRatingJsonLd } from "@/lib/seo";
 import TestimonialCarousel, { type PublicTestimonial } from "@/components/TestimonialCarousel";
+import ReviewSummary from "@/components/ReviewSummary";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const t = {
@@ -184,7 +185,7 @@ export default async function LandingPage({
   const c = isEN ? t.en : t.pt;
 
   const admin = createAdminClient();
-  const [{ data: coach }, { data: publicTestimonials }, { data: allRatings }] = await Promise.all([
+  const [{ data: coach }, { data: publicTestimonials }, { data: allRatings }, { data: googleReviews }] = await Promise.all([
     admin
       .from("profiles")
       .select("id, full_name, avatar_url, tagline, tagline_en, bio, bio_en, years_experience, credentials, transformation_before_url, transformation_after_url")
@@ -193,8 +194,11 @@ export default async function LandingPage({
       .maybeSingle(),
     admin
       .from("testimonials")
-      .select("id, display_name, content, rating, result_highlight, duration_weeks, source")
+      .select("id, display_name, content, rating, result_highlight, duration_weeks, source, client_id, submitted_at")
       .eq("is_public", true)
+      // Stars with no words still count toward the score above the row, but a
+      // card with nothing to read has no place in it.
+      .neq("content", "")
       // Only the positive ones reach the landing page. A rating is a whole
       // number, so "4.5 or above" means 5, and 4 is included as the other
       // clearly happy score. Anything below belongs in the coach's inbox, not
@@ -202,16 +206,28 @@ export default async function LandingPage({
       .gte("rating", 4)
       .order("rating", { ascending: false })
       .order("submitted_at", { ascending: false })
-      .limit(12),
-    // Every public rating, unfiltered. The carousel shows the happy ones, but
-    // the average has to be computed over all of them: displaying only the
-    // positives while publishing an average built from the same filtered set
-    // inflates the score, and that is precisely what the structured-data
-    // guidelines treat as review spam.
+      .limit(20),
+    // Every public rating collected here, whatever the score. The carousel
+    // shows the happy ones, but the average has to be computed over all of
+    // them: displaying only the positives while publishing an average built
+    // from the same filtered set inflates the score, and that is precisely
+    // what the structured-data guidelines treat as review spam.
     admin
       .from("testimonials")
       .select("rating")
-      .eq("is_public", true),
+      .eq("is_public", true)
+      // Google reviews stay out of the markup. The guidelines forbid marking
+      // up ratings copied from another platform, and Google already counts
+      // these itself on the Business Profile.
+      .neq("source", "google"),
+    // Every Google review on record, with or without text, public or hidden,
+    // for the score above the row. Hiding a bad one from the carousel must not
+    // be able to lift the number.
+    admin
+      .from("testimonials")
+      .select("display_name, rating")
+      .eq("source", "google")
+      .order("submitted_at", { ascending: false }),
   ]);
 
   // Self-service funnel: always /start (quiz + stripe)
@@ -591,14 +607,23 @@ export default async function LandingPage({
 
         {/* ── TESTIMONIALS ─────────────────────────────────────── */}
         {publicTestimonials && publicTestimonials.length > 0 && (
-          <section className="max-w-2xl mx-auto px-5 pb-20">
-            <ScrollReveal direction="up">
-              <p className="text-center text-xs font-semibold tracking-widest uppercase text-zinc-600 mb-3">
-                {isEN ? "What our clients say" : "O que dizem os nossos clientes"}
-              </p>
-              <h2 className="text-center text-2xl font-black text-white mb-8">
-                {isEN ? "Real results, real people" : "Resultados reais, pessoas reais"}
-              </h2>
+          // The header keeps the page's reading column; the row of reviews runs
+          // edge to edge, so it reads as a wall of voices rather than a widget.
+          <section className="pb-24">
+            <div className="max-w-2xl mx-auto px-5">
+              <ScrollReveal direction="up">
+                <p className="text-center text-xs font-semibold tracking-widest uppercase text-zinc-600 mb-3">
+                  {isEN ? "Reviews" : "Avaliações"}
+                </p>
+                <h2 className="text-center text-2xl font-black text-white mb-6">
+                  {isEN ? "Real results, real people" : "Resultados reais, pessoas reais"}
+                </h2>
+                <div className="mb-10">
+                  <ReviewSummary reviews={googleReviews ?? []} isEN={isEN} />
+                </div>
+              </ScrollReveal>
+            </div>
+            <ScrollReveal direction="none" delay={120}>
               <TestimonialCarousel
                 testimonials={publicTestimonials as PublicTestimonial[]}
                 isEN={isEN}

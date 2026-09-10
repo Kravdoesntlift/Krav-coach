@@ -22,7 +22,7 @@ export default async function CoachTestimonialsPage() {
   const { data: testimonials } = await supabase
     .from("testimonials")
     .select(
-      "id, client_id, display_name, content, result_highlight, duration_weeks, is_public, requested_at, submitted_at"
+      "id, client_id, display_name, content, result_highlight, duration_weeks, is_public, requested_at, submitted_at, rating, source"
     )
     .eq("coach_id", user.id)
     .order("created_at", { ascending: false });

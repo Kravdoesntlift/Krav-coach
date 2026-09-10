@@ -31,6 +31,10 @@ export default async function ClientTestimonialPage() {
       "id, display_name, result_highlight, duration_weeks, content, submitted_at"
     )
     .eq("client_id", user.id)
+    // A Google review copied onto the site can carry the client's id. It is
+    // not a request from the coach, and with no requested_at it would sort
+    // first under DESC (nulls first) and replace the real request here.
+    .neq("source", "google")
     .order("requested_at", { ascending: false })
     .limit(1)
     .maybeSingle();
