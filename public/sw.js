@@ -1,6 +1,6 @@
 // ─── Cache Config ────────────────────────────────────────────────────────────
 // Bump CACHE_VERSION on every deploy to force cache refresh.
-const CACHE_VERSION = "krav-v9";
+const CACHE_VERSION = "krav-v10";
 const STATIC_CACHE  = `${CACHE_VERSION}-static`;   // /_next/static/ — immutable JS/CSS
 const PAGES_CACHE   = `${CACHE_VERSION}-pages`;    // SSR page HTML
 const ASSETS_CACHE  = `${CACHE_VERSION}-assets`;   // icons, images, fonts
@@ -8,15 +8,18 @@ const OFFLINE_URL   = "/offline.html";             // static, no JS chunk deps
 
 const ALL_CACHES = [STATIC_CACHE, PAGES_CACHE, ASSETS_CACHE];
 
-// Pages where stale content is acceptable (serve from cache instantly, refresh in background)
-const SWR_PAGES = [
-  "/client/dashboard",
-  "/client/history",
-  "/client/profile",
-  "/client/achievements",
-  "/client/checkin",
-  "/coach/dashboard",
-];
+// Signed-in pages. Their HTML is personal and it goes stale the moment anything
+// is logged, so it is never stored and never served from a cache.
+//
+// These used to be served stale-while-revalidate: a refresh returned the copy
+// from the previous visit, which is exactly what "I refresh and my progress is
+// gone" looked like from the outside. Caching them also meant one account's
+// page could be handed to the next account signed in on the same phone.
+const PRIVATE_PAGES = ["/client", "/coach"];
+
+function isPrivate(pathname) {
+  return PRIVATE_PAGES.some((p) => pathname === p || pathname.startsWith(p + "/"));
+}
 
 // ─── Install — precache shell ─────────────────────────────────────────────────
 self.addEventListener("install", (event) => {
@@ -35,11 +38,19 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((k) => !ALL_CACHES.includes(k))
-          .map((k) => caches.delete(k))
-      )
+      Promise.all([
+        ...keys.filter((k) => !ALL_CACHES.includes(k)).map((k) => caches.delete(k)),
+        // Older versions stored signed-in pages. Drop those entries outright.
+        caches.open(PAGES_CACHE).then((cache) =>
+          cache.keys().then((reqs) =>
+            Promise.all(
+              reqs
+                .filter((r) => isPrivate(new URL(r.url).pathname))
+                .map((r) => cache.delete(r))
+            )
+          )
+        ),
+      ])
     )
   );
   self.clients.claim();
@@ -85,13 +96,10 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // ── Known app pages — Stale-While-Revalidate (instant open, fresh in background) ──
-  if (request.mode === "navigate" && SWR_PAGES.some((p) => url.pathname.startsWith(p))) {
-    event.respondWith(staleWhileRevalidate(request));
-    return;
-  }
-
-  // ── Other page navigations — Network-First, offline fallback ─────────────
+  // ── Page navigations — always the network first ──────────────────────────
+  // Signed-in pages fall back to the offline screen rather than to a stale copy
+  // of themselves, because a stale copy of a training week is indistinguishable
+  // from losing the week.
   if (request.mode === "navigate") {
     event.respondWith(networkFirstPage(request));
     return;
@@ -118,43 +126,24 @@ async function cacheFirst(cacheName, request) {
   }
 }
 
-// Serve from cache immediately if available; refresh in background.
-// On first visit (no cache) falls through to network.
-async function staleWhileRevalidate(request) {
-  const cache = await caches.open(PAGES_CACHE);
-  const cached = await cache.match(request);
-
-  const networkFetch = fetch(request).then((response) => {
-    if (response.ok) {
-      const ct = response.headers.get("content-type") ?? "";
-      if (ct.includes("text/html")) cache.put(request, response.clone());
-    }
-    return response;
-  }).catch(async () => {
-    // Offline and nothing cached — show offline page
-    if (!cached) {
-      const offline = await caches.match(OFFLINE_URL);
-      return offline || new Response("Offline", { status: 503 });
-    }
-    return cached;
-  });
-
-  // Return cached version instantly; network result updates cache for next time
-  return cached || networkFetch;
-}
-
 async function networkFirstPage(request) {
+  const url = new URL(request.url);
+  const privatePage = isPrivate(url.pathname);
   const cache = await caches.open(PAGES_CACHE);
   try {
     const response = await fetch(request);
-    if (response.ok) {
+    if (response.ok && !privatePage) {
       const ct = response.headers.get("content-type") ?? "";
       if (ct.includes("text/html")) cache.put(request, response.clone());
     }
     return response;
   } catch {
-    const cached = await cache.match(request);
-    if (cached) return cached;
+    // Offline: /offline.html reads the plan saved on the device, so there is
+    // still something to train from, and nothing pretends to be current.
+    if (!privatePage) {
+      const cached = await cache.match(request);
+      if (cached) return cached;
+    }
     const offline = await caches.match(OFFLINE_URL);
     return offline || new Response("Offline", { status: 503 });
   }

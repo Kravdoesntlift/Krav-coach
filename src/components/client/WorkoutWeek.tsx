@@ -11,6 +11,8 @@ import ExerciseNotes from "@/components/client/ExerciseNotes";
 import { haptic, HAPTIC } from "@/lib/haptic";
 import { useLang } from "@/lib/i18n/useLang";
 import { enqueueOfflineAction, useOfflineSync } from "@/hooks/useOfflineQueue";
+import { useRouter } from "next/navigation";
+import { markDayComplete, undoDayComplete } from "@/app/client/workout/actions";
 
 // Strings not in the shared dictionary
 const extra = {
@@ -229,6 +231,11 @@ function WorkoutDayCard({
   const [feeling, setFeeling] = useState(existingCompletion?.feeling ?? "");
   const [note, setNote] = useState(existingCompletion?.note ?? "");
   const [sessionVolume, setSessionVolume] = useState<number | null>(null);
+  // What the server said, when it said no. The card never shows a workout as
+  // saved unless it was.
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [pendingSync, setPendingSync] = useState(false);
+  const router = useRouter();
 
   const exercises = day.exercises ?? [];
 
@@ -237,24 +244,11 @@ function WorkoutDayCard({
     await saveComplete(feeling, note);
   }
 
-  async function saveComplete(f: string, n: string) {
-    setLoading(true);
+  /** Everything that happens once the server has confirmed the workout. */
+  async function afterSaved(f: string, n: string) {
     const supabase = createClient();
-    const completionData = {
-      client_id: clientId,
-      day_id: day.id,
-      feeling: f,
-      note: n.trim() || null,
-    };
-    const { error: insertErr } = await supabase
-      .from("workout_completions")
-      .insert(completionData);
-    // If offline or network error, queue for later sync
-    if (insertErr && (insertErr.message?.includes("fetch") || !navigator.onLine)) {
-      enqueueOfflineAction("completion", completionData);
-    }
 
-    // Calculate today's session volume from workout_logs
+    // Session volume, read back from what was actually stored
     const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
     const exerciseIds = exercises.map((e) => e.name);
@@ -291,30 +285,81 @@ function WorkoutDayCard({
       }).catch(() => {});
     }
 
+    setFeeling(f);
+    setNote(n);
     setCompleted(true);
     setShowFeedback(false);
     setPulsing(true);
     setTimeout(() => setPulsing(false), 700);
-    setLoading(false);
     onComplete?.();
+    // The page is rendered on the server, so ask it for the truth again. Without
+    // this the tick lives only in this component and a reload can disagree.
+    router.refresh();
+  }
+
+  function offlineMessage() {
+    return navigator.onLine
+      ? (lang === "en" ? "Could not reach the server." : "Não foi possível falar com o servidor.")
+      : (lang === "en" ? "No connection." : "Sem ligação à internet.");
+  }
+
+  async function saveComplete(f: string, n: string) {
+    setLoading(true);
+    setSaveError(null);
+
+    const result = await markDayComplete({ dayId: day.id, feeling: f, note: n }).catch(
+      (): { ok: false; error: string } => ({ ok: false, error: offlineMessage() }),
+    );
+
+    if (!result.ok) {
+      if (!navigator.onLine) {
+        // A tick carries no data that can be lost, so it can wait in the queue.
+        // The card says it is waiting rather than claiming it is done.
+        enqueueOfflineAction("completion", {
+          client_id: clientId,
+          day_id: day.id,
+          feeling: f,
+          note: n.trim() || null,
+        });
+        setPendingSync(true);
+        await afterSaved(f, n);
+      } else {
+        setSaveError(result.error);
+      }
+      setLoading(false);
+      return;
+    }
+
+    setPendingSync(false);
+    await afterSaved(f, n);
+    setLoading(false);
   }
 
   async function undoComplete() {
     setLoading(true);
-    const supabase = createClient();
-    const { error: delErr } = await supabase
-      .from("workout_completions")
-      .delete()
-      .eq("client_id", clientId)
-      .eq("day_id", day.id);
-    if (delErr && (delErr.message?.includes("fetch") || !navigator.onLine)) {
-      enqueueOfflineAction("undo_completion", { client_id: clientId, day_id: day.id });
+    setSaveError(null);
+
+    const result = await undoDayComplete(day.id).catch(
+      (): { ok: false; error: string } => ({ ok: false, error: offlineMessage() }),
+    );
+
+    if (!result.ok) {
+      if (!navigator.onLine) {
+        enqueueOfflineAction("undo_completion", { client_id: clientId, day_id: day.id });
+        setPendingSync(true);
+      } else {
+        setSaveError(result.error);
+        setLoading(false);
+        return;
+      }
     }
+
     setCompleted(false);
     setFeeling("");
     setNote("");
     setLoading(false);
     onUndo?.();
+    router.refresh();
   }
 
   // Rest day
@@ -343,7 +388,7 @@ function WorkoutDayCard({
         dayId={day.id}
         clientId={clientId}
         dayLabel={day.label || DAY_NAMES_FULL[day.day_of_week]}
-        onComplete={async (f, n) => { await saveComplete(f, n); setLiveMode(false); }}
+        onComplete={async (f, n) => { setPendingSync(false); await afterSaved(f, n); setLiveMode(false); }}
         onClose={() => setLiveMode(false)}
       />
     )}
@@ -542,6 +587,30 @@ function WorkoutDayCard({
               </div>
             )}
 
+            {saveError && (
+              <div className="rounded-xl px-3 py-2.5"
+                style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)" }}>
+                <p className="text-red-300 text-xs font-semibold">
+                  {lang === "en" ? "Not saved" : "Não foi guardado"}
+                </p>
+                <p className="text-zinc-400 text-[11px] mt-0.5 leading-relaxed">{saveError}</p>
+              </div>
+            )}
+
+            {pendingSync && (
+              <div className="rounded-xl px-3 py-2.5"
+                style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.22)" }}>
+                <p className="text-brand-gold text-xs font-semibold">
+                  {lang === "en" ? "Waiting for signal" : "À espera de rede"}
+                </p>
+                <p className="text-zinc-400 text-[11px] mt-0.5 leading-relaxed">
+                  {lang === "en"
+                    ? "Saved on this phone. It syncs by itself when you are back online."
+                    : "Guardado neste telemóvel. Sincroniza sozinho assim que houver ligação."}
+                </p>
+              </div>
+            )}
+
             <button
               onClick={completed ? undoComplete : handleComplete}
               disabled={loading}
@@ -651,6 +720,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
   const [sessionHistory, setSessionHistory] = useState<{ date: string; maxWeight: number | null; avgReps: number; vol: number }[]>([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [logError, setLogError] = useState<string | null>(null);
   const hasVideo = !!exercise.video_url;
 
   // Load today's log + last session's log for overload suggestion
@@ -788,10 +858,15 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
       sets: allSets,
     }, { onConflict: "client_id,exercise_name,logged_at" });
     setSaving(false);
-    if (!error) {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+    if (error) {
+      // Silence here is how sets went missing for weeks: the button simply did
+      // nothing and the numbers looked kept.
+      setLogError(error.message + (error.code ? ` (${error.code})` : ""));
+      return;
     }
+    setLogError(null);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
   }
 
   const currentSets = setsMap[activeTab];
@@ -1008,6 +1083,11 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
             >
               {saving ? extra.saving[lang] : saved ? extra.saved[lang] : extra.save_log[lang]}
             </button>
+            {logError && (
+              <p className="text-red-300 text-[11px] mt-2 leading-relaxed">
+                {lang === "en" ? "Not saved: " : "Não foi guardado: "}{logError}
+              </p>
+            )}
           </div>
         </div>
       )}

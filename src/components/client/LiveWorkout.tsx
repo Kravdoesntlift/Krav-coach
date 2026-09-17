@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Exercise } from "@/lib/supabase/types";
 import { useLang } from "@/lib/i18n/useLang";
+import { finishWorkout } from "@/app/client/workout/actions";
 import ExerciseNotes from "@/components/client/ExerciseNotes";
 import { parseExerciseNote } from "@/lib/exercise-notes";
 
@@ -106,6 +107,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
   const [feeling, setFeeling]       = useState("");
   const [note, setNote]             = useState("");
   const [saving, setSaving]         = useState(false);
+  const [saveError, setSaveError]   = useState<string | null>(null);
   const [wakeLock, setWakeLock]     = useState(false);
   const [prevLogs, setPrevLogs]     = useState<Map<string, { topWeight: number; reps: number; date: string }>>(new Map());
   // Substitutions chosen during this session, by exercise index. Deliberately
@@ -363,31 +365,48 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
 
   async function handleFinish() {
     setSaving(true);
-    const supabase = createClient();
-    const today    = new Date();
-    const logged_at = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+    setSaveError(null);
 
-    // Save exercise logs
-    await Promise.all(
-      sorted.map((ex, i) =>
-        supabase.from("workout_logs").upsert({
-          client_id: clientId, exercise_name: nameFor(i), day_id: dayId, logged_at,
-          sets: setLogs[i].map((s) => ({ weight_kg: s.weight ? parseFloat(s.weight) : null, reps: parseInt(s.reps) || ex.reps, done: s.done })),
-        }, { onConflict: "client_id,exercise_name,day_id,logged_at" })
-      )
-    );
+    const today = new Date();
+    const loggedAt = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
 
-    // Mark workout as complete in DB
-    await supabase.from("workout_completions")
-      .upsert({ client_id: clientId, day_id: dayId }, { onConflict: "client_id,day_id" });
+    // One call, on the server, that says whether it worked. The sets and the
+    // tick are written together there, so the day can never be marked done
+    // over sets that were not kept.
+    const result = await finishWorkout({
+      dayId,
+      loggedAt,
+      feeling: feeling || "\u{1F4AA}",
+      note,
+      logs: sorted.map((ex, i) => ({
+        exercise_name: nameFor(i),
+        sets: setLogs[i].map((s) => ({
+          weight_kg: s.weight ? parseFloat(s.weight) : null,
+          reps: parseInt(s.reps) || ex.reps,
+          done: s.done,
+        })),
+      })),
+    }).catch((): { ok: false; error: string } => ({
+      ok: false,
+      error: navigator.onLine
+        ? (isEN ? "Could not reach the server." : "Não foi possível falar com o servidor.")
+        : (isEN ? "No connection." : "Sem ligação à internet."),
+    }));
 
-    // Clear workout notification
+    if (!result.ok) {
+      // The workout stays on the device and the card keeps offering "Retomar",
+      // so nothing is lost and nothing is claimed that is not true.
+      setSaveError(result.error);
+      setSaving(false);
+      return;
+    }
+
     try { new Notification("KRAV · Treino concluído 🏆", { body: `${dayLabel}`, icon: "/icon.png", tag: "krav-workout", silent: true }); } catch { /* ignore */ }
 
-    // Only now is it safe to drop the local copy.
+    // Only now, with the server's confirmation, is it safe to drop the copy.
     clearActiveWorkout();
 
-    await onComplete(feeling || "💪", note);
+    await onComplete(feeling || "\u{1F4AA}", note);
     setSaving(false);
   }
 
@@ -512,6 +531,20 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
               );
             })}
           </div>
+          {saveError && (
+            <div className="rounded-2xl px-4 py-3 space-y-1"
+              style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)" }}>
+              <p className="text-red-300 text-sm font-semibold">
+                {isEN ? "Not saved yet" : "Ainda não foi guardado"}
+              </p>
+              <p className="text-zinc-400 text-xs leading-relaxed">{saveError}</p>
+              <p className="text-zinc-500 text-xs leading-relaxed">
+                {isEN
+                  ? "The workout is kept on this phone. Try again, here or from the day card."
+                  : "O treino fica guardado neste telemóvel. Tenta outra vez, aqui ou no cartão do dia."}
+              </p>
+            </div>
+          )}
           <button onClick={handleFinish} disabled={saving}
             className="w-full rounded-2xl font-black text-black text-base transition-all active:scale-[0.98] disabled:opacity-50"
             style={{ paddingTop: 16, paddingBottom: 16, background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>
