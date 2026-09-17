@@ -155,9 +155,21 @@ export async function POST() {
   }));
 
   if (workoutUpserts.length > 0) {
-    await admin
+    const { error } = await admin
       .from("client_workouts")
       .upsert(workoutUpserts, { onConflict: "client_id,source,external_id" });
+    // This conflict target has no matching unique index yet, so the write
+    // fails with 42P10. Nobody has connected Strava, which is the only reason
+    // it has not lost anything: the same unchecked upsert dropped every
+    // workout log for two weeks. Fail loudly instead of importing nothing and
+    // reporting success.
+    if (error) {
+      console.error("[strava/sync] client_workouts", error.code, error.message);
+      return NextResponse.json(
+        { error: `Não foi possível guardar os treinos importados: ${error.message}`, code: error.code },
+        { status: 500 },
+      );
+    }
   }
 
   // Update last_synced_at
