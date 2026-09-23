@@ -14,12 +14,15 @@ export default function BasePlanNote({
   daysPerWeek,
   equipmentLabel,
   isTrial,
+  hasInjuries,
 }: {
   lang: Lang;
   daysPerWeek: number | null;
   equipmentLabel: string | null;
   /** Someone who already pays must never be sold what they have bought. */
   isTrial: boolean;
+  /** They wrote something in the injuries box at signup. */
+  hasInjuries: boolean;
 }) {
   const isEN = lang === "en";
 
@@ -44,6 +47,15 @@ export default function BasePlanNote({
           ? "Built automatically from your answers, following the KRAV method. Log every set: the app compares each week with the last one, which is where progress actually comes from."
           : "Montado automaticamente a partir das tuas respostas, com o método KRAV. Regista as séries: a app compara cada semana com a anterior, que é de onde vem o progresso."}
       </p>
+      {hasInjuries && (
+        // The generator does not know how to train around an injury, and
+        // pretending otherwise is the one mistake here with a real cost.
+        <p className="text-xs leading-relaxed" style={{ color: "#fca5a5" }}>
+          {isEN
+            ? "You mentioned an injury. Message me in the chat before the first session so we adjust it, and skip anything that hurts."
+            : "Falaste numa lesão. Escreve-me no chat antes do primeiro treino para ajustarmos, e não faças nada que doa."}
+        </p>
+      )}
       <p className="text-zinc-500 text-xs leading-relaxed">
         {isTrial
           ? isEN

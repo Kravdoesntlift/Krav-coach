@@ -118,7 +118,7 @@ export default async function ClientDashboard() {
     supabase.from("challenge_progress").select("*").eq("client_id", user!.id),
     supabase.from("client_goals").select("*").eq("client_id", user!.id).eq("completed", false).order("created_at"),
     // Onboarding
-    supabase.from("client_onboarding").select("client_id, availability, available_days, equipment").eq("client_id", user!.id).maybeSingle(),
+    supabase.from("client_onboarding").select("client_id, availability, available_days, equipment, injuries").eq("client_id", user!.id).maybeSingle(),
     // Exercises logged this week (muscle map)
     supabase.from("workout_logs").select("exercise_name").eq("client_id", user!.id)
       .gte("logged_at", weekStart).lte("logged_at", weekEndStr),
@@ -475,6 +475,7 @@ export default async function ClientDashboard() {
                     : (typeof onboardingRecord?.availability === "number" ? onboardingRecord.availability : null)
                 }
                 equipmentLabel={equipmentLabel(onboardingRecord?.equipment, lang)}
+                hasInjuries={typeof onboardingRecord?.injuries === "string" && onboardingRecord.injuries.trim().length > 0}
                 isTrial={
                   typeof mergedProfile?.trial_ends_at === "string" &&
                   new Date(mergedProfile.trial_ends_at).getTime() > Date.now()
