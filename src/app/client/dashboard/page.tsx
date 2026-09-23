@@ -25,7 +25,7 @@ import WorkoutCacheWriter from "@/components/client/WorkoutCacheWriter";
 import type { WeeklyCheckin } from "@/lib/supabase/types";
 import MonthCalendar, { type DayStatus } from "@/components/client/MonthCalendar";
 import { computeAchievements } from "@/lib/achievements";
-import { ensureBasePlan } from "@/lib/training/provision";
+import { ensureBasePlan, basePlanIdFor } from "@/lib/training/provision";
 import { isBasePlan } from "@/lib/training/base-plan";
 import BasePlanNote from "@/components/client/BasePlanNote";
 
@@ -210,12 +210,21 @@ export default async function ClientDashboard() {
       // renders of this page can run at once; the one that loses the race gets
       // "already has a plan", and skipping the read there is what made the
       // very first screen of a trial still say the week was empty.
-      const { data: fresh } = await supabase
+      // Read by id, not by week. Next memoises identical fetches within one
+      // render, and the query above already asked for this exact week and got
+      // nothing, so repeating it returns that same empty answer from cache
+      // instead of the row we just wrote. This is why the first screen of a
+      // trial stayed empty while the plan sat in the database.
+      const { data: fresh, error: freshErr } = await supabase
         .from("workout_plans")
         .select(`*, workout_days(*, exercises(*), workout_completions(*))`)
-        .eq("client_id", user!.id)
-        .eq("week_start", weekStart)
+        .eq("id", basePlanIdFor(user!.id, weekStart))
         .maybeSingle();
+      if (freshErr) {
+        console.error("[base-plan] wrote the plan but could not read it back:", freshErr.code, freshErr.message);
+      } else if (!fresh) {
+        console.error("[base-plan] wrote the plan but no row for week", weekStart, "client", user!.id);
+      }
       if (fresh) {
         plan = fresh;
         isCurrentWeek = true;

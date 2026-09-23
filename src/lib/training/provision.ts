@@ -32,7 +32,7 @@ export type ProvisionResult =
  *
  * UUID v5 style: a namespace hash with the version and variant bits set.
  */
-function planIdFor(clientId: string, weekStart: string): string {
+export function basePlanIdFor(clientId: string, weekStart: string): string {
   const hash = createHash("sha1").update(`krav-base-plan:${clientId}:${weekStart}`).digest();
   const bytes = Buffer.from(hash.subarray(0, 16));
   bytes[6] = (bytes[6] & 0x0f) | 0x50;
@@ -136,7 +136,7 @@ export async function ensureBasePlan(args: {
   for (let week = 0; week < weeks; week++) {
     const blueprint = week === 0 ? thisWeek : laterWeeks;
     const weekStart = addWeeks(firstMonday, week);
-    const planId = planIdFor(clientId, weekStart);
+    const planId = basePlanIdFor(clientId, weekStart);
 
     const { error: planErr } = await admin
       .from("workout_plans")
