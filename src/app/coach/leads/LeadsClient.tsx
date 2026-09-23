@@ -25,23 +25,50 @@ function LeadRow({ lead }: { lead: Lead }) {
   const [showNotes, setShowNotes] = useState(false);
   const [notes, setNotes] = useState(lead.notes ?? "");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  // These three buttons failed silently for their whole life. Whatever the
+  // server says now, the row says it too.
+  const [error, setError] = useState<string | null>(null);
 
   const status = (lead.status ?? "new") as keyof typeof STATUS_CONFIG;
   const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.new;
 
   const daysAgo = Math.floor((Date.now() - new Date(lead.created_at).getTime()) / 86400000);
 
+  const unreachable = "Não foi possível falar com o servidor. Tenta outra vez.";
+
   function handleStatus(next: "new" | "contacted" | "converted") {
-    startTransition(() => updateLeadStatus(lead.id, next));
+    setError(null);
+    startTransition(async () => {
+      const result = await updateLeadStatus(lead.id, next).catch(
+        (): { ok: false; error: string } => ({ ok: false, error: unreachable }),
+      );
+      if (!result.ok) setError(result.error);
+    });
   }
 
   function handleNotesSave() {
-    startTransition(() => updateLeadNotes(lead.id, notes));
-    setShowNotes(false);
+    setError(null);
+    startTransition(async () => {
+      const result = await updateLeadNotes(lead.id, notes).catch(
+        (): { ok: false; error: string } => ({ ok: false, error: unreachable }),
+      );
+      // The panel stays open when it failed, with the text still in it.
+      if (result.ok) setShowNotes(false);
+      else setError(result.error);
+    });
   }
 
   function handleDelete() {
-    startTransition(() => deleteLead(lead.id));
+    setError(null);
+    startTransition(async () => {
+      const result = await deleteLead(lead.id).catch(
+        (): { ok: false; error: string } => ({ ok: false, error: unreachable }),
+      );
+      if (!result.ok) {
+        setError(result.error);
+        setConfirmDelete(false);
+      }
+    });
   }
 
   return (
@@ -127,6 +154,13 @@ function LeadRow({ lead }: { lead: Lead }) {
           </div>
         </div>
       </div>
+
+      {error && (
+        <p className="text-[11px] mt-2.5 px-3 py-2 rounded-lg leading-relaxed"
+          style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", color: "#fca5a5" }}>
+          Não foi guardado: {error}
+        </p>
+      )}
 
       {/* Notes area */}
       {showNotes && (
