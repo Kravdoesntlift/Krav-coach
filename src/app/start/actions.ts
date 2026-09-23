@@ -126,6 +126,20 @@ async function _signupAndTrial(
     console.error("[signupAndTrial] coach assignment failed:", assignErr.message);
   }
 
+  // 5.5 Write the base programme from the answers just given, so the first
+  // screen of the trial is a real week. A failure here must not block the
+  // signup: the account and the trial are already valid, and the dashboard
+  // writes the plan on first load if it is missing. It is logged loudly
+  // because "nobody noticed for two weeks" is how this app lost workout data
+  // before.
+  try {
+    const { ensureBasePlan } = await import("@/lib/training/provision");
+    const provisioned = await ensureBasePlan({ clientId, coachId });
+    if (!provisioned.ok) console.error("[signupAndTrial] base plan:", provisioned.error);
+  } catch (e) {
+    console.error("[signupAndTrial] base plan threw:", e instanceof Error ? e.message : e);
+  }
+
   // 6. Sign user in (sets browser session cookie)
   const supabase = await createClient();
   const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });

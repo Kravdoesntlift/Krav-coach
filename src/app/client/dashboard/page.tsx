@@ -25,6 +25,22 @@ import WorkoutCacheWriter from "@/components/client/WorkoutCacheWriter";
 import type { WeeklyCheckin } from "@/lib/supabase/types";
 import MonthCalendar, { type DayStatus } from "@/components/client/MonthCalendar";
 import { computeAchievements } from "@/lib/achievements";
+import { ensureBasePlan } from "@/lib/training/provision";
+import { isBasePlan } from "@/lib/training/base-plan";
+import BasePlanNote from "@/components/client/BasePlanNote";
+
+
+/** The equipment answer, in words, for the base plan note. */
+function equipmentLabel(value: unknown, lang: "pt" | "en"): string | null {
+  const labels: Record<string, { pt: string; en: string }> = {
+    gym_full:     { pt: "ginásio completo", en: "full gym" },
+    gym_basic:    { pt: "ginásio básico",   en: "basic gym" },
+    home_weights: { pt: "casa com pesos",   en: "home with weights" },
+    home_none:    { pt: "casa sem material", en: "home, no equipment" },
+    outdoor:      { pt: "ar livre",          en: "outdoors" },
+  };
+  return typeof value === "string" && labels[value] ? labels[value][lang] : null;
+}
 
 export default async function ClientDashboard() {
   const supabase = await createClient();
@@ -92,7 +108,7 @@ export default async function ClientDashboard() {
       .maybeSingle(),
     // Profile: merged into one query (was two separate queries to same table)
     supabase.from("profiles")
-      .select("full_name, tagline, welcomed_at, seen_achievements, avatar_url, subscription_renews_at")
+      .select("full_name, tagline, welcomed_at, seen_achievements, avatar_url, subscription_renews_at, trial_ends_at")
       .eq("id", user!.id)
       .single(),
     // Check-in this week
@@ -102,7 +118,7 @@ export default async function ClientDashboard() {
     supabase.from("challenge_progress").select("*").eq("client_id", user!.id),
     supabase.from("client_goals").select("*").eq("client_id", user!.id).eq("completed", false).order("created_at"),
     // Onboarding
-    supabase.from("client_onboarding").select("client_id").eq("client_id", user!.id).maybeSingle(),
+    supabase.from("client_onboarding").select("client_id, availability, available_days, equipment").eq("client_id", user!.id).maybeSingle(),
     // Exercises logged this week (muscle map)
     supabase.from("workout_logs").select("exercise_name").eq("client_id", user!.id)
       .gte("logged_at", weekStart).lte("logged_at", weekEndStr),
@@ -178,6 +194,29 @@ export default async function ClientDashboard() {
       .maybeSingle();
     plan = latestPlan;
     isCurrentWeek = false;
+  }
+
+  // Still nothing: a brand new account, or one created before the base plan
+  // existed. Write it now and read it straight back, so the first screen of a
+  // trial is the week itself rather than "o teu coach ainda não criou o plano".
+  // The calendar above was computed before this and catches up on the next
+  // load; it has nothing to show for a new account either way.
+  if (!plan) {
+    const provisioned = await ensureBasePlan({ clientId: user!.id });
+    if (!provisioned.ok) {
+      console.error("[base-plan] could not provision for", user!.id, provisioned.error);
+    } else if (provisioned.created) {
+      const { data: fresh } = await supabase
+        .from("workout_plans")
+        .select(`*, workout_days(*, exercises(*), workout_completions(*))`)
+        .eq("client_id", user!.id)
+        .eq("week_start", weekStart)
+        .maybeSingle();
+      if (fresh) {
+        plan = fresh;
+        isCurrentWeek = true;
+      }
+    }
   }
 
   // Get coach info: from plan first, then from explicit assignment (coach_clients)
@@ -426,6 +465,21 @@ export default async function ClientDashboard() {
               <div className="text-xs text-zinc-600 bg-zinc-900/60 border border-zinc-800 rounded-xl px-4 py-2.5">
                 {t("showing_recent", lang)}
               </div>
+            )}
+            {isBasePlan(plan.name) && (
+              <BasePlanNote
+                lang={lang}
+                daysPerWeek={
+                  Array.isArray(onboardingRecord?.available_days) && onboardingRecord.available_days.length > 0
+                    ? onboardingRecord.available_days.length
+                    : (typeof onboardingRecord?.availability === "number" ? onboardingRecord.availability : null)
+                }
+                equipmentLabel={equipmentLabel(onboardingRecord?.equipment, lang)}
+                isTrial={
+                  typeof mergedProfile?.trial_ends_at === "string" &&
+                  new Date(mergedProfile.trial_ends_at).getTime() > Date.now()
+                }
+              />
             )}
             <WorkoutWeek plan={plan as unknown as WorkoutPlan} clientId={user!.id} coachId={coachId ?? undefined} />
           </>
