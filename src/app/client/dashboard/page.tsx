@@ -205,7 +205,11 @@ export default async function ClientDashboard() {
     const provisioned = await ensureBasePlan({ clientId: user!.id });
     if (!provisioned.ok) {
       console.error("[base-plan] could not provision for", user!.id, provisioned.error);
-    } else if (provisioned.created) {
+    } else {
+      // Read back whether or not this render was the one that wrote it. Two
+      // renders of this page can run at once; the one that loses the race gets
+      // "already has a plan", and skipping the read there is what made the
+      // very first screen of a trial still say the week was empty.
       const { data: fresh } = await supabase
         .from("workout_plans")
         .select(`*, workout_days(*, exercises(*), workout_completions(*))`)
