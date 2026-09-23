@@ -87,7 +87,9 @@ export default async function AnalyticsPage() {
   ] = await Promise.all([
     supabase.from("coach_clients").select("client_id, profiles!coach_clients_client_id_fkey(status, created_at)").eq("coach_id", user.id).eq("assigned_role", "coach"),
     supabase.from("weekly_checkins").select("client_id, week_start").gte("week_start", since).order("week_start"),
-    supabase.from("workout_completions").select("client_id, created_at").gte("created_at", since + "T00:00:00"),
+    // The column is completed_at. Asking for created_at made Postgres reject
+    // the query, so this chart counted zero workouts for everyone, always.
+    supabase.from("workout_completions").select("client_id, completed_at").gte("completed_at", since + "T00:00:00"),
     supabase.from("stripe_subscriptions").select("status, amount_cents, current_period_end").eq("coach_id", user.id),
     supabase.from("workout_plans").select("client_id, week_start").eq("coach_id", user.id).gte("week_start", since),
     supabase.from("leads").select("id, status, created_at").order("created_at").limit(1000),
@@ -126,7 +128,7 @@ export default async function AnalyticsPage() {
   // Weekly completion count
   const completionsByWeek = new Map<string, number>();
   for (const c of completions ?? []) {
-    const date = c.created_at.slice(0, 10);
+    const date = c.completed_at.slice(0, 10);
     const wk = weekKeys.find((w) => {
       const diff = (new Date(date).getTime() - new Date(w).getTime()) / 86400000;
       return diff >= 0 && diff < 7;
