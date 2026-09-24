@@ -382,3 +382,52 @@
     animation: none !important;
   }
 }
+
+/* ── Free guide, screen and print ────────────────────────────
+   The PDFs handed to leads are printed from /guia/ler, so the page breaks
+   live here rather than in a separate template that would drift from it. */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html,
+  body {
+    background: #08080a !important;
+  }
+
+  .guide-page {
+    /* Each part starts on its own sheet, and fills it: a page with content
+       only in the top half reads as a document that ran out. */
+    padding: 18mm 16mm !important;
+    max-width: none !important;
+    min-height: 297mm;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .guide-body {
+    flex: 1;
+  }
+
+  .guide-footer {
+    margin: 10mm 0 0;
+    padding-top: 4mm;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    font-size: 9pt;
+    color: rgba(255, 255, 255, 0.28);
+  }
+
+  .guide-break {
+    break-after: page;
+    page-break-after: always;
+  }
+
+  /* An exercise block or a card split across two sheets reads as a printing
+     fault, not as a layout. */
+  .guide-avoid-break {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
