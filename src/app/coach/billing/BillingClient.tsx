@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { createPayLink } from "./pay-link-action";
 
 interface ClientBillingInfo {
   id: string;
@@ -75,27 +76,22 @@ export default function BillingClient({ clients }: Props) {
     }
 
     startTransition(async () => {
-      try {
-        const res = await fetch("/api/stripe/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            clientId: selectedClientId,
-            priceAmount: Math.round(amountNum * 100),
-            currency: "eur",
-            clientEmail: selectedClient?.email ?? "",
-            clientName: selectedClient?.full_name ?? "",
-          }),
-        });
-        const data = await res.json();
-        if (!res.ok || data.error) {
-          setCheckoutError(data.error ?? "Erro ao criar link.");
-          return;
-        }
-        setGeneratedLink(data.url);
-      } catch {
-        setCheckoutError("Erro de ligação. Tenta novamente.");
+      // A short signed link on our own domain, not the Stripe Checkout URL.
+      // The Stripe session is created when the client opens it, so the link
+      // still works days after it was sent.
+      const result = await createPayLink({
+        clientId: selectedClientId,
+        amountCents: Math.round(amountNum * 100),
+      }).catch((): { ok: false; error: string } => ({
+        ok: false,
+        error: "Erro de ligação. Tenta novamente.",
+      }));
+
+      if (!result.ok) {
+        setCheckoutError(result.error);
+        return;
       }
+      setGeneratedLink(result.url);
     });
   }
 
@@ -207,7 +203,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...`}
               <input
                 readOnly
                 value={generatedLink}
-                className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-300 truncate"
+                className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-300"
               />
               <button
                 onClick={copyLink}

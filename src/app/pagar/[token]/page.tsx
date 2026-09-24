@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import Stripe from "stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { clientIdFromPayToken } from "@/lib/billing/pay-link";
+import { readPayToken } from "@/lib/billing/pay-link";
 
 /**
  * The page behind a payment link the coach sends by message.
@@ -52,13 +52,27 @@ function Card({ title, body, cta }: { title: string; body: string; cta?: { href:
 
 export default async function PayPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
-  const clientId = clientIdFromPayToken(token);
+  const parsed = readPayToken(token);
 
-  if (!clientId) {
+  if (!parsed) {
     return (
       <Card
         title="Link inválido"
         body="Este link de pagamento não é válido. Pede um novo ao teu coach."
+        cta={{ href: "/", label: "Ir para o site" }}
+      />
+    );
+  }
+
+  const { clientId, amountCents } = parsed;
+
+  // A signed amount, still checked: a bug upstream must not be able to charge
+  // someone 5000 euros a month because the number travelled in a URL.
+  if (!Number.isInteger(amountCents) || amountCents < 500 || amountCents > 100000) {
+    return (
+      <Card
+        title="Link inválido"
+        body="Este link tem um valor que não faz sentido. Pede um novo ao teu coach."
         cta={{ href: "/", label: "Ir para o site" }}
       />
     );
@@ -128,7 +142,7 @@ export default async function PayPage({ params }: { params: Promise<{ token: str
       price_data: {
         currency: "eur",
         product_data: { name: "KRAV Premium Coaching" },
-        unit_amount: 12700,
+        unit_amount: amountCents,
         recurring: { interval: "month" },
       },
       quantity: 1,
