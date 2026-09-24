@@ -213,9 +213,24 @@ export default async function CoachDashboard() {
   const allClients = Array.from(allClientMap.values()).filter(isReallyActive);
   const weekClients = Array.from(clientMap.values()).filter((c) => isReallyActive(c as unknown as AllClientEntry));
 
+  // Alerts the coach has already ticked off, for the context they were in.
+  // The table arrives with supabase/migration_alert_acks.sql; until it is run
+  // the query errors and every alert simply stays on the list.
+  const { data: alertAcks } = await supabase
+    .from("coach_alert_acks")
+    .select("client_id, alert_type, context")
+    .eq("coach_id", user!.id);
+
+  const ackKeys = new Set(
+    (alertAcks ?? []).map((a) => `${a.client_id}|${a.alert_type}|${a.context}`),
+  );
+
   // Smart alerts
   type AlertType = "no_checkin" | "renewal" | "overdue_renewal" | "no_completion" | "perfect_week" | "pr_week" | "at_risk";
-  const alerts: { type: AlertType; clientId: string; clientName: string; detail: string; urgency: "high" | "medium" | "low" }[] = [];
+  // `context` is what the alert is about right now: the week, or the renewal
+  // date. Marking one as handled stores that context, so the alert returns by
+  // itself when the week turns or the renewal moves.
+  const alerts: { type: AlertType; clientId: string; clientName: string; detail: string; urgency: "high" | "medium" | "low"; context: string }[] = [];
 
   for (const client of allClients) {
     const name = client.full_name;
@@ -229,18 +244,18 @@ export default async function CoachDashboard() {
     const subStatus = subStatusByClient.get(id);
 
     if (subStatus === "past_due" || subStatus === "unpaid") {
-      alerts.push({ type: "overdue_renewal", clientId: id, clientName: name, detail: "Pagamento recusado, cartão a precisar de atenção", urgency: "high" });
+      alerts.push({ type: "overdue_renewal", clientId: id, clientName: name, detail: "Pagamento recusado, cartão a precisar de atenção", urgency: "high", context: renewsAt ?? "sem-data" });
     } else if (renewsAt) {
       const diff = Math.ceil((new Date(renewsAt + "T00:00:00").getTime() - todayMidnight.getTime()) / 86400000);
       if (diff < 0) {
         // Charged and waiting on Stripe to confirm, not late.
         if (subStatus !== "cancelled" && subStatus !== "canceled") {
-          alerts.push({ type: "renewal", clientId: id, clientName: name, detail: "Renovação a processar", urgency: "low" });
+          alerts.push({ type: "renewal", clientId: id, clientName: name, detail: "Renovação a processar", urgency: "low", context: renewsAt });
         }
       } else if (diff <= 3) {
-        alerts.push({ type: "renewal", clientId: id, clientName: name, detail: `Renovação em ${diff} dia${diff !== 1 ? "s" : ""}`, urgency: "high" });
+        alerts.push({ type: "renewal", clientId: id, clientName: name, detail: `Renovação em ${diff} dia${diff !== 1 ? "s" : ""}`, urgency: "high", context: renewsAt });
       } else if (diff <= 7) {
-        alerts.push({ type: "renewal", clientId: id, clientName: name, detail: `Renovação em ${diff} dias`, urgency: "medium" });
+        alerts.push({ type: "renewal", clientId: id, clientName: name, detail: `Renovação em ${diff} dias`, urgency: "medium", context: renewsAt });
       }
     }
 
@@ -250,25 +265,25 @@ export default async function CoachDashboard() {
       const detail = lastCheckinStr
         ? `Último check-in há ${Math.floor((Date.now() - new Date(lastCheckinStr + "T00:00:00").getTime()) / 86400000)} dias`
         : "Nunca fez check-in";
-      alerts.push({ type: "no_checkin", clientId: id, clientName: name, detail, urgency: "medium" });
+      alerts.push({ type: "no_checkin", clientId: id, clientName: name, detail, urgency: "medium", context: weekStart });
     }
 
     // No workout completed this week (but has a plan)
     const weekClient = clientMap.get(id);
     if (weekClient && weekClient.completedDays === 0 && weekClient.totalDays > 0) {
-      alerts.push({ type: "no_completion", clientId: id, clientName: name, detail: "Sem treinos concluídos esta semana", urgency: "low" });
+      alerts.push({ type: "no_completion", clientId: id, clientName: name, detail: "Sem treinos concluídos esta semana", urgency: "low", context: weekStart });
     }
 
     // Perfect week
     if (weekClient && weekClient.totalDays > 0 && weekClient.completedDays >= weekClient.totalDays) {
-      alerts.push({ type: "perfect_week", clientId: id, clientName: name, detail: "Semana perfeita, envia parabéns!", urgency: "low" });
+      alerts.push({ type: "perfect_week", clientId: id, clientName: name, detail: "Semana perfeita, envia parabéns!", urgency: "low", context: weekStart });
     }
 
     // PR esta semana
     const prs = prsByClient.get(id);
     if (prs && prs.length > 0) {
       alerts.push({
-        type: "pr_week", clientId: id, clientName: name, urgency: "low",
+        type: "pr_week", clientId: id, clientName: name, urgency: "low", context: weekStart,
         detail: prs.length === 1 ? `Novo PR em ${prs[0]}` : `${prs.length} novos PRs esta semana`,
       });
     }
@@ -279,10 +294,20 @@ export default async function CoachDashboard() {
       const lowPct     = weekClient.totalDays > 0 && (weekClient.completedDays / weekClient.totalDays) < 0.5;
       const noCheckin  = !weekCheckins?.find((c) => c.client_id === id);
       if (lowEnergy && lowPct && noCheckin) {
-        alerts.push({ type: "at_risk", clientId: id, clientName: name, detail: "Energia baixa, poucos treinos e sem check-in", urgency: "high" });
+        alerts.push({ type: "at_risk", clientId: id, clientName: name, detail: "Energia baixa, poucos treinos e sem check-in", urgency: "high", context: weekStart });
       }
     }
   }
+
+  // What is still open, and what was ticked off for this same context. The
+  // handled ones are kept and shown behind a toggle: hiding them entirely
+  // would make the button feel like deleting something.
+  const openAlerts = alerts.filter(
+    (a) => !ackKeys.has(`${a.clientId}|${a.type}|${a.context}`),
+  );
+  const handledAlerts = alerts.filter(
+    (a) => ackKeys.has(`${a.clientId}|${a.type}|${a.context}`),
+  );
 
   // Stats
   const totalCompletions = weekClients.reduce((s, c) => s + c.completedDays, 0);
@@ -346,7 +371,7 @@ export default async function CoachDashboard() {
       </div>
 
       {/* Smart alerts */}
-      <SmartAlerts alerts={alerts} />
+      <SmartAlerts alerts={openAlerts} handled={handledAlerts} />
 
       {/* New clients without plans */}
       {newClients.length > 0 && (

@@ -6,6 +6,8 @@ import { DAY_NAMES, DAY_NAMES_FULL, WEEK_ORDER_MON_FIRST, byWeekOrder } from "@/
 import { signPhotoUrls } from "@/lib/storage";
 import { deletePlan, duplicatePlan } from "@/app/coach/plans/actions";
 import { isBasePlan } from "@/lib/training/base-plan";
+import PayLinkButton from "@/components/coach/PayLinkButton";
+import { payLinkFor } from "@/lib/billing/pay-link";
 import DeletePlanButton from "@/components/coach/DeletePlanButton";
 import DuplicatePlanButton from "@/components/coach/DuplicatePlanButton";
 import CreateProgramButton from "@/components/coach/CreateProgramButton";
@@ -199,6 +201,7 @@ export default async function ClientDetailPage({
             📄 Relatório
           </Link>
           <NotifyButton clientId={clientId} />
+          <PayLinkButton link={payLinkFor(clientId)} />
           {/* Starting from the week they already trained beats starting from
               nothing: the base plan the app wrote for the trial is usually the
               right skeleton, and it comes with what they logged against it. */}
