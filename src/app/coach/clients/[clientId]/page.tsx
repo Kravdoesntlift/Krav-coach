@@ -5,6 +5,7 @@ import Link from "next/link";
 import { DAY_NAMES, DAY_NAMES_FULL, WEEK_ORDER_MON_FIRST, byWeekOrder } from "@/lib/supabase/types";
 import { signPhotoUrls } from "@/lib/storage";
 import { deletePlan, duplicatePlan } from "@/app/coach/plans/actions";
+import { isBasePlan } from "@/lib/training/base-plan";
 import DeletePlanButton from "@/components/coach/DeletePlanButton";
 import DuplicatePlanButton from "@/components/coach/DuplicatePlanButton";
 import CreateProgramButton from "@/components/coach/CreateProgramButton";
@@ -63,6 +64,9 @@ export default async function ClientDetailPage({
     .eq("client_id", clientId)
     .order("week_start", { ascending: false })
     .limit(26);
+
+  // Ordered newest first, so this is the week to build the next block from.
+  const latestPlan = plans?.[0] ?? null;
 
   const { data: checkins } = await supabase
     .from("weekly_checkins")
@@ -195,6 +199,22 @@ export default async function ClientDetailPage({
             📄 Relatório
           </Link>
           <NotifyButton clientId={clientId} />
+          {/* Starting from the week they already trained beats starting from
+              nothing: the base plan the app wrote for the trial is usually the
+              right skeleton, and it comes with what they logged against it. */}
+          {latestPlan && (
+            <Link
+              href={`/coach/plans/new?client=${clientId}&from=${latestPlan.id}`}
+              className="text-sm px-4 py-2 rounded-xl font-semibold transition-colors"
+              style={{
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                color: "#d4d4d8",
+              }}
+            >
+              {isBasePlan(latestPlan.name) ? "Partir do plano base" : "Partir do último plano"}
+            </Link>
+          )}
           <Link
             href={`/coach/plans/new?client=${clientId}`}
             className="btn-primary text-sm"

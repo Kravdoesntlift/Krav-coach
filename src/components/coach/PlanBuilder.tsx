@@ -35,6 +35,15 @@ interface Props {
   clients: Profile[];
   preselectedClientId?: string;
   existingPlan?: WorkoutPlan;
+  /**
+   * A plan to copy the days from while still creating a new one.
+   *
+   * Writing a paid client's first block used to start from an empty week, even
+   * though the app had already built them a base plan and the client had been
+   * training on it for seven days. Starting from that week means editing what
+   * they actually did instead of retyping it.
+   */
+  seedPlan?: WorkoutPlan;
   libraryItems?: LibraryExercise[];
 }
 
@@ -62,11 +71,11 @@ interface Template {
   days: DayInput[];
 }
 
-export default function PlanBuilder({ coachId, clients, preselectedClientId, existingPlan, libraryItems = [], templates = [], suggestMode = false }: Props & { templates?: Template[]; suggestMode?: boolean }) {
+export default function PlanBuilder({ coachId, clients, preselectedClientId, existingPlan, seedPlan, libraryItems = [], templates = [], suggestMode = false }: Props & { templates?: Template[]; suggestMode?: boolean }) {
   const router = useRouter();
   const isEdit = !!existingPlan;
 
-  const [clientId, setClientId] = useState(existingPlan?.client_id ?? preselectedClientId ?? "");
+  const [clientId, setClientId] = useState(existingPlan?.client_id ?? seedPlan?.client_id ?? preselectedClientId ?? "");
   const [planName, setPlanName] = useState(existingPlan?.name ?? "");
   const [weekStart, setWeekStart] = useState(() => {
     if (existingPlan) return existingPlan.week_start;
@@ -80,7 +89,9 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
     const d = String(monday.getDate()).padStart(2, "0");
     return `${y}-${m}-${d}`;
   });
-  const [days, setDays] = useState<DayInput[]>(existingPlan ? planToDayInputs(existingPlan) : []);
+  const [days, setDays] = useState<DayInput[]>(
+    existingPlan ? planToDayInputs(existingPlan) : seedPlan ? planToDayInputs(seedPlan) : [],
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savingTemplate, setSavingTemplate] = useState(false);
