@@ -30,7 +30,7 @@ export interface TierInfo {
 export const TIERS: Record<Tier, TierInfo> = {
   app: {
     id: "app",
-    amountCents: 2900,
+    amountCents: 3500,
     productName: "KRAV App",
     name: { pt: "App", en: "App" },
     tagline: {
@@ -112,7 +112,10 @@ export const TIERS: Record<Tier, TierInfo> = {
  * Old app prices stay listed here when the price changes, so people who
  * subscribed at the old one keep their tier.
  */
-const APP_AMOUNTS_CENTS = new Set<number>([2900]);
+const APP_AMOUNTS_CENTS = new Set<number>([
+  3500, // current
+  2900, // the launch price, live for a few hours on 2026-09-29
+]);
 
 export function tierForAmount(amountCents: number | null | undefined): Tier | null {
   if (typeof amountCents !== "number" || amountCents <= 0) return null;
