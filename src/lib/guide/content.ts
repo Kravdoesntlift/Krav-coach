@@ -1,4 +1,5 @@
 import { buildBasePlan, type Equipment, type Lang } from "@/lib/training/base-plan";
+import { priceLabel } from "@/lib/billing/tiers";
 
 /**
  * The free guide, in two versions and two languages.
@@ -111,7 +112,7 @@ const SHARED_PT: Omit<GuideCopy, "kicker" | "title" | "subtitle" | "intro" | "co
   footer: "@kravdoesntlift · zerando máquinas medíocres",
   upgradeTitle: "O que muda se assinares",
   upgradeIntro:
-    "Este guia é o método. Dá para fazer sozinho e funciona, se fores consistente. O que a mensalidade acrescenta é a parte que quase ninguém consegue fazer a si próprio.",
+    `Este guia é o método. Dá para fazer sozinho e funciona, se fores consistente. Acabados os 7 dias, a app sozinha fica por €${priceLabel("app")} por mês e continua a montar-te e a renovar-te o treino. O que o coaching 1:1 acrescenta, por €${priceLabel("coaching")}, é a parte que quase ninguém consegue fazer a si próprio.`,
   upgradeFree: {
     title: "Grátis, este guia e o trial",
     items: [
@@ -122,7 +123,7 @@ const SHARED_PT: Omit<GuideCopy, "kicker" | "title" | "subtitle" | "intro" | "co
     ],
   },
   upgradePaid: {
-    title: "Com a mensalidade",
+    title: `Com o coaching 1:1, €${priceLabel("coaching")}/mês`,
     items: [
       "Plano escrito pelo André a partir do que registaste, não gerado",
       "Ajustes todas as semanas com base na tua evolução real",
@@ -176,7 +177,7 @@ const SHARED_EN: Omit<GuideCopy, "kicker" | "title" | "subtitle" | "intro" | "co
   footer: "@kravdoesntlift · zeroing out mediocre machines",
   upgradeTitle: "What changes if you subscribe",
   upgradeIntro:
-    "This guide is the method. You can run it alone and it works, if you stay consistent. What the subscription adds is the part almost nobody manages to do for themselves.",
+    `This guide is the method. You can run it alone and it works, if you stay consistent. Once the 7 days are up, the app on its own is €${priceLabel("app")} a month and keeps building and refreshing your training. What 1:1 coaching adds, at €${priceLabel("coaching")}, is the part almost nobody manages to do for themselves.`,
   upgradeFree: {
     title: "Free: this guide and the trial",
     items: [
@@ -187,7 +188,7 @@ const SHARED_EN: Omit<GuideCopy, "kicker" | "title" | "subtitle" | "intro" | "co
     ],
   },
   upgradePaid: {
-    title: "With the subscription",
+    title: `With 1:1 coaching, €${priceLabel("coaching")}/month`,
     items: [
       "A plan written by André from what you logged, not generated",
       "Adjusted every week against your actual progress",

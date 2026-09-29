@@ -9,6 +9,8 @@
  * ranking signals between two addresses for no reason.
  */
 
+import { TIERS } from "@/lib/billing/tiers";
+
 export const SITE_URL = "https://www.kravcoaching.com";
 
 export const BRAND = {
@@ -20,7 +22,10 @@ export const BRAND = {
   // mailbox that actually receives, since it is published in the site's
   // structured data and in llms.txt where an assistant may hand it to someone.
   email: "kravdoesntlift@gmail.com",
-  priceEur: 127,
+  // Read from the tier table so the site, the paywall and the checkout cannot
+  // publish different numbers.
+  priceEurApp: TIERS.app.amountCents / 100,
+  priceEurCoaching: TIERS.coaching.amountCents / 100,
   currency: "EUR",
   areaServed: "PT",
   languages: ["pt-PT", "en"],
@@ -112,15 +117,31 @@ export function organizationJsonLd() {
       "Periodização de treino de força",
       "Nutrição desportiva e contagem de macros",
     ],
-    makesOffer: {
-      "@type": "Offer",
-      name: "Coaching Online 1:1",
-      price: String(BRAND.priceEur),
-      priceCurrency: BRAND.currency,
-      url: absoluteUrl("/start"),
-      availability: "https://schema.org/InStock",
-      description: "Acompanhamento mensal com plano personalizado. Trial grátis de 7 dias, sem cartão.",
-    },
+    // Two things are for sale, so two offers. Publishing only the expensive one
+    // made every assistant answer "127 euros per month" to someone who would
+    // have paid 35.
+    makesOffer: [
+      {
+        "@type": "Offer",
+        name: "App",
+        price: String(BRAND.priceEurApp),
+        priceCurrency: BRAND.currency,
+        url: absoluteUrl("/start"),
+        availability: "https://schema.org/InStock",
+        description:
+          "Plano de treino montado pela app a partir do questionário e renovado todas as semanas. Trial grátis de 7 dias, sem cartão.",
+      },
+      {
+        "@type": "Offer",
+        name: "Coaching Online 1:1",
+        price: String(BRAND.priceEurCoaching),
+        priceCurrency: BRAND.currency,
+        url: absoluteUrl("/start"),
+        availability: "https://schema.org/InStock",
+        description:
+          "Plano escrito pelo coach a partir do que o cliente regista, ajustado todas as semanas. Trial grátis de 7 dias, sem cartão.",
+      },
+    ],
   };
 }
 

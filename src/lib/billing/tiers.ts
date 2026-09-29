@@ -43,6 +43,7 @@ export const TIERS: Record<Tier, TierInfo> = {
         "Treino guiado com registo de séries, pesos e descanso",
         "Comparação automática com a semana anterior",
         "Histórico, progresso e registo alimentar",
+        "AI Coach 24/7 para tirar dúvidas sobre treino e nutrição",
         "Semana mais leve a cada 4 semanas, como manda o método",
       ],
       en: [
@@ -50,6 +51,7 @@ export const TIERS: Record<Tier, TierInfo> = {
         "Guided sessions with set, weight and rest logging",
         "Automatic comparison with last week",
         "History, progress and food logging",
+        "AI Coach 24/7 for training and nutrition questions",
         "A lighter week every 4 weeks, as the method asks",
       ],
     },
@@ -130,7 +132,7 @@ export function isTier(value: unknown): value is Tier {
   return value === "app" || value === "coaching";
 }
 
-/** "29" and "127", for copy that should not carry cents. */
+/** "35" and "127", for copy that should not carry cents. */
 export function priceLabel(tier: Tier): string {
   return String(Math.round(TIERS[tier].amountCents / 100));
 }

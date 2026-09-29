@@ -164,8 +164,8 @@ async function notifyNewSubscriber(
       clientId,
       isEN ? "✅ Payment confirmed!" : "✅ Pagamento confirmado!",
       isEN
-        ? "Welcome to KRAV! Your coach will reach out to you soon."
-        : "Bem-vindo à KRAV! O teu coach vai contactar-te em breve.",
+        ? "Welcome to KRAV! You now have full access to the app."
+        : "Bem-vindo à KRAV! Já tens acesso total à app.",
       "/client/dashboard",
     ).catch((e: unknown) => console.error("[webhook] client push failed:", e));
   } catch (e) {

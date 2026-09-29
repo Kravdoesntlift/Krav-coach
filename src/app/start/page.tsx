@@ -45,7 +45,7 @@ const T = {
 
   // Step 2: Body profile
   step2_title:      { pt: "O teu perfil físico",                                  en: "Your body profile" },
-  step2_sub:        { pt: "Estes dados ajudam o coach a criar um plano 100% adaptado a ti.", en: "This data helps your coach create a plan tailored specifically to you." },
+  step2_sub:        { pt: "Estes dados são o que monta o teu plano, e o que o André lê se passares a coaching 1:1.", en: "This data is what builds your plan, and what André reads if you move to 1:1 coaching." },
   sex_label:        { pt: "Sexo biológico",                                       en: "Biological sex" },
   male:             { pt: "Masculino",                                            en: "Male" },
   female:           { pt: "Feminino",                                             en: "Female" },

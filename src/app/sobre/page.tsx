@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { priceLabel } from "@/lib/billing/tiers";
 import Link from "next/link";
 import Image from "next/image";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -206,8 +207,8 @@ export default async function Sobre() {
                   a: "Trabalho com um número reduzido de clientes de propósito, para conseguir rever os registos de cada um todas as semanas. Se quiseres saber quantos são neste momento, pergunta-me no chat e digo-te.",
                 },
                 {
-                  q: "Porquê 127 euros por mês?",
-                  a: "Não estás a pagar uma biblioteca de treinos, que encontras de graça. Estás a pagar o tempo de alguém a olhar para os teus números todas as semanas e a decidir o que muda. É esse trabalho que custa, e é por isso que não posso ter clientes sem limite.",
+                  q: `Porquê €${priceLabel("coaching")} por mês, se a app sozinha custa €${priceLabel("app")}?`,
+                  a: `Porque são duas coisas diferentes. Por €${priceLabel("app")} a app monta-te o treino a partir das tuas respostas e renova-o todas as semanas: funciona, e é honesto dizer que ninguém está a olhar para ele. Os €${priceLabel("coaching")} são o meu tempo, a olhar para os teus números todas as semanas e a decidir o que muda. É esse trabalho que custa, e é por isso que não posso ter clientes sem limite.`,
                 },
                 {
                   q: "Posso experimentar antes de pagar?",

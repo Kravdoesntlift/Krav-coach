@@ -1,3 +1,4 @@
+import { priceLabel } from "@/lib/billing/tiers";
 import { Resend } from "resend";
 
 const FROM = process.env.RESEND_FROM ?? "André · KRAV Coaching <andre@kravcoaching.com>";
@@ -134,12 +135,12 @@ export async function sendWelcomeEmail({
 
   const steps = isEN
     ? [
-        ["1", "Complete your profile", "Fill in your data (weight, height, goal) so the coach can personalise your plan."],
+        ["1", "Complete your profile", "Fill in your data (weight, height, goal) so your plan fits you properly."],
         ["2", "Explore the app", "Check out the workouts, log check-ins and use the chat to talk directly with your coach."],
         ["3", "Install on your phone", "Open the site in Safari/Chrome and use 'Add to Home Screen' for native access."],
       ]
     : [
-        ["1", "Completa o teu perfil", "Preenche os teus dados (peso, altura, objetivo) para o coach personalizar o teu plano."],
+        ["1", "Completa o teu perfil", "Preenche os teus dados (peso, altura, objetivo) para o plano assentar bem em ti."],
         ["2", "Explora a app", "Vê os treinos, regista check-ins e usa o chat para falar directamente com o teu coach."],
         ["3", "Instala no telemóvel", "Abre o site no Safari/Chrome e usa 'Adicionar ao ecrã de início' para acesso nativo."],
       ];
@@ -171,8 +172,8 @@ export async function sendWelcomeEmail({
       </p>
       <p style="color:#a1a1aa;font-size:15px;line-height:1.7;text-align:center;margin:0 0 28px">
         ${isEN
-          ? `Your coach <strong style="color:#fff">${coachFirst}</strong> will prepare your training plan soon. Any questions, message directly via chat.`
-          : `O teu coach <strong style="color:#fff">${coachFirst}</strong> vai preparar o teu plano de treino em breve. Qualquer dúvida, fala directamente por chat.`}
+          ? `Your first training week is already in the app, built from the answers you gave. Log every set, and any question goes straight to <strong style="color:#fff">${coachFirst}</strong> in the chat.`
+          : `A tua primeira semana de treino já está na app, montada a partir das respostas que deste. Regista as séries, e qualquer dúvida fala directamente com o <strong style="color:#fff">${coachFirst}</strong> no chat.`}
       </p>
       <a href="${siteUrl}/client/dashboard"
          style="display:block;background:linear-gradient(135deg,#E8C96B,#C9A84C);color:#000;font-weight:800;font-size:15px;padding:14px 24px;border-radius:14px;text-decoration:none;text-align:center">
@@ -283,15 +284,19 @@ export async function sendTrialReminderEmail({
               <td style="color:#C9A84C;font-weight:900;font-size:14px;text-align:right;padding:7px 0">${check}</td>
             </tr>`).join("")}
             <tr style="border-top:1px solid #27272a">
-              <td style="color:#fff;font-weight:700;font-size:15px;padding:12px 0 0">${isEN ? "Total per month" : "Total por mês"}</td>
-              <td style="color:#C9A84C;font-weight:900;font-size:20px;text-align:right;padding-top:12px">€127</td>
+              <td style="color:#a1a1aa;font-size:14px;padding:12px 0 0">${isEN ? "App, plan built by the app" : "App, plano montado pela app"}</td>
+              <td style="color:#fff;font-weight:900;font-size:17px;text-align:right;padding-top:12px">€${priceLabel("app")}<span style="color:#71717a;font-size:12px;font-weight:400">${isEN ? "/mo" : "/mês"}</span></td>
+            </tr>
+            <tr>
+              <td style="color:#a1a1aa;font-size:14px;padding:7px 0 0">${isEN ? "1:1, André writes and adjusts it" : "1:1, o André escreve e ajusta"}</td>
+              <td style="color:#C9A84C;font-weight:900;font-size:17px;text-align:right;padding-top:7px">€${priceLabel("coaching")}<span style="color:#71717a;font-size:12px;font-weight:400">${isEN ? "/mo" : "/mês"}</span></td>
             </tr>
           </table>
         </td></tr>
       </table>
-      <a href="${siteUrl}/client/dashboard"
+      <a href="${siteUrl}/client/planos"
          style="display:block;background:linear-gradient(135deg,#E8C96B,#C9A84C);color:#000;font-weight:800;font-size:15px;padding:15px 24px;border-radius:14px;text-decoration:none;text-align:center">
-        ${isEN ? "Activate subscription →" : "Activar subscrição →"}
+        ${isEN ? "Choose my plan →" : "Escolher o meu plano →"}
       </a>
     </div>
     <p style="text-align:center;color:#3f3f46;font-size:11px;margin:0">
@@ -545,13 +550,16 @@ export async function sendTrialEndEmail({
           <span style="color:#a1a1aa;font-size:13px">${b}</span>
         </div>`).join("")}
         <div style="padding-top:14px;text-align:right">
-          <span style="color:#fff;font-weight:900;font-size:22px">€127</span>
+          <span style="color:#71717a;font-size:13px">${isEN ? "App " : "App "}</span>
+          <span style="color:#fff;font-weight:900;font-size:20px">€${priceLabel("app")}</span>
+          <span style="color:#71717a;font-size:13px"> ${isEN ? "/month · 1:1 " : "/mês · 1:1 "}</span>
+          <span style="color:#C9A84C;font-weight:900;font-size:20px">€${priceLabel("coaching")}</span>
           <span style="color:#71717a;font-size:13px"> ${isEN ? "/month" : "/mês"}</span>
         </div>
       </div>
-      <a href="${siteUrl}/client/dashboard"
+      <a href="${siteUrl}/client/planos"
          style="display:block;background:linear-gradient(135deg,#E8C96B,#A8893A);color:#000;font-weight:800;font-size:15px;padding:15px 24px;border-radius:14px;text-decoration:none;text-align:center;margin-bottom:10px">
-        ${isEN ? "Continue my coaching →" : "Continuar o coaching →"}
+        ${isEN ? "See the two plans →" : "Ver os dois planos →"}
       </a>
       <p style="color:#3f3f46;font-size:11px;text-align:center;margin:8px 0 0">
         ${isEN ? "No commitment · Cancel at any time" : "Sem permanência · Cancelas a qualquer momento"}

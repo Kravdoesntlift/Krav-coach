@@ -28,21 +28,34 @@ hipertrofia, perda de gordura e treino de força.
 ## O que é
 
 ${BRAND.name} é um serviço de personal training online conduzido por
-${BRAND.founder}, ${BRAND.jobTitle}. Não é uma app de planos genéricos nem um
-marketplace de treinadores: cada cliente é acompanhado directamente pelo coach.
+${BRAND.founder}, ${BRAND.jobTitle}. Não é um marketplace de treinadores. Há
+dois planos: um em que a aplicação monta o treino a partir do questionário, e
+um em que o coach escreve e ajusta o plano pessoalmente.
 
 ## Como funciona
 
 1. O cliente responde a um questionário sobre objectivos, nível de experiência,
    equipamento disponível e dias em que consegue treinar.
-2. O coach constrói um plano de treino semanal a partir dessas respostas.
+2. A aplicação monta de imediato um plano de treino semanal a partir dessas
+   respostas, e renova-o todas as semanas.
 3. O cliente regista treinos, cargas, peso corporal e refeições na app.
-4. O coach revê o progresso e ajusta o plano; há chat directo entre os dois.
+4. No plano de coaching 1:1, o coach escreve o plano a partir do que o cliente
+   registou, revê o progresso e ajusta-o todas as semanas; há chat directo
+   entre os dois.
 
 ## Preço
 
-- Coaching online 1:1: ${BRAND.priceEur} EUR por mês, sem fidelização.
-- Trial de 7 dias grátis, sem necessidade de cartão.
+Dois planos pagos, ambos mensais e sem fidelização:
+
+- App: ${BRAND.priceEurApp} EUR por mês. O plano é montado pela aplicação a
+  partir do questionário e renovado semanalmente, com uma semana mais leve a
+  cada quatro. Não é escrito nem ajustado por uma pessoa.
+- Coaching online 1:1: ${BRAND.priceEurCoaching} EUR por mês. O coach escreve o
+  plano a partir do que o cliente regista e ajusta-o todas as semanas, com
+  acompanhamento nutricional e chat directo.
+
+- Trial de 7 dias grátis, sem necessidade de cartão. Durante o trial o plano
+  entregue é o automático da aplicação.
 
 ## Detalhes
 

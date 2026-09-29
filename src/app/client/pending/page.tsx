@@ -129,14 +129,14 @@ export default async function PendingPage({
 
   const extra = {
     greeting:         { pt: `Olá, ${firstName}!`, en: `Hi, ${firstName}!` },
-    payment_confirmed:{ pt: "Pagamento confirmado! O teu coach vai criar o teu plano personalizado. Receberás uma notificação assim que estiver pronto.", en: "Payment confirmed! Your coach will create your personalised plan. You'll receive a notification when it's ready." },
+    payment_confirmed:{ pt: "Pagamento confirmado! Estamos a activar o teu acesso. O teu plano já está à tua espera na app.", en: "Payment confirmed! We are activating your access. Your plan is already waiting for you in the app." },
     account_created:  { pt: "A tua conta foi criada. O teu coach irá ativá-la assim que confirmar o pagamento.", en: "Your account has been created. Your coach will activate it once payment is confirmed." },
     step_account:     { pt: "Conta criada", en: "Account created" },
     step_payment_ok:  { pt: "Pagamento confirmado", en: "Payment confirmed" },
-    step_plan:        { pt: "Plano personalizado em preparação", en: "Personalised plan being prepared" },
+    step_plan:        { pt: "Plano pronto na app", en: "Plan ready in the app" },
     step_payment_pend:{ pt: "Pagamento a aguardar confirmação", en: "Payment awaiting confirmation" },
     step_access:      { pt: "Acesso total à app", en: "Full app access" },
-    info_welcome:     { pt: "Podes já falar com o teu coach no chat enquanto o plano é preparado.", en: "You can already chat with your coach while the plan is being prepared." },
+    info_welcome:     { pt: "Podes já falar com o teu coach no chat.", en: "You can already chat with your coach." },
     info_pending:     { pt: "Já tens acesso ao chat com o teu coach. Fala com ele se tiveres dúvidas.", en: "You already have access to chat with your coach. Contact them if you have any questions." },
     chat_cta:         { pt: "💬 Falar com o coach", en: "💬 Chat with coach" },
     auto_update:      { pt: "Esta página atualiza automaticamente quando o teu acesso for ativado.", en: "This page will update automatically when your access is activated." },

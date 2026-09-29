@@ -8,6 +8,8 @@ import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 import { SITE_URL, SOCIAL_PROFILES, aggregateRatingJsonLd } from "@/lib/seo";
 import TestimonialCarousel, { type PublicTestimonial } from "@/components/TestimonialCarousel";
 import ReviewSummary from "@/components/ReviewSummary";
+import PricingTiers from "@/components/PricingTiers";
+import { priceLabel } from "@/lib/billing/tiers";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const t = {
@@ -16,7 +18,7 @@ const t = {
     hero_title:   <>O teu treino.<br /><span style={{ background: "linear-gradient(90deg,#E8C96B,#C9A84C,#A8893A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Personalizado.</span></>,
     hero_tagline: "Coaching fitness premium com acompanhamento real. No teu telemóvel, 24/7.",
     cta_primary:  "Trial grátis de 7 dias →",
-    cta_secondary: "Depois €127/mês · Sem contratos",
+    cta_secondary: `Depois desde €${priceLabel("app")}/mês · Sem contratos`,
     cta_login:    "Já tenho conta",
     no_contract:  "7 dias grátis, sem cartão de crédito.",
     section_features: "Tudo o que está incluído",
@@ -40,10 +42,6 @@ const t = {
       '"Adicionar ao ecrã inicial"',
       'Toca "Instalar". Pronto! 🎉',
     ],
-    price_label:    "Plano Premium",
-    price_sub:      "Tudo incluído. Sem surpresas.",
-    price_cta:      "Aderir agora →",
-    price_note:     "Cancela a qualquer momento. Sem permanência.",
     footer_login:   "Entrar",
     footer_signup:  "Registar",
     features: [
@@ -58,39 +56,23 @@ const t = {
     ],
     steps: [
       { n: "1", title: "Inscreve-te",        desc: "Preenche o questionário em 2 minutos. O coach recebe as tuas respostas de imediato." },
-      { n: "2", title: "Recebe o teu plano", desc: "Nas primeiras 24 horas úteis o coach cria e envia o teu plano personalizado na app." },
+      { n: "2", title: "Recebe o teu plano", desc: "O plano aparece na app no momento, montado a partir das tuas respostas. Com coaching 1:1, o André reescreve-o a partir do que registas." },
       { n: "3", title: "Treina com suporte", desc: "Segue o plano, regista os treinos e acompanha a tua evolução. O coach está sempre disponível." },
     ],
-    included: [
-      "Plano de treino semanal 100% personalizado",
-      "Ajustes semanais ao plano",
-      "Check-ins e análise de progresso",
-      "Chat privado com o coach",
-      "AI Coach disponível 24/7",
-      "Rastreio de nutrição e macros (base de dados portuguesa)",
-      "Registo de séries, pesos e medidas",
-      "Fotos de progresso com comparação antes/depois",
-      "Recordes pessoais e conquistas",
-      "Relatório mensal em PDF",
-      "Notificações e lembretes automáticos",
-      "Acesso à app iOS e Android (PWA)",
-    ],
     faq: [
-      { q: "Quando recebo o meu plano?", a: "Nas primeiras 24 horas úteis após o registo, o coach cria e envia o teu plano personalizado diretamente na app." },
-      { q: "É realmente personalizado?", a: "100%. O teu coach cria o plano com base nas tuas respostas: objetivos, nível, dias disponíveis e equipamento. Não é um template genérico." },
+      { q: "Quando recebo o meu plano?", a: "Assim que acabas o questionário. A app monta a tua semana a partir das respostas e renova-a todas as semanas. Se escolheres coaching 1:1, o André escreve o teu plano nas primeiras 24 horas úteis, a partir do que já registaste." },
+      { q: "É realmente personalizado?", a: "O plano é construído a partir das tuas respostas: objetivos, nível, dias disponíveis e equipamento. Não é um template. No plano App quem o monta é a aplicação; no coaching 1:1 é o André que o escreve e o ajusta todas as semanas com base no que registaste." },
       { q: "Funciona para iniciantes?", a: "Sim. O plano é totalmente adaptado ao teu nível, seja iniciante, intermédio ou avançado." },
       { q: "Posso cancelar quando quiser?", a: "Sim. Sem permanência, sem contratos. Cancelas a qualquer momento através da tua área de cliente no Stripe." },
       { q: "E se não ficar satisfeito?", a: "Tens 7 dias para experimentar. Se não estiveres satisfeito, contacta o coach e reembolsamos sem perguntas." },
     ],
-    guarantee: "Garantia de 7 dias",
-    guarantee_sub: "Experimenta sem risco. Reembolso total se não ficares satisfeito.",
   },
   en: {
     login:        "Log in →",
     hero_title:   <>Your training.<br /><span style={{ background: "linear-gradient(90deg,#E8C96B,#C9A84C,#A8893A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Personalised.</span></>,
     hero_tagline: "Premium fitness coaching with real accountability. On your phone, 24/7.",
     cta_primary:  "Start free 7-day trial →",
-    cta_secondary: "Then €127/month · No contracts",
+    cta_secondary: `Then from €${priceLabel("app")}/month · No contracts`,
     cta_login:    "I already have an account",
     no_contract:  "7 days free, no credit card required.",
     section_features: "Everything that's included",
@@ -114,10 +96,6 @@ const t = {
       '"Add to Home Screen"',
       'Tap "Install". Done! 🎉',
     ],
-    price_label:    "Premium Plan",
-    price_sub:      "Everything included. No surprises.",
-    price_cta:      "Join now →",
-    price_note:     "Cancel at any time. No commitment.",
     footer_login:   "Log in",
     footer_signup:  "Sign up",
     features: [
@@ -132,32 +110,16 @@ const t = {
     ],
     steps: [
       { n: "1", title: "Sign up",           desc: "Fill in the questionnaire in 2 minutes. Your coach receives your answers immediately." },
-      { n: "2", title: "Get your plan",     desc: "Within 24 working hours your coach creates and sends your personalised plan in the app." },
+      { n: "2", title: "Get your plan",     desc: "Your plan shows up in the app right away, built from your answers. On 1:1 coaching, André rewrites it from what you log." },
       { n: "3", title: "Train with support", desc: "Follow the plan, log your workouts and track your progress. Your coach is always available." },
     ],
-    included: [
-      "100% personalised weekly training plan",
-      "Weekly plan adjustments",
-      "Check-ins and progress analysis",
-      "Private chat with your coach",
-      "AI Coach available 24/7",
-      "Nutrition & macro tracking (Portuguese food database)",
-      "Sets, weights and measurements log",
-      "Progress photos with before/after slider",
-      "Personal records and achievements",
-      "Monthly progress report (PDF)",
-      "Automated notifications and reminders",
-      "Access to the iOS and Android app (PWA)",
-    ],
     faq: [
-      { q: "When do I get my plan?", a: "Within 24 working hours of signing up, your coach creates and sends your personalised plan directly in the app." },
-      { q: "Is it really personalised?", a: "100%. Your coach builds the plan based on your answers: goals, level, available days and equipment. Not a generic template." },
+      { q: "When do I get my plan?", a: "As soon as you finish the questionnaire. The app builds your week from your answers and refreshes it every week. On 1:1 coaching, André writes your plan within the first 24 working hours, starting from what you have already logged." },
+      { q: "Is it really personalised?", a: "The plan is built from your answers: goals, level, available days and equipment. It is not a template. On the App plan the application builds it; on 1:1 coaching André writes it and adjusts it every week from what you logged." },
       { q: "Does it work for beginners?", a: "Yes. The plan is fully adapted to your current level: beginner, intermediate or advanced." },
       { q: "Can I cancel anytime?", a: "Yes. No commitment, no contracts. Cancel anytime through your Stripe customer portal." },
       { q: "What if I'm not satisfied?", a: "You have 7 days to try it out. If you're not happy, contact your coach and we'll refund you, no questions asked." },
     ],
-    guarantee: "7-day guarantee",
-    guarantee_sub: "Try it risk-free. Full refund if you're not satisfied.",
   },
 } as const;
 
@@ -256,7 +218,7 @@ export default async function LandingPage({
       : "Coaching fitness online com planos de treino semanais personalizados, acompanhamento nutricional e acesso direto ao coach via app.",
     "url": SITE_URL,
     "image": `${SITE_URL}/andre-bg.jpg`,
-    "priceRange": "€127/mês",
+    "priceRange": `€${priceLabel("app")} - €${priceLabel("coaching")}/${isEN ? "month" : "mês"}`,
     "areaServed": { "@type": "Country", "name": "Portugal" },
     "sameAs": SOCIAL_PROFILES,
     "founder": {
@@ -265,15 +227,30 @@ export default async function LandingPage({
       "jobTitle": "Personal Trainer & Fitness Coach",
     },
     ...(aggregateRating ? { aggregateRating } : {}),
-    "offers": {
-      "@type": "Offer",
-      "name": isEN ? "Online Coaching 1:1" : "Coaching Online 1:1",
-      "price": "127",
-      "priceCurrency": "EUR",
-      "url": `${SITE_URL}/start`,
-      "availability": "https://schema.org/InStock",
-      "description": isEN ? "7-day free trial included" : "Trial grátis de 7 dias incluído",
-    },
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": isEN ? "App" : "App",
+        "price": priceLabel("app"),
+        "priceCurrency": "EUR",
+        "url": `${SITE_URL}/start`,
+        "availability": "https://schema.org/InStock",
+        "description": isEN
+          ? "Training plan built by the app from your answers, refreshed weekly. 7-day free trial included."
+          : "Plano montado pela app a partir das tuas respostas, renovado todas as semanas. Trial grátis de 7 dias incluído.",
+      },
+      {
+        "@type": "Offer",
+        "name": isEN ? "Online Coaching 1:1" : "Coaching Online 1:1",
+        "price": priceLabel("coaching"),
+        "priceCurrency": "EUR",
+        "url": `${SITE_URL}/start`,
+        "availability": "https://schema.org/InStock",
+        "description": isEN
+          ? "Plan written by the coach and adjusted every week. 7-day free trial included."
+          : "Plano escrito pelo coach e ajustado todas as semanas. Trial grátis de 7 dias incluído.",
+      },
+    ],
   };
 
   return (
@@ -635,52 +612,7 @@ export default async function LandingPage({
         {/* ── PRICE ────────────────────────────────────────────── */}
         <section className="max-w-2xl mx-auto px-5 pb-20">
           <ScrollReveal direction="up">
-            <div
-              className="rounded-3xl p-7 space-y-6"
-              style={{
-                background: "linear-gradient(160deg, rgba(201,168,76,0.1) 0%, rgba(10,10,12,0.95) 100%)",
-                border: "1px solid rgba(201,168,76,0.28)",
-              }}
-            >
-              <div className="text-center space-y-1">
-                <p className="text-zinc-500 text-xs font-bold tracking-widest uppercase">{c.price_label}</p>
-                <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-5xl font-black text-white">€127</span>
-                  <span className="text-zinc-500 text-base">{isEN ? "/month" : "/mês"}</span>
-                </div>
-                <p className="text-zinc-500 text-sm">{c.price_sub}</p>
-              </div>
-
-              <ul className="space-y-2.5">
-                {c.included.map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-zinc-300">
-                    <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold text-black"
-                      style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>✓</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href={signupUrlWithLang}
-                className="block text-center w-full py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110"
-                style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
-              >
-                {c.price_cta}
-              </Link>
-
-              {/* Guarantee badge */}
-              <div className="flex items-center justify-center gap-2.5 py-3 px-4 rounded-2xl"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                <span className="text-lg">🛡️</span>
-                <div className="text-left">
-                  <p className="text-white text-xs font-bold">{c.guarantee}</p>
-                  <p className="text-zinc-500 text-xs">{c.guarantee_sub}</p>
-                </div>
-              </div>
-
-              <p className="text-center text-zinc-600 text-xs">{c.price_note}</p>
-            </div>
+            <PricingTiers lang={isEN ? "en" : "pt"} signupHref={signupUrlWithLang} />
           </ScrollReveal>
         </section>
 

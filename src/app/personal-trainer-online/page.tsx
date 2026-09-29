@@ -3,6 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { createAdminClient } from "@/lib/supabase/admin";
 import ScrollReveal from "@/components/ScrollReveal";
+import PricingTiers from "@/components/PricingTiers";
+import { priceLabel } from "@/lib/billing/tiers";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
 
 export const metadata: Metadata = {
@@ -51,19 +53,19 @@ const faqItems = [
   },
   {
     q: "É realmente personalizado ou é um plano genérico?",
-    a: "100% personalizado. Antes de criares a conta respondes a um questionário sobre os teus objetivos, nível, equipamento e dias disponíveis. O coach cria o plano com base nessas respostas. Não é um template.",
+    a: "Nunca é um template. Antes de criares a conta respondes a um questionário sobre os teus objetivos, nível, equipamento e dias disponíveis, e o plano é construído a partir dessas respostas. No plano App é a aplicação que o monta e o renova todas as semanas; no coaching 1:1 é o André que o escreve e o ajusta a partir do que registaste.",
   },
   {
     q: "Preciso de ginásio?",
-    a: "Não. O plano adapta-se ao teu equipamento, ginásio completo, ginásio básico, treino em casa com pesos, ou apenas com o peso do corpo. Diz o que tens disponível e o coach cria o plano à medida.",
+    a: "Não. O plano adapta-se ao teu equipamento, ginásio completo, ginásio básico, treino em casa com pesos, ou apenas com o peso do corpo. Dizes o que tens disponível no questionário e o plano é construído à volta disso.",
   },
   {
     q: "Quando recebo o meu plano?",
-    a: "Nas primeiras 24 horas úteis após o registo. O coach recebe as tuas respostas de imediato e tem esse prazo para criar e enviar o plano na app.",
+    a: "Assim que acabas o questionário. A app monta a tua primeira semana no momento e renova-a todas as semanas. Se escolheres coaching 1:1, o André escreve o teu plano nas primeiras 24 horas úteis, já a partir do que registaste.",
   },
   {
     q: "Quanto custa um personal trainer online?",
-    a: "A KRAV Coach custa €127/mês com tudo incluído, plano de treino, nutrição, AI Coach 24/7, check-ins semanais e chat direto com o coach. O que estás a pagar não é a biblioteca de treinos, que encontras de graça, é o tempo de alguém a rever os teus registos todas as semanas e a decidir o que muda. Podes experimentar gratuitamente durante 7 dias, sem cartão de crédito.",
+    a: `A KRAV Coach tem dois planos. O plano App custa €${priceLabel("app")}/mês: a aplicação monta o teu treino a partir do questionário, renova-o todas as semanas, regista séries e cargas e inclui nutrição e AI Coach 24/7. O coaching 1:1 custa €${priceLabel("coaching")}/mês e é o André a escrever o teu plano a partir do que registaste, a ajustá-lo todas as semanas e a responder-te no chat no próprio dia. O que pagas no segundo não é a biblioteca de treinos, que encontras de graça, é o tempo de alguém a rever os teus registos e a decidir o que muda. Podes experimentar sete dias grátis, sem cartão de crédito.`,
   },
   {
     q: "Posso cancelar quando quiser?",
@@ -75,7 +77,7 @@ const faqItems = [
   },
   {
     q: "Como é o acompanhamento semanal?",
-    a: "Todas as semanas fazes um check-in na app (peso, energia, notas). O coach analisa e ajusta o plano se necessário. Se tiveres dúvidas, o chat está sempre disponível.",
+    a: "Todas as semanas fazes um check-in na app (peso, energia, notas). No coaching 1:1 o André analisa esse check-in e ajusta o plano; no plano App a semana seguinte é montada a partir do que registaste. O chat está sempre disponível.",
   },
 ];
 
@@ -102,18 +104,34 @@ const serviceSchema = {
     address: { "@type": "PostalAddress", addressCountry: "PT" },
   },
   areaServed: { "@type": "Country", name: "Portugal" },
-  offers: {
-    "@type": "Offer",
-    price: "127",
-    priceCurrency: "EUR",
-    priceSpecification: {
-      "@type": "UnitPriceSpecification",
-      price: "127",
+  offers: [
+    {
+      "@type": "Offer",
+      name: "App",
+      price: priceLabel("app"),
       priceCurrency: "EUR",
-      unitText: "mês",
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: priceLabel("app"),
+        priceCurrency: "EUR",
+        unitText: "mês",
+      },
+      availability: "https://schema.org/InStock",
     },
-    availability: "https://schema.org/InStock",
-  },
+    {
+      "@type": "Offer",
+      name: "Coaching 1:1",
+      price: priceLabel("coaching"),
+      priceCurrency: "EUR",
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: priceLabel("coaching"),
+        priceCurrency: "EUR",
+        unitText: "mês",
+      },
+      availability: "https://schema.org/InStock",
+    },
+  ],
 };
 
 const features = [
@@ -129,24 +147,10 @@ const features = [
 
 const steps = [
   { n: "1", title: "Inscreve-te",        desc: "Preenche o questionário em 2 minutos. O coach recebe as tuas respostas de imediato." },
-  { n: "2", title: "Recebe o teu plano", desc: "Nas primeiras 24 horas úteis o coach cria e envia o teu plano personalizado na app." },
+  { n: "2", title: "Recebe o teu plano", desc: "O plano aparece na app no momento, montado a partir das tuas respostas. Com coaching 1:1, o André reescreve-o a partir do que registas." },
   { n: "3", title: "Treina com suporte", desc: "Segue o plano, regista os treinos e acompanha a tua evolução · o coach está sempre disponível." },
 ];
 
-const included = [
-  "Plano de treino semanal 100% personalizado",
-  "Ajustes semanais ao plano",
-  "Check-ins e análise de progresso",
-  "Chat privado com o coach",
-  "AI Coach disponível 24/7",
-  "Rastreio de nutrição e macros (base de dados portuguesa)",
-  "Registo de séries, pesos e medidas",
-  "Fotos de progresso com comparação antes/depois",
-  "Recordes pessoais e conquistas",
-  "Relatório mensal em PDF",
-  "Notificações e lembretes automáticos",
-  "Acesso à app iOS e Android (PWA)",
-];
 
 export default async function PersonalTrainerOnlinePage() {
   const admin = createAdminClient();
@@ -244,7 +248,7 @@ export default async function PersonalTrainerOnlinePage() {
                   >
                     Trial grátis de 7 dias →
                   </Link>
-                  <p className="text-zinc-500 text-xs">Depois €127/mês · Sem contratos</p>
+                  <p className="text-zinc-500 text-xs">{`Depois desde €${priceLabel("app")}/mês · Sem contratos`}</p>
                 </div>
 
                 <Link
@@ -487,52 +491,7 @@ export default async function PersonalTrainerOnlinePage() {
           {/* ── PRICE ────────────────────────────────────────────── */}
           <section className="max-w-2xl mx-auto px-5 pb-20">
             <ScrollReveal direction="up">
-              <div
-                className="rounded-3xl p-7 space-y-6"
-                style={{
-                  background: "linear-gradient(160deg, rgba(201,168,76,0.1) 0%, rgba(10,10,12,0.95) 100%)",
-                  border: "1px solid rgba(201,168,76,0.28)",
-                }}
-              >
-                <div className="text-center space-y-1">
-                  <p className="text-zinc-500 text-xs font-bold tracking-widest uppercase">Plano Premium</p>
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-5xl font-black text-white">€127</span>
-                    <span className="text-zinc-500 text-base">/mês</span>
-                  </div>
-                  <p className="text-zinc-500 text-sm">Tudo incluído. Sem surpresas.</p>
-                </div>
-
-                <ul className="space-y-2.5">
-                  {included.map((item) => (
-                    <li key={item} className="flex items-center gap-3 text-sm text-zinc-300">
-                      <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold text-black"
-                        style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>✓</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  href="/start"
-                  className="block text-center w-full py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110"
-                  style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
-                >
-                  Aderir agora →
-                </Link>
-
-                {/* Guarantee badge */}
-                <div className="flex items-center justify-center gap-2.5 py-3 px-4 rounded-2xl"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                  <span className="text-lg">🛡️</span>
-                  <div className="text-left">
-                    <p className="text-white text-xs font-bold">Garantia de 7 dias</p>
-                    <p className="text-zinc-500 text-xs">Experimenta sem risco. Reembolso total se não ficares satisfeito.</p>
-                  </div>
-                </div>
-
-                <p className="text-center text-zinc-600 text-xs">Cancela a qualquer momento. Sem permanência.</p>
-              </div>
+              <PricingTiers lang="pt" signupHref="/start" />
             </ScrollReveal>
           </section>
 
