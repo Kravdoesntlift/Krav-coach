@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { priceLabel } from "@/lib/billing/tiers";
 import { signupAndStartCheckout } from "./actions";
 import { DAY_NAMES, DAY_NAMES_EN, WEEK_ORDER_MON_FIRST } from "@/lib/supabase/types";
 
@@ -102,6 +103,10 @@ const T = {
   terms_pre:        { pt: "Ao criar conta aceitas os nossos",                     en: "By creating an account you accept our" },
   terms_link:       { pt: "termos de serviço",                                    en: "terms of service" },
   terms_post:       { pt: ". 7 dias grátis, sem cartão de crédito.",              en: ". 7 days free, no credit card required." },
+  after_title:      { pt: "No fim dos 7 dias escolhes",                           en: "At the end of the 7 days you choose" },
+  after_app:        { pt: "o plano é montado pela app e renovado todas as semanas", en: "the app builds your plan and refreshes it every week" },
+  after_coaching:   { pt: "o André escreve o teu plano e ajusta-o todas as semanas", en: "André writes your plan and adjusts it every week" },
+  after_note:       { pt: "Não pedimos cartão agora. Se não escolheres nenhum, não te cobramos nada.", en: "We do not ask for a card now. If you pick neither, you are not charged." },
 
   back:             { pt: "Voltar",                                               en: "Back" },
   continue:         { pt: "Continuar",                                            en: "Continue" },
@@ -549,6 +554,24 @@ export default function StartPage() {
                   {quiz.confirmPassword.length > 0 && quiz.password !== quiz.confirmPassword && (
                     <p className="text-red-400 text-xs mt-1 ml-1">{tx(T.pw_mismatch, lang)}</p>
                   )}
+                </div>
+                {/* Nobody pays here, so the two prices have to appear at least
+                    once before the account exists: otherwise the only clue that
+                    the cheaper tier exists is one line on the landing hero. */}
+                <div className="rounded-2xl p-4 space-y-2.5"
+                  style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.16)" }}>
+                  <p className="text-[10px] font-black tracking-[0.14em] uppercase text-brand-gold text-center">
+                    {tx(T.after_title, lang)}
+                  </p>
+                  <div className="flex items-start gap-2 text-xs">
+                    <span className="text-white font-bold shrink-0 w-[68px]">App €{priceLabel("app")}</span>
+                    <span className="text-zinc-500 leading-snug">{tx(T.after_app, lang)}</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-xs">
+                    <span className="font-bold shrink-0 w-[68px]" style={{ color: "#C9A84C" }}>1:1 €{priceLabel("coaching")}</span>
+                    <span className="text-zinc-500 leading-snug">{tx(T.after_coaching, lang)}</span>
+                  </div>
+                  <p className="text-zinc-600 text-[11px] leading-snug text-center pt-0.5">{tx(T.after_note, lang)}</p>
                 </div>
                 <p className="text-zinc-600 text-xs text-center pt-1">
                   {tx(T.terms_pre, lang)}{" "}
