@@ -8,6 +8,7 @@ import PushNotificationToggle from "@/components/PushNotificationToggle";
 import CoachClientList, { type ClientData } from "@/components/coach/CoachClientList";
 import SuggestPlanButton from "@/components/coach/SuggestPlanButton";
 import { healStaleSubscriptions } from "@/lib/billing/sync";
+import { tierForAmount, type Tier } from "@/lib/billing/tiers";
 
 export default async function CoachDashboard() {
   const supabase = await createClient();
@@ -88,16 +89,24 @@ export default async function CoachDashboard() {
   // Stripe had already charged of being in arrears.
   const { data: subRows } = await supabase
     .from("stripe_subscriptions")
-    .select("client_id, status")
+    .select("client_id, status, amount_cents")
     .eq("coach_id", user!.id);
 
   const subStatusByClient = new Map<string, string>();
+  // Which tier each client is on, read from what they pay. The coach needs it
+  // at a glance: writing a plan by hand for somebody on the app tier is work
+  // nobody is paying for.
+  const tierByClient = new Map<string, Tier>();
   for (const s of subRows ?? []) {
     // A client may have older cancelled rows alongside the live one; the live
     // one is what governs.
     const current = subStatusByClient.get(s.client_id);
     if (!current || s.status === "active" || s.status === "trialing") {
       subStatusByClient.set(s.client_id, s.status);
+    }
+    if (s.status === "active" || s.status === "trialing") {
+      const tier = tierForAmount(s.amount_cents);
+      if (tier) tierByClient.set(s.client_id, tier);
     }
   }
 
@@ -469,6 +478,7 @@ export default async function CoachDashboard() {
                 needsAttention,
                 renewsSoon,
                 trialDaysLeft,
+                tier: tierByClient.get(client.id) ?? null,
               };
             })}
         />

@@ -27,6 +27,7 @@ import MonthCalendar, { type DayStatus } from "@/components/client/MonthCalendar
 import { computeAchievements } from "@/lib/achievements";
 import { ensureBasePlan, basePlanIdFor } from "@/lib/training/provision";
 import { isBasePlan } from "@/lib/training/base-plan";
+import { tierForAmount } from "@/lib/billing/tiers";
 import BasePlanNote from "@/components/client/BasePlanNote";
 
 
@@ -77,6 +78,7 @@ export default async function ClientDashboard() {
     { data: challengeProgress },
     { data: clientGoals },
     { data: onboardingRecord },
+    { data: liveSubscription },
     { data: weekLogs },
     { data: allCheckins },
     { data: allRecords },
@@ -119,6 +121,10 @@ export default async function ClientDashboard() {
     supabase.from("client_goals").select("*").eq("client_id", user!.id).eq("completed", false).order("created_at"),
     // Onboarding
     supabase.from("client_onboarding").select("client_id, availability, available_days, equipment, injuries").eq("client_id", user!.id).maybeSingle(),
+    // What they pay for, so the app never sells somebody what they already have
+    supabase.from("stripe_subscriptions").select("status, amount_cents")
+      .eq("client_id", user!.id).in("status", ["active", "trialing"])
+      .order("current_period_end", { ascending: false }).limit(1),
     // Exercises logged this week (muscle map)
     supabase.from("workout_logs").select("exercise_name").eq("client_id", user!.id)
       .gte("logged_at", weekStart).lte("logged_at", weekEndStr),
@@ -180,9 +186,44 @@ export default async function ClientDashboard() {
     break; // "missed" always breaks, including today
   }
 
-  // Fallback: if no plan for this week, show the most recent plan
+  // Trial, app tier or coaching: the base plan card says something different
+  // in each, and getting this wrong means selling someone what they bought.
+  const paidTier = tierForAmount(liveSubscription?.[0]?.amount_cents);
+  const onTrial =
+    typeof mergedProfile?.trial_ends_at === "string" &&
+    new Date(mergedProfile.trial_ends_at).getTime() > Date.now();
+  const planMode: "trial" | "app" | "coaching" = paidTier ?? (onTrial ? "trial" : "coaching");
+
   let plan = planThisWeek;
   let isCurrentWeek = true;
+
+  // No plan for the week that is actually running. For a trial, and for
+  // anyone on the app tier, that is this app's job: write it now. It used to
+  // run only when the client had no plan at all, which meant somebody paying
+  // for the app tier stayed on the last week the trial had written, forever.
+  if (!plan) {
+    const provisioned = await ensureBasePlan({ clientId: user!.id });
+    if (!provisioned.ok) {
+      console.error("[base-plan] could not provision for", user!.id, provisioned.error);
+    } else {
+      // Read by id, not by week. Next memoises identical fetches within one
+      // render, and the query above already asked for this exact week and got
+      // nothing, so repeating it would be served that same empty answer from
+      // cache while the rows sat in the database.
+      const { data: fresh, error: freshErr } = await supabase
+        .from("workout_plans")
+        .select(`*, workout_days(*, exercises(*), workout_completions(*))`)
+        .eq("id", basePlanIdFor(user!.id, weekStart))
+        .maybeSingle();
+      if (freshErr) {
+        console.error("[base-plan] wrote the plan but could not read it back:", freshErr.code, freshErr.message);
+      }
+      if (fresh) plan = fresh;
+    }
+  }
+
+  // Still nothing: a coaching client waiting on the coach, or an account with
+  // no plan this week. Show the most recent one rather than an empty screen.
   if (!plan) {
     const { data: latestPlan } = await supabase
       .from("workout_plans")
@@ -194,42 +235,6 @@ export default async function ClientDashboard() {
       .maybeSingle();
     plan = latestPlan;
     isCurrentWeek = false;
-  }
-
-  // Still nothing: a brand new account, or one created before the base plan
-  // existed. Write it now and read it straight back, so the first screen of a
-  // trial is the week itself rather than "o teu coach ainda não criou o plano".
-  // The calendar above was computed before this and catches up on the next
-  // load; it has nothing to show for a new account either way.
-  if (!plan) {
-    const provisioned = await ensureBasePlan({ clientId: user!.id });
-    if (!provisioned.ok) {
-      console.error("[base-plan] could not provision for", user!.id, provisioned.error);
-    } else {
-      // Read back whether or not this render was the one that wrote it. Two
-      // renders of this page can run at once; the one that loses the race gets
-      // "already has a plan", and skipping the read there is what made the
-      // very first screen of a trial still say the week was empty.
-      // Read by id, not by week. Next memoises identical fetches within one
-      // render, and the query above already asked for this exact week and got
-      // nothing, so repeating it returns that same empty answer from cache
-      // instead of the row we just wrote. This is why the first screen of a
-      // trial stayed empty while the plan sat in the database.
-      const { data: fresh, error: freshErr } = await supabase
-        .from("workout_plans")
-        .select(`*, workout_days(*, exercises(*), workout_completions(*))`)
-        .eq("id", basePlanIdFor(user!.id, weekStart))
-        .maybeSingle();
-      if (freshErr) {
-        console.error("[base-plan] wrote the plan but could not read it back:", freshErr.code, freshErr.message);
-      } else if (!fresh) {
-        console.error("[base-plan] wrote the plan but no row for week", weekStart, "client", user!.id);
-      }
-      if (fresh) {
-        plan = fresh;
-        isCurrentWeek = true;
-      }
-    }
   }
 
   // Get coach info: from plan first, then from explicit assignment (coach_clients)
@@ -489,10 +494,7 @@ export default async function ClientDashboard() {
                 }
                 equipmentLabel={equipmentLabel(onboardingRecord?.equipment, lang)}
                 hasInjuries={typeof onboardingRecord?.injuries === "string" && onboardingRecord.injuries.trim().length > 0}
-                isTrial={
-                  typeof mergedProfile?.trial_ends_at === "string" &&
-                  new Date(mergedProfile.trial_ends_at).getTime() > Date.now()
-                }
+                mode={planMode}
               />
             )}
             <WorkoutWeek plan={plan as unknown as WorkoutPlan} clientId={user!.id} coachId={coachId ?? undefined} />

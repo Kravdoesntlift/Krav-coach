@@ -1,6 +1,7 @@
 import { createHash } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { buildBasePlan, type BasePlanInput, type Equipment, type Goal, type Level } from "./base-plan";
+import { buildBasePlan, isBasePlan, type BasePlanInput, type Equipment, type Goal, type Level } from "./base-plan";
+import { tierForAmount } from "@/lib/billing/tiers";
 
 /**
  * Give a new account a plan the moment it exists.
@@ -12,8 +13,13 @@ import { buildBasePlan, type BasePlanInput, type Equipment, type Goal, type Leve
  * for every trial, most of which never pay.
  *
  * The plan written here is explicitly the base programme, named as such. What
- * a subscription buys is the coach reading the answers and writing a plan
+ * the coaching tier buys is the coach reading the answers and writing a plan
  * against them, which is a different thing and has to stay a different thing.
+ *
+ * It also runs every week, not only once: somebody paying for the app tier
+ * would otherwise run out of plan the moment the two weeks written during the
+ * trial ran out. Every fourth week is lighter, which is what the guide asks
+ * for and what nobody does on their own.
  */
 
 export type ProvisionResult =
@@ -63,6 +69,46 @@ function asOneOf<T extends string>(value: unknown, allowed: T[]): T | null {
   return typeof value === "string" && (allowed as string[]).includes(value) ? (value as T) : null;
 }
 
+type Admin = ReturnType<typeof createAdminClient>;
+
+/**
+ * Whether this client should be getting plans written by the app.
+ *
+ * Trial: yes, that is the whole trial. App tier: yes, that is what it is.
+ * Coaching tier: no. Writing an automatic week for somebody paying 127 euros
+ * for a coach to write it would be the worst bug in the product, so the check
+ * fails closed: anything unclear means no automatic plan.
+ */
+async function entitledToBasePlans(
+  admin: Admin,
+  clientId: string,
+): Promise<{ entitled: true } | { entitled: false; reason: string }> {
+  const [{ data: profile }, { data: subs }] = await Promise.all([
+    admin.from("profiles").select("trial_ends_at").eq("id", clientId).maybeSingle(),
+    admin
+      .from("stripe_subscriptions")
+      .select("status, amount_cents")
+      .eq("client_id", clientId)
+      .in("status", ["active", "trialing"])
+      .order("current_period_end", { ascending: false })
+      .limit(1),
+  ]);
+
+  const live = subs?.[0];
+  if (live) {
+    const tier = tierForAmount(live.amount_cents);
+    if (tier === "app") return { entitled: true };
+    return { entitled: false, reason: "coaching tier: the coach writes this plan" };
+  }
+
+  const trialEnds = profile?.trial_ends_at ? new Date(profile.trial_ends_at as string) : null;
+  if (trialEnds && trialEnds.getTime() > Date.now()) return { entitled: true };
+
+  // No live subscription and no running trial. The client layout will not let
+  // them in anyway; writing plans for them would just be noise.
+  return { entitled: false, reason: "no live subscription and no running trial" };
+}
+
 /**
  * Writes the base plan for the current week and the next one. A seven day
  * trial almost always straddles a Sunday, and a plan that stops on the
@@ -98,14 +144,30 @@ export async function ensureBasePlan(args: {
   }
   if (!coachId) return { ok: false, error: "no coach to attach the plan to" };
 
-  // Never a second time, and never over a plan the coach wrote.
+  // Which weeks this call is responsible for, and which of them are empty.
+  // A week the coach has already written into is covered: the automatic plan
+  // never lands on top of a plan a person wrote.
+  const firstMonday = mondayOf();
+  const wantedWeeks = Array.from({ length: weeks }, (_, i) => addWeeks(firstMonday, i));
+
   const { data: existing, error: existingErr } = await admin
     .from("workout_plans")
-    .select("id")
-    .eq("client_id", clientId)
-    .limit(1);
+    .select("id, name, week_start")
+    .eq("client_id", clientId);
   if (existingErr) return { ok: false, error: `looking for existing plans: ${existingErr.message}` };
-  if (existing && existing.length > 0) return { ok: true, created: false, reason: "client already has a plan" };
+
+  const covered = new Set((existing ?? []).map((p) => p.week_start as string));
+  const missing = wantedWeeks.filter((w) => !covered.has(w));
+  if (missing.length === 0) return { ok: true, created: false, reason: "weeks already covered" };
+
+  // Who gets an automatic plan: anyone still in the trial, and anyone paying
+  // for the app tier. Coaching clients do not, because their plan is the
+  // thing they are paying a person to write.
+  const eligible = await entitledToBasePlans(admin, clientId);
+  if (!eligible.entitled) return { ok: true, created: false, reason: eligible.reason };
+
+  // How many base weeks this client has had, so every fourth one is lighter.
+  const baseWeeksSoFar = (existing ?? []).filter((p) => isBasePlan(p.name as string)).length;
 
   const [{ data: onboarding }, { data: profile }] = await Promise.all([
     admin
@@ -126,16 +188,18 @@ export async function ensureBasePlan(args: {
     lang: profile?.lang === "en" ? "en" : "pt",
   };
 
-  const firstMonday = mondayOf();
   const planIds: string[] = [];
 
-  // The week in progress starts today. Every week after it is the full split.
-  const thisWeek = buildBasePlan({ ...input, startOnWeekday: new Date().getUTCDay() });
-  const laterWeeks = buildBasePlan(input);
-
-  for (let week = 0; week < weeks; week++) {
-    const blueprint = week === 0 ? thisWeek : laterWeeks;
-    const weekStart = addWeeks(firstMonday, week);
+  for (const weekStart of missing) {
+    // The week already in progress starts today, so nothing is owed for days
+    // that are already gone. Later weeks are the full split.
+    const inProgress = weekStart === firstMonday;
+    const weekNumber = baseWeeksSoFar + missing.indexOf(weekStart) + 1;
+    const blueprint = buildBasePlan({
+      ...input,
+      deload: weekNumber % 4 === 0,
+      startOnWeekday: inProgress ? new Date().getUTCDay() : null,
+    });
     const planId = basePlanIdFor(clientId, weekStart);
 
     const { error: planErr } = await admin

@@ -32,6 +32,12 @@ export interface BasePlanInput {
   sessionMinutes: number | null;
   lang: Lang;
   /**
+   * A lighter week: one set less on everything, which the guide asks for every
+   * fourth week. Training hard forever is not a harder plan, it is a plan that
+   * ends in an injury or in quitting.
+   */
+  deload?: boolean;
+  /**
    * For the week already in progress: the weekday the plan starts on, in JS
    * numbering. Days before it become rest.
    *
@@ -374,7 +380,8 @@ function exerciseCount(sessionMinutes: number | null, level: Level): number {
   return level === "beginner" ? Math.min(byTime, 5) : byTime;
 }
 
-function setsFor(isCompound: boolean, level: Level, position: number): number {
+function setsFor(isCompound: boolean, level: Level, position: number, deload = false): number {
+  if (deload) return level === "beginner" ? 2 : 3;
   if (level === "beginner") return 3;
   // Four sets belong to the two movements the session is built around. Giving
   // every compound four turns a five compound lower day into twenty heavy sets.
@@ -406,6 +413,10 @@ const NOTES = {
   core: {
     pt: "Abdominal contraído, sem deixar cair a lombar.",
     en: "Brace hard, do not let the lower back sag.",
+  },
+  deload: {
+    pt: "Semana mais leve, de propósito. Menos uma série em tudo, mesma execução. É aqui que o corpo apanha o trabalho das últimas semanas.",
+    en: "A lighter week, on purpose. One set less on everything, same execution. This is where the body catches up with the last few weeks.",
   },
   restDay: {
     pt: "Descanso, recuperação ativa",
@@ -501,6 +512,7 @@ export function buildBasePlan(input: BasePlanInput): BasePlan {
       const isCompound = movement.compound === true;
       const note =
         id === "plank" ? NOTES.core[lang]
+        : index === 0 && input.deload === true ? NOTES.deload[lang]
         : index === 0 ? NOTES.firstCompound[lang]
         : isCompound ? NOTES.compound[lang]
         : bodyweightOnly ? NOTES.isolationBodyweight[lang]
@@ -508,7 +520,7 @@ export function buildBasePlan(input: BasePlanInput): BasePlan {
 
       return {
         name,
-        sets: setsFor(isCompound, level, index),
+        sets: setsFor(isCompound, level, index, input.deload === true),
         reps: repsFor(isCompound, id),
         notes: note,
         order_index: index,

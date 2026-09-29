@@ -29,6 +29,8 @@ export interface ClientData {
   needsAttention: boolean;
   renewsSoon: boolean;
   trialDaysLeft?: number | null;
+  /** What they pay for: app (automatic plan) or coaching (you write it). */
+  tier?: "app" | "coaching" | null;
 }
 
 interface Props {
@@ -129,6 +131,19 @@ export default function CoachClientList({ clients, coachId, coachName }: Props) 
                       {client.trialDaysLeft !== null && client.trialDaysLeft !== undefined && client.trialDaysLeft <= 0 && (
                         <span className="text-[9px] bg-red-900/30 text-red-400 border border-red-700/30 px-1.5 py-0.5 rounded-full shrink-0 font-bold">
                           Trial expirado
+                        </span>
+                      )}
+                      {/* What they pay for. "App" means the plan is written by
+                          the app: doing it by hand is unpaid work. */}
+                      {client.tier === "app" && (
+                        <span className="text-[9px] bg-zinc-800 text-zinc-300 border border-zinc-700 px-1.5 py-0.5 rounded-full shrink-0 font-bold">
+                          App
+                        </span>
+                      )}
+                      {client.tier === "coaching" && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full shrink-0 font-bold"
+                          style={{ background: "rgba(201,168,76,0.16)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.3)" }}>
+                          1:1
                         </span>
                       )}
                       {client.needsAttention && client.status !== "cancelled" && (

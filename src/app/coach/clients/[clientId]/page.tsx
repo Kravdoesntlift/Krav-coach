@@ -8,6 +8,7 @@ import { deletePlan, duplicatePlan } from "@/app/coach/plans/actions";
 import { isBasePlan } from "@/lib/training/base-plan";
 import PayLinkButton from "@/components/coach/PayLinkButton";
 import { payLinkFor } from "@/lib/billing/pay-link";
+import { TIERS, tierForAmount } from "@/lib/billing/tiers";
 import DeletePlanButton from "@/components/coach/DeletePlanButton";
 import DuplicatePlanButton from "@/components/coach/DuplicatePlanButton";
 import CreateProgramButton from "@/components/coach/CreateProgramButton";
@@ -69,6 +70,17 @@ export default async function ClientDetailPage({
 
   // Ordered newest first, so this is the week to build the next block from.
   const latestPlan = plans?.[0] ?? null;
+
+  // What this client pays for. On the app tier their week is written by the
+  // app, so a plan written by hand here is work nobody is paying for.
+  const { data: liveSubs } = await supabase
+    .from("stripe_subscriptions")
+    .select("status, amount_cents")
+    .eq("client_id", clientId)
+    .in("status", ["active", "trialing"])
+    .order("current_period_end", { ascending: false })
+    .limit(1);
+  const tier = tierForAmount(liveSubs?.[0]?.amount_cents);
 
   const { data: checkins } = await supabase
     .from("weekly_checkins")
@@ -182,6 +194,23 @@ export default async function ClientDetailPage({
             trialDaysLeft > 0
               ? <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#C9A84C]/15 text-[#C9A84C] border border-[#C9A84C]/30">Trial · {trialDaysLeft}d</span>
               : <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">Trial expirado</span>
+          )}
+          {tier && (
+            <span
+              className="text-xs font-bold px-2 py-0.5 rounded-full"
+              style={
+                tier === "coaching"
+                  ? { background: "rgba(201,168,76,0.16)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.3)" }
+                  : { background: "#27272a", color: "#d4d4d8", border: "1px solid #3f3f46" }
+              }
+              title={
+                tier === "app"
+                  ? "Plano escrito pela app, todas as semanas. Não precisas de escrever nada."
+                  : "Plano escrito por ti, ajustado todas as semanas."
+              }
+            >
+              {TIERS[tier].name.pt}
+            </span>
           )}
           {trialDaysLeft !== null && trialDaysLeft <= 2 && (
             <SendTrialEmailButton clientId={clientId} daysLeft={trialDaysLeft} />

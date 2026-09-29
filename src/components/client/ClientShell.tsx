@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useLang } from "@/lib/i18n/useLang";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
@@ -12,7 +13,6 @@ interface ClientShellProps {
   profile: Profile;
   unread: number;
   trialDaysLeft: number | null;
-  subscribeAction: () => Promise<void>;
   userId: string;
 }
 
@@ -21,7 +21,6 @@ export function ClientShell({
   profile,
   unread,
   trialDaysLeft,
-  subscribeAction,
   userId,
 }: ClientShellProps) {
   const { t, lang } = useLang();
@@ -94,14 +93,14 @@ export function ClientShell({
                 {trialDaysLeft === 1 ? t("trial_ends_tomorrow") : t("trial_ends_2days")}
               </p>
             </div>
-            <form action={subscribeAction} className="shrink-0">
-              <button
-                type="submit"
-                className="text-xs font-bold text-black bg-[#C9A84C] rounded-lg px-3 py-1.5 hover:bg-[#A8893A] transition-colors"
-              >
-                {t("subscribe")}
-              </button>
-            </form>
+            {/* Sends them to the two plans rather than silently picking one:
+                the whole point of the cheaper tier is that it is offered. */}
+            <Link
+              href="/client/planos"
+              className="shrink-0 text-xs font-bold text-black bg-[#C9A84C] rounded-lg px-3 py-1.5 hover:bg-[#A8893A] transition-colors"
+            >
+              {t("subscribe")}
+            </Link>
           </div>
         )}
         {children}
