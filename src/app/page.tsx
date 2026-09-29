@@ -194,7 +194,7 @@ export default async function LandingPage({
 
   // Self-service funnel: always /start (quiz + stripe)
   const signupUrl = "/start";
-  const signupUrlWithLang = signupUrl;
+  const signupUrlWithLang = isEN ? `${signupUrl}?lang=en` : signupUrl;
   const initials = coach?.full_name
     ? coach.full_name.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()
     : "K";

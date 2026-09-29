@@ -245,7 +245,7 @@ export default async function OnlinePersonalTrainerPage() {
 
                 <div className="flex flex-col items-center gap-2">
                   <Link
-                    href="/start"
+                    href="/start?lang=en"
                     className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110 w-full sm:w-auto"
                     style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
                   >
@@ -494,7 +494,7 @@ export default async function OnlinePersonalTrainerPage() {
           {/* ── PRICE ────────────────────────────────────────────── */}
           <section className="max-w-2xl mx-auto px-5 pb-20">
             <ScrollReveal direction="up">
-              <PricingTiers lang="en" signupHref="/start" />
+              <PricingTiers lang="en" signupHref="/start?lang=en" />
             </ScrollReveal>
           </section>
 
@@ -594,7 +594,7 @@ export default async function OnlinePersonalTrainerPage() {
             </span>
             <div className="flex gap-4">
               <Link href="/auth/login" className="hover:text-zinc-400 transition-colors">Log in</Link>
-              <Link href="/start" className="hover:text-zinc-400 transition-colors">Sign up</Link>
+              <Link href="/start?lang=en" className="hover:text-zinc-400 transition-colors">Sign up</Link>
             </div>
           </footer>
 

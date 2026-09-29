@@ -305,6 +305,11 @@ export default function StartPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // A link from the English landing has to win over the phone's locale:
+    // somebody reading the site in English and landing in a Portuguese
+    // questionnaire simply leaves.
+    const asked = new URLSearchParams(window.location.search).get("lang");
+    if (asked === "en" || asked === "pt") { setLang(asked); return; }
     const browser = navigator.language.toLowerCase();
     if (browser.startsWith("en") || browser.startsWith("de") || browser.startsWith("fr") || browser.startsWith("it")) {
       setLang("en");
