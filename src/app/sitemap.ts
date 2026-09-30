@@ -22,6 +22,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/start`,                       lastModified: LAST_CONTENT_UPDATE, changeFrequency: "monthly", priority: 0.8 },
     // Lead magnet: was crawlable and linked, but missing from the sitemap
     { url: `${SITE_URL}/guia`,                        lastModified: LAST_CONTENT_UPDATE, changeFrequency: "monthly", priority: 0.7 },
+    // The only page that sells something outright, so it ranks near the top.
+    { url: `${SITE_URL}/ebook`,                       lastModified: new Date("2026-09-30"), changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE_URL}/links`,                       lastModified: LAST_CONTENT_UPDATE, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/terms`,                       lastModified: LAST_LEGAL_UPDATE,   changeFrequency: "yearly",  priority: 0.3 },
     { url: `${SITE_URL}/privacy`,                     lastModified: LAST_LEGAL_UPDATE,   changeFrequency: "yearly",  priority: 0.3 },

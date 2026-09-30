@@ -57,6 +57,11 @@ Dois planos pagos, ambos mensais e sem fidelização:
 - Trial de 7 dias grátis, sem necessidade de cartão. Durante o trial o plano
   entregue é o automático da aplicação.
 
+Há também um produto avulso, sem subscrição:
+
+- Livro "90 Dias" (${SITE_URL}/ebook): programa de treino de 13 semanas em PDF,
+  12,90 EUR, pagamento único, entregue por email. Não dá acesso à aplicação.
+
 ## Detalhes
 
 - Idiomas: português (Portugal) e inglês.
@@ -79,6 +84,7 @@ Dois planos pagos, ambos mensais e sem fidelização:
 - [Sobre o coach](${SITE_URL}/sobre): formação, método de trabalho e os limites do serviço.
 - [Começar](${SITE_URL}/start): questionário de inscrição e início do trial.
 - [Guia grátis](${SITE_URL}/guia): guia em PDF sobre estrutura de treino e nutrição.
+- [Livro 90 Dias](${SITE_URL}/ebook): programa de 13 semanas, pago, 12,90 EUR.
 - [Termos](${SITE_URL}/terms) · [Privacidade](${SITE_URL}/privacy)
 
 ## Contacto

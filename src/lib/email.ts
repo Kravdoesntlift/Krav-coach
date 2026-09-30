@@ -218,6 +218,68 @@ export async function sendWelcomeEmail({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Ebook delivery: sent the moment Stripe confirms the payment
+// ─────────────────────────────────────────────────────────────────────────────
+export async function sendEbookEmail({
+  to, name, link, lang = "pt",
+}: {
+  to: string; name?: string | null; link: string; lang?: "pt" | "en";
+}) {
+  if (!process.env.RESEND_API_KEY) return;
+  const firstName = (name ?? "").split(" ")[0];
+  const isEN = lang === "en";
+  const hello = firstName
+    ? (isEN ? `Hi ${firstName},` : `Olá ${firstName},`)
+    : (isEN ? "Hi," : "Olá,");
+
+  await sendEmail({
+    from: FROM, to,
+    subject: isEN ? "Your copy of 90 Days" : "O teu exemplar dos 90 Dias",
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0a0c;font-family:system-ui,-apple-system,sans-serif;color:#e4e4e7">
+  <div style="max-width:520px;margin:40px auto;padding:0 16px">
+    <div style="text-align:center;margin-bottom:28px">
+      <p style="font-size:24px;font-weight:900;letter-spacing:-0.5px;color:#fff;margin:0">KRAV<span style="color:#C9A84C">.</span></p>
+    </div>
+    <div style="background:#111113;border:1px solid #27272a;border-radius:20px;padding:32px;margin-bottom:16px">
+      <p style="color:#C9A84C;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0 0 10px">
+        ${isEN ? "90 Days · your copy" : "90 Dias · o teu exemplar"}
+      </p>
+      <h1 style="color:#fff;font-size:22px;font-weight:900;margin:0 0 16px">${hello}</h1>
+      <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0 0 20px">
+        ${isEN
+          ? "Thank you. Your book is at the link below. Keep this email: the link does not expire, and it is how you get back to it."
+          : "Obrigado. O teu livro está no link aqui em baixo. Guarda este email: o link não expira e é por aí que voltas ao livro."}
+      </p>
+      <a href="${link}"
+         style="display:block;background:linear-gradient(135deg,#E8C96B,#C9A84C);color:#000;font-weight:800;font-size:15px;padding:15px 24px;border-radius:14px;text-decoration:none;text-align:center;margin-bottom:18px">
+        ${isEN ? "Read 90 Days →" : "Ler os 90 Dias →"}
+      </a>
+      <p style="color:#71717a;font-size:13px;line-height:1.6;margin:0 0 6px">
+        ${isEN
+          ? "To keep it as a PDF, open it and use your browser's print option, then \"Save as PDF\"."
+          : "Para guardares em PDF, abre o livro e usa a opção de imprimir do browser, depois \"Guardar como PDF\"."}
+      </p>
+      <p style="color:#71717a;font-size:13px;line-height:1.6;margin:0">
+        ${isEN
+          ? "Start with block 1 even if you have trained before, and log every session. Reply to this email if anything is unclear, it reaches me."
+          : "Começa pelo bloco 1 mesmo que já treines, e regista todos os treinos. Responde a este email se alguma coisa não estiver clara, chega-me a mim."}
+      </p>
+    </div>
+    <p style="text-align:center;color:#3f3f46;font-size:11px;margin:0">
+      André Kravchuk · KRAV Coaching<br>
+      <a href="https://www.kravcoaching.com/start" style="color:#52525b">${isEN ? "The app, 7 days free" : "A app, 7 dias grátis"}</a>
+    </p>
+  </div>
+</body>
+</html>`,
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Trial reminder email: sent day 5 and day 6 of trial
 // ─────────────────────────────────────────────────────────────────────────────
 export async function sendTrialReminderEmail({

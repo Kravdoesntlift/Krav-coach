@@ -113,6 +113,56 @@ async function provisionSubscription(
   await syncSubscription(admin, args);
 }
 
+/**
+ * A book sale, which has nothing to do with subscriptions.
+ *
+ * Delivery is a signed link, not a file and not a row: there is no account,
+ * no table for purchases, and nothing here can be blocked by a migration
+ * somebody has not run. The buyer is written into `leads` afterwards, so the
+ * coach sees who bought, and a failure there must never cost the delivery.
+ */
+async function deliverEbook(admin: Admin, session: Stripe.Checkout.Session): Promise<void> {
+  const email = session.customer_details?.email ?? session.customer_email ?? null;
+  const name = session.customer_details?.name ?? null;
+  const lang = session.metadata?.lang === "en" ? "en" : "pt";
+  if (!email) {
+    console.error("[webhook] ebook sale with no email", { session: session.id });
+    return;
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.kravcoaching.com";
+  const { sendEbookEmail } = await import("@/lib/email");
+  const { ebookLink } = await import("@/lib/ebook/access");
+
+  // The email is the delivery. It runs first and its failure is loud.
+  await sendEbookEmail({ to: email, name, link: ebookLink(lang, siteUrl), lang });
+
+  try {
+    const note = `Comprou o ebook 90 Dias em ${new Date().toISOString().slice(0, 10)}.`;
+    const { error } = await admin
+      .from("leads")
+      .insert({ name: name ?? email.split("@")[0], email, source: `ebook-90dias-${lang}`, notes: note });
+
+    // Already a lead from the free guide: keep the original source, which is
+    // where they actually came from, and record the purchase in the notes.
+    if (error && (error.code === "23505" || error.message?.includes("duplicate"))) {
+      const { data: existing } = await admin
+        .from("leads")
+        .select("id, notes")
+        .eq("email", email)
+        .maybeSingle();
+      if (existing) {
+        const notes = existing.notes ? `${existing.notes}\n${note}` : note;
+        await admin.from("leads").update({ notes }).eq("id", existing.id);
+      }
+    } else if (error) {
+      console.error("[webhook] ebook lead insert failed:", error);
+    }
+  } catch (e) {
+    console.error("[webhook] ebook lead bookkeeping failed:", e);
+  }
+}
+
 /** Welcome message + push. Never throws: notifications must not block provisioning. */
 async function notifyNewSubscriber(
   admin: Admin,
@@ -207,6 +257,17 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
+
+        // One-off payments: today that means the book. Checked before the
+        // subscription guard below, which would otherwise drop it silently.
+        if (session.mode === "payment") {
+          const { EBOOK } = await import("@/lib/ebook/content");
+          if (session.metadata?.product === EBOOK.id && session.payment_status === "paid") {
+            await deliverEbook(admin, session);
+          }
+          break;
+        }
+
         if (!session.subscription) break;
 
         const customerId =
