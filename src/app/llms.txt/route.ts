@@ -1,4 +1,5 @@
 import { SITE_URL, BRAND, GOOGLE_BUSINESS_URL } from "@/lib/seo";
+import { ebookPrice } from "@/lib/ebook/content";
 
 export const dynamic = "force-static";
 
@@ -60,7 +61,8 @@ Dois planos pagos, ambos mensais e sem fidelização:
 Há também um produto avulso, sem subscrição:
 
 - Livro "90 Dias" (${SITE_URL}/ebook): programa de treino de 13 semanas em PDF,
-  12,90 EUR, pagamento único, entregue por email. Não dá acesso à aplicação.
+  ${ebookPrice()} EUR, pagamento único, entregue por email, com versão de ginásio
+  e versão de casa. Não dá acesso à aplicação.
 
 ## Detalhes
 
@@ -84,7 +86,7 @@ Há também um produto avulso, sem subscrição:
 - [Sobre o coach](${SITE_URL}/sobre): formação, método de trabalho e os limites do serviço.
 - [Começar](${SITE_URL}/start): questionário de inscrição e início do trial.
 - [Guia grátis](${SITE_URL}/guia): guia em PDF sobre estrutura de treino e nutrição.
-- [Livro 90 Dias](${SITE_URL}/ebook): programa de 13 semanas, pago, 12,90 EUR.
+- [Livro 90 Dias](${SITE_URL}/ebook): programa de 13 semanas, pago, ${ebookPrice()} EUR.
 - [Termos](${SITE_URL}/terms) · [Privacidade](${SITE_URL}/privacy)
 
 ## Contacto

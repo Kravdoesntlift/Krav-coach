@@ -26,6 +26,10 @@ export async function buyEbookAction(formData: FormData) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.kravcoaching.com";
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
+    // Euros, everywhere. Stripe's adaptive pricing offers the local currency
+    // to somebody browsing from abroad, and the conversion lands on us: the
+    // coach travels, so this would have fired on his own tests first.
+    adaptive_pricing: { enabled: false },
     payment_method_types: ["card"],
     line_items: [{
       price_data: {

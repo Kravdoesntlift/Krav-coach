@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ebookCopy, EBOOK } from "@/lib/ebook/content";
+import { ebookCopy, ebookPrice, EBOOK } from "@/lib/ebook/content";
 import { buyEbookAction } from "./actions";
 import { SITE_URL, absoluteUrl } from "@/lib/seo";
 import { priceLabel } from "@/lib/billing/tiers";
@@ -19,11 +19,11 @@ import ScrollReveal from "@/components/ScrollReveal";
 export const metadata: Metadata = {
   title: "90 Dias, o programa completo de treino | KRAV Coach",
   description:
-    "Programa de treino de 13 semanas em PDF: três blocos, progressão semana a semana, nutrição e como medir o progresso. Entrega imediata por email, 12,90 euros.",
+    `Programa de treino de 13 semanas em PDF: três blocos, progressão semana a semana, versão de ginásio e de casa, nutrição e como medir o progresso. Entrega imediata por email, ${ebookPrice()} euros.`,
   alternates: { canonical: "/ebook" },
   openGraph: {
     title: "90 Dias, o programa completo de treino",
-    description: "13 semanas, três blocos, progressão escrita. PDF entregue na hora por 12,90 euros.",
+    description: `13 semanas, três blocos, ginásio ou casa. PDF entregue na hora por ${ebookPrice()} euros.`,
     url: absoluteUrl("/ebook"),
     type: "website",
   },
@@ -37,8 +37,9 @@ const T = {
     eyebrow: "Ebook · PDF",
     title: "90 Dias",
     sub: "O programa completo para construíres o teu primeiro físico estético. Treze semanas escritas ao pormenor, não três dicas.",
-    cta: "Comprar por €12,90",
+    cta: `Comprar por €${ebookPrice("pt")}`,
     cta_note: "Pagamento único. O link chega ao teu email em segundos.",
+    pills: ["13 semanas", "Ginásio ou casa", "PT e EN"],
     problem_title: "O problema não é falta de informação",
     problem: [
       "Há vinte mil vídeos sobre como treinar peito. Não há um único que te diga o que fazer na semana 7 depois do que fizeste na semana 6.",
@@ -63,7 +64,7 @@ const T = {
     guarantee_title: "Garantia de 14 dias",
     guarantee: "Se o livro não te servir, escreve-me e devolvo o dinheiro. Prefiro isso a ter alguém a pagar por algo que não usa.",
     final_title: "Treze semanas, um plano, sem adivinhar",
-    final_note: "Pagamento único de €12,90. Sem subscrição.",
+    final_note: `Pagamento único de €${ebookPrice("pt")}. Sem subscrição.`,
     free_hint: "Ainda não me conheces? Começa pelo guia grátis.",
     free_cta: "Ver o guia grátis",
     app_hint: (app: string) => `Preferes que seja a app a montar e a renovar o teu treino todas as semanas? Isso é o plano App, €${app} por mês, com 7 dias grátis.`,
@@ -74,8 +75,9 @@ const T = {
     eyebrow: "Ebook · PDF",
     title: "90 Days",
     sub: "The complete programme for building your first aesthetic physique. Thirteen weeks written out in detail, not three tips.",
-    cta: "Buy for €12.90",
+    cta: `Buy for €${ebookPrice("en")}`,
     cta_note: "One payment. The link reaches your inbox in seconds.",
+    pills: ["13 weeks", "Gym or home", "PT and EN"],
     problem_title: "The problem is not a lack of information",
     problem: [
       "There are twenty thousand videos on how to train chest. There is not one that tells you what to do in week 7 given what you did in week 6.",
@@ -100,7 +102,7 @@ const T = {
     guarantee_title: "14 day guarantee",
     guarantee: "If the book is not for you, write to me and I refund you. I would rather that than have somebody paying for something they do not use.",
     final_title: "Thirteen weeks, one plan, no guessing",
-    final_note: "One payment of €12.90. No subscription.",
+    final_note: `One payment of €${ebookPrice("en")}. No subscription.`,
     free_hint: "Do not know me yet? Start with the free guide.",
     free_cta: "See the free guide",
     app_hint: (app: string) => `Would you rather the app built and refreshed your training every week? That is the App plan, €${app} a month, with 7 days free.`,
@@ -118,7 +120,7 @@ export default async function EbookSalesPage({
   const isEN = lang === "en";
   const t = T[lang];
   const book = ebookCopy(lang);
-  const price = isEN ? "12.90" : "12,90";
+  const price = ebookPrice(lang);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -174,7 +176,16 @@ export default async function EbookSalesPage({
               <h1 className="mt-4 text-6xl font-black tracking-tight sm:text-7xl">{t.title}</h1>
               <p className="mt-5 text-base leading-relaxed text-zinc-400 max-w-lg mx-auto">{t.sub}</p>
 
-              <div className="mt-8 flex items-baseline justify-center gap-2">
+              <div className="mt-7 flex flex-wrap items-center justify-center gap-2">
+                {t.pills.map((pill) => (
+                  <span key={pill} className="rounded-full px-3 py-1.5 text-[11px] font-bold text-zinc-400"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                    {pill}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-7 flex items-baseline justify-center gap-2">
                 <span className="text-4xl font-black text-white">€{price}</span>
                 <span className="text-zinc-500 text-sm">PDF</span>
               </div>

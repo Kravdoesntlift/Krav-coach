@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { ebookPrice } from "@/lib/ebook/price";
+import { priceLabel } from "@/lib/billing/tiers";
 
 /* ─── Types ──────────────────────────────────────────────────────────────────── */
 interface CardData {
@@ -64,6 +66,30 @@ function GuiaBg() {
           <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
         </svg>
       </div>
+    </div>
+  );
+}
+
+function EbookBg() {
+  return (
+    <div className="absolute inset-0 overflow-hidden" style={{ background: "#0b0906" }}>
+      <div className="absolute inset-0" style={{
+        background: "radial-gradient(ellipse at 70% 30%, rgba(201,168,76,0.18) 0%, transparent 62%)"
+      }}/>
+      <div className="absolute inset-0" style={{
+        backgroundImage: "linear-gradient(rgba(201,168,76,0.045) 1px,transparent 1px)",
+        backgroundSize: "100% 26px",
+      }}/>
+      {/* The number, oversized and cropped, as a cover would do it. */}
+      <span className="absolute -right-3 top-1/2 -translate-y-1/2 font-black leading-none"
+        style={{
+          fontSize: 132,
+          letterSpacing: "-0.06em",
+          color: "transparent",
+          WebkitTextStroke: "1.5px rgba(201,168,76,0.4)",
+        }}>
+        90
+      </span>
     </div>
   );
 }
@@ -144,37 +170,76 @@ function CommunityBg() {
 }
 
 /* ─── Cards data ─────────────────────────────────────────────────────────────── */
+/**
+ * Ordered by what it costs the person to say yes: free first, then fifteen
+ * euros, then a trial, then the coach. Every card states the price, because a
+ * card that hides it gets clicked once and never again.
+ */
 const CARDS: CardData[] = [
   {
     id: "pdf",
     badge: "✓ GRÁTIS",
     badgeColor: "green",
-    title: "Guia de Treino",
-    sub: "Download, enviado para o teu email",
+    title: "O plano de 5 dias, à borla",
+    sub: "Ginásio ou casa. Chega ao teu email em segundos.",
     cta: "Quero o guia",
     ctaStyle: "gold",
     href: "/guia",
-    featured: true,
     photo: "/pexels-hiral-chavda-1934832-8522509.jpg",
     photoPosition: "center 30%",
     bgStyle: { background: "#080a08" },
   },
   {
-    id: "coaching",
-    badge: "COACHING 1:1",
+    id: "ebook",
+    badge: `NOVO · LIVRO €${ebookPrice()}`,
     badgeColor: "gold",
-    title: "Transforma o teu corpo",
-    sub: "App exclusiva · acompanhamento direto comigo",
-    cta: "Trial grátis",
+    title: "90 Dias, escritos ao pormenor",
+    sub: `13 semanas, 3 blocos, ginásio ou casa · €${ebookPrice()}`,
+    cta: "Comprar",
+    ctaStyle: "gold",
+    href: "/ebook",
+    featured: true,
+    bgStyle: {},
+    modal: {
+      title: "90 Dias",
+      desc: "O programa completo, não três dicas. Treze semanas em três blocos, com a regra de progressão escrita para cada exercício, técnica dos seis movimentos principais, folha de registo, nutrição e uma semana de teste no fim. Versão de ginásio e versão de casa no mesmo livro. Chega ao teu email em segundos.",
+      cta: `Comprar por €${ebookPrice()}`,
+      href: "/ebook",
+    },
+  },
+  {
+    id: "app",
+    badge: "7 DIAS GRÁTIS",
+    badgeColor: "gold",
+    title: "A app monta o treino por ti",
+    sub: `Semana nova todas as semanas · desde €${priceLabel("app")}/mês`,
+    cta: "Experimentar",
     ctaStyle: "gold",
     href: "/start",
     photo: "/pexels-tima-miroshnichenko-6389516.jpg",
     photoPosition: "center center",
     bgStyle: { background: "#1a1200" },
     modal: {
-      title: "Coaching Online 1:1",
-      desc: "Treino e nutrição 100% feitos para ti, plano semanal personalizado, check-ins de evolução, nutrição adaptada ao teu objetivo e acesso direto a mim via chat. Um cliente ganhou +20kg de massa. Sem planos genéricos. Sem desculpas.",
-      cta: "Começar trial grátis de 7 dias",
+      title: "A app",
+      desc: `Respondes a um questionário de dois minutos e a app monta-te a semana a partir das tuas respostas, renova-a todas as semanas e compara cada treino com o anterior. Regista séries, cargas e refeições, e tem AI Coach 24/7. São 7 dias grátis sem cartão, e depois €${priceLabel("app")} por mês se quiseres ficar.`,
+      cta: "Começar os 7 dias grátis",
+      href: "/start",
+    },
+  },
+  {
+    id: "coaching",
+    badge: "COACHING 1:1",
+    badgeColor: "gold",
+    title: "Ou sou eu a escrever o teu plano",
+    sub: `Ajustes semanais e chat direto · €${priceLabel("coaching")}/mês`,
+    cta: "Ver como é",
+    ctaStyle: "outline",
+    href: "/start",
+    bgStyle: { background: "#120d04" },
+    modal: {
+      title: "Coaching 1:1",
+      desc: "Eu escrevo o teu plano a partir do que registaste, ajusto-o todas as semanas com base na tua evolução real, troco exercícios quando algo dói, e respondo-te no chat no próprio dia. Trabalho com poucos clientes de propósito, para conseguir olhar para os números de cada um. Começas pelos mesmos 7 dias grátis.",
+      cta: "Começar os 7 dias grátis",
       href: "/start",
     },
   },
@@ -301,6 +366,7 @@ function Card({ card, onOpen }: { card: CardData; onOpen?: () => void }) {
 
         {/* Specific CSS backgrounds */}
         {card.id === "pdf" && !card.photo && <GuiaBg />}
+        {card.id === "ebook" && <EbookBg />}
         {card.id === "myprotein" && <MyProteinBg />}
         {card.id === "community" && <CommunityBg />}
 
@@ -432,10 +498,23 @@ export default function LinksPage() {
           </div>
 
           {/* Bio */}
-          <p className="text-xs leading-relaxed max-w-[240px] text-center" style={{ color: "rgba(255,255,255,0.38)" }}>
-            De 59kg a estético, sem genética.<br />
-            <span style={{ color: "rgba(201,168,76,0.7)" }}>Cliente ganhou +20kg de massa.</span>
+          <p className="text-xs leading-relaxed max-w-[250px] text-center" style={{ color: "rgba(255,255,255,0.42)" }}>
+            De 59kg a estético, sem genética e sem atalhos.<br />
+            <span style={{ color: "rgba(201,168,76,0.75)" }}>Cliente ganhou +20kg de massa.</span>
           </p>
+
+          {/* Proof, verifiable rather than claimed: the link goes to the real
+              Google profile instead of printing a rating nobody can check. */}
+          <a
+            href="https://www.google.com/search?kgmid=/g/11nvv2h6db"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-[10px] font-bold px-3 py-1.5 rounded-full active:scale-95 transition-transform"
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.55)" }}
+          >
+            <span style={{ color: "#C9A84C", letterSpacing: "0.05em" }}>★★★★★</span>
+            <span>avaliações no Google</span>
+          </a>
 
           {/* Trial pill */}
           <a href="/start"

@@ -10,6 +10,7 @@ import TestimonialCarousel, { type PublicTestimonial } from "@/components/Testim
 import ReviewSummary from "@/components/ReviewSummary";
 import PricingTiers from "@/components/PricingTiers";
 import { priceLabel } from "@/lib/billing/tiers";
+import { ebookPrice } from "@/lib/ebook/price";
 
 // ─── Translations ─────────────────────────────────────────────────────────────
 const t = {
@@ -42,6 +43,15 @@ const t = {
       '"Adicionar ao ecrã inicial"',
       'Toca "Instalar". Pronto! 🎉',
     ],
+    book_eyebrow: "Sem mensalidade",
+    book_title: "Ou leva só o programa",
+    book_sub: "Se não queres uma subscrição, o método está escrito num livro: 13 semanas, três blocos, ginásio ou casa.",
+    book_items: [
+      "Progressão escrita para cada exercício, semana a semana",
+      "Técnica dos seis movimentos e folha de registo",
+      "Versão de ginásio e versão de casa no mesmo livro",
+    ],
+    book_cta: "Ver o livro",
     footer_login:   "Entrar",
     footer_signup:  "Registar",
     features: [
@@ -96,6 +106,15 @@ const t = {
       '"Add to Home Screen"',
       'Tap "Install". Done! 🎉',
     ],
+    book_eyebrow: "No subscription",
+    book_title: "Or just take the programme",
+    book_sub: "If you do not want a subscription, the method is written in a book: 13 weeks, three blocks, gym or home.",
+    book_items: [
+      "A written progression rule for every exercise, week by week",
+      "Technique for the six main lifts, and a log sheet",
+      "Gym version and home version in the same book",
+    ],
+    book_cta: "See the book",
     footer_login:   "Log in",
     footer_signup:  "Sign up",
     features: [
@@ -613,6 +632,46 @@ export default async function LandingPage({
         <section className="max-w-2xl mx-auto px-5 pb-20">
           <ScrollReveal direction="up">
             <PricingTiers lang={isEN ? "en" : "pt"} signupHref={signupUrlWithLang} />
+          </ScrollReveal>
+        </section>
+
+        {/* ── BOOK ─────────────────────────────────────────────── */}
+        {/* Right after the two subscriptions, which is where somebody who is
+            not going to subscribe decides to leave. */}
+        <section className="max-w-2xl mx-auto px-5 pb-20">
+          <ScrollReveal direction="up">
+            <div className="rounded-3xl p-6 sm:p-7"
+              style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.09)" }}>
+              <div className="flex flex-wrap items-baseline justify-between gap-3">
+                <div>
+                  <p className="text-[10px] font-black tracking-[0.18em] uppercase text-zinc-600">{c.book_eyebrow}</p>
+                  <h2 className="mt-1.5 text-2xl font-black text-white">{c.book_title}</h2>
+                </div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-black text-white">€{ebookPrice(isEN ? "en" : "pt")}</span>
+                  <span className="text-zinc-500 text-xs">PDF</span>
+                </div>
+              </div>
+
+              <p className="mt-3 text-sm leading-relaxed text-zinc-400">{c.book_sub}</p>
+
+              <ul className="mt-4 space-y-2">
+                {c.book_items.map((item) => (
+                  <li key={item} className="flex items-start gap-2.5 text-[13px] leading-snug text-zinc-300">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: "#C9A84C" }} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
+              <Link
+                href={isEN ? "/ebook?lang=en" : "/ebook"}
+                className="mt-6 block w-full rounded-2xl py-3.5 text-center text-sm font-bold text-white transition-all active:scale-95 hover:bg-white/[0.06]"
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.14)" }}
+              >
+                {c.book_cta} →
+              </Link>
+            </div>
           </ScrollReveal>
         </section>
 

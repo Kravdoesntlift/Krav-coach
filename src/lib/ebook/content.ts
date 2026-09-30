@@ -1,4 +1,5 @@
 import { buildBasePlan, type Equipment, type Lang } from "@/lib/training/base-plan";
+import { EBOOK_PRICE_CENTS, ebookPrice } from "./price";
 
 /**
  * "90 Dias", the first paid book.
@@ -16,11 +17,13 @@ import { buildBasePlan, type Equipment, type Lang } from "@/lib/training/base-pl
 
 export const EBOOK = {
   id: "90-dias",
-  priceCents: 1290,
+  priceCents: EBOOK_PRICE_CENTS,
   /** What shows up on the Stripe receipt and in the catalogue. */
   productName: "KRAV 90 Dias",
   pages: 22,
 } as const;
+
+export { ebookPrice };
 
 export type EbookVariant = "gym" | "home";
 export type PhaseNumber = 1 | 2 | 3;
@@ -147,6 +150,11 @@ export interface EbookCopy {
   end: Block[];
   endCta: string;
   endUrl: string;
+  // Version labels
+  variantGym: string;
+  variantHome: string;
+  variantSwitchHint: string;
+  variantHomeNote: string;
   // Chrome
   footer: string;
   dayLabel: string;
@@ -479,6 +487,10 @@ const PT: EbookCopy = {
   endCta: "Experimentar a app, 7 dias grátis",
   endUrl: "https://www.kravcoaching.com/start",
 
+  variantGym: "Versão ginásio",
+  variantHome: "Versão casa",
+  variantSwitchHint: "Treinas em casa? Troca de versão no topo da página e os treinos mudam todos.",
+  variantHomeNote: "Estás a ler a versão de casa: os treinos dos três blocos já vêm com halteres e barra de elevações. Esta tabela fica como referência, para quando fores a um ginásio ou quiseres perceber o que cada exercício substitui.",
   footer: "@kravdoesntlift · kravcoaching.com",
   dayLabel: "Dia",
   restLabel: "Descanso",
@@ -810,6 +822,10 @@ const EN: EbookCopy = {
   endCta: "Try the app, 7 days free",
   endUrl: "https://www.kravcoaching.com/start?lang=en",
 
+  variantGym: "Gym version",
+  variantHome: "Home version",
+  variantSwitchHint: "Training at home? Switch version at the top of the page and every session changes.",
+  variantHomeNote: "You are reading the home version: the sessions in all three blocks already use dumbbells and a pull-up bar. This table stays as a reference, for when you get to a gym or want to see what each exercise replaces.",
   footer: "@kravdoesntlift · kravcoaching.com",
   dayLabel: "Day",
   restLabel: "Rest",

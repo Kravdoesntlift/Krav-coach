@@ -136,6 +136,9 @@ export default async function PayPage({ params }: { params: Promise<{ token: str
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
+    // Euros only: the conversion offered by adaptive pricing costs us the
+    // spread, and a payment link is the one place nobody is watching.
+    adaptive_pricing: { enabled: false },
     customer: customerId,
     payment_method_types: ["card"],
     line_items: [{

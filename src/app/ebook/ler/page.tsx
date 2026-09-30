@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ebookCopy, phasePlan, type EbookVariant, type PhaseNumber } from "@/lib/ebook/content";
 import { readEbookToken } from "@/lib/ebook/access";
+import ReaderToolbar from "@/components/ebook/ReaderToolbar";
 import type { Lang } from "@/lib/training/base-plan";
 
 /**
@@ -24,9 +25,12 @@ const DAY_NAMES: Record<Lang, string[]> = {
 
 const GOLD = "#C9A84C";
 
-function Section({ children, last = false }: { children: React.ReactNode; last?: boolean }) {
+function Section({ children, last = false, id }: { children: React.ReactNode; last?: boolean; id?: string }) {
   return (
-    <section className={`guide-page mx-auto w-full max-w-[720px] px-6 py-12 sm:px-10 ${last ? "" : "guide-break"}`}>
+    <section
+      id={id}
+      className={`guide-page mx-auto w-full max-w-[720px] px-6 py-12 sm:px-10 scroll-mt-16 ${last ? "" : "guide-break"}`}
+    >
       <div className="guide-body">{children}</div>
       <p className="guide-footer hidden print:block">@kravdoesntlift · kravcoaching.com</p>
     </section>
@@ -139,33 +143,45 @@ export default async function EbookReaderPage({
 
   return (
     <main className="min-h-screen" style={{ background: "#08080a", color: "#fff" }}>
+      <ReaderToolbar token={t ?? ""} lang={lang} variant={variant} />
+
       {/* ── Cover ─────────────────────────────────────────────────── */}
-      <Section>
+      <Section id="c0">
         <Eyebrow>{c.kicker}</Eyebrow>
         <h1 className="mt-5 text-5xl font-black leading-[1.02] tracking-tight sm:text-6xl">{c.title}</h1>
         <p className="mt-4 text-base leading-relaxed" style={{ color: GOLD }}>{c.subtitle}</p>
-        <p className="mt-3 text-xs text-zinc-500">{c.author}</p>
+
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <span
+            className="rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em]"
+            style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)", color: GOLD }}
+          >
+            {variant === "home" ? c.variantHome : c.variantGym}
+          </span>
+          <span className="text-xs text-zinc-500">{c.author}</span>
+        </div>
+        <p className="mt-3 text-xs text-zinc-600 print:hidden">{c.variantSwitchHint}</p>
 
         <div className="mt-10">
           <Eyebrow>{c.contentsTitle}</Eyebrow>
           <div className="mt-4 space-y-2.5">
             {c.contents.map((item, i) => (
-              <div key={item} className="flex items-start gap-4">
+              <a key={item} href={`#c${i + 1}`} className="flex items-start gap-4 group">
                 <span
                   className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-black"
                   style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)", color: GOLD }}
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span className="text-sm text-zinc-300">{item}</span>
-              </div>
+                <span className="text-sm text-zinc-300 group-hover:text-white transition-colors">{item}</span>
+              </a>
             ))}
           </div>
         </div>
       </Section>
 
       {/* ── Who it is for ─────────────────────────────────────────── */}
-      <Section>
+      <Section id="c1">
         <Eyebrow>{part(1)}</Eyebrow>
         <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{c.forWhoTitle}</h2>
         <Blocks blocks={c.forWho} />
@@ -176,7 +192,7 @@ export default async function EbookReaderPage({
       </Section>
 
       {/* ── How it works ──────────────────────────────────────────── */}
-      <Section>
+      <Section id="c2">
         <Eyebrow>{part(2)}</Eyebrow>
         <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{c.howTitle}</h2>
         <p className="mt-3 text-sm leading-relaxed text-zinc-400">{c.howIntro}</p>
@@ -197,7 +213,7 @@ export default async function EbookReaderPage({
       </Section>
 
       {/* ── Warm up ───────────────────────────────────────────────── */}
-      <Section>
+      <Section id="c3">
         <Eyebrow>{part(3)}</Eyebrow>
         <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{c.warmupTitle}</h2>
         <p className="mt-3 text-sm leading-relaxed text-zinc-400">{c.warmupIntro}</p>
@@ -205,7 +221,7 @@ export default async function EbookReaderPage({
       </Section>
 
       {/* ── Technique ─────────────────────────────────────────────── */}
-      <Section>
+      <Section id="c4">
         <Eyebrow>{part(4)}</Eyebrow>
         <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{c.techniqueTitle}</h2>
         <p className="mt-3 text-sm leading-relaxed text-zinc-400">{c.techniqueIntro}</p>
@@ -227,7 +243,7 @@ export default async function EbookReaderPage({
       </Section>
 
       {/* ── Log sheet ─────────────────────────────────────────────── */}
-      <Section>
+      <Section id="c5">
         <Eyebrow>{part(5)}</Eyebrow>
         <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{c.logTitle}</h2>
         <p className="mt-3 text-sm leading-relaxed text-zinc-400">{c.logIntro}</p>
@@ -259,7 +275,7 @@ export default async function EbookReaderPage({
 
       {/* ── The three blocks ──────────────────────────────────────── */}
       {c.phases.map((p, i) => (
-        <Section key={p.n}>
+        <Section key={p.n} id={`c${6 + i}`}>
           <Eyebrow>{part(6 + i)}</Eyebrow>
           <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">
             {p.name}
@@ -291,7 +307,7 @@ export default async function EbookReaderPage({
       ))}
 
       {/* ── Test week ─────────────────────────────────────────────── */}
-      <Section>
+      <Section id="c9">
         <Eyebrow>{part(9)}</Eyebrow>
         <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{c.testTitle}</h2>
         <p className="mt-3 text-sm leading-relaxed text-zinc-400">{c.testIntro}</p>
@@ -299,10 +315,12 @@ export default async function EbookReaderPage({
       </Section>
 
       {/* ── Training at home ──────────────────────────────────────── */}
-      <Section>
+      <Section id="c10">
         <Eyebrow>{part(10)}</Eyebrow>
         <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{c.homeTitle}</h2>
-        <p className="mt-3 text-sm leading-relaxed text-zinc-400">{c.homeIntro}</p>
+        <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+          {variant === "home" ? c.variantHomeNote : c.homeIntro}
+        </p>
         <div className="mt-6 space-y-2">
           {c.homeSwaps.map((s) => (
             <div key={s.from} className="guide-avoid-break flex items-start gap-3 rounded-xl px-4 py-3 text-sm" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
@@ -315,7 +333,7 @@ export default async function EbookReaderPage({
       </Section>
 
       {/* ── Nutrition ─────────────────────────────────────────────── */}
-      <Section>
+      <Section id="c11">
         <Eyebrow>{part(11)}</Eyebrow>
         <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{c.nutritionTitle}</h2>
         <p className="mt-3 text-[11px] leading-relaxed text-zinc-600">{c.nutritionDisclaimer}</p>
@@ -335,14 +353,14 @@ export default async function EbookReaderPage({
       </Section>
 
       {/* ── Recovery ──────────────────────────────────────────────── */}
-      <Section>
+      <Section id="c12">
         <Eyebrow>{part(12)}</Eyebrow>
         <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{c.recoveryTitle}</h2>
         <Blocks blocks={c.recovery} />
       </Section>
 
       {/* ── Measuring ─────────────────────────────────────────────── */}
-      <Section>
+      <Section id="c13">
         <Eyebrow>{part(13)}</Eyebrow>
         <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{c.measureTitle}</h2>
         <p className="mt-3 text-sm leading-relaxed text-zinc-400">{c.measureIntro}</p>
@@ -350,13 +368,13 @@ export default async function EbookReaderPage({
       </Section>
 
       {/* ── Mistakes and FAQ ──────────────────────────────────────── */}
-      <Section>
+      <Section id="c14">
         <Eyebrow>{part(14)}</Eyebrow>
         <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{c.mistakesTitle}</h2>
         <Blocks blocks={c.mistakes} />
       </Section>
 
-      <Section>
+      <Section id="c15">
         <Eyebrow>{part(15)}</Eyebrow>
         <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{c.faqTitle}</h2>
         <div className="mt-6 space-y-4">
@@ -370,7 +388,7 @@ export default async function EbookReaderPage({
       </Section>
 
       {/* ── Day 91 ────────────────────────────────────────────────── */}
-      <Section last>
+      <Section id="c16" last>
         <Eyebrow>{part(16)}</Eyebrow>
         <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">{c.endTitle}</h2>
         <p className="mt-3 text-sm leading-relaxed text-zinc-400">{c.endIntro}</p>
