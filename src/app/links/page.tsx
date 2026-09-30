@@ -11,6 +11,8 @@ interface CardData {
   badge: string;
   badgeColor?: "gold" | "green" | "white";
   title: string;
+  /** Short name for the row under the image: the title there is the hook. */
+  label?: string;
   sub: string;
   cta: string;
   ctaStyle: "gold" | "green" | "outline";
@@ -178,6 +180,7 @@ function CommunityBg() {
 const CARDS: CardData[] = [
   {
     id: "pdf",
+    label: "Guia de Treino",
     badge: "✓ GRÁTIS",
     badgeColor: "green",
     title: "O plano de 5 dias, à borla",
@@ -191,6 +194,7 @@ const CARDS: CardData[] = [
   },
   {
     id: "ebook",
+    label: "90 Dias · PDF",
     badge: `NOVO · LIVRO €${ebookPrice()}`,
     badgeColor: "gold",
     title: "90 Dias, escritos ao pormenor",
@@ -209,6 +213,7 @@ const CARDS: CardData[] = [
   },
   {
     id: "app",
+    label: "A app KRAV",
     badge: "7 DIAS GRÁTIS",
     badgeColor: "gold",
     title: "A app monta o treino por ti",
@@ -228,6 +233,7 @@ const CARDS: CardData[] = [
   },
   {
     id: "coaching",
+    label: "Coaching 1:1",
     badge: "COACHING 1:1",
     badgeColor: "gold",
     title: "Ou sou eu a escrever o teu plano",
@@ -245,6 +251,7 @@ const CARDS: CardData[] = [
   },
   {
     id: "myprotein",
+    label: "MyProtein",
     badge: "PARCEIRO",
     badgeColor: "white",
     title: "MyProtein",
@@ -256,6 +263,7 @@ const CARDS: CardData[] = [
   },
   {
     id: "community",
+    label: "Comunidade KRAV",
     badge: "EM BREVE",
     badgeColor: "white",
     title: "Comunidade KRAV",
@@ -404,7 +412,7 @@ function Card({ card, onOpen }: { card: CardData; onOpen?: () => void }) {
       <div className="px-4 py-3.5 flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className={`text-[13px] font-bold leading-tight truncate ${card.disabled ? "text-zinc-600" : "text-white"}`}>
-            {card.id === "myprotein" ? "MyProtein" : card.title}
+            {card.label ?? card.title}
           </p>
           <p className="text-[11px] mt-0.5 leading-relaxed" style={{ color: card.disabled ? "#3f3f46" : "rgba(255,255,255,0.35)" }}>
             {card.sub}
