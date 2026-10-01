@@ -440,7 +440,14 @@ function Card({ card, onOpen }: { card: CardData; onOpen?: () => void }) {
 
 /* ─── Social Row ─────────────────────────────────────────────────────────────── */
 function SocialRow() {
+  // Instagram included so the same page works as the bio link on TikTok and
+  // YouTube: whoever arrives from there can still find the main account.
   const socials = [
+    {
+      id: "instagram", label: "Instagram",
+      href: "https://www.instagram.com/kravdoesntlift/",
+      icon: <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07zm0 5.68a4.16 4.16 0 100 8.32 4.16 4.16 0 000-8.32zm0 6.86a2.7 2.7 0 110-5.4 2.7 2.7 0 010 5.4zm5.3-7.03a.97.97 0 11-1.95 0 .97.97 0 011.95 0z"/></svg>,
+    },
     {
       id: "tiktok", label: "TikTok",
       href: "https://www.tiktok.com/@kravdoesntlift",
@@ -453,13 +460,13 @@ function SocialRow() {
     },
   ];
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-3 gap-3">
       {socials.map((s) => (
         <a key={s.id} href={s.href} target="_blank" rel="noopener noreferrer"
-          className="flex flex-col items-center gap-2 py-5 rounded-2xl active:scale-[0.98] transition-transform"
+          className="flex flex-col items-center gap-2 py-4 rounded-2xl active:scale-[0.98] transition-transform"
           style={{ background: "#0f0c08", border: "1px solid rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.4)" }}>
           {s.icon}
-          <span className="text-[11px] font-bold tracking-wide">{s.label}</span>
+          <span className="text-[10px] font-bold tracking-wide">{s.label}</span>
         </a>
       ))}
     </div>
