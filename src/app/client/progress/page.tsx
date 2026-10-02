@@ -50,7 +50,7 @@ export default async function ProgressPage() {
       .limit(200),
     supabase
       .from("client_nutrition_goals")
-      .select("height_cm, age, sex")
+      .select("height_cm, age, sex, goal")
       .eq("client_id", user!.id)
       .maybeSingle(),
     supabase
@@ -60,6 +60,25 @@ export default async function ProgressPage() {
       .order("date", { ascending: true })
       .limit(500),
   ]);
+
+  // Which direction on the scale counts as progress.
+  //
+  // This used to be "down is good, up is red", which painted every single week
+  // red for the client this app is mostly built for: somebody light who signed
+  // up to put on size. The goal comes from the nutrition row when it exists and
+  // from the signup answers otherwise, and when neither says anything the badge
+  // stays neutral rather than guessing.
+  const { data: onboarding } = await supabase
+    .from("client_onboarding")
+    .select("goal")
+    .eq("client_id", user!.id)
+    .maybeSingle();
+
+  const goalRaw = (nutritionGoals as { goal?: string | null } | null)?.goal
+    ?? (onboarding as { goal?: string | null } | null)?.goal
+    ?? null;
+  const gainingIsGood = goalRaw === "bulk" || goalRaw === "gain_muscle";
+  const losingIsGood = goalRaw === "cut" || goalRaw === "lose_weight";
 
   // Group logs by exercise name: compute per-session volume and top set
   const byExercise = new Map<string, { date: string; topSet: number; volume: number; doneSets: number }[]>();
@@ -181,7 +200,11 @@ export default async function ProgressPage() {
     if (c.weight_kg != null) {
       const prevWeight = i > 0 ? checkinsAsc[i - 1].weight_kg : null;
       const diff = prevWeight != null ? +(Number(c.weight_kg) - Number(prevWeight)).toFixed(1) : null;
-      const positive = diff != null ? diff < 0 : undefined;
+      const positive = diff == null || diff === 0
+        ? undefined
+        : gainingIsGood ? diff > 0
+        : losingIsGood ? diff < 0
+        : undefined;
       timelineEvents.push({
         type: "weight",
         date: c.week_start as string,
