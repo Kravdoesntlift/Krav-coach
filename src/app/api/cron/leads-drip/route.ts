@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Resend } from "resend";
+import { SUBJECTS, email2, email3, email4 } from "@/lib/emails/lead-drip";
 
 /**
  * GET /api/cron/leads-drip
@@ -109,115 +110,4 @@ export async function GET(req: NextRequest) {
 
   console.log("[leads-drip]", results);
   return NextResponse.json({ ok: true, ...results });
-}
-
-/* ─── Email templates ─────────────────────────────────────────────────────────
-   Intentionally plain, look like a personal email, not a newsletter.
-   Short paragraphs, no images, no big headers.
-────────────────────────────────────────────────────────────────────────────── */
-
-function wrap(body: string, unsubUrl: string) {
-  return `<!DOCTYPE html>
-<html lang="pt">
-<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
-<body style="margin:0;padding:0;background:#f9f9f9;">
-<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f9f9f9">
-  <tr><td align="center" style="padding:40px 16px;">
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;">
-      <tr>
-        <td bgcolor="#ffffff" style="background:#ffffff;border-radius:12px;padding:36px 36px 32px;border:1px solid #ebebeb;">
-          <p style="margin:0 0 24px 0;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#C9A84C;font-family:Helvetica,Arial,sans-serif;">KRAV COACH</p>
-          ${body}
-          <p style="margin:32px 0 0;font-size:12px;color:#bbb;font-family:Helvetica,Arial,sans-serif;border-top:1px solid #f0f0f0;padding-top:20px;line-height:1.6;">
-            Recebeste este email porque pediste o guia gratuito em kravcoaching.com<br>
-            <a href="${unsubUrl}" style="color:#bbb;text-decoration:underline;">Cancelar subscrição destes emails</a>
-          </p>
-        </td>
-      </tr>
-    </table>
-  </td></tr>
-</table>
-</body>
-</html>`;
-}
-
-function p(text: string, style = "") {
-  return `<p style="margin:0 0 18px 0;font-size:15px;color:#222222;line-height:1.7;font-family:Helvetica,Arial,sans-serif;${style}">${text}</p>`;
-}
-
-function link(href: string, text: string) {
-  return `<a href="${href}" style="color:#C9A84C;text-decoration:none;font-weight:600;">${text}</a>`;
-}
-
-type Lang = "pt" | "en";
-
-const SUBJECTS: Record<number, Record<Lang, string>> = {
-  0: { pt: "Já leste?", en: "Did you read it?" },
-  1: { pt: "O Guilherme", en: "About Guilherme" },
-  2: { pt: "último email", en: "last email" },
-};
-
-const IG = "https://www.instagram.com/kravdoesntlift";
-const SITE = "https://www.kravcoaching.com";
-
-// ── Email 2: day 3 ────────────────────────────────────────────────────────────
-function email2(firstName: string, unsubUrl: string, lang: Lang) {
-  const body = lang === "en"
-    ? `
-    ${p(`Hi ${firstName},`)}
-    ${p("have you had a chance to open the guide?")}
-    ${p("Most people download it, find it interesting, and then life carries on exactly the same. It is not a willpower problem. Information on its own rarely changes anything.")}
-    ${p(`If you want to talk about where you are, reply here or message me on Instagram ${link(IG, "@kravdoesntlift")}.`)}
-    ${p("André", "margin-bottom:0;")}
-  `
-    : `
-    ${p(`Olá ${firstName},`)}
-    ${p("já tiveste tempo de abrir o guia?")}
-    ${p("A maioria das pessoas descarrega, acha interessante e depois a vida continua igual. Não é falta de vontade. É que informação sozinha raramente muda alguma coisa.")}
-    ${p(`Se quiseres falar sobre a tua situação, responde aqui ou fala comigo no Instagram ${link(IG, "@kravdoesntlift")}.`)}
-    ${p("André", "margin-bottom:0;")}
-  `;
-  return wrap(body, unsubUrl);
-}
-
-// ── Email 3: day 7 ────────────────────────────────────────────────────────────
-function email3(firstName: string, unsubUrl: string, lang: Lang) {
-  const body = lang === "en"
-    ? `
-    ${p(`Hi ${firstName},`)}
-    ${p("Guilherme came to me at 67kg. He had been training for two years and knew what he was doing. His body just would not respond.")}
-    ${p("He put on 20kg. With the physique he always wanted.")}
-    ${p("It was not magic. It was having someone look at the numbers every week and adjust the plan around what was actually working for him.")}
-    ${p(`If you want to be next: ${link(SITE, "kravcoaching.com")}`)}
-    ${p("André", "margin-bottom:0;")}
-  `
-    : `
-    ${p(`Olá ${firstName},`)}
-    ${p("o Guilherme chegou ao meu coaching com 67kg. Já treinava há dois anos e sabia o que estava a fazer. Mas o corpo não respondia.")}
-    ${p("Ganhou 20kg. Com o físico que sempre quis.")}
-    ${p("Não foi magia. Foi ter alguém a olhar para os números todas as semanas e ajustar o plano de acordo com o que estava a funcionar para ele.")}
-    ${p(`Se quiseres ser o próximo: ${link(SITE, "kravcoaching.com")}`)}
-    ${p("André", "margin-bottom:0;")}
-  `;
-  return wrap(body, unsubUrl);
-}
-
-// ── Email 4: day 14 ───────────────────────────────────────────────────────────
-function email4(firstName: string, unsubUrl: string, lang: Lang) {
-  const body = lang === "en"
-    ? `
-    ${p(`Hi ${firstName},`)}
-    ${p("this is the last email I will send you about coaching.")}
-    ${p("If you have not moved yet, the timing is not right, and there is nothing wrong with that.")}
-    ${p(`But if you have been thinking about it and only needed a push, I keep few spots and they fill quickly. Reply here or find me on ${link(IG, "Instagram")}.`)}
-    ${p("André", "margin-bottom:0;")}
-  `
-    : `
-    ${p(`Olá ${firstName},`)}
-    ${p("não te mando mais emails sobre coaching depois deste.")}
-    ${p("Se ainda não avançaste é porque o momento não é o certo e não há problema nenhum nisso.")}
-    ${p(`Mas se tens pensado nisso e só precisavas de um empurrão, as vagas que tenho são poucas e enchem depressa. Podes falar comigo aqui ou no ${link(IG, "Instagram")}.`)}
-    ${p("André", "margin-bottom:0;")}
-  `;
-  return wrap(body, unsubUrl);
 }
