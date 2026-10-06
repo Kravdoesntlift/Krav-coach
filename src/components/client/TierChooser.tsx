@@ -26,7 +26,9 @@ const COPY = {
   },
 } as const;
 
-function TierCard({ tier, lang, highlight }: { tier: Tier; lang: Lang; highlight: boolean }) {
+function TierCard({
+  tier, lang, highlight, spotsLeft,
+}: { tier: Tier; lang: Lang; highlight: boolean; spotsLeft?: number | null }) {
   const info = TIERS[tier];
 
   return (
@@ -59,6 +61,19 @@ function TierCard({ tier, lang, highlight }: { tier: Tier; lang: Lang; highlight
         <p className="text-zinc-400 text-xs leading-relaxed">{info.tagline[lang]}</p>
       </div>
 
+      {typeof spotsLeft === "number" && (
+        <p
+          className="rounded-xl px-3 py-2 text-center text-[11px] font-bold leading-snug"
+          style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", color: "#C9A84C" }}
+        >
+          {spotsLeft === 0
+            ? (lang === "en" ? "No places right now, the waiting list is open" : "Sem vagas neste momento, lista de espera aberta")
+            : spotsLeft === 1
+            ? (lang === "en" ? "1 place left" : "Resta 1 vaga")
+            : (lang === "en" ? `${spotsLeft} places left` : `Restam ${spotsLeft} vagas`)}
+        </p>
+      )}
+
       <ul className="space-y-2">
         {info.includes[lang].map((item) => (
           <li key={item} className="flex items-start gap-2.5 text-xs leading-relaxed text-zinc-300">
@@ -88,12 +103,12 @@ function TierCard({ tier, lang, highlight }: { tier: Tier; lang: Lang; highlight
   );
 }
 
-export default function TierChooser({ lang }: { lang: Lang }) {
+export default function TierChooser({ lang, spotsLeft = null }: { lang: Lang; spotsLeft?: number | null }) {
   return (
     <div className="space-y-3">
       <div className="grid gap-3 sm:grid-cols-2">
         <TierCard tier="app" lang={lang} highlight={false} />
-        <TierCard tier="coaching" lang={lang} highlight />
+        <TierCard tier="coaching" lang={lang} highlight spotsLeft={spotsLeft} />
       </div>
       <p className="text-center text-[11px] text-zinc-600">
         {COPY.cancel[lang]} {COPY.upgradeNote[lang]}

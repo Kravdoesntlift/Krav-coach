@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { coachingCapacity } from "@/lib/billing/capacity";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -166,6 +167,11 @@ export default async function LandingPage({
   const c = isEN ? t.en : t.pt;
 
   const admin = createAdminClient();
+
+  // Places left on 1:1, counted rather than claimed. `show` is false while
+  // there is plenty of room: an empty calendar is not a selling point.
+  const capacity = await coachingCapacity(admin);
+  const spotsLeft = capacity.show ? capacity.left : null;
   const [{ data: coach }, { data: publicTestimonials }, { data: allRatings }, { data: googleReviews }] = await Promise.all([
     admin
       .from("profiles")
@@ -631,7 +637,7 @@ export default async function LandingPage({
         {/* ── PRICE ────────────────────────────────────────────── */}
         <section className="max-w-2xl mx-auto px-5 pb-20">
           <ScrollReveal direction="up">
-            <PricingTiers lang={isEN ? "en" : "pt"} signupHref={signupUrlWithLang} />
+            <PricingTiers lang={isEN ? "en" : "pt"} signupHref={signupUrlWithLang} spotsLeft={spotsLeft} />
           </ScrollReveal>
         </section>
 

@@ -44,11 +44,14 @@ function Card({
   lang,
   href,
   highlight,
+  spotsLeft,
 }: {
   tier: Tier;
   lang: "pt" | "en";
   href: string;
   highlight: boolean;
+  /** Real places left on 1:1, or null when there is no reason to say. */
+  spotsLeft?: number | null;
 }) {
   const info = TIERS[tier];
   const c = COPY[lang];
@@ -90,6 +93,19 @@ function Card({
         </div>
         <p className="text-zinc-500 text-xs leading-relaxed px-2">{info.tagline[lang]}</p>
       </div>
+
+      {typeof spotsLeft === "number" && (
+        <p
+          className="rounded-xl px-3 py-2 text-center text-[11px] font-bold leading-snug"
+          style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.25)", color: "#C9A84C" }}
+        >
+          {spotsLeft === 0
+            ? (lang === "en" ? "No places right now, the waiting list is open" : "Sem vagas neste momento, lista de espera aberta")
+            : spotsLeft === 1
+            ? (lang === "en" ? "1 place left" : "Resta 1 vaga")
+            : (lang === "en" ? `${spotsLeft} places left` : `Restam ${spotsLeft} vagas`)}
+        </p>
+      )}
 
       <ul className="space-y-2.5">
         {info.includes[lang].map((item) => (
@@ -143,11 +159,17 @@ export default function PricingTiers({
   lang,
   signupHref = "/start",
   showHeading = true,
+  spotsLeft = null,
 }: {
   lang: "pt" | "en";
   /** Where both buttons go. The trial is the entry point for either tier. */
   signupHref?: string;
   showHeading?: boolean;
+  /**
+   * Places left on 1:1, counted from the live subscriptions. Null means there
+   * is plenty of room, and the card says nothing rather than advertising it.
+   */
+  spotsLeft?: number | null;
 }) {
   const c = COPY[lang];
 
@@ -163,7 +185,7 @@ export default function PricingTiers({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
         <Card tier="app" lang={lang} href={signupHref} highlight={false} />
-        <Card tier="coaching" lang={lang} href={signupHref} highlight />
+        <Card tier="coaching" lang={lang} href={signupHref} highlight spotsLeft={spotsLeft} />
       </div>
 
       <div

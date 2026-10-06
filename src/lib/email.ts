@@ -1,4 +1,5 @@
 import { priceLabel } from "@/lib/billing/tiers";
+import { ebookPrice } from "@/lib/ebook/price";
 import { Resend } from "resend";
 
 const FROM = process.env.RESEND_FROM ?? "André · KRAV Coaching <andre@kravcoaching.com>";
@@ -221,9 +222,11 @@ export async function sendWelcomeEmail({
 // Ebook delivery: sent the moment Stripe confirms the payment
 // ─────────────────────────────────────────────────────────────────────────────
 export async function sendEbookEmail({
-  to, name, link, lang = "pt",
+  to, name, link, lang = "pt", bonus = false,
 }: {
   to: string; name?: string | null; link: string; lang?: "pt" | "en";
+  /** Included with a subscription rather than bought on its own. */
+  bonus?: boolean;
 }) {
   if (!process.env.RESEND_API_KEY) return;
   const firstName = (name ?? "").split(" ")[0];
@@ -234,7 +237,9 @@ export async function sendEbookEmail({
 
   await sendEmail({
     from: FROM, to,
-    subject: isEN ? "Your copy of 90 Days" : "O teu exemplar dos 90 Dias",
+    subject: bonus
+      ? (isEN ? "Your subscription includes the book" : "A tua subscrição inclui o livro")
+      : (isEN ? "Your copy of 90 Days" : "O teu exemplar dos 90 Dias"),
     html: `
 <!DOCTYPE html>
 <html>
@@ -250,9 +255,13 @@ export async function sendEbookEmail({
       </p>
       <h1 style="color:#fff;font-size:22px;font-weight:900;margin:0 0 16px">${hello}</h1>
       <p style="color:#a1a1aa;font-size:15px;line-height:1.7;margin:0 0 20px">
-        ${isEN
-          ? "Thank you. Your book is at the link below. Keep this email: the link does not expire, and it is how you get back to it."
-          : "Obrigado. O teu livro está no link aqui em baixo. Guarda este email: o link não expira e é por aí que voltas ao livro."}
+        ${bonus
+          ? (isEN
+            ? `Welcome. Your subscription includes the 90 Days book, which sells on its own for €${ebookPrice("en")}, and here it is. Keep this email: the link does not expire.`
+            : `Bem-vindo. A tua subscrição inclui o livro 90 Dias, que à parte custa €${ebookPrice("pt")}, e aqui está ele. Guarda este email: o link não expira.`)
+          : (isEN
+            ? "Thank you. Your book is at the link below. Keep this email: the link does not expire, and it is how you get back to it."
+            : "Obrigado. O teu livro está no link aqui em baixo. Guarda este email: o link não expira e é por aí que voltas ao livro.")}
       </p>
       <a href="${link}"
          style="display:block;background:linear-gradient(135deg,#E8C96B,#C9A84C);color:#000;font-weight:800;font-size:15px;padding:15px 24px;border-radius:14px;text-decoration:none;text-align:center;margin-bottom:18px">

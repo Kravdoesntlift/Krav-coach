@@ -163,6 +163,49 @@ async function deliverEbook(admin: Admin, session: Stripe.Checkout.Session): Pro
   }
 }
 
+/**
+ * The book, included with any subscription.
+ *
+ * It costs nothing to give away a second copy and it is worth fifteen euros to
+ * the person receiving it, which makes the cheaper tier an easier yes. Sent
+ * here rather than promised in copy somewhere: a bonus nobody receives is
+ * worse than no bonus at all. Never throws, because a subscription must not
+ * fail over an email.
+ */
+async function deliverEbookBonus(
+  admin: Admin,
+  clientId: string,
+  checkoutEmail: string | null,
+): Promise<void> {
+  try {
+    let email = checkoutEmail;
+    let name: string | null = null;
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("full_name, lang")
+      .eq("id", clientId)
+      .maybeSingle();
+    name = (profile as { full_name?: string } | null)?.full_name ?? null;
+    const lang = (profile as { lang?: string } | null)?.lang === "en" ? "en" : "pt";
+
+    if (!email) {
+      const { data: authUser } = await admin.auth.admin.getUserById(clientId);
+      email = authUser?.user?.email ?? null;
+    }
+    if (!email) {
+      console.error("[webhook] ebook bonus: no email for client", clientId);
+      return;
+    }
+
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.kravcoaching.com";
+    const { sendEbookEmail } = await import("@/lib/email");
+    const { ebookLink } = await import("@/lib/ebook/access");
+    await sendEbookEmail({ to: email, name, link: ebookLink(lang, siteUrl), lang, bonus: true });
+  } catch (e) {
+    console.error("[webhook] ebook bonus failed:", e);
+  }
+}
+
 /** Welcome message + push. Never throws: notifications must not block provisioning. */
 async function notifyNewSubscriber(
   admin: Admin,
@@ -295,6 +338,7 @@ export async function POST(req: NextRequest) {
 
         await provisionSubscription(admin, { subscription, clientId, coachId });
         await notifyNewSubscriber(admin, { clientId, coachId });
+        await deliverEbookBonus(admin, clientId, session.customer_details?.email ?? null);
 
         break;
       }

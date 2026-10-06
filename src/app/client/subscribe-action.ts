@@ -61,6 +61,9 @@ export async function subscribeAction(formData: FormData) {
     // to somebody browsing from abroad, and the conversion lands on us: the
     // coach travels, so this would have fired on his own tests first.
     adaptive_pricing: { enabled: false },
+    // So a coupon can be honoured at the till: the book costs 15 and a buyer
+    // who then subscribes should not pay for the same thing twice.
+    allow_promotion_codes: true,
     customer: stripeCustomerId,
     payment_method_types: ["card"],
     line_items: [{

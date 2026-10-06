@@ -1,5 +1,7 @@
 import TierChooser from "@/components/client/TierChooser";
 import { getLang } from "@/lib/i18n/getLang";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { coachingCapacity } from "@/lib/billing/capacity";
 
 /**
  * The two plans, reachable while the trial is still running.
@@ -16,6 +18,9 @@ export const metadata = {
 
 export default async function PlanosPage() {
   const lang = await getLang();
+  // Counted, never claimed: see lib/billing/capacity.
+  const capacity = await coachingCapacity(createAdminClient());
+  const spotsLeft = capacity.show ? capacity.left : null;
   const isEN = lang === "en";
 
   return (
@@ -34,7 +39,7 @@ export default async function PlanosPage() {
         </p>
       </div>
 
-      <TierChooser lang={lang} />
+      <TierChooser lang={lang} spotsLeft={spotsLeft} />
     </div>
   );
 }

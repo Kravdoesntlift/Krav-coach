@@ -2,10 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { coachingCapacity } from "@/lib/billing/capacity";
 import ScrollReveal from "@/components/ScrollReveal";
 import PricingTiers from "@/components/PricingTiers";
 import { priceLabel } from "@/lib/billing/tiers";
 import BeforeAfterSlider from "@/components/BeforeAfterSlider";
+
+// The page now carries a number counted from live subscriptions, so it cannot
+// be frozen at build time: half an hour old is fine, three deploys old is not.
+export const revalidate = 1800;
 
 export const metadata: Metadata = {
   title: "Online Personal Trainer | KRAV Coach · Free 7-Day Trial",
@@ -153,6 +158,11 @@ const steps = [
 
 export default async function OnlinePersonalTrainerPage() {
   const admin = createAdminClient();
+
+  // Places left on 1:1, counted rather than claimed. `show` is false while
+  // there is plenty of room: an empty calendar is not a selling point.
+  const capacity = await coachingCapacity(admin);
+  const spotsLeft = capacity.show ? capacity.left : null;
   const { data: coach } = await admin
     .from("profiles")
     .select("id, full_name, avatar_url, tagline_en, bio_en, years_experience, credentials, transformation_before_url, transformation_after_url")
@@ -494,7 +504,7 @@ export default async function OnlinePersonalTrainerPage() {
           {/* ── PRICE ────────────────────────────────────────────── */}
           <section className="max-w-2xl mx-auto px-5 pb-20">
             <ScrollReveal direction="up">
-              <PricingTiers lang="en" signupHref="/start?lang=en" />
+              <PricingTiers lang="en" signupHref="/start?lang=en" spotsLeft={spotsLeft} />
             </ScrollReveal>
           </section>
 

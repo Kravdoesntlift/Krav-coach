@@ -38,6 +38,10 @@ export default async function ClientLayout({
     profile.status === "cancelled" ||
     (profile.trial_ends_at !== null && new Date(profile.trial_ends_at as string) <= new Date());
 
+  // Only needed when a paywall is about to be shown, so it costs nothing on a
+  // normal page load.
+  const spotsLeft = wouldBeBlocked ? await paywallSpotsLeft() : null;
+
   if (wouldBeBlocked) {
     const healed = await healStaleSubscriptions({ clientId: user.id }).catch(() => 0);
     if (healed > 0) {
@@ -94,6 +98,7 @@ export default async function ClientLayout({
           lang={lang}
           logoutAction={logout}
           showFeedback
+          spotsLeft={spotsLeft}
         />
       );
     }
@@ -136,6 +141,7 @@ export default async function ClientLayout({
         reason="cancelled"
         lang={lang}
         logoutAction={logout}
+        spotsLeft={spotsLeft}
       />
     );
   }
@@ -169,18 +175,28 @@ export default async function ClientLayout({
 }
 
 // ── Unified paywall (trial expired + subscription cancelled) ─────────────────
+async function paywallSpotsLeft(): Promise<number | null> {
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  const { coachingCapacity } = await import("@/lib/billing/capacity");
+  const capacity = await coachingCapacity(createAdminClient());
+  return capacity.show ? capacity.left : null;
+}
+
 function Paywall({
   firstName,
   reason,
   lang,
   logoutAction,
   showFeedback = false,
+  spotsLeft = null,
 }: {
   firstName: string;
   reason: "trial" | "cancelled";
   lang: Lang;
   logoutAction: () => Promise<void>;
   showFeedback?: boolean;
+  /** Real places left on 1:1, or null while there is room to spare. */
+  spotsLeft?: number | null;
 }) {
   const isEN = lang === "en";
 
@@ -214,7 +230,7 @@ function Paywall({
           <p className="text-gray-400 text-sm leading-relaxed">{subtitle}</p>
         </div>
 
-        <TierChooser lang={lang} />
+        <TierChooser lang={lang} spotsLeft={spotsLeft} />
 
         <a
           href="https://instagram.com/kravdoesntlift"

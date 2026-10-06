@@ -1,4 +1,5 @@
 import type { Lang } from "@/lib/training/base-plan";
+import { ebookPrice } from "@/lib/ebook/price";
 
 /**
  * The two things someone can pay for.
@@ -45,6 +46,7 @@ export const TIERS: Record<Tier, TierInfo> = {
         "Histórico, progresso e registo alimentar",
         "AI Coach 24/7 para tirar dúvidas sobre treino e nutrição",
         "Semana mais leve a cada 4 semanas, como manda o método",
+        `O livro 90 Dias incluído, que à parte custa €${ebookPrice("pt")}`,
       ],
       en: [
         "A training week built from your answers, every week",
@@ -53,6 +55,7 @@ export const TIERS: Record<Tier, TierInfo> = {
         "History, progress and food logging",
         "AI Coach 24/7 for training and nutrition questions",
         "A lighter week every 4 weeks, as the method asks",
+        `The 90 Days book included, which costs €${ebookPrice("en")} on its own`,
       ],
     },
     excludes: {

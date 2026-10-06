@@ -139,6 +139,9 @@ export default async function PayPage({ params }: { params: Promise<{ token: str
     // Euros only: the conversion offered by adaptive pricing costs us the
     // spread, and a payment link is the one place nobody is watching.
     adaptive_pricing: { enabled: false },
+    // So a coupon can be honoured at the till: the book costs 15 and a buyer
+    // who then subscribes should not pay for the same thing twice.
+    allow_promotion_codes: true,
     customer: customerId,
     payment_method_types: ["card"],
     line_items: [{
