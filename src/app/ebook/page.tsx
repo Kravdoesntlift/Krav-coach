@@ -39,6 +39,7 @@ const T = {
     sub: "O programa completo para construíres o teu primeiro físico estético. Treze semanas escritas ao pormenor, não três dicas.",
     cta: `Comprar por €${ebookPrice("pt")}`,
     cta_note: "Pagamento único. O link chega ao teu email em segundos.",
+    credit_note: "E se mais tarde quiseres a app ou o coaching, os €15 são descontados no primeiro mês.",
     pills: ["13 semanas", "Ginásio ou casa", "PT e EN"],
     problem_title: "O problema não é falta de informação",
     problem: [
@@ -60,6 +61,7 @@ const T = {
       { q: "Preciso de conta na app?", a: "Não precisas de nada. Pagas, recebes o link, lês. A app é outra coisa e é opcional." },
       { q: "Sou principiante. É demasiado para mim?", a: "O primeiro bloco existe precisamente para quem está a começar, e diz-te com que peso começar. Se nunca treinaste, começa por aí e não saltes à frente." },
       { q: "E se não for o que eu esperava?", a: "Escreve-me nos primeiros 14 dias e devolvo o dinheiro, sem perguntas." },
+      { q: "Se comprar o livro e depois quiser a app, pago duas vezes?", a: "Não. Com o livro recebes um código só teu que vale €15 de desconto no primeiro mês de qualquer plano. É uma devolução do livro, não um desconto permanente: a partir do segundo mês pagas o preço normal." },
     ],
     guarantee_title: "Garantia de 14 dias",
     guarantee: "Se o livro não te servir, escreve-me e devolvo o dinheiro. Prefiro isso a ter alguém a pagar por algo que não usa.",
@@ -77,6 +79,7 @@ const T = {
     sub: "The complete programme for building your first aesthetic physique. Thirteen weeks written out in detail, not three tips.",
     cta: `Buy for €${ebookPrice("en")}`,
     cta_note: "One payment. The link reaches your inbox in seconds.",
+    credit_note: "And if you later want the app or the coaching, the €15 comes off your first month.",
     pills: ["13 weeks", "Gym or home", "PT and EN"],
     problem_title: "The problem is not a lack of information",
     problem: [
@@ -98,6 +101,7 @@ const T = {
       { q: "Do I need an account in the app?", a: "You need nothing. You pay, you get the link, you read. The app is a separate thing and it is optional." },
       { q: "I am a beginner. Is this too much?", a: "The first block exists precisely for people starting out, and it tells you what weight to start with. If you have never trained, start there and do not skip ahead." },
       { q: "What if it is not what I expected?", a: "Write to me within 14 days and I refund you, no questions." },
+      { q: "If I buy the book and then want the app, do I pay twice?", a: "No. With the book you get a code of your own worth €15 off the first month of any plan. It is a refund of the book, not a permanent discount: from the second month you pay the normal price." },
     ],
     guarantee_title: "14 day guarantee",
     guarantee: "If the book is not for you, write to me and I refund you. I would rather that than have somebody paying for something they do not use.",
@@ -201,6 +205,7 @@ export default async function EbookSalesPage({
                 </button>
               </form>
               <p className="mt-3 text-xs text-zinc-600">{t.cta_note}</p>
+              <p className="mt-1.5 text-xs" style={{ color: "rgba(201,168,76,0.75)" }}>{t.credit_note}</p>
             </ScrollReveal>
           </section>
 
@@ -324,6 +329,7 @@ export default async function EbookSalesPage({
                   </button>
                 </form>
                 <p className="text-xs text-zinc-600">{t.final_note}</p>
+                <p className="text-xs" style={{ color: "rgba(201,168,76,0.75)" }}>{t.credit_note}</p>
 
                 <div className="flex items-start gap-2.5 py-3 px-4 rounded-2xl text-left"
                   style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>

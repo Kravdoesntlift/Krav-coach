@@ -134,8 +134,19 @@ async function deliverEbook(admin: Admin, session: Stripe.Checkout.Session): Pro
   const { sendEbookEmail } = await import("@/lib/email");
   const { ebookLink } = await import("@/lib/ebook/access");
 
-  // The email is the delivery. It runs first and its failure is loud.
-  await sendEbookEmail({ to: email, name, link: ebookLink(lang, siteUrl), lang });
+  // A code only this buyer can use, towards their first month if they ever
+  // subscribe. Minted before the email because the email carries it, and null
+  // when Stripe says no: a missing credit is a conversation, a failed delivery
+  // is a refund.
+  const { createBookCredit } = await import("@/lib/billing/book-credit");
+  const credit = await createBookCredit(getStripe(), {
+    product: "90-dias",
+    checkout_session: session.id,
+    email,
+  });
+
+  // The email is the delivery. Its failure is loud.
+  await sendEbookEmail({ to: email, name, link: ebookLink(lang, siteUrl), lang, credit });
 
   try {
     const note = `Comprou o ebook 90 Dias em ${new Date().toISOString().slice(0, 10)}.`;

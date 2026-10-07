@@ -222,11 +222,13 @@ export async function sendWelcomeEmail({
 // Ebook delivery: sent the moment Stripe confirms the payment
 // ─────────────────────────────────────────────────────────────────────────────
 export async function sendEbookEmail({
-  to, name, link, lang = "pt", bonus = false,
+  to, name, link, lang = "pt", bonus = false, credit = null,
 }: {
   to: string; name?: string | null; link: string; lang?: "pt" | "en";
   /** Included with a subscription rather than bought on its own. */
   bonus?: boolean;
+  /** A single-use code worth the price of the book off the first month. */
+  credit?: string | null;
 }) {
   if (!process.env.RESEND_API_KEY) return;
   const firstName = (name ?? "").split(" ")[0];
@@ -277,6 +279,18 @@ export async function sendEbookEmail({
           ? "Start with block 1 even if you have trained before, and log every session. Reply to this email if anything is unclear, it reaches me."
           : "Começa pelo bloco 1 mesmo que já treines, e regista todos os treinos. Responde a este email se alguma coisa não estiver clara, chega-me a mim."}
       </p>
+      ${credit ? `
+      <div style="margin-top:22px;padding:16px 18px;border-radius:14px;background:#0a0a0c;border:1px solid rgba(201,168,76,0.3)">
+        <p style="color:#C9A84C;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0 0 8px">
+          ${isEN ? "Your credit, if you ever subscribe" : "O teu crédito, se um dia assinares"}
+        </p>
+        <p style="color:#fff;font-size:20px;font-weight:900;letter-spacing:0.08em;margin:0 0 8px">${credit}</p>
+        <p style="color:#71717a;font-size:12px;line-height:1.6;margin:0">
+          ${isEN
+            ? `Worth €${ebookPrice("en")} off your first month on any plan, so you never pay twice for the same thing. It is yours alone and works once, at checkout.`
+            : `Vale €${ebookPrice("pt")} de desconto no primeiro mês de qualquer plano, para nunca pagares duas vezes pela mesma coisa. É só teu e funciona uma vez, no checkout.`}
+        </p>
+      </div>` : ""}
     </div>
     <p style="text-align:center;color:#3f3f46;font-size:11px;margin:0">
       André Kravchuk · KRAV Coaching<br>
