@@ -10,6 +10,7 @@ import { SITE_URL, SOCIAL_PROFILES, aggregateRatingJsonLd } from "@/lib/seo";
 import TestimonialCarousel, { type PublicTestimonial } from "@/components/TestimonialCarousel";
 import ReviewSummary from "@/components/ReviewSummary";
 import PricingTiers from "@/components/PricingTiers";
+import ClientTransformations from "@/components/ClientTransformations";
 import { priceLabel } from "@/lib/billing/tiers";
 import { ebookPrice } from "@/lib/ebook/price";
 
@@ -606,6 +607,11 @@ export default async function LandingPage({
             <p className="text-center text-zinc-600 text-xs">{c.install_hint}</p>
           </ScrollReveal>
         </section>
+
+        {/* ── CLIENT TRANSFORMATIONS ───────────────────────────── */}
+        {/* Before the written reviews: a photo is read in a second and a
+            paragraph is not. Renders nothing while the list is empty. */}
+        <ClientTransformations lang={isEN ? "en" : "pt"} />
 
         {/* ── TESTIMONIALS ─────────────────────────────────────── */}
         {publicTestimonials && publicTestimonials.length > 0 && (

@@ -515,7 +515,7 @@ export default function LinksPage() {
           {/* Bio */}
           <p className="text-xs leading-relaxed max-w-[250px] text-center" style={{ color: "rgba(255,255,255,0.42)" }}>
             De 59kg a estético, sem genética e sem atalhos.<br />
-            <span style={{ color: "rgba(201,168,76,0.75)" }}>Cliente ganhou +20kg de massa.</span>
+            <span style={{ color: "rgba(201,168,76,0.75)" }}>Um cliente meu: de 67kg a 87kg.</span>
           </p>
 
           {/* Proof, verifiable rather than claimed: the link goes to the real
