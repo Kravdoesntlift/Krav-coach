@@ -6,10 +6,13 @@
  * them natively would have meant cutting the before and after out of each
  * composite, and they are not cropped alike, so the seams would show.
  *
- * Every person here is real, named by the coach, and already published with
- * their name on his own channels. Nothing invented, no stock photography, and
- * no photo of the coach presented as a client: the first prospect who asks
- * would put the whole site in doubt.
+ * Every person here is real and named by the coach. All three were already
+ * published with their names in his Instagram highlights, and on 2026-10-08
+ * he confirmed that each of them agreed to appear on the site as well.
+ *
+ * Nothing invented, no stock photography, and no photo of the coach presented
+ * as a client. Anything added here later needs the same: the person's own
+ * numbers, and the person's permission.
  */
 
 export interface Transformation {
