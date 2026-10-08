@@ -1,37 +1,54 @@
 /**
  * Client transformations shown on the landing page.
  *
- * Three things matter here and none of them are technical.
+ * These are the cards the coach already publishes in his Instagram highlights,
+ * reused as they are: same photos, same numbers, same branding. Rebuilding
+ * them natively would have meant cutting the before and after out of each
+ * composite, and they are not cropped alike, so the seams would show.
  *
- * Every entry is a real person who gave permission for their photos to be
- * published. No stock images, no photos of the coach presented as a client,
- * and nothing lifted from a chat without being asked. A transformation that
- * cannot be backed by the person in it is worth less than no transformation,
- * because the first prospect who asks lands the whole site in doubt.
- *
- * The numbers are what actually happened, in the time it actually took. A
- * result with no timeframe reads as a result that took no time.
- *
- * The list is empty until the photos exist. The section disappears on its own
- * rather than rendering frames with nothing in them.
+ * Every person here is real, named by the coach, and already published with
+ * their name on his own channels. Nothing invented, no stock photography, and
+ * no photo of the coach presented as a client: the first prospect who asks
+ * would put the whole site in doubt.
  */
 
 export interface Transformation {
-  /** First name, or "Cliente" when the person prefers not to be named. */
+  /** As written on the card itself. */
   name: string;
-  /** Files under public/transformacoes. */
-  before: string;
-  after: string;
-  /** The headline number, e.g. "67kg → 87kg". */
-  result: string;
-  /** How long it took, e.g. "14 meses". Never left vague. */
-  duration: { pt: string; en: string };
-  /** One line about what changed, in the coach's voice. */
+  /** File under public/transformacoes. */
+  image: string;
+  /** The headline number, exactly as the card states it. */
+  result: { pt: string; en: string };
+  /** One line, in the coach's voice. */
   note: { pt: string; en: string };
 }
 
-export const TRANSFORMATIONS: Transformation[] = [];
-
-export function hasTransformations(): boolean {
-  return TRANSFORMATIONS.length > 0;
-}
+export const TRANSFORMATIONS: Transformation[] = [
+  {
+    name: "Guilherme",
+    image: "guilherme.webp",
+    result: { pt: "67kg → 87kg", en: "67kg → 87kg" },
+    note: {
+      pt: "Treinava há dois anos e tinha estagnado. Mais 20 quilos de massa com treino estruturado.",
+      en: "He had trained for two years and stalled. Twenty kilos of mass with structured training.",
+    },
+  },
+  {
+    name: "Francisco",
+    image: "francisco.webp",
+    result: { pt: "110kg → 80kg", en: "110kg → 80kg" },
+    note: {
+      pt: "Menos 30 quilos, sem dietas milagrosas e sem atalhos.",
+      en: "Thirty kilos down, with no miracle diets and no shortcuts.",
+    },
+  },
+  {
+    name: "Maxim Moisa",
+    image: "maxim-moisa.webp",
+    result: { pt: "73kg → 87kg", en: "73kg → 87kg" },
+    note: {
+      pt: "Mais 14 quilos de massa muscular. Treino estruturado, comida a sério, consistência.",
+      en: "Fourteen kilos of muscle. Structured training, real food, consistency.",
+    },
+  },
+];
