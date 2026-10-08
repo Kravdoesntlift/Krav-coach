@@ -538,7 +538,7 @@ export default async function OnlinePersonalTrainerPage() {
                   </div>
                   <div className="h-14 w-px shrink-0" style={{ background: "rgba(201,168,76,0.22)" }} />
                   <p className="text-zinc-300 text-sm leading-relaxed">
-                    Client started from scratch and built 20 kg of muscle mass with personalised weekly plans, nutrition tracking and direct coaching.
+                    A client who had already trained for two years and stopped progressing went from 67kg to 87kg, with weekly plans written from his own logs, nutrition tracking and direct coaching.
                   </p>
                 </div>
 
