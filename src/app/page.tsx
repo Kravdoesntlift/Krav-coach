@@ -218,6 +218,12 @@ export default async function LandingPage({
       .order("submitted_at", { ascending: false }),
   ]);
 
+  // One-word reviews count towards the score but do not get a card. Set large,
+  // as the carousel sets short quotes, "profissional" reads as a card with
+  // nothing in it, and there are now enough written ones to be picky.
+  const carouselTestimonials = ((publicTestimonials ?? []) as PublicTestimonial[])
+    .filter((t) => (t.content ?? "").trim().length >= 25);
+
   // Self-service funnel: always /start (quiz + stripe)
   const signupUrl = "/start";
   const signupUrlWithLang = isEN ? `${signupUrl}?lang=en` : signupUrl;
@@ -614,7 +620,7 @@ export default async function LandingPage({
         <ClientTransformations lang={isEN ? "en" : "pt"} />
 
         {/* ── TESTIMONIALS ─────────────────────────────────────── */}
-        {publicTestimonials && publicTestimonials.length > 0 && (
+        {carouselTestimonials.length > 0 && (
           // The header keeps the page's reading column; the row of reviews runs
           // edge to edge, so it reads as a wall of voices rather than a widget.
           <section className="pb-24">
@@ -633,7 +639,7 @@ export default async function LandingPage({
             </div>
             <ScrollReveal direction="none" delay={120}>
               <TestimonialCarousel
-                testimonials={publicTestimonials as PublicTestimonial[]}
+                testimonials={carouselTestimonials}
                 isEN={isEN}
               />
             </ScrollReveal>
