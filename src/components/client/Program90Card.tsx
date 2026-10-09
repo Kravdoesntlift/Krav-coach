@@ -53,7 +53,26 @@ export default function Program90Card({
     );
   }
 
-  const week = state.currentWeek ?? 1;
+  // Enrolled, but the first Monday has not arrived yet.
+  if (state.currentWeek === null) {
+    return (
+      <div
+        className="rounded-2xl p-4 space-y-2"
+        style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)" }}
+      >
+        <p className="text-[10px] font-black tracking-[0.14em] uppercase text-brand-gold">
+          {isEN ? "90 Days programme" : "Programa 90 Dias"}
+        </p>
+        <p className="text-zinc-300 text-xs leading-relaxed">
+          {isEN
+            ? "Week 1 starts on Monday. Block one is four weeks of a particular shape and starting it mid-week would cost you most of the first one. Train this week as it is."
+            : "A semana 1 começa na segunda-feira. O primeiro bloco são quatro semanas com uma forma própria, e começá-lo a meio da semana custava-te quase toda a primeira. Esta semana treina o que está aí."}
+        </p>
+      </div>
+    );
+  }
+
+  const week = state.currentWeek;
   const s = program90Structure(week);
   const pct = Math.round((week / PROGRAM_90_WEEKS) * 100);
 

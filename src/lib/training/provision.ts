@@ -367,32 +367,46 @@ export async function startProgram90(args: { clientId: string }): Promise<StartP
   const thisMonday = mondayOf();
   const nextMonday = addWeeks(thisMonday, 1);
 
-  // Can the programme start this week, or does something already live there?
+  /** An automatic week nobody has trained is ours to replace. Anything else is theirs. */
+  const canReplace = async (plan: { id: string; name: string | null } | undefined) => {
+    if (!plan) return true;
+    const automatic = isBasePlan(plan.name) || is90DaysPlan(plan.name);
+    if (!automatic) return false;
+    return !(await weekWasTouched(admin, plan.id));
+  };
+  const dropWeek = async (weekStart: string) => {
+    const plan = plans.find((p) => p.week_start === weekStart);
+    if (plan) await admin.from("workout_plans").delete().eq("id", plan.id);
+  };
+
+  // Block one is four weeks of a specific shape, and the first of them should
+  // not be a Friday with one session in it. Monday to Wednesday the programme
+  // starts now; later in the week it starts on the coming Monday and this
+  // week stays as it is.
+  const weekday = new Date().getUTCDay();
+  const earlyEnough = weekday >= 1 && weekday <= 3;
+
   let startMonday = thisMonday;
   let replacedThisWeek = false;
-  const here = plans.find((p) => p.week_start === thisMonday);
-  if (here) {
-    const automatic = isBasePlan(here.name) || is90DaysPlan(here.name);
-    const touched = automatic ? await weekWasTouched(admin, here.id) : true;
-    if (automatic && !touched) {
-      await admin.from("workout_plans").delete().eq("id", here.id);
-      replacedThisWeek = true;
-    } else {
-      startMonday = nextMonday;
-    }
+
+  if (earlyEnough && (await canReplace(plans.find((p) => p.week_start === thisMonday)))) {
+    await dropWeek(thisMonday);
+    replacedThisWeek = plans.some((p) => p.week_start === thisMonday);
+  } else {
+    startMonday = nextMonday;
   }
 
-  // Starting next week instead: the same question about that week.
-  if (startMonday === nextMonday) {
-    const there = plans.find((p) => p.week_start === nextMonday);
-    if (there) {
-      const automatic = isBasePlan(there.name) || is90DaysPlan(there.name);
-      const touched = automatic ? await weekWasTouched(admin, there.id) : true;
-      if (!automatic || touched) {
-        return { ok: true, started: false, reason: "the next two weeks are already written" };
+  // Whichever Monday it starts on, the first two weeks of the programme need
+  // the room: an untouched automatic week there is replaced too.
+  for (const weekStart of [startMonday, addWeeks(startMonday, 1)]) {
+    if (weekStart === thisMonday && startMonday === thisMonday) continue;
+    if (!(await canReplace(plans.find((p) => p.week_start === weekStart)))) {
+      if (weekStart === startMonday) {
+        return { ok: true, started: false, reason: "that week already has a plan somebody wrote" };
       }
-      await admin.from("workout_plans").delete().eq("id", there.id);
+      continue;
     }
+    await dropWeek(weekStart);
   }
 
   const input = await planInputFor(admin, clientId);
@@ -411,16 +425,13 @@ export async function startProgram90(args: { clientId: string }): Promise<StartP
 
   // The week after, so the programme does not stop at the first Sunday. Only
   // when it is free: ensureBasePlan writes it on the next visit otherwise.
-  const secondWeek = addWeeks(startMonday, 1);
-  if (!plans.some((p) => p.week_start === secondWeek)) {
-    const second = await writeWeek(admin, {
-      clientId,
-      coachId,
-      weekStart: secondWeek,
-      blueprint: buildProgram90Week(2, { ...input, startOnWeekday: null }),
-    });
-    if (!second.ok) return { ok: false, error: second.error };
-  }
+  const second = await writeWeek(admin, {
+    clientId,
+    coachId,
+    weekStart: addWeeks(startMonday, 1),
+    blueprint: buildProgram90Week(2, { ...input, startOnWeekday: null }),
+  });
+  if (!second.ok) return { ok: false, error: second.error };
 
   return { ok: true, started: true, startMonday, replacedThisWeek };
 }
