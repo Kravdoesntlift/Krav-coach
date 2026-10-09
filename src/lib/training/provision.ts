@@ -1,6 +1,12 @@
 import { createHash } from "crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { buildBasePlan, isBasePlan, type BasePlanInput, type Equipment, type Goal, type Level } from "./base-plan";
+import { buildBasePlan, isBasePlan, type BasePlan, type BasePlanInput, type Equipment, type Goal, type Level } from "./base-plan";
+import {
+  buildProgram90Week,
+  is90DaysPlan,
+  program90State,
+  program90WeekFor,
+} from "./program90";
 import { tierForAmount } from "@/lib/billing/tiers";
 
 /**
@@ -128,20 +134,7 @@ export async function ensureBasePlan(args: {
   // are written for coaches), so a caller on the client side has no way to
   // pass this. Resolve it here, with the service role, or the whole thing
   // silently does nothing for exactly the people it exists for.
-  let coachId = args.coachId ?? null;
-  if (!coachId) {
-    const { data: link } = await admin
-      .from("coach_clients")
-      .select("coach_id")
-      .eq("client_id", clientId)
-      .eq("assigned_role", "coach")
-      .maybeSingle();
-    coachId = link?.coach_id ?? null;
-  }
-  if (!coachId) {
-    const { data: coach } = await admin.from("profiles").select("id").eq("role", "coach").limit(1).maybeSingle();
-    coachId = coach?.id ?? null;
-  }
+  const coachId = await resolveCoachId(admin, clientId, args.coachId ?? null);
   if (!coachId) return { ok: false, error: "no coach to attach the plan to" };
 
   // Which weeks this call is responsible for, and which of them are empty.
@@ -169,6 +162,121 @@ export async function ensureBasePlan(args: {
   // How many base weeks this client has had, so every fourth one is lighter.
   const baseWeeksSoFar = (existing ?? []).filter((p) => isBasePlan(p.name as string)).length;
 
+  // Whether they are part way through the 90 Days programme, read from the
+  // names of the plans they already have.
+  const program = program90State(
+    (existing ?? []).map((p) => ({ name: p.name as string | null, week_start: p.week_start as string })),
+  );
+
+  const input = await planInputFor(admin, clientId);
+
+  const planIds: string[] = [];
+
+  for (const weekStart of missing) {
+    // The week already in progress starts today, so nothing is owed for days
+    // that are already gone. Later weeks are the full split.
+    const inProgress = weekStart === firstMonday;
+    const startOnWeekday = inProgress ? new Date().getUTCDay() : null;
+
+    // Somebody following the 90 Days programme gets that week, not the
+    // generic one. The week comes from the calendar, so a missed week is
+    // picked up where the programme is rather than where they stopped.
+    const programWeek = program.enrolled && program.startMonday
+      ? program90WeekFor(program.startMonday, weekStart)
+      : null;
+
+    const weekNumber = baseWeeksSoFar + missing.indexOf(weekStart) + 1;
+    const blueprint = programWeek
+      ? buildProgram90Week(programWeek, { ...input, startOnWeekday })
+      : buildBasePlan({
+          ...input,
+          deload: weekNumber % 4 === 0,
+          startOnWeekday,
+        });
+    const written = await writeWeek(admin, { clientId, coachId, weekStart, blueprint });
+    if (!written.ok) return { ok: false, error: written.error };
+    if (written.planId) planIds.push(written.planId);
+  }
+
+  return { ok: true, created: true, planIds };
+}
+
+/**
+ * One week on disk: the plan, its days, its exercises.
+ *
+ * Shared by the weekly provisioning and by somebody starting the 90 Days
+ * programme, because two copies of this would drift and only one of them
+ * would be the copy anybody tested.
+ */
+async function writeWeek(
+  admin: Admin,
+  args: { clientId: string; coachId: string; weekStart: string; blueprint: BasePlan },
+): Promise<{ ok: true; planId: string | null } | { ok: false; error: string }> {
+  const { clientId, coachId, weekStart, blueprint } = args;
+  const planId = basePlanIdFor(clientId, weekStart);
+
+  const { error: planErr } = await admin
+    .from("workout_plans")
+    .insert({
+      id: planId,
+      coach_id: coachId,
+      client_id: clientId,
+      name: blueprint.name,
+      week_start: weekStart,
+    });
+
+  if (planErr && planErr.code !== "23505") {
+    return { ok: false, error: `workout_plans: ${planErr.message}` };
+  }
+
+  if (planErr) {
+    // Another render got here first. Its days are either already in, or it
+    // died between the two writes: only carry on if the week is still empty.
+    const { count } = await admin
+      .from("workout_days")
+      .select("id", { count: "exact", head: true })
+      .eq("plan_id", planId);
+    if ((count ?? 0) > 0) return { ok: true, planId: null };
+  }
+
+  const { data: days, error: daysErr } = await admin
+    .from("workout_days")
+    .insert(
+      blueprint.days.map((d) => ({
+        plan_id: planId,
+        day_of_week: d.day_of_week,
+        label: d.label,
+        is_rest: d.is_rest,
+        order_index: d.order_index,
+      })),
+    )
+    .select("id, day_of_week");
+  if (daysErr || !days) return { ok: false, error: `workout_days: ${daysErr?.message ?? "no rows returned"}` };
+
+  const byWeekday = new Map(days.map((d) => [d.day_of_week, d.id]));
+  const exercises = blueprint.days.flatMap((d) => {
+    const dayId = byWeekday.get(d.day_of_week);
+    if (!dayId) return [];
+    return d.exercises.map((e) => ({
+      day_id: dayId,
+      name: e.name,
+      sets: e.sets,
+      reps: e.reps,
+      notes: e.notes,
+      order_index: e.order_index,
+    }));
+  });
+
+  if (exercises.length > 0) {
+    const { error: exErr } = await admin.from("exercises").insert(exercises);
+    if (exErr) return { ok: false, error: `exercises: ${exErr.message}` };
+  }
+
+  return { ok: true, planId };
+}
+
+/** What the generator needs about this person: their answers and their language. */
+async function planInputFor(admin: Admin, clientId: string): Promise<BasePlanInput> {
   const [{ data: onboarding }, { data: profile }] = await Promise.all([
     admin
       .from("client_onboarding")
@@ -178,7 +286,7 @@ export async function ensureBasePlan(args: {
     admin.from("profiles").select("lang").eq("id", clientId).maybeSingle(),
   ]);
 
-  const input: BasePlanInput = {
+  return {
     level: asOneOf(onboarding?.level ?? onboarding?.fitness_level, LEVELS),
     equipment: asOneOf(onboarding?.equipment, EQUIPMENT),
     goal: asOneOf(onboarding?.goal, GOALS),
@@ -187,80 +295,132 @@ export async function ensureBasePlan(args: {
     sessionMinutes: typeof onboarding?.session_duration === "number" ? onboarding.session_duration : null,
     lang: profile?.lang === "en" ? "en" : "pt",
   };
+}
 
-  const planIds: string[] = [];
+/** The coach a plan hangs off, however little the caller knows. */
+async function resolveCoachId(admin: Admin, clientId: string, given?: string | null): Promise<string | null> {
+  if (given) return given;
+  const { data: link } = await admin
+    .from("coach_clients")
+    .select("coach_id")
+    .eq("client_id", clientId)
+    .eq("assigned_role", "coach")
+    .maybeSingle();
+  if (link?.coach_id) return link.coach_id as string;
+  const { data: coach } = await admin.from("profiles").select("id").eq("role", "coach").limit(1).maybeSingle();
+  return (coach?.id as string) ?? null;
+}
 
-  for (const weekStart of missing) {
-    // The week already in progress starts today, so nothing is owed for days
-    // that are already gone. Later weeks are the full split.
-    const inProgress = weekStart === firstMonday;
-    const weekNumber = baseWeeksSoFar + missing.indexOf(weekStart) + 1;
-    const blueprint = buildBasePlan({
-      ...input,
-      deload: weekNumber % 4 === 0,
-      startOnWeekday: inProgress ? new Date().getUTCDay() : null,
-    });
-    const planId = basePlanIdFor(clientId, weekStart);
+/** Whether anything has been logged against a week, which makes it theirs. */
+async function weekWasTouched(admin: Admin, planId: string): Promise<boolean> {
+  const { data: days } = await admin.from("workout_days").select("id").eq("plan_id", planId);
+  const ids = (days ?? []).map((d) => d.id as string);
+  if (ids.length === 0) return false;
 
-    const { error: planErr } = await admin
-      .from("workout_plans")
-      .insert({
-        id: planId,
-        coach_id: coachId,
-        client_id: clientId,
-        name: blueprint.name,
-        week_start: weekStart,
-      });
+  const [{ count: done }, { count: logged }] = await Promise.all([
+    admin.from("workout_completions").select("id", { count: "exact", head: true }).in("day_id", ids),
+    admin.from("workout_logs").select("id", { count: "exact", head: true }).in("day_id", ids),
+  ]);
+  return (done ?? 0) > 0 || (logged ?? 0) > 0;
+}
 
-    if (planErr && planErr.code !== "23505") {
-      return { ok: false, error: `workout_plans: ${planErr.message}` };
-    }
+export type StartProgramResult =
+  | { ok: true; started: true; startMonday: string; replacedThisWeek: boolean }
+  | { ok: true; started: false; reason: string }
+  | { ok: false; error: string };
 
-    if (planErr) {
-      // Another render got here first. Its days are either already in, or it
-      // died between the two writes: only carry on if the week is still empty.
-      const { count } = await admin
-        .from("workout_days")
-        .select("id", { count: "exact", head: true })
-        .eq("plan_id", planId);
-      if ((count ?? 0) > 0) continue;
-    }
+/**
+ * Put somebody on the thirteen weeks of the book, from this week if possible.
+ *
+ * The one rule is that nothing they have already trained gets overwritten. An
+ * automatic week nobody has touched is replaced without ceremony; a week with
+ * a single set logged against it, or a week the coach wrote, is left alone and
+ * the programme starts on the following Monday.
+ */
+export async function startProgram90(args: { clientId: string }): Promise<StartProgramResult> {
+  const { clientId } = args;
+  const admin = createAdminClient();
 
-    planIds.push(planId);
+  const eligible = await entitledToBasePlans(admin, clientId);
+  if (!eligible.entitled) return { ok: true, started: false, reason: eligible.reason };
 
-    const { data: days, error: daysErr } = await admin
-      .from("workout_days")
-      .insert(
-        blueprint.days.map((d) => ({
-          plan_id: planId,
-          day_of_week: d.day_of_week,
-          label: d.label,
-          is_rest: d.is_rest,
-          order_index: d.order_index,
-        })),
-      )
-      .select("id, day_of_week");
-    if (daysErr || !days) return { ok: false, error: `workout_days: ${daysErr?.message ?? "no rows returned"}` };
+  const coachId = await resolveCoachId(admin, clientId);
+  if (!coachId) return { ok: false, error: "no coach to attach the plan to" };
 
-    const byWeekday = new Map(days.map((d) => [d.day_of_week, d.id]));
-    const exercises = blueprint.days.flatMap((d) => {
-      const dayId = byWeekday.get(d.day_of_week);
-      if (!dayId) return [];
-      return d.exercises.map((e) => ({
-        day_id: dayId,
-        name: e.name,
-        sets: e.sets,
-        reps: e.reps,
-        notes: e.notes,
-        order_index: e.order_index,
-      }));
-    });
+  const { data: existing, error: existingErr } = await admin
+    .from("workout_plans")
+    .select("id, name, week_start")
+    .eq("client_id", clientId);
+  if (existingErr) return { ok: false, error: `looking for existing plans: ${existingErr.message}` };
 
-    if (exercises.length > 0) {
-      const { error: exErr } = await admin.from("exercises").insert(exercises);
-      if (exErr) return { ok: false, error: `exercises: ${exErr.message}` };
+  const plans = (existing ?? []).map((p) => ({
+    id: p.id as string,
+    name: p.name as string | null,
+    week_start: p.week_start as string,
+  }));
+
+  const state = program90State(plans);
+  if (state.enrolled && !state.finished) {
+    return { ok: true, started: false, reason: "already following the programme" };
+  }
+
+  const thisMonday = mondayOf();
+  const nextMonday = addWeeks(thisMonday, 1);
+
+  // Can the programme start this week, or does something already live there?
+  let startMonday = thisMonday;
+  let replacedThisWeek = false;
+  const here = plans.find((p) => p.week_start === thisMonday);
+  if (here) {
+    const automatic = isBasePlan(here.name) || is90DaysPlan(here.name);
+    const touched = automatic ? await weekWasTouched(admin, here.id) : true;
+    if (automatic && !touched) {
+      await admin.from("workout_plans").delete().eq("id", here.id);
+      replacedThisWeek = true;
+    } else {
+      startMonday = nextMonday;
     }
   }
 
-  return { ok: true, created: true, planIds };
+  // Starting next week instead: the same question about that week.
+  if (startMonday === nextMonday) {
+    const there = plans.find((p) => p.week_start === nextMonday);
+    if (there) {
+      const automatic = isBasePlan(there.name) || is90DaysPlan(there.name);
+      const touched = automatic ? await weekWasTouched(admin, there.id) : true;
+      if (!automatic || touched) {
+        return { ok: true, started: false, reason: "the next two weeks are already written" };
+      }
+      await admin.from("workout_plans").delete().eq("id", there.id);
+    }
+  }
+
+  const input = await planInputFor(admin, clientId);
+  const inProgress = startMonday === thisMonday;
+
+  const first = await writeWeek(admin, {
+    clientId,
+    coachId,
+    weekStart: startMonday,
+    blueprint: buildProgram90Week(1, {
+      ...input,
+      startOnWeekday: inProgress ? new Date().getUTCDay() : null,
+    }),
+  });
+  if (!first.ok) return { ok: false, error: first.error };
+
+  // The week after, so the programme does not stop at the first Sunday. Only
+  // when it is free: ensureBasePlan writes it on the next visit otherwise.
+  const secondWeek = addWeeks(startMonday, 1);
+  if (!plans.some((p) => p.week_start === secondWeek)) {
+    const second = await writeWeek(admin, {
+      clientId,
+      coachId,
+      weekStart: secondWeek,
+      blueprint: buildProgram90Week(2, { ...input, startOnWeekday: null }),
+    });
+    if (!second.ok) return { ok: false, error: second.error };
+  }
+
+  return { ok: true, started: true, startMonday, replacedThisWeek };
 }

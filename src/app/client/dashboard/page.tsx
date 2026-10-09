@@ -29,6 +29,8 @@ import { ensureBasePlan, basePlanIdFor } from "@/lib/training/provision";
 import { isBasePlan } from "@/lib/training/base-plan";
 import { tierForAmount } from "@/lib/billing/tiers";
 import BasePlanNote from "@/components/client/BasePlanNote";
+import Program90Card from "@/components/client/Program90Card";
+import { is90DaysPlan, program90State } from "@/lib/training/program90";
 
 
 /** The equipment answer, in words, for the base plan note. */
@@ -90,7 +92,7 @@ export default async function ClientDashboard() {
     // 6-month history (streak + calendar)
     supabase
       .from("workout_plans")
-      .select("week_start, workout_days(day_of_week, is_rest, workout_completions(client_id))")
+      .select("name, week_start, workout_days(day_of_week, is_rest, workout_completions(client_id))")
       .eq("client_id", user!.id)
       .order("week_start", { ascending: false })
       .limit(26),
@@ -193,6 +195,17 @@ export default async function ClientDashboard() {
     typeof mergedProfile?.trial_ends_at === "string" &&
     new Date(mergedProfile.trial_ends_at).getTime() > Date.now();
   const planMode: "trial" | "app" | "coaching" = paidTier ?? (onTrial ? "trial" : "coaching");
+
+  // Where they are in the book's thirteen weeks, read from the plan names.
+  // Only offered to people whose plans the app writes: a coaching client's
+  // weeks are the thing they are paying a person for.
+  const program = program90State(
+    (allPlans ?? []).map((w: { week_start: string; name?: string | null }) => ({
+      name: w.name ?? null,
+      week_start: w.week_start,
+    })),
+  );
+  const showProgram90 = planMode === "trial" || planMode === "app";
 
   let plan = planThisWeek;
   let isCurrentWeek = true;
@@ -484,7 +497,10 @@ export default async function ClientDashboard() {
                 {t("showing_recent", lang)}
               </div>
             )}
-            {isBasePlan(plan.name) && (
+            {showProgram90 && (
+              <Program90Card lang={lang} state={program} />
+            )}
+            {isBasePlan(plan.name) && !is90DaysPlan(plan.name) && (
               <BasePlanNote
                 lang={lang}
                 daysPerWeek={
