@@ -102,9 +102,63 @@ function phaseInput(week: number, input: BasePlanInput): BasePlanInput {
   return { ...input, level: "intermediate", trainingDays: days, sessionMinutes: Math.max(input.sessionMinutes ?? 60, 75), deload: s.deload };
 }
 
+/**
+ * What separates one block from the next, in the person's own session.
+ *
+ * Blocks two and three come out of the generator with the same sets and the
+ * same exercises, because what changes between them is how they are lifted:
+ * more repetitions in one, more weight in the other. That instruction lives
+ * in the book, and somebody following the programme in the app would never
+ * see it, so it rides on the first exercise of the week.
+ */
+const WEEK_NOTE: Record<"p1" | "p2" | "p3" | "deload" | "test", { pt: string; en: string }> = {
+  p1: {
+    pt: "Fundação: escolhe pesos que te deixem 2 a 3 repetições na reserva e regista tudo.",
+    en: "Foundation: pick weights that leave 2 to 3 repetitions in reserve, and log everything.",
+  },
+  p2: {
+    pt: "Volume: sobe primeiro as repetições, só depois o peso. Sempre por essa ordem.",
+    en: "Volume: add repetitions first, weight second. Always in that order.",
+  },
+  p3: {
+    pt: "Intensidade: nos compostos trabalha na parte de baixo do intervalo, com mais peso. Nos isolamentos mantém as repetições altas.",
+    en: "Intensity: on the compounds work at the bottom of the range, with more weight. Keep the repetitions high on isolation work.",
+  },
+  deload: {
+    pt: "Semana leve: menos uma série em tudo, com o mesmo peso. É isto que faz o bloco seguinte subir.",
+    en: "Light week: one set fewer on everything, same weight. This is what makes the next block go up.",
+  },
+  test: {
+    pt: "Semana de teste: uma série a sério por treino, registada, e o resto leve. Compara com a semana 1.",
+    en: "Test week: one real set per session, logged, and the rest light. Compare it with week 1.",
+  },
+};
+
+function noteFor(week: number, lang: Lang): string {
+  const s = program90Structure(week);
+  const key = s.test ? "test" : s.deload ? "deload" : s.phase === 1 ? "p1" : s.phase === 2 ? "p2" : "p3";
+  const head = lang === "en" ? `Week ${week} of ${PROGRAM_90_WEEKS}` : `Semana ${week} de ${PROGRAM_90_WEEKS}`;
+  return `${head}. ${WEEK_NOTE[key][lang]}`;
+}
+
 export function buildProgram90Week(week: number, input: BasePlanInput): BasePlan {
   const plan = buildBasePlan(phaseInput(week, input));
-  return { ...plan, name: program90Name(week, input.lang) };
+  const note = noteFor(week, input.lang);
+
+  // On the first exercise of the first session, where it is read before the
+  // first set rather than after the week is over.
+  let placed = false;
+  const days = plan.days.map((d) => {
+    if (placed || d.is_rest || d.exercises.length === 0) return d;
+    placed = true;
+    const [first, ...rest] = d.exercises;
+    return {
+      ...d,
+      exercises: [{ ...first, notes: first.notes ? `${note} ${first.notes}` : note }, ...rest],
+    };
+  });
+
+  return { name: program90Name(week, input.lang), days };
 }
 
 /** Monday of the week containing `date`, as YYYY-MM-DD, in UTC. */
