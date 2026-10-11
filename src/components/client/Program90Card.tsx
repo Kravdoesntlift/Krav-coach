@@ -1,6 +1,5 @@
 import { PROGRAM_90_WEEKS, program90Structure, type Program90State } from "@/lib/training/program90";
 import { StartProgram90Button } from "./StartProgram90Button";
-import { startProgram90Action } from "@/app/client/program-action";
 import type { Lang } from "@/lib/training/base-plan";
 
 /**
@@ -41,14 +40,13 @@ export default function Program90Card({
                 : "Treze semanas em três blocos, com uma semana mais leve a cada quatro e uma semana de teste no fim. A app escreve cada semana para os teus dias e o teu material, em vez de andares a procurar num PDF onde ficaste.")}
           </p>
         </div>
-        <form action={startProgram90Action}>
-          <StartProgram90Button
-            label={state.finished
-              ? (isEN ? "Run it again" : "Fazer outra vez")
-              : (isEN ? "Follow the 90 Days in the app" : "Seguir os 90 Dias na app")}
-            pendingLabel={isEN ? "Writing your weeks..." : "A escrever as tuas semanas..."}
-          />
-        </form>
+        <StartProgram90Button
+          lang={isEN ? "en" : "pt"}
+          label={state.finished
+            ? (isEN ? "Run it again" : "Fazer outra vez")
+            : (isEN ? "Follow the 90 Days in the app" : "Seguir os 90 Dias na app")}
+          pendingLabel={isEN ? "Writing your weeks..." : "A escrever as tuas semanas..."}
+        />
       </div>
     );
   }

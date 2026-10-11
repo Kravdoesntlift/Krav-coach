@@ -1,9 +1,10 @@
 "use client";
 
+import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { startProgram90Action, type ProgramActionState } from "@/app/client/program-action";
 
-/** Its own component so the pending state belongs to this form alone. */
-export function StartProgram90Button({ label, pendingLabel }: { label: string; pendingLabel: string }) {
+function Submit({ label, pendingLabel }: { label: string; pendingLabel: string }) {
   const { pending } = useFormStatus();
   return (
     <button
@@ -14,5 +15,37 @@ export function StartProgram90Button({ label, pendingLabel }: { label: string; p
     >
       {pending ? pendingLabel : label}
     </button>
+  );
+}
+
+/**
+ * The form and its answer in one place, so a refusal is read rather than
+ * swallowed: pressing a button and watching nothing happen is the worst
+ * outcome this screen can produce.
+ */
+export function StartProgram90Button({
+  label,
+  pendingLabel,
+  lang,
+}: {
+  label: string;
+  pendingLabel: string;
+  lang: "pt" | "en";
+}) {
+  const [state, action] = useActionState<ProgramActionState, FormData>(
+    startProgram90Action,
+    { ok: false, message: null },
+  );
+
+  return (
+    <form action={action} className="space-y-2">
+      <input type="hidden" name="lang" value={lang} />
+      <Submit label={label} pendingLabel={pendingLabel} />
+      {state.message && (
+        <p className="text-xs leading-relaxed" style={{ color: "#fca5a5" }}>
+          {state.message}
+        </p>
+      )}
+    </form>
   );
 }
