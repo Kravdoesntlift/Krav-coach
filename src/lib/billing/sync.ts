@@ -23,6 +23,22 @@ export function getStripe(): Stripe | null {
 }
 
 /** Stripe subscription status → the value `profiles.status` should hold. */
+/**
+ * Access granted by hand outlives a settled Stripe subscription.
+ *
+ * `trial_ends_at` is this app's own "access until" date: it is what the
+ * paywall reads and what the plan writer reads. When the coach gives somebody
+ * free access, that is the field he sets. The nightly reconcile lists every
+ * subscription Stripe has, including the ones cancelled months ago, and used
+ * to write "cancelled" straight back onto the profile, which silently undid
+ * the gift overnight. A live subscription still wins, because that is a real
+ * state change rather than old news being replayed.
+ */
+export function comped(profile: { trial_ends_at?: string | null } | null | undefined): boolean {
+  const until = profile?.trial_ends_at ? new Date(profile.trial_ends_at) : null;
+  return until !== null && until.getTime() > Date.now();
+}
+
 export function profileStatusFor(stripeStatus: string): string | null {
   switch (stripeStatus) {
     case "active":
@@ -133,9 +149,13 @@ export async function syncSubscription(
     .eq("id", clientId)
     .maybeSingle();
 
+  // Somebody with an access window the coach set keeps their status: the
+  // subscription row below still records exactly what Stripe says.
+  const statusToWrite = !isLive && comped(dbProfile) ? null : wantStatus;
+
   const profileDiffers =
     !dbProfile ||
-    (wantStatus !== null && dbProfile.status !== wantStatus) ||
+    (statusToWrite !== null && dbProfile.status !== statusToWrite) ||
     dbProfile.subscription_renews_at !== renewsAt ||
     (isLive && dbProfile.trial_ends_at !== null) ||
     (customerId !== null && dbProfile.stripe_customer_id !== customerId);
@@ -144,7 +164,7 @@ export async function syncSubscription(
     const { error } = await admin
       .from("profiles")
       .update({
-        ...(wantStatus ? { status: wantStatus } : {}),
+        ...(statusToWrite ? { status: statusToWrite } : {}),
         subscription_renews_at: renewsAt,
         // A real subscription supersedes any trial countdown
         ...(isLive ? { trial_ends_at: null } : {}),

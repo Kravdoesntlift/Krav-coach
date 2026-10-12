@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPushToUser } from "@/lib/push";
 import { sendInvoiceEmail, sendPaymentFailedEmail, sendSubscriptionCancelledEmail } from "@/lib/email";
-import { syncSubscription, getStripe as getStripeClient } from "@/lib/billing/sync";
+import { syncSubscription, comped, getStripe as getStripeClient } from "@/lib/billing/sync";
 import Stripe from "stripe";
 
 export const runtime = "nodejs";
@@ -418,8 +418,16 @@ export async function POST(req: NextRequest) {
         if (sub?.client_id) {
           const clientId = sub.client_id;
 
-          // Update profile status so layout blocks access
-          await admin.from("profiles").update({ status: "cancelled" }).eq("id", clientId);
+          // Update profile status so layout blocks access, unless the coach
+          // has given this person an access window of their own: see comped().
+          const { data: prof0 } = await admin
+            .from("profiles")
+            .select("trial_ends_at")
+            .eq("id", clientId)
+            .maybeSingle();
+          if (!comped(prof0)) {
+            await admin.from("profiles").update({ status: "cancelled" }).eq("id", clientId);
+          }
 
           // Notify client via push + email
           const [{ data: prof }, { data: authUser }] = await Promise.all([
