@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PROGRAM_90_WEEKS, program90Structure, type Program90State } from "@/lib/training/program90";
 import { StartProgram90Button } from "./StartProgram90Button";
 import type { Lang } from "@/lib/training/base-plan";
@@ -110,6 +111,10 @@ export default function Program90Card({
             ? "Hit the top of the repetition range on every set and the weight goes up next week."
             : "Chega ao topo do intervalo de repetições em todas as séries e o peso sobe na semana seguinte.")}
       </p>
+
+      <Link href="/client/programa" className="inline-block text-xs font-bold text-brand-gold hover:underline">
+        {isEN ? "See the thirteen weeks" : "Ver as treze semanas"} →
+      </Link>
     </div>
   );
 }
