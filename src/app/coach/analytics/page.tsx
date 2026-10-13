@@ -1,3 +1,5 @@
+import WeeklyFunnel from "@/components/coach/WeeklyFunnel";
+import { weeklyFunnel } from "@/lib/coach/weekly-funnel";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 
@@ -94,6 +96,9 @@ export default async function AnalyticsPage() {
     supabase.from("workout_plans").select("client_id, week_start").eq("coach_id", user.id).gte("week_start", since),
     supabase.from("leads").select("id, status, created_at").order("created_at").limit(1000),
   ]);
+
+  // Counted from the things themselves, including Stripe for the book.
+  const funnel = await weeklyFunnel(8);
 
   type ProfileRef = { status: string | null; created_at: string } | null;
   const activeClients = (clients ?? []).filter((c) => (c.profiles as unknown as ProfileRef)?.status === "active");
@@ -194,6 +199,9 @@ export default async function AnalyticsPage() {
         <StatCard label="Taxa check-in" value={`${avgCheckinRate}%`} sub="média 8 sem." />
         <StatCard label="Projeção anual" value={`€${yearlyProjection}`} sub="baseado na receita atual" />
       </div>
+
+      {/* What each week produced, which is the question content raises. */}
+      <WeeklyFunnel data={funnel} />
 
       {/* ── Funil /links ── */}
       <div>
