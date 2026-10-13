@@ -220,7 +220,21 @@ export default async function CoachDashboard() {
   }
 
   const allClients = Array.from(allClientMap.values()).filter(isReallyActive);
+
+  /**
+   * Trials, which `isReallyActive` deliberately drops once they lapse.
+   *
+   * Hiding a dead trial keeps the client list honest, and it also hid the one
+   * moment where the money is actually won or lost: somebody whose seven days
+   * just ended and who has not paid. That person left the dashboard the day
+   * the trial expired and nobody saw them again.
+   */
+  const trialWatch = Array.from(allClientMap.values()).filter(
+    (c) => c.status === "active" && c.trial_ends_at && !c.subscription_renews_at,
+  );
   const weekClients = Array.from(clientMap.values()).filter((c) => isReallyActive(c as unknown as AllClientEntry));
+
+  // (the trial alerts are pushed after the per-client loop below)
 
   // Alerts the coach has already ticked off, for the context they were in.
   // The table arrives with supabase/migration_alert_acks.sql; until it is run
@@ -235,7 +249,7 @@ export default async function CoachDashboard() {
   );
 
   // Smart alerts
-  type AlertType = "no_checkin" | "renewal" | "overdue_renewal" | "no_completion" | "perfect_week" | "pr_week" | "at_risk";
+  type AlertType = "no_checkin" | "renewal" | "overdue_renewal" | "no_completion" | "perfect_week" | "pr_week" | "at_risk" | "trial_ending" | "trial_lost";
   // `context` is what the alert is about right now: the week, or the renewal
   // date. Marking one as handled stores that context, so the alert returns by
   // itself when the week turns or the renewal moves.
@@ -305,6 +319,36 @@ export default async function CoachDashboard() {
       if (lowEnergy && lowPct && noCheckin) {
         alerts.push({ type: "at_risk", clientId: id, clientName: name, detail: "Energia baixa, poucos treinos e sem check-in", urgency: "high", context: weekStart });
       }
+    }
+  }
+
+  // Trials, which are where a reader of this dashboard can still change the
+  // outcome. The context is the trial date, so ticking one off brings it back
+  // if the date ever moves.
+  for (const c of trialWatch) {
+    const ends = c.trial_ends_at as string;
+    const daysLeft = Math.ceil(
+      (new Date(ends.slice(0, 10) + "T00:00:00").getTime() - todayMidnight.getTime()) / 86_400_000,
+    );
+
+    if (daysLeft >= 0 && daysLeft <= 2) {
+      alerts.push({
+        type: "trial_ending",
+        clientId: c.id,
+        clientName: c.full_name,
+        detail: daysLeft === 0 ? "O trial acaba hoje" : `O trial acaba em ${daysLeft} dia${daysLeft === 1 ? "" : "s"}`,
+        urgency: "high",
+        context: ends.slice(0, 10),
+      });
+    } else if (daysLeft < 0 && daysLeft >= -21) {
+      alerts.push({
+        type: "trial_lost",
+        clientId: c.id,
+        clientName: c.full_name,
+        detail: `O trial acabou há ${Math.abs(daysLeft)} dia${daysLeft === -1 ? "" : "s"} e não subscreveu`,
+        urgency: "high",
+        context: ends.slice(0, 10),
+      });
     }
   }
 

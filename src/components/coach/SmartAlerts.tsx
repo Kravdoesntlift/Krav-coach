@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import { acknowledgeAlert, undoAcknowledgeAlert } from "@/app/coach/alerts/actions";
 
 interface Alert {
-  type: "no_checkin" | "renewal" | "overdue_renewal" | "no_completion" | "perfect_week" | "pr_week" | "at_risk";
+  type: "no_checkin" | "renewal" | "overdue_renewal" | "no_completion" | "perfect_week" | "pr_week" | "at_risk" | "trial_ending" | "trial_lost";
   clientId: string;
   clientName: string;
   detail: string;
@@ -22,6 +22,8 @@ interface Props {
 const ALERT_CONFIG = {
   no_checkin:       { icon: "⚠️",  color: "text-yellow-400", border: "border-yellow-700/40", bg: "bg-yellow-950/20" },
   renewal:          { icon: "💳",  color: "text-orange-400", border: "border-orange-700/40", bg: "bg-orange-950/20" },
+  trial_ending:     { icon: "⏳",  color: "text-orange-400", border: "border-orange-700/40", bg: "bg-orange-950/20" },
+  trial_lost:       { icon: "🚪",  color: "text-red-400",    border: "border-red-700/40",    bg: "bg-red-950/20"    },
   overdue_renewal:  { icon: "🔴",  color: "text-red-400",    border: "border-red-700/40",    bg: "bg-red-950/20"    },
   no_completion:    { icon: "🏋",  color: "text-blue-400",   border: "border-blue-700/40",   bg: "bg-blue-950/20"   },
   perfect_week:     { icon: "🏆",  color: "text-green-400",  border: "border-green-700/40",  bg: "bg-green-950/20"  },
@@ -33,6 +35,8 @@ const ALERT_CONFIG = {
 const RETURNS: Record<Alert["type"], string> = {
   no_checkin:      "Volta para a semana que vem se continuar sem check-in.",
   renewal:         "Volta na próxima renovação.",
+  trial_ending:    "Volta amanhã enquanto o trial não acabar.",
+  trial_lost:      "Volta enquanto não subscrever, até três semanas depois do trial.",
   overdue_renewal: "Volta enquanto o pagamento continuar recusado, na próxima data.",
   no_completion:   "Volta para a semana que vem se continuar sem treinos.",
   perfect_week:    "Volta se voltar a fazer semana perfeita.",
