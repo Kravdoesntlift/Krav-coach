@@ -14,6 +14,7 @@ import DuplicatePlanButton from "@/components/coach/DuplicatePlanButton";
 import CreateProgramButton from "@/components/coach/CreateProgramButton";
 import FeedbackForm from "@/components/coach/FeedbackForm";
 import CoachNotes from "@/components/coach/CoachNotes";
+import AccessControl from "@/components/coach/AccessControl";
 import ClientStatusForm from "@/components/coach/ClientStatusForm";
 import RefundAndCancelButton from "@/components/coach/RefundAndCancelButton";
 import ChallengeForm from "@/components/coach/ChallengeForm";
@@ -276,6 +277,13 @@ export default async function ClientDetailPage({
       <section>
         <h2 className="text-white font-semibold mb-3">Estado da Subscrição</h2>
         <div className="card p-5 space-y-4">
+          {/* Free access, for the cases that are not a subscription: a friend
+              testing, somebody between plans, a decision the coach made. */}
+          <AccessControl
+            clientId={clientId}
+            hasLiveSubscription={(liveSubs?.length ?? 0) > 0}
+            trialEndsAt={(client.trial_ends_at as string | null) ?? null}
+          />
           <ClientStatusForm
             clientId={clientId}
             currentStatus={(client.status ?? "active") as ClientStatus}
