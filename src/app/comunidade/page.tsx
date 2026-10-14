@@ -74,7 +74,7 @@ const T = {
       other: "Não mostra o teu número nem o meu, e sais quando quiseres.",
     },
     join_cta: "Entrar no canal →",
-    soon_title: "O canal abre em breve",
+    soon_title: "Comunidade · abre em breve",
     soon_sub: "Deixa o email no guia grátis e eu aviso-te no dia em que abrir. É o mesmo email por onde te chega o plano de 5 dias.",
     soon_cta: "Quero o guia grátis →",
     doors_title: "E se quiseres o programa",
@@ -124,7 +124,7 @@ const T = {
       other: "It shows neither your phone number nor mine, and you can leave whenever you want.",
     },
     join_cta: "Join the channel →",
-    soon_title: "The channel opens shortly",
+    soon_title: "Community · opening shortly",
     soon_sub: "Leave your email on the free guide and I will tell you the day it opens. Same email that brings you the 5 day plan.",
     soon_cta: "I want the free guide →",
     doors_title: "And if you want the programme",
@@ -177,7 +177,11 @@ export default async function CommunityPage({
         {/* ── HERO ──────────────────────────────────────────────── */}
         <section className="max-w-2xl mx-auto px-5 pt-10 pb-14 text-center">
           <ScrollReveal direction="up">
-            <p className="text-[11px] font-black tracking-[0.2em] uppercase" style={{ color: GOLD }}>{t.eyebrow}</p>
+            {/* Honest at the top: while there is no channel, the page does not
+                open by calling itself one. */}
+            <p className="text-[11px] font-black tracking-[0.2em] uppercase" style={{ color: GOLD }}>
+              {communityOpen ? t.eyebrow : t.soon_title}
+            </p>
             <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl leading-[1.05]">{t.title}</h1>
             <p className="mt-5 text-base leading-relaxed text-zinc-400 max-w-lg mx-auto">{t.sub}</p>
 
