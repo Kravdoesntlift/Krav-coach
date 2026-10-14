@@ -5,7 +5,7 @@ import { absoluteUrl } from "@/lib/seo";
 import { ebookPrice } from "@/lib/ebook/price";
 import { priceLabel } from "@/lib/billing/tiers";
 import {
-  COMMUNITY_URL, communityOpen, COHORT_WEEKS,
+  COMMUNITY_URL, communityOpen, communityPlatform, COHORT_WEEKS,
   cohortState, cohortStartLabel, cohortName,
 } from "@/lib/community";
 
@@ -67,7 +67,12 @@ const T = {
       ["03", `Começa a ${cohortStartLabel("pt")}`, "Todos na semana 1 ao mesmo tempo. É muito mais difícil desistir na semana 3 quando há gente a ir pela mesma semana."],
     ],
     join_title: "Entrar no canal",
-    join_sub: "Canal de difusão do Instagram. Não mostra o teu número nem o meu, e sais quando quiseres.",
+    join_sub: {
+      instagram: "Canal de difusão do Instagram. Não mostra o teu número nem o meu, e sais quando quiseres.",
+      telegram: "Canal no Telegram. Não mostra o teu número nem o meu, e sais quando quiseres.",
+      whatsapp: "Não mostra o teu número nem o meu, e sais quando quiseres.",
+      other: "Não mostra o teu número nem o meu, e sais quando quiseres.",
+    },
     join_cta: "Entrar no canal →",
     soon_title: "O canal abre em breve",
     soon_sub: "Deixa o email no guia grátis e eu aviso-te no dia em que abrir. É o mesmo email por onde te chega o plano de 5 dias.",
@@ -112,7 +117,12 @@ const T = {
       ["03", `Start on ${cohortStartLabel("en")}`, "Everybody on week 1 at the same time. Quitting in week 3 is a lot harder when other people are on the same week."],
     ],
     join_title: "Join the channel",
-    join_sub: "An Instagram broadcast channel. It shows neither your phone number nor mine, and you can leave whenever you want.",
+    join_sub: {
+      instagram: "An Instagram broadcast channel. It shows neither your phone number nor mine, and you can leave whenever you want.",
+      telegram: "A Telegram channel. It shows neither your phone number nor mine, and you can leave whenever you want.",
+      whatsapp: "It shows neither your phone number nor mine, and you can leave whenever you want.",
+      other: "It shows neither your phone number nor mine, and you can leave whenever you want.",
+    },
     join_cta: "Join the channel →",
     soon_title: "The channel opens shortly",
     soon_sub: "Leave your email on the free guide and I will tell you the day it opens. Same email that brings you the 5 day plan.",
@@ -191,7 +201,7 @@ export default async function CommunityPage({
               </Link>
             )}
             <p className="mt-3 text-xs text-zinc-600 max-w-sm mx-auto leading-relaxed">
-              {communityOpen ? t.join_sub : t.soon_sub}
+              {communityOpen ? t.join_sub[communityPlatform()] : t.soon_sub}
             </p>
           </ScrollReveal>
         </section>

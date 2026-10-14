@@ -33,6 +33,31 @@ export const COMMUNITY_URL: string = process.env.NEXT_PUBLIC_COMMUNITY_URL || ""
 /** Whether there is a room to send anybody to yet. */
 export const communityOpen: boolean = /^https:\/\//.test(COMMUNITY_URL);
 
+/**
+ * Which room it turned out to be, read from the link rather than assumed.
+ *
+ * Instagram's own requirement is a public account with more than a thousand
+ * followers, and the account is not there yet, so the first room may well be
+ * a Telegram channel instead. The page has to describe whatever is actually
+ * behind the link: telling somebody "it is an Instagram channel" and handing
+ * them a Telegram link is the kind of small lie that costs the click.
+ */
+export type CommunityPlatform = "instagram" | "telegram" | "whatsapp" | "other";
+
+export function communityPlatform(): CommunityPlatform {
+  if (!communityOpen) return "other";
+  let host = "";
+  try {
+    host = new URL(COMMUNITY_URL).hostname.toLowerCase();
+  } catch {
+    return "other";
+  }
+  if (/(^|\.)(instagram\.com|ig\.me)$/.test(host)) return "instagram";
+  if (/(^|\.)(t\.me|telegram\.me|telegram\.org)$/.test(host)) return "telegram";
+  if (/(^|\.)(whatsapp\.com|wa\.me)$/.test(host)) return "whatsapp";
+  return "other";
+}
+
 /* ─── The group ────────────────────────────────────────────────────────────── */
 
 /**
