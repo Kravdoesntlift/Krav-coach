@@ -24,6 +24,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/guia`,                        lastModified: LAST_CONTENT_UPDATE, changeFrequency: "monthly", priority: 0.7 },
     // The only page that sells something outright, so it ranks near the top.
     { url: `${SITE_URL}/ebook`,                       lastModified: new Date("2026-09-30"), changeFrequency: "monthly", priority: 0.8 },
+    // The group has a start date, so this page genuinely changes.
+    { url: `${SITE_URL}/comunidade`,                  lastModified: new Date("2026-10-15"), changeFrequency: "weekly", priority: 0.6 },
     { url: `${SITE_URL}/links`,                       lastModified: LAST_CONTENT_UPDATE, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/terms`,                       lastModified: LAST_LEGAL_UPDATE,   changeFrequency: "yearly",  priority: 0.3 },
     { url: `${SITE_URL}/privacy`,                     lastModified: LAST_LEGAL_UPDATE,   changeFrequency: "yearly",  priority: 0.3 },

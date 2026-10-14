@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EBOOK } from "@/lib/ebook/content";
 import { ebookToken } from "@/lib/ebook/access";
+import { cohortState, cohortStartLabel } from "@/lib/community";
 
 /**
  * After the payment.
@@ -42,6 +43,8 @@ export default async function EbookThanksPage({
   const isEN = langParam === "en";
   const paid = await paidSession(session_id);
   const href = `/ebook/ler?t=${ebookToken()}${isEN ? "&lang=en" : ""}`;
+  const cohort = cohortState();
+  const cohortLabel = cohortStartLabel(isEN ? "en" : "pt");
 
   return (
     <main className="min-h-screen flex items-center justify-center px-5 py-16 bg-black text-white">
@@ -71,6 +74,33 @@ export default async function EbookThanksPage({
                 ? "To keep it as a PDF: open it and use your browser's print option, then \"Save as PDF\"."
                 : "Para guardares em PDF: abre o livro e usa a opção de imprimir do browser, depois \"Guardar como PDF\"."}
             </p>
+            <div className="pt-2 text-left rounded-2xl p-5"
+              style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.25)" }}>
+              <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: GOLD }}>
+                {isEN ? "One more thing" : "Falta uma coisa"}
+              </p>
+              <p className="mt-2 text-sm font-bold text-white">
+                {cohort.phase === "before"
+                  ? (isEN
+                    ? `The group starts on ${cohortLabel}, in ${cohort.daysUntil} ${cohort.daysUntil === 1 ? "day" : "days"}.`
+                    : `A turma começa a ${cohortLabel}, daqui a ${cohort.daysUntil} ${cohort.daysUntil === 1 ? "dia" : "dias"}.`)
+                  : (isEN ? "Join the community channel." : "Entra no canal da comunidade.")}
+              </p>
+              <p className="mt-1.5 text-xs leading-relaxed text-zinc-400">
+                {cohort.phase === "before"
+                  ? (isEN
+                    ? "Read the book now, start week 1 on that Monday with everybody else, and follow it in the community channel. It is free and it shows nobody's phone number."
+                    : "Lê o livro agora, começa a semana 1 nessa segunda-feira com todos os outros, e acompanha no canal da comunidade. É grátis e não mostra o número de ninguém.")
+                  : (isEN
+                    ? "Start on your own week 1 whenever you are ready. The channel is where I follow each week, correct form and answer questions. Free, and it shows nobody's phone number."
+                    : "Começa na tua semana 1 quando quiseres. O canal é onde acompanho cada semana, corrijo execução e respondo a perguntas. Grátis, e não mostra o número de ninguém.")}
+              </p>
+              <Link href={isEN ? "/comunidade?lang=en" : "/comunidade"}
+                className="mt-3 inline-block text-sm font-bold" style={{ color: GOLD }}>
+                {isEN ? "See the group and the channel →" : "Ver a turma e o canal →"}
+              </Link>
+            </div>
+
             <div className="pt-4">
               <p className="text-xs text-zinc-600">
                 {isEN ? "Any problem, write to " : "Qualquer problema, escreve para "}

@@ -87,6 +87,7 @@ Há também um produto avulso, sem subscrição:
 - [Começar](${SITE_URL}/start): questionário de inscrição e início do trial.
 - [Guia grátis](${SITE_URL}/guia): guia em PDF sobre estrutura de treino e nutrição.
 - [Livro 90 Dias](${SITE_URL}/ebook): programa de 13 semanas, pago, ${ebookPrice()} EUR.
+- [Comunidade](${SITE_URL}/comunidade): canal gratuito de acompanhamento e a data de arranque da turma que faz o programa de 90 dias em conjunto.
 - [Termos](${SITE_URL}/terms) · [Privacidade](${SITE_URL}/privacy)
 
 ## Contacto

@@ -5,6 +5,7 @@ import { buyEbookAction } from "./actions";
 import { SITE_URL, absoluteUrl } from "@/lib/seo";
 import { priceLabel } from "@/lib/billing/tiers";
 import ScrollReveal from "@/components/ScrollReveal";
+import { cohortState, cohortStartLabel, cohortName, COHORT_WEEKS } from "@/lib/community";
 
 /**
  * The sales page for the book.
@@ -40,6 +41,16 @@ const T = {
     cta: `Comprar por €${ebookPrice("pt")}`,
     cta_note: "Pagamento único. O link chega ao teu email em segundos.",
     credit_note: "E se mais tarde quiseres a app ou o coaching, os €15 são descontados no primeiro mês.",
+    cohort_eyebrow: "Arranque com data",
+    cohort_title: (label: string) => `A próxima turma começa a ${label}`,
+    cohort_before: (days: number, label: string) =>
+      `Em vez de começares o programa num dia qualquer, começas a ${label} ao mesmo tempo que todos os outros, na semana 1. No canal da comunidade digo em que semana vamos, o que muda nessa semana e o erro que quase todos cometem nela. Quem compra até lá entra na turma.`,
+    cohort_running: (week: number, label: string) =>
+      `A turma que arrancou a ${label} vai na semana ${week} de ${COHORT_WEEKS}. Compras hoje e começas na tua semana 1, porque ninguém entra a meio de um bloco, e tens o canal da comunidade para acompanhar e perguntar.`,
+    cohort_finished: "A última turma já acabou as treze semanas. A data da próxima sai no canal da comunidade, que é grátis.",
+    cohort_title_next: "A próxima turma",
+    cohort_days_label: "até ao arranque",
+    cohort_cta: "Ver a turma e o canal",
     pills: ["13 semanas", "Ginásio ou casa", "PT e EN"],
     problem_title: "O problema não é falta de informação",
     problem: [
@@ -62,6 +73,7 @@ const T = {
       { q: "Sou principiante. É demasiado para mim?", a: "O primeiro bloco existe precisamente para quem está a começar, e diz-te com que peso começar. Se nunca treinaste, começa por aí e não saltes à frente." },
       { q: "E se não for o que eu esperava?", a: "Escreve-me nos primeiros 14 dias e devolvo o dinheiro, sem perguntas." },
       { q: "Se comprar o livro e depois quiser a app, pago duas vezes?", a: "Não. Com o livro recebes um código só teu que vale €15 de desconto no primeiro mês de qualquer plano. É uma devolução do livro, não um desconto permanente: a partir do segundo mês pagas o preço normal." },
+      { q: "O que é a turma, e tenho de entrar?", a: "Não tens de entrar, o livro é teu e funciona sozinho. A turma é só um arranque com data: começa um grupo na mesma segunda-feira e eu acompanho semana a semana no canal da comunidade, que é grátis e aberto a todos. É muito mais difícil parar na semana 3 quando há gente a ir pela mesma semana." },
     ],
     guarantee_title: "Garantia de 14 dias",
     guarantee: "Se o livro não te servir, escreve-me e devolvo o dinheiro. Prefiro isso a ter alguém a pagar por algo que não usa.",
@@ -80,6 +92,16 @@ const T = {
     cta: `Buy for €${ebookPrice("en")}`,
     cta_note: "One payment. The link reaches your inbox in seconds.",
     credit_note: "And if you later want the app or the coaching, the €15 comes off your first month.",
+    cohort_eyebrow: "A dated start",
+    cohort_title: (label: string) => `The next group starts on ${label}`,
+    cohort_before: (days: number, label: string) =>
+      `Instead of starting the programme on some random day, you start on ${label} at the same time as everybody else, on week 1. In the community channel I say which week we are on, what changes that week and the mistake almost everybody makes in it. Buy before then and you are in the group.`,
+    cohort_running: (week: number, label: string) =>
+      `The group that started on ${label} is on week ${week} of ${COHORT_WEEKS}. Buy today and you start on your own week 1, because nobody walks in halfway through a block, and the community channel is there to follow and to ask.`,
+    cohort_finished: "The last group has finished its thirteen weeks. The next date goes out in the community channel, which is free.",
+    cohort_title_next: "The next group",
+    cohort_days_label: "until we start",
+    cohort_cta: "See the group and the channel",
     pills: ["13 weeks", "Gym or home", "PT and EN"],
     problem_title: "The problem is not a lack of information",
     problem: [
@@ -102,6 +124,7 @@ const T = {
       { q: "I am a beginner. Is this too much?", a: "The first block exists precisely for people starting out, and it tells you what weight to start with. If you have never trained, start there and do not skip ahead." },
       { q: "What if it is not what I expected?", a: "Write to me within 14 days and I refund you, no questions." },
       { q: "If I buy the book and then want the app, do I pay twice?", a: "No. With the book you get a code of your own worth €15 off the first month of any plan. It is a refund of the book, not a permanent discount: from the second month you pay the normal price." },
+      { q: "What is the group, and do I have to join?", a: "You do not have to join, the book is yours and works on its own. The group is simply a dated start: a group of people begin on the same Monday and I follow it week by week in the community channel, which is free and open to everybody. Stopping in week 3 is much harder when other people are on the same week." },
     ],
     guarantee_title: "14 day guarantee",
     guarantee: "If the book is not for you, write to me and I refund you. I would rather that than have somebody paying for something they do not use.",
@@ -125,6 +148,8 @@ export default async function EbookSalesPage({
   const t = T[lang];
   const book = ebookCopy(lang);
   const price = ebookPrice(lang);
+  const cohort = cohortState();
+  const cohortLabel = cohortStartLabel(lang);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -206,6 +231,58 @@ export default async function EbookSalesPage({
               </form>
               <p className="mt-3 text-xs text-zinc-600">{t.cta_note}</p>
               <p className="mt-1.5 text-xs" style={{ color: "rgba(201,168,76,0.75)" }}>{t.credit_note}</p>
+            </ScrollReveal>
+          </section>
+
+          {/* ── THE GROUP ───────────────────────────────────────── */}
+          {/* A book on sale forever gives nobody a reason to buy it today. A
+              group that starts on a Monday does, and the date is real: the
+              programme's week one opens on a Monday either way. */}
+          <section className="max-w-2xl mx-auto px-5 pb-16">
+            <ScrollReveal direction="up">
+              <div className="rounded-3xl p-6 sm:p-7"
+                style={{
+                  background: "linear-gradient(160deg, rgba(201,168,76,0.1) 0%, rgba(10,10,12,0.95) 100%)",
+                  border: "1px solid rgba(201,168,76,0.28)",
+                }}>
+                <p className="text-[11px] font-black tracking-[0.2em] uppercase" style={{ color: GOLD }}>
+                  {t.cohort_eyebrow}
+                </p>
+
+                {cohort.phase === "before" ? (
+                  <>
+                    <h2 className="mt-3 text-2xl font-black tracking-tight">{t.cohort_title(cohortLabel)}</h2>
+                    <div className="mt-5 flex items-center gap-4">
+                      <div className="rounded-2xl px-5 py-3 text-center shrink-0"
+                        style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(201,168,76,0.3)" }}>
+                        <p className="text-3xl font-black leading-none" style={{ color: GOLD }}>{cohort.daysUntil}</p>
+                        <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+                          {t.cohort_days_label}
+                        </p>
+                      </div>
+                      <p className="text-sm leading-relaxed text-zinc-400">
+                        {t.cohort_before(cohort.daysUntil, cohortLabel)}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="mt-3 text-2xl font-black tracking-tight">
+                      {cohort.phase === "running" ? cohortName(lang) : t.cohort_title_next}
+                    </h2>
+                    <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+                      {cohort.phase === "running"
+                        ? t.cohort_running(cohort.week, cohortLabel)
+                        : t.cohort_finished}
+                    </p>
+                  </>
+                )}
+
+                <Link href={isEN ? "/comunidade?lang=en" : "/comunidade"}
+                  className="mt-5 inline-block text-sm font-bold" style={{ color: GOLD }}>
+                  {t.cohort_cta} →
+                </Link>
+              </div>
             </ScrollReveal>
           </section>
 

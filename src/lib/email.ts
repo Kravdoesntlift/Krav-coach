@@ -1,5 +1,6 @@
 import { priceLabel } from "@/lib/billing/tiers";
 import { ebookPrice } from "@/lib/ebook/price";
+import { cohortState, cohortStartLabel } from "@/lib/community";
 import { Resend } from "resend";
 
 const FROM = process.env.RESEND_FROM ?? "André · KRAV Coaching <andre@kravcoaching.com>";
@@ -237,6 +238,24 @@ export async function sendEbookEmail({
     ? (isEN ? `Hi ${firstName},` : `Olá ${firstName},`)
     : (isEN ? "Hi," : "Olá,");
 
+  // Finishing thirteen weeks alone is the hard way. Worked out at send time,
+  // so an email going out in December never invites anybody to a November
+  // Monday that has already happened.
+  const cohort = cohortState();
+  const cohortLabel = cohortStartLabel(lang);
+  const cohortHeadline = cohort.phase === "before"
+    ? (isEN
+      ? `The group starts on ${cohortLabel}, in ${cohort.daysUntil} ${cohort.daysUntil === 1 ? "day" : "days"}.`
+      : `A turma começa a ${cohortLabel}, daqui a ${cohort.daysUntil} ${cohort.daysUntil === 1 ? "dia" : "dias"}.`)
+    : (isEN ? "There is a channel for this." : "Há um canal para isto.");
+  const cohortBody = cohort.phase === "before"
+    ? (isEN
+      ? "Start week 1 on that Monday with everybody else and follow it in the community channel, where I say what changes each week and the mistake almost everybody makes in it. Free, and it shows nobody's phone number."
+      : "Começa a semana 1 nessa segunda-feira com todos os outros e acompanha no canal da comunidade, onde digo o que muda em cada semana e o erro que quase todos cometem nela. Grátis, e não mostra o número de ninguém.")
+    : (isEN
+      ? "Start on your own week 1 whenever you are ready. In the community channel I follow each week, correct form and answer questions. Free, and it shows nobody's phone number."
+      : "Começa na tua semana 1 quando quiseres. No canal da comunidade acompanho cada semana, corrijo execução e respondo a perguntas. Grátis, e não mostra o número de ninguém.");
+
   await sendEmail({
     from: FROM, to,
     subject: bonus
@@ -279,8 +298,18 @@ export async function sendEbookEmail({
           ? "Start with block 1 even if you have trained before, and log every session. Reply to this email if anything is unclear, it reaches me."
           : "Começa pelo bloco 1 mesmo que já treines, e regista todos os treinos. Responde a este email se alguma coisa não estiver clara, chega-me a mim."}
       </p>
+      <div style="margin-top:22px;padding:16px 18px;border-radius:14px;background:#0a0a0c;border:1px solid #27272a">
+        <p style="color:#C9A84C;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0 0 8px">
+          ${isEN ? "Do not do it alone" : "Não faças isto sozinho"}
+        </p>
+        <p style="color:#fff;font-size:15px;font-weight:700;margin:0 0 8px">${cohortHeadline}</p>
+        <p style="color:#71717a;font-size:13px;line-height:1.6;margin:0 0 12px">${cohortBody}</p>
+        <a href="https://www.kravcoaching.com/comunidade${isEN ? "?lang=en" : ""}" style="color:#C9A84C;font-size:13px;font-weight:700;text-decoration:none">
+          ${isEN ? "See the group and the channel →" : "Ver a turma e o canal →"}
+        </a>
+      </div>
       ${credit ? `
-      <div style="margin-top:22px;padding:16px 18px;border-radius:14px;background:#0a0a0c;border:1px solid rgba(201,168,76,0.3)">
+      <div style="margin-top:16px;padding:16px 18px;border-radius:14px;background:#0a0a0c;border:1px solid rgba(201,168,76,0.3)">
         <p style="color:#C9A84C;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin:0 0 8px">
           ${isEN ? "Your credit, if you ever subscribe" : "O teu crédito, se um dia assinares"}
         </p>

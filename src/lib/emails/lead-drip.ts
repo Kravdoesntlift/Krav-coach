@@ -1,5 +1,8 @@
 import { priceLabel } from "@/lib/billing/tiers";
 import { ebookPrice } from "@/lib/ebook/price";
+import { cohortState, cohortStartLabel } from "@/lib/community";
+
+export type Lang = "pt" | "en";
 
 /**
  * The three emails every lead receives after the free guide.
@@ -17,9 +20,13 @@ import { ebookPrice } from "@/lib/ebook/price";
    Short paragraphs, no images, no big headers.
 ────────────────────────────────────────────────────────────────────────────── */
 
-function wrap(body: string, unsubUrl: string) {
+// Every English lead was reading an English email with a Portuguese footer,
+// unsubscribe link included. The wrapper is only ever called from the three
+// templates below, and each of them already knows the language.
+function wrap(body: string, unsubUrl: string, lang: Lang) {
+  const isEN = lang === "en";
   return `<!DOCTYPE html>
-<html lang="pt">
+<html lang="${isEN ? "en" : "pt"}">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/></head>
 <body style="margin:0;padding:0;background:#f9f9f9;">
 <table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f9f9f9">
@@ -30,8 +37,10 @@ function wrap(body: string, unsubUrl: string) {
           <p style="margin:0 0 24px 0;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#C9A84C;font-family:Helvetica,Arial,sans-serif;">KRAV COACH</p>
           ${body}
           <p style="margin:32px 0 0;font-size:12px;color:#bbb;font-family:Helvetica,Arial,sans-serif;border-top:1px solid #f0f0f0;padding-top:20px;line-height:1.6;">
-            Recebeste este email porque pediste o guia gratuito em kravcoaching.com<br>
-            <a href="${unsubUrl}" style="color:#bbb;text-decoration:underline;">Cancelar subscrição destes emails</a>
+            ${isEN
+              ? "You are getting this email because you asked for the free guide at kravcoaching.com"
+              : "Recebeste este email porque pediste o guia gratuito em kravcoaching.com"}<br>
+            <a href="${unsubUrl}" style="color:#bbb;text-decoration:underline;">${isEN ? "Unsubscribe from these emails" : "Cancelar subscrição destes emails"}</a>
           </p>
         </td>
       </tr>
@@ -50,8 +59,6 @@ function link(href: string, text: string) {
   return `<a href="${href}" style="color:#C9A84C;text-decoration:none;font-weight:600;">${text}</a>`;
 }
 
-export type Lang = "pt" | "en";
-
 export const SUBJECTS: Record<number, Record<Lang, string>> = {
   0: { pt: "Já leste?", en: "Did you read it?" },
   1: { pt: "O Guilherme", en: "About Guilherme" },
@@ -64,15 +71,27 @@ const IG = "https://www.instagram.com/kravdoesntlift";
 const SITE = "https://www.kravcoaching.com";
 const EBOOK = `${SITE}/ebook`;
 const START = `${SITE}/start`;
+const COMMUNITY = `${SITE}/comunidade`;
 
 // ── Email 2: day 3 ────────────────────────────────────────────────────────────
 export function email2(firstName: string, unsubUrl: string, lang: Lang) {
+  // A reason for it to be this week rather than some week. Only while there is
+  // a start still ahead: an email promising a Monday that has already happened
+  // is worse than one that promises nothing.
+  const cohort = cohortState();
+  const label = cohortStartLabel(lang);
+  const days = cohort.daysUntil;
+  const groupLine = cohort.phase !== "before" ? "" : (lang === "en"
+    ? p(`And there is a reason to do it this week: a group starts on ${label}, in ${days} ${days === 1 ? "day" : "days"}. Everybody begins week 1 on the same Monday and I follow it week by week in the ${link(COMMUNITY, "community channel")}, which is free whether you buy anything or not. Finishing thirteen weeks is a great deal easier when you are not the only one on week three.`)
+    : p(`E há uma razão para ser esta semana: começa uma turma a ${label}, daqui a ${days} ${days === 1 ? "dia" : "dias"}. Todos começam a semana 1 na mesma segunda-feira e eu acompanho semana a semana no ${link(COMMUNITY, "canal da comunidade")}, que é grátis compres ou não compres. Acabar treze semanas é bastante mais fácil quando não és o único na semana três.`));
+
   const body = lang === "en"
     ? `
     ${p(`Hi ${firstName},`)}
     ${p("have you had a chance to open the guide?")}
     ${p("Most people download it, find it interesting, and then life carries on exactly the same. It is not a willpower problem. The guide gives you the principles and one example week, and then you are on your own deciding what week two looks like.")}
     ${p(`That is the part I wrote the book for: thirteen weeks in three blocks, with the progression rule written out for every exercise, gym version and home version. It is €${ebookPrice("en")}, it arrives by email in seconds, and there is no subscription attached: ${link(EBOOK, "the 90 Days programme")}.`)}
+    ${groupLine}
     ${p(`If you would rather just talk about where you are, reply here or message me on Instagram ${link(IG, "@kravdoesntlift")}.`)}
     ${p("André", "margin-bottom:0;")}
   `
@@ -81,10 +100,11 @@ export function email2(firstName: string, unsubUrl: string, lang: Lang) {
     ${p("já tiveste tempo de abrir o guia?")}
     ${p("A maioria das pessoas descarrega, acha interessante e depois a vida continua igual. Não é falta de vontade. O guia dá-te os princípios e uma semana de exemplo, e depois ficas sozinho a decidir como é a semana dois.")}
     ${p(`Foi para essa parte que escrevi o livro: treze semanas em três blocos, com a regra de progressão escrita para cada exercício, versão de ginásio e versão de casa. São €${ebookPrice("pt")}, chega ao email em segundos e não tem subscrição nenhuma agarrada: ${link(EBOOK, "o programa 90 Dias")}.`)}
+    ${groupLine}
     ${p(`Se preferires só falar sobre a tua situação, responde aqui ou fala comigo no Instagram ${link(IG, "@kravdoesntlift")}.`)}
     ${p("André", "margin-bottom:0;")}
   `;
-  return wrap(body, unsubUrl);
+  return wrap(body, unsubUrl, lang);
 }
 
 // ── Email 3: day 7 ────────────────────────────────────────────────────────────
@@ -108,7 +128,7 @@ export function email3(firstName: string, unsubUrl: string, lang: Lang) {
     ${p(`Experimenta e vê o que é ter um plano a sério: ${link(START, "kravcoaching.com/start")}`)}
     ${p("André", "margin-bottom:0;")}
   `;
-  return wrap(body, unsubUrl);
+  return wrap(body, unsubUrl, lang);
 }
 
 // ── Email 4: day 14 ───────────────────────────────────────────────────────────
@@ -130,5 +150,5 @@ export function email4(firstName: string, unsubUrl: string, lang: Lang) {
     ${p(`De qualquer forma, responde aqui ou fala comigo no ${link(IG, "Instagram")}. Leio tudo.`)}
     ${p("André", "margin-bottom:0;")}
   `;
-  return wrap(body, unsubUrl);
+  return wrap(body, unsubUrl, lang);
 }
