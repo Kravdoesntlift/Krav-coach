@@ -138,7 +138,7 @@ export default async function PendingPage({
     step_access:      { pt: "Acesso total à app", en: "Full app access" },
     info_welcome:     { pt: "Podes já falar com o teu coach no chat.", en: "You can already chat with your coach." },
     follow_title:     { pt: "Falta um passo", en: "One step left" },
-    follow_body:      { pt: "Segue @kravdoesntlift no Instagram. Só te posso adicionar aos meus amigos próximos se me seguires, e é lá que acompanho o programa semana a semana, com correções e o que não vai para o feed.", en: "Follow @kravdoesntlift on Instagram. I can only add you to my close friends if you follow, and that is where I follow the programme week by week, with corrections and everything that does not go on the feed." },
+    follow_body:      { pt: "Segue @kravdoesntlift no Instagram. Só te posso adicionar aos meus amigos chegados se me seguires, e é lá que acompanho o programa semana a semana, com correções e o que não vai para o feed.", en: "Follow @kravdoesntlift on Instagram. I can only add you to my close friends if you follow, and that is where I follow the programme week by week, with corrections and everything that does not go on the feed." },
     follow_cta:       { pt: "Seguir @kravdoesntlift", en: "Follow @kravdoesntlift" },
     info_pending:     { pt: "Já tens acesso ao chat com o teu coach. Fala com ele se tiveres dúvidas.", en: "You already have access to chat with your coach. Contact them if you have any questions." },
     chat_cta:         { pt: "💬 Falar com o coach", en: "💬 Chat with coach" },

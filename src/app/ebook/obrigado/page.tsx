@@ -98,7 +98,7 @@ export default async function EbookThanksPage({
               <p className="mt-2.5 text-xs leading-relaxed text-zinc-400">
                 {isEN
                   ? "One step left: follow @kravdoesntlift. I can only add you to my close friends if you follow the account, and that is where the group gets followed week by week."
-                  : "Falta um passo: segue @kravdoesntlift. Só te posso adicionar aos meus amigos próximos se me seguires, e é lá que acompanho a turma semana a semana."}
+                  : "Falta um passo: segue @kravdoesntlift. Só te posso adicionar aos meus amigos chegados se me seguires, e é lá que acompanho a turma semana a semana."}
               </p>
               <Link href={isEN ? "/comunidade?lang=en" : "/comunidade"}
                 className="mt-3 inline-block text-sm font-bold" style={{ color: GOLD }}>

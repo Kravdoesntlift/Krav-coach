@@ -27,7 +27,7 @@ export function instagramField(lang: "pt" | "en" = "pt"): CustomField[] {
     key: HANDLE_KEY,
     label: {
       type: "custom",
-      custom: lang === "en" ? "Instagram (for close friends)" : "Instagram (para os amigos próximos)",
+      custom: lang === "en" ? "Instagram (for close friends)" : "Instagram (para os amigos chegados)",
     },
     type: "text",
     optional: true,
@@ -48,7 +48,7 @@ export function instagramSubmitText(lang: "pt" | "en" = "pt"): CustomText {
     submit: {
       message: lang === "en"
         ? "Leave your Instagram above and follow @kravdoesntlift: I can only add you to my close friends if you follow the account, and that is where the 90 days get followed week by week."
-        : "Deixa o teu Instagram aí em cima e segue @kravdoesntlift: só te posso adicionar aos amigos próximos se me seguires, e é lá que acompanho os 90 dias semana a semana.",
+        : "Deixa o teu Instagram aí em cima e segue @kravdoesntlift: só te posso adicionar aos amigos chegados se me seguires, e é lá que acompanho os 90 dias semana a semana.",
     },
   };
 }

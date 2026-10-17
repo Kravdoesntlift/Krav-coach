@@ -310,7 +310,7 @@ export async function sendEbookEmail({
         <p style="color:#71717a;font-size:13px;line-height:1.6;margin:12px 0 0;padding-top:12px;border-top:1px solid #27272a">
           ${isEN
             ? 'One step left: follow <a href="https://www.instagram.com/kravdoesntlift/" style="color:#C9A84C;text-decoration:none">@kravdoesntlift</a>. I can only add you to my close friends if you follow the account, and that is where the group gets followed week by week.'
-            : 'Falta um passo: segue <a href="https://www.instagram.com/kravdoesntlift/" style="color:#C9A84C;text-decoration:none">@kravdoesntlift</a>. Só te posso adicionar aos meus amigos próximos se me seguires, e é lá que acompanho a turma semana a semana.'}
+            : 'Falta um passo: segue <a href="https://www.instagram.com/kravdoesntlift/" style="color:#C9A84C;text-decoration:none">@kravdoesntlift</a>. Só te posso adicionar aos meus amigos chegados se me seguires, e é lá que acompanho a turma semana a semana.'}
         </p>
       </div>
       ${credit ? `

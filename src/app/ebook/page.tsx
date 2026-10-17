@@ -51,7 +51,7 @@ const T = {
     cohort_title_next: "A próxima turma",
     cohort_days_label: "até ao arranque",
     cohort_cta: "Ver a turma e o canal",
-    cohort_bonus: "Incluído na compra: deixas o teu Instagram no checkout e entras nos meus amigos próximos durante as treze semanas. É lá que ponho o acompanhamento da turma, as correções e o que não vai para o feed.",
+    cohort_bonus: "Incluído na compra: deixas o teu Instagram no checkout e entras nos meus amigos chegados durante as treze semanas. É lá que ponho o acompanhamento da turma, as correções e o que não vai para o feed.",
     pills: ["13 semanas", "Ginásio ou casa", "PT e EN"],
     problem_title: "O problema não é falta de informação",
     problem: [
