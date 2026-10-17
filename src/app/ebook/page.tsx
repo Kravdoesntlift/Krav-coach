@@ -51,6 +51,7 @@ const T = {
     cohort_title_next: "A próxima turma",
     cohort_days_label: "até ao arranque",
     cohort_cta: "Ver a turma e o canal",
+    cohort_bonus: "Incluído na compra: deixas o teu Instagram no checkout e entras nos meus amigos próximos durante as treze semanas. É lá que ponho o acompanhamento da turma, as correções e o que não vai para o feed.",
     pills: ["13 semanas", "Ginásio ou casa", "PT e EN"],
     problem_title: "O problema não é falta de informação",
     problem: [
@@ -102,6 +103,7 @@ const T = {
     cohort_title_next: "The next group",
     cohort_days_label: "until we start",
     cohort_cta: "See the group and the channel",
+    cohort_bonus: "Included with the book: leave your Instagram at checkout and you join my close friends list for the thirteen weeks. That is where the group gets followed week by week, with corrections and everything that does not go on the feed.",
     pills: ["13 weeks", "Gym or home", "PT and EN"],
     problem_title: "The problem is not a lack of information",
     problem: [
@@ -278,8 +280,13 @@ export default async function EbookSalesPage({
                   </>
                 )}
 
+                <p className="mt-5 rounded-2xl px-4 py-3 text-sm leading-relaxed"
+                  style={{ background: "rgba(0,0,0,0.35)", border: "1px solid rgba(201,168,76,0.22)", color: "rgba(255,255,255,0.75)" }}>
+                  {t.cohort_bonus}
+                </p>
+
                 <Link href={isEN ? "/comunidade?lang=en" : "/comunidade"}
-                  className="mt-5 inline-block text-sm font-bold" style={{ color: GOLD }}>
+                  className="mt-4 inline-block text-sm font-bold" style={{ color: GOLD }}>
                   {t.cohort_cta} →
                 </Link>
               </div>

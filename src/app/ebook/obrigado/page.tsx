@@ -95,6 +95,11 @@ export default async function EbookThanksPage({
                     ? "Start on your own week 1 whenever you are ready. The channel is where I follow each week, correct form and answer questions. Free, and it shows nobody's phone number."
                     : "Começa na tua semana 1 quando quiseres. O canal é onde acompanho cada semana, corrijo execução e respondo a perguntas. Grátis, e não mostra o número de ninguém.")}
               </p>
+              <p className="mt-2.5 text-xs leading-relaxed text-zinc-400">
+                {isEN
+                  ? "If you left your Instagram at checkout: follow me at @kravdoesntlift and I will add you to my close friends, where the group gets followed week by week. Following is the part I cannot do for you."
+                  : "Se deixaste o teu Instagram no checkout: segue-me em @kravdoesntlift e eu adiciono-te aos meus amigos próximos, onde acompanho a turma semana a semana. Seguires é a única parte que eu não posso fazer por ti."}
+              </p>
               <Link href={isEN ? "/comunidade?lang=en" : "/comunidade"}
                 className="mt-3 inline-block text-sm font-bold" style={{ color: GOLD }}>
                 {isEN ? "See the group and the channel →" : "Ver a turma e o canal →"}

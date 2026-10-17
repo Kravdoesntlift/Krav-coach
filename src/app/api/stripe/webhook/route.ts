@@ -149,7 +149,16 @@ async function deliverEbook(admin: Admin, session: Stripe.Checkout.Session): Pro
   await sendEbookEmail({ to: email, name, link: ebookLink(lang, siteUrl), lang, credit });
 
   try {
-    const note = `Comprou o ebook 90 Dias em ${new Date().toISOString().slice(0, 10)}.`;
+    // The handle the buyer typed at checkout, so the close friends list can be
+    // built from paid customers without asking anybody for a screenshot.
+    const { instagramHandle } = await import("@/lib/instagram");
+    const typed = session.custom_fields?.find((f) => f.key === "instagram")?.text?.value ?? null;
+    const handle = instagramHandle(typed);
+
+    const note = [
+      `Comprou o ebook 90 Dias em ${new Date().toISOString().slice(0, 10)}.`,
+      handle ? `Instagram: ${handle}` : null,
+    ].filter(Boolean).join(" ");
     const { error } = await admin
       .from("leads")
       .insert({ name: name ?? email.split("@")[0], email, source: `ebook-90dias-${lang}`, notes: note });
