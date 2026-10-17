@@ -3,6 +3,7 @@ import Link from "next/link";
 import Stripe from "stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { readPayToken } from "@/lib/billing/pay-link";
+import { instagramField, instagramSubmitText } from "@/lib/billing/instagram-field";
 
 /**
  * The page behind a payment link the coach sends by message.
@@ -153,6 +154,8 @@ export default async function PayPage({ params }: { params: Promise<{ token: str
       },
       quantity: 1,
     }],
+    custom_fields: instagramField("pt"),
+    custom_text: instagramSubmitText("pt"),
     metadata: { coach_id: coachId, client_id: clientId },
     // Landing here activates the account on the spot instead of waiting for
     // the webhook, and the webhook still covers the case where they close the

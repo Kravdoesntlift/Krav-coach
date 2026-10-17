@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { TIERS, isTier, tierAmount, type Tier } from "@/lib/billing/tiers";
+import { instagramField, instagramSubmitText } from "@/lib/billing/instagram-field";
 
 /**
  * Start a subscription, in the tier the person chose.
@@ -30,12 +31,13 @@ export async function subscribeAction(formData: FormData) {
 
   const admin = createAdminClient();
   const [{ data: profile }, { data: coachLink }, { data: authUser }] = await Promise.all([
-    admin.from("profiles").select("stripe_customer_id, full_name").eq("id", user.id).single(),
+    admin.from("profiles").select("stripe_customer_id, full_name, lang").eq("id", user.id).single(),
     admin.from("coach_clients").select("coach_id").eq("client_id", user.id).maybeSingle(),
     admin.auth.admin.getUserById(user.id),
   ]);
 
   const coachId = coachLink?.coach_id ?? "";
+  const lang = (profile as { lang?: string } | null)?.lang === "en" ? "en" : "pt";
   const email = authUser?.user?.email ?? "";
 
   const Stripe = (await import("stripe")).default;
@@ -75,6 +77,10 @@ export async function subscribeAction(formData: FormData) {
       },
       quantity: 1,
     }],
+    // Somebody paying 35 or 127 a month should not watch a 15 euro book buyer
+    // get into the close friends list while they do not.
+    custom_fields: instagramField(lang),
+    custom_text: instagramSubmitText(lang),
     // The tier travels with the subscription too, so a report or a later
     // column can read it without guessing from the amount.
     metadata: { coach_id: coachId, client_id: user.id, tier },

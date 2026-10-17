@@ -152,8 +152,8 @@ async function deliverEbook(admin: Admin, session: Stripe.Checkout.Session): Pro
     // The handle the buyer typed at checkout, so the close friends list can be
     // built from paid customers without asking anybody for a screenshot.
     const { instagramHandle } = await import("@/lib/instagram");
-    const typed = session.custom_fields?.find((f) => f.key === "instagram")?.text?.value ?? null;
-    const handle = instagramHandle(typed);
+    const { instagramFromSession } = await import("@/lib/billing/instagram-field");
+    const handle = instagramHandle(instagramFromSession(session));
 
     const note = [
       `Comprou o ebook 90 Dias em ${new Date().toISOString().slice(0, 10)}.`,
@@ -180,6 +180,48 @@ async function deliverEbook(admin: Admin, session: Stripe.Checkout.Session): Pro
     }
   } catch (e) {
     console.error("[webhook] ebook lead bookkeeping failed:", e);
+  }
+}
+
+/**
+ * The Instagram handle a subscriber typed at checkout, put where the coach
+ * will see it: the private note on the client's page.
+ *
+ * Prepended to whatever is already written there rather than replacing it,
+ * and skipped when the same line is already present, so a webhook Stripe
+ * decides to deliver twice cannot pile the handle up. Never throws: a
+ * subscription must not fail over a note.
+ */
+async function recordInstagramHandle(
+  admin: Admin,
+  session: Stripe.Checkout.Session,
+  clientId: string,
+  coachId: string,
+): Promise<void> {
+  try {
+    const { instagramHandle } = await import("@/lib/instagram");
+    const { instagramFromSession } = await import("@/lib/billing/instagram-field");
+    const handle = instagramHandle(instagramFromSession(session));
+    if (!handle || !coachId) return;
+
+    const line = `Instagram: ${handle}`;
+    const { data: existing } = await admin
+      .from("coach_notes")
+      .select("content")
+      .eq("coach_id", coachId)
+      .eq("client_id", clientId)
+      .maybeSingle();
+
+    const current = (existing as { content?: string } | null)?.content ?? "";
+    if (current.includes(line)) return;
+
+    const content = current ? `${line}\n${current}` : line;
+    const { error } = await admin
+      .from("coach_notes")
+      .upsert({ coach_id: coachId, client_id: clientId, content }, { onConflict: "coach_id,client_id" });
+    if (error) console.error("[webhook] could not record instagram handle:", error);
+  } catch (e) {
+    console.error("[webhook] instagram handle bookkeeping failed:", e);
   }
 }
 
@@ -359,6 +401,7 @@ export async function POST(req: NextRequest) {
         await provisionSubscription(admin, { subscription, clientId, coachId });
         await notifyNewSubscriber(admin, { clientId, coachId });
         await deliverEbookBonus(admin, clientId, session.customer_details?.email ?? null);
+        await recordInstagramHandle(admin, session, clientId, coachId ?? "");
 
         break;
       }

@@ -307,12 +307,11 @@ export async function sendEbookEmail({
         <a href="https://www.kravcoaching.com/comunidade${isEN ? "?lang=en" : ""}" style="color:#C9A84C;font-size:13px;font-weight:700;text-decoration:none">
           ${isEN ? "See the group and the channel →" : "Ver a turma e o canal →"}
         </a>
-        ${bonus ? "" : `
         <p style="color:#71717a;font-size:13px;line-height:1.6;margin:12px 0 0;padding-top:12px;border-top:1px solid #27272a">
           ${isEN
-            ? 'Left your Instagram at checkout? Follow <a href="https://www.instagram.com/kravdoesntlift/" style="color:#C9A84C;text-decoration:none">@kravdoesntlift</a> and I will add you to my close friends, where I follow the group week by week. Following is the one part I cannot do for you.'
-            : 'Deixaste o teu Instagram no checkout? Segue <a href="https://www.instagram.com/kravdoesntlift/" style="color:#C9A84C;text-decoration:none">@kravdoesntlift</a> e eu adiciono-te aos meus amigos próximos, onde acompanho a turma semana a semana. Seguires é a única parte que eu não posso fazer por ti.'}
-        </p>`}
+            ? 'One step left: follow <a href="https://www.instagram.com/kravdoesntlift/" style="color:#C9A84C;text-decoration:none">@kravdoesntlift</a>. I can only add you to my close friends if you follow the account, and that is where the group gets followed week by week.'
+            : 'Falta um passo: segue <a href="https://www.instagram.com/kravdoesntlift/" style="color:#C9A84C;text-decoration:none">@kravdoesntlift</a>. Só te posso adicionar aos meus amigos próximos se me seguires, e é lá que acompanho a turma semana a semana.'}
+        </p>
       </div>
       ${credit ? `
       <div style="margin-top:16px;padding:16px 18px;border-radius:14px;background:#0a0a0c;border:1px solid rgba(201,168,76,0.3)">

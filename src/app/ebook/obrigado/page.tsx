@@ -97,8 +97,8 @@ export default async function EbookThanksPage({
               </p>
               <p className="mt-2.5 text-xs leading-relaxed text-zinc-400">
                 {isEN
-                  ? "If you left your Instagram at checkout: follow me at @kravdoesntlift and I will add you to my close friends, where the group gets followed week by week. Following is the part I cannot do for you."
-                  : "Se deixaste o teu Instagram no checkout: segue-me em @kravdoesntlift e eu adiciono-te aos meus amigos próximos, onde acompanho a turma semana a semana. Seguires é a única parte que eu não posso fazer por ti."}
+                  ? "One step left: follow @kravdoesntlift. I can only add you to my close friends if you follow the account, and that is where the group gets followed week by week."
+                  : "Falta um passo: segue @kravdoesntlift. Só te posso adicionar aos meus amigos próximos se me seguires, e é lá que acompanho a turma semana a semana."}
               </p>
               <Link href={isEN ? "/comunidade?lang=en" : "/comunidade"}
                 className="mt-3 inline-block text-sm font-bold" style={{ color: GOLD }}>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { instagramField, instagramSubmitText } from "@/lib/billing/instagram-field";
 
 export async function POST(req: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -96,6 +97,8 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         },
       ],
+      custom_fields: instagramField("pt"),
+      custom_text: instagramSubmitText("pt"),
       metadata: {
         coach_id: user.id,
         client_id: clientId,

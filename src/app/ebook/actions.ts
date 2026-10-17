@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { EBOOK } from "@/lib/ebook/content";
+import { instagramField, instagramSubmitText } from "@/lib/billing/instagram-field";
 
 /**
  * Buying the book: one payment, no account, no trial.
@@ -44,19 +45,8 @@ export async function buyEbookAction(formData: FormData) {
       },
       quantity: 1,
     }],
-    // Asked here rather than by DM afterwards, because a purchase is already
-    // proof of purchase: whoever pays gets added to the close friends list,
-    // with no screenshot to chase. Optional, so it can never cost a sale.
-    custom_fields: [{
-      key: "instagram",
-      label: {
-        type: "custom",
-        custom: lang === "en" ? "Instagram (for close friends)" : "Instagram (para os amigos próximos)",
-      },
-      type: "text",
-      optional: true,
-      text: { maximum_length: 40 },
-    }],
+    custom_fields: instagramField(lang),
+    custom_text: instagramSubmitText(lang),
     // The webhook reads this to tell a book sale from a subscription, and to
     // know which language to write the delivery email in.
     metadata: { product: EBOOK.id, lang },

@@ -137,6 +137,9 @@ export default async function PendingPage({
     step_payment_pend:{ pt: "Pagamento a aguardar confirmação", en: "Payment awaiting confirmation" },
     step_access:      { pt: "Acesso total à app", en: "Full app access" },
     info_welcome:     { pt: "Podes já falar com o teu coach no chat.", en: "You can already chat with your coach." },
+    follow_title:     { pt: "Falta um passo", en: "One step left" },
+    follow_body:      { pt: "Segue @kravdoesntlift no Instagram. Só te posso adicionar aos meus amigos próximos se me seguires, e é lá que acompanho o programa semana a semana, com correções e o que não vai para o feed.", en: "Follow @kravdoesntlift on Instagram. I can only add you to my close friends if you follow, and that is where I follow the programme week by week, with corrections and everything that does not go on the feed." },
+    follow_cta:       { pt: "Seguir @kravdoesntlift", en: "Follow @kravdoesntlift" },
     info_pending:     { pt: "Já tens acesso ao chat com o teu coach. Fala com ele se tiveres dúvidas.", en: "You already have access to chat with your coach. Contact them if you have any questions." },
     chat_cta:         { pt: "💬 Falar com o coach", en: "💬 Chat with coach" },
     auto_update:      { pt: "Esta página atualiza automaticamente quando o teu acesso for ativado.", en: "This page will update automatically when your access is activated." },
@@ -214,6 +217,22 @@ export default async function PendingPage({
               {isWelcome ? extra.info_welcome[lang] : extra.info_pending[lang]}
             </p>
           </div>
+
+          {isWelcome && (
+            <div className="rounded-2xl p-4 text-left"
+              style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.25)" }}>
+              <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: "#C9A84C" }}>
+                {extra.follow_title[lang]}
+              </p>
+              <p className="mt-2 text-zinc-400 text-xs leading-relaxed">
+                {extra.follow_body[lang]}
+              </p>
+              <a href="https://www.instagram.com/kravdoesntlift/" target="_blank" rel="noopener noreferrer"
+                className="mt-3 inline-block text-xs font-bold" style={{ color: "#C9A84C" }}>
+                {extra.follow_cta[lang]} →
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Chat link */}
