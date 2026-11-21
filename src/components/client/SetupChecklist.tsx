@@ -125,7 +125,7 @@ export default function SetupChecklist({
         </div>
         <button
           onClick={dismiss}
-          className="text-zinc-600 hover:text-zinc-400 transition-colors text-xs p-1"
+          className="tap-44 text-zinc-600 hover:text-zinc-400 transition-colors text-xs p-1"
           aria-label={extra.close[lang]}
         >
           ✕

@@ -119,7 +119,7 @@ export default function InstallPrompt() {
             </p>
           </div>
         </div>
-        <button onClick={dismiss} className="text-zinc-600 hover:text-zinc-400 transition-colors p-1 -m-1 shrink-0" aria-label={isEN ? "Close" : "Fechar"}>
+        <button onClick={dismiss} className="tap-44 text-zinc-600 hover:text-zinc-400 transition-colors p-1 -m-1 shrink-0" aria-label={isEN ? "Close" : "Fechar"}>
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
           </svg>
@@ -142,7 +142,7 @@ export default function InstallPrompt() {
               {androidSteps.map((label, i) => (
                 <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-400">
                   <span
-                    className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
+                    className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px] font-black text-black mt-0.5"
                     style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
                   >
                     {i + 1}
@@ -162,7 +162,7 @@ export default function InstallPrompt() {
             {iosSteps.map((label, i) => (
               <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-400">
                 <span
-                  className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
+                  className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px] font-black text-black mt-0.5"
                   style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
                 >
                   {i + 1}

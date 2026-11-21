@@ -120,7 +120,7 @@ function MacroBar({ label, current, target, color }: { label: string; current: n
   const pct = Math.min(100, target > 0 ? (current / target) * 100 : 0);
   return (
     <div className="space-y-1">
-      <div className="flex justify-between text-[10px]">
+      <div className="flex justify-between text-[11px]">
         <span className="text-zinc-500 font-semibold uppercase tracking-wide">{label}</span>
         <span className={color}>{current} / {target}</span>
       </div>
@@ -635,11 +635,11 @@ function FoodSearch({
                     >
                       <div className="flex items-center gap-1.5">
                         {f.source === "custom" && (
-                          <span className="text-[9px] bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded font-semibold shrink-0">{extra.my_label[lang]}</span>
+                          <span className="text-[11px] bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded font-semibold shrink-0">{extra.my_label[lang]}</span>
                         )}
                         <p className="text-white text-sm">{f.name}</p>
                       </div>
-                      <p className="text-zinc-500 text-[10px] mt-0.5">
+                      <p className="text-zinc-500 text-[11px] mt-0.5">
                         {f.per100g.calories != null ? `${f.per100g.calories} kcal` : ""}
                         {f.per100g.protein != null ? ` · ${f.per100g.protein}g ${extra.prot_abbr[lang]}` : ""}
                         {f.servingSize ? ` · ${extra.serving_abbr[lang]}: ${f.servingSize}g` : ` · ${extra.per_100g[lang]}`}
@@ -662,11 +662,11 @@ function FoodSearch({
                   <div className="rounded-xl p-3" style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.16)" }}>
                     <div className="flex items-center gap-2">
                       {selected.source === "custom" && (
-                        <span className="text-[9px] bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded font-semibold">{extra.my_label[lang]}</span>
+                        <span className="text-[11px] bg-brand-gold/20 text-brand-gold px-1.5 py-0.5 rounded font-semibold">{extra.my_label[lang]}</span>
                       )}
                       <p className="text-white text-sm font-semibold">{selected.name}</p>
                     </div>
-                    <p className="text-zinc-500 text-[10px]">
+                    <p className="text-zinc-500 text-[11px]">
                       {selected.servingSize ? `${extra.std_serving[lang]}: ${selected.servingSize}g` : extra.per_100g[lang]}
                     </p>
                   </div>
@@ -707,7 +707,7 @@ function FoodSearch({
                         ].map(({ label, val, color }) => (
                           <div key={label} className="text-center rounded-xl py-2" style={{ background: "rgba(255,255,255,0.03)" }}>
                             <p className={`text-sm font-bold ${color}`}>{val ?? "-"}</p>
-                            <p className="text-zinc-600 text-[9px]">{label}</p>
+                            <p className="text-zinc-600 text-[11px]">{label}</p>
                           </div>
                         ))}
                       </div>
@@ -715,7 +715,7 @@ function FoodSearch({
                       {/* Micronutrients */}
                       {[scaled.fiber, scaled.sugar, scaled.sodium, scaled.vit_c, scaled.vit_d, scaled.vit_b12, scaled.calcium, scaled.iron, scaled.potassium, scaled.magnesium].some((v) => v != null && v > 0) && (
                         <div className="rounded-xl p-3 space-y-1.5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
-                          <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest mb-2">{extra.micronutrients[lang]}</p>
+                          <p className="text-zinc-500 text-[11px] font-semibold uppercase tracking-widest mb-2">{extra.micronutrients[lang]}</p>
                           {[
                             { label: extra.fiber_label[lang],     val: scaled.fiber,     unit: "g" },
                             { label: extra.sugar_label[lang],     val: scaled.sugar,     unit: "g" },
@@ -858,7 +858,7 @@ function FoodSearch({
                             <div className="flex items-start justify-between gap-2">
                               <div className="min-w-0">
                                 <p className="text-white text-sm font-semibold">{recipe.name}</p>
-                                <p className="text-zinc-600 text-[10px] mt-0.5">
+                                <p className="text-zinc-600 text-[11px] mt-0.5">
                                   {recipe.portions > 1
                                     ? `${extra.per_portion_of[lang]} (${recipe.portions} ${extra.total_portions[lang]})`
                                     : extra.per_portion[lang]}
@@ -922,7 +922,7 @@ function FoodSearch({
                                 className="w-full text-left px-3 py-2 hover:bg-zinc-800 transition-colors rounded-xl"
                               >
                                 <p className="text-white text-xs">{f.name}</p>
-                                <p className="text-zinc-600 text-[10px]">{f.per100g.calories} kcal · {f.per100g.protein}g {extra.prot_abbr[lang]} /100g</p>
+                                <p className="text-zinc-600 text-[11px]">{f.per100g.calories} kcal · {f.per100g.protein}g {extra.prot_abbr[lang]} /100g</p>
                               </button>
                             ))}
                           </div>
@@ -966,7 +966,7 @@ function FoodSearch({
                           <div key={idx} className="flex items-center justify-between px-3 py-2 rounded-xl" style={{ background: "rgba(255,255,255,0.03)" }}>
                             <div>
                               <p className="text-white text-xs">{ing.food_name}</p>
-                              <p className="text-zinc-600 text-[10px]">
+                              <p className="text-zinc-600 text-[11px]">
                                 {ing.grams}g · {Math.round(ing.calories_100g * factor)} kcal · {Math.round(ing.protein_100g * factor)}g {extra.prot_abbr[lang]}
                               </p>
                             </div>
@@ -985,7 +985,7 @@ function FoodSearch({
                   {/* Running totals */}
                   {ingredients.length > 0 && (
                     <div className="rounded-xl p-3 space-y-2" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                      <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest">
+                      <p className="text-zinc-500 text-[11px] font-semibold uppercase tracking-widest">
                         {extra.recipe_total[lang]}{portions > 1 ? ` · ${extra.per_portion[lang]} (÷${portions})` : ""}
                       </p>
                       <div className="grid grid-cols-4 gap-2">
@@ -997,8 +997,8 @@ function FoodSearch({
                         ].map(({ label, total, pp, color }) => (
                           <div key={label} className="text-center">
                             <p className={`text-xs font-bold ${color}`}>{portions > 1 ? pp : total}</p>
-                            <p className="text-zinc-600 text-[9px]">{label}</p>
-                            {portions > 1 && <p className="text-zinc-700 text-[8px]">{total} total</p>}
+                            <p className="text-zinc-600 text-[11px]">{label}</p>
+                            {portions > 1 && <p className="text-zinc-700 text-[11px]">{total} total</p>}
                           </div>
                         ))}
                       </div>
@@ -1379,7 +1379,7 @@ export default function NutritionPage() {
         <button onClick={() => changeDay(-1)} className="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center transition-colors text-lg leading-none">‹</button>
         <div className="text-center">
           <p className="text-white text-sm font-semibold capitalize">{fmtDate(date, lang)}</p>
-          {isToday && <p className="text-brand-gold text-[10px]">{extra.today_label[lang]}</p>}
+          {isToday && <p className="text-brand-gold text-[11px]">{extra.today_label[lang]}</p>}
         </div>
         <button onClick={() => changeDay(1)} disabled={isToday}
           className="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center transition-colors disabled:opacity-30 text-lg leading-none">›</button>
@@ -1453,7 +1453,7 @@ export default function NutritionPage() {
               { label: extra.fat_label2[lang],  val: fat,      set: setFat,      color: "text-pink-400" },
             ].map(({ label, val, set, color }) => (
               <div key={label}>
-                <label className={`text-[10px] font-semibold uppercase tracking-widest ${color} block mb-1`}>{label}</label>
+                <label className={`text-[11px] font-semibold uppercase tracking-widest ${color} block mb-1`}>{label}</label>
                 <input type="number" min="0" value={val} onChange={(e) => set(e.target.value)} placeholder="-" className="input text-sm" />
               </div>
             ))}
@@ -1486,7 +1486,7 @@ export default function NutritionPage() {
                 <div className="min-w-0">
                   <p className="text-white text-sm font-semibold">{log.meal_name}</p>
                   {log.description && <p className="text-zinc-500 text-xs mt-0.5 capitalize">{log.description}</p>}
-                  {log.serving_g && <p className="text-zinc-700 text-[10px]">{log.serving_g}g</p>}
+                  {log.serving_g && <p className="text-zinc-700 text-[11px]">{log.serving_g}g</p>}
                 </div>
                 {pendingDeleteId === log.id ? (
                   <div className="flex items-center gap-1 shrink-0">
@@ -1511,10 +1511,10 @@ export default function NutritionPage() {
               {/* Micronutrients row */}
               {(log.vit_c_mg || log.calcium_mg || log.iron_mg || log.sodium_mg) && (
                 <div className="flex gap-3 flex-wrap">
-                  {log.sodium_mg   != null && <span className="text-zinc-500 text-[10px]">{extra.sodium_inline[lang]} {log.sodium_mg}mg</span>}
-                  {log.vit_c_mg    != null && <span className="text-zinc-500 text-[10px]">{extra.vit_c_inline[lang]} {log.vit_c_mg}mg</span>}
-                  {log.calcium_mg  != null && <span className="text-zinc-500 text-[10px]">{extra.calcium_inline[lang]} {log.calcium_mg}mg</span>}
-                  {log.iron_mg     != null && <span className="text-zinc-500 text-[10px]">{extra.iron_inline[lang]} {log.iron_mg}mg</span>}
+                  {log.sodium_mg   != null && <span className="text-zinc-500 text-[11px]">{extra.sodium_inline[lang]} {log.sodium_mg}mg</span>}
+                  {log.vit_c_mg    != null && <span className="text-zinc-500 text-[11px]">{extra.vit_c_inline[lang]} {log.vit_c_mg}mg</span>}
+                  {log.calcium_mg  != null && <span className="text-zinc-500 text-[11px]">{extra.calcium_inline[lang]} {log.calcium_mg}mg</span>}
+                  {log.iron_mg     != null && <span className="text-zinc-500 text-[11px]">{extra.iron_inline[lang]} {log.iron_mg}mg</span>}
                 </div>
               )}
             </div>
@@ -1523,7 +1523,7 @@ export default function NutritionPage() {
           {/* Day totals at bottom */}
           {totals.sodium > 0 || totals.vit_c > 0 || totals.calcium > 0 ? (
             <div className="card p-3 space-y-1">
-              <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest mb-2">{extra.day_total_micro[lang]}</p>
+              <p className="text-zinc-500 text-[11px] font-semibold uppercase tracking-widest mb-2">{extra.day_total_micro[lang]}</p>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                 {[
                   { label: extra.fiber_label[lang],   val: totals.fiber,   unit: "g" },

@@ -56,7 +56,7 @@ export default function ReviewSummary({ reviews, isEN }: Props) {
         {faces.map((r, i) => (
           <span
             key={i}
-            className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-brand-gold ring-2 ring-black"
+            className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-brand-gold ring-2 ring-black"
             style={{ background: "linear-gradient(145deg, #232327 0%, #0c0c0e 100%)" }}
           >
             {/* One letter: the overlap covers the right third of each face,
@@ -66,7 +66,7 @@ export default function ReviewSummary({ reviews, isEN }: Props) {
         ))}
         {rest > 0 && (
           <span
-            className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black text-black ring-2 ring-black"
+            className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black text-black ring-2 ring-black"
             style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
           >
             +{rest}

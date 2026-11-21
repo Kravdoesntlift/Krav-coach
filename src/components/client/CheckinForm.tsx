@@ -46,7 +46,7 @@ function EmojiScale({ opts, value, onChange }: {
               border: active ? "1px solid rgba(201,168,76,0.55)" : "1px solid rgba(63,63,70,0.4)",
             }}>
             <span className={`text-xl transition-transform ${active ? "scale-110" : "grayscale opacity-50"}`}>{emoji}</span>
-            <span className="text-[9px] font-semibold leading-tight text-center"
+            <span className="text-[11px] font-semibold leading-tight text-center"
               style={{ color: active ? "#C9A84C" : "#52525b" }}>{label}</span>
           </button>
         );
@@ -298,7 +298,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
           <div className="grid grid-cols-2 gap-3 pt-1 animate-fade-in">
             {measureLabels.map(({ label, value, set, ph }) => (
               <div key={label} className="space-y-1.5">
-                <p className="text-[10px] text-zinc-600 text-center">{label} ({t("cm")})</p>
+                <p className="text-[11px] text-zinc-600 text-center">{label} ({t("cm")})</p>
                 <input type="number" step="0.1" min="0" value={value}
                   onChange={(e) => set(e.target.value)} placeholder={ph}
                   className="w-full bg-zinc-800/60 border border-zinc-700/60 rounded-xl px-2 py-2.5 text-white text-sm font-bold text-center placeholder-zinc-700 focus:outline-none focus:border-brand-gold/50 transition-colors" />

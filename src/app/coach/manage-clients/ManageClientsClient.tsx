@@ -186,7 +186,7 @@ function ClientCard({
                 <button
                   onClick={handleAssign}
                   disabled={pending}
-                  className="px-3 py-1.5 rounded-lg bg-brand-gold hover:bg-brand-gold-dark text-black text-xs font-semibold transition-colors disabled:opacity-50"
+                  className="tap-44 px-3 py-1.5 rounded-lg bg-brand-gold hover:bg-brand-gold-dark text-black text-xs font-semibold transition-colors disabled:opacity-50"
                 >
                   {pending ? "A guardar..." : "Confirmar"}
                 </button>

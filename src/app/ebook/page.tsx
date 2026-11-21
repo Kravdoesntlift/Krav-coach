@@ -258,7 +258,7 @@ export default async function EbookSalesPage({
                       <div className="rounded-2xl px-5 py-3 text-center shrink-0"
                         style={{ background: "rgba(0,0,0,0.5)", border: "1px solid rgba(201,168,76,0.3)" }}>
                         <p className="text-3xl font-black leading-none" style={{ color: GOLD }}>{cohort.daysUntil}</p>
-                        <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+                        <p className="mt-1 text-[11px] font-bold uppercase tracking-wider text-zinc-500">
                           {t.cohort_days_label}
                         </p>
                       </div>

@@ -57,7 +57,7 @@ export default async function ProgramaPage() {
     return (
       <div className="max-w-2xl mx-auto space-y-5 py-2 page-enter">
         <header className="space-y-1">
-          <p className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: "rgba(201,168,76,0.7)" }}>
+          <p className="text-[11px] font-black tracking-[0.2em] uppercase" style={{ color: "rgba(201,168,76,0.7)" }}>
             {isEN ? "Programme" : "Programa"}
           </p>
           <h1 className="text-2xl font-black tracking-tight text-white">90 Dias</h1>
@@ -105,7 +105,7 @@ export default async function ProgramaPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-5 py-2 page-enter">
       <header className="space-y-1">
-        <p className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: "rgba(201,168,76,0.7)" }}>
+        <p className="text-[11px] font-black tracking-[0.2em] uppercase" style={{ color: "rgba(201,168,76,0.7)" }}>
           {isEN ? "Programme" : "Programa"}
         </p>
         <h1 className="text-2xl font-black tracking-tight text-white">90 Dias</h1>
@@ -154,7 +154,7 @@ export default async function ProgramaPage() {
                 <p className={`text-sm font-semibold ${isCurrent ? "text-white" : "text-zinc-300"}`}>
                   {w.label}
                   {isCurrent && (
-                    <span className="ml-2 text-[10px] font-black uppercase tracking-wider" style={{ color: "#C9A84C" }}>
+                    <span className="ml-2 text-[11px] font-black uppercase tracking-wider" style={{ color: "#C9A84C" }}>
                       {isEN ? "now" : "agora"}
                     </span>
                   )}

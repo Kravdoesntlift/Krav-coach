@@ -78,7 +78,7 @@ export default function AchievementUnlockModal({ achievements, seenAchievements 
           </div>
 
           {/* Label */}
-          <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-brand-gold mb-3">
+          <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-brand-gold mb-3">
             {isEN ? "Achievement unlocked!" : "Conquista desbloqueada!"}
           </p>
 

@@ -141,7 +141,7 @@ export default function MessagesClient({ convos }: { convos: Convo[] }) {
                   )}
                   {c.unread > 0 && (
                     <span
-                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-black"
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-black text-black"
                       style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C)" }}
                     >
                       {c.unread > 9 ? "9+" : c.unread}
@@ -159,11 +159,11 @@ export default function MessagesClient({ convos }: { convos: Convo[] }) {
                       {c.clientName}
                     </p>
                     {isDuplicate && (
-                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 shrink-0">
+                      <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 shrink-0">
                         #{shortId}
                       </span>
                     )}
-                    <span className="ml-auto text-zinc-600 text-[10px] shrink-0">{formatRelative(c.lastAt)}</span>
+                    <span className="ml-auto text-zinc-600 text-[11px] shrink-0">{formatRelative(c.lastAt)}</span>
                   </div>
                   <p className={`text-xs mt-0.5 truncate ${c.unread > 0 ? "text-zinc-400" : "text-zinc-600"}`}>
                     {c.hasMessages

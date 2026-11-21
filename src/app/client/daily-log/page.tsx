@@ -327,12 +327,12 @@ export default function DailyLogPage() {
               <div className="flex-1 bg-zinc-800/60 rounded-xl p-3 text-center">
                 <p className="text-2xl font-black text-white">{healthLog.steps.toLocaleString()}</p>
                 <p className="text-gray-500 text-xs mt-0.5">{extra.steps_unit[lang]}</p>
-                {healthLog.steps >= GOAL_STEPS && <p className="text-green-400 text-[10px] font-bold mt-1">{extra.goal_badge[lang]}</p>}
+                {healthLog.steps >= GOAL_STEPS && <p className="text-green-400 text-[11px] font-bold mt-1">{extra.goal_badge[lang]}</p>}
               </div>
               <div className="flex-1 bg-zinc-800/60 rounded-xl p-3 text-center">
                 <p className="text-2xl font-black text-white">{healthLog.water_ml >= 1000 ? `${(healthLog.water_ml / 1000).toFixed(1)}L` : `${healthLog.water_ml}ml`}</p>
                 <p className="text-gray-500 text-xs mt-0.5">{extra.water[lang].toLowerCase()}</p>
-                {healthLog.water_ml >= GOAL_GLASSES * GLASS_ML && <p className="text-blue-400 text-[10px] font-bold mt-1">{extra.goal_badge[lang]}</p>}
+                {healthLog.water_ml >= GOAL_GLASSES * GLASS_ML && <p className="text-blue-400 text-[11px] font-bold mt-1">{extra.goal_badge[lang]}</p>}
               </div>
             </div>
           )}
@@ -360,7 +360,7 @@ export default function DailyLogPage() {
                     }`}
                   >
                     <span className="text-3xl leading-none">{opt.emoji}</span>
-                    <span className={`text-[10px] font-semibold leading-tight text-center ${selected ? "text-brand-gold" : "text-gray-500"}`}>
+                    <span className={`text-[11px] font-semibold leading-tight text-center ${selected ? "text-brand-gold" : "text-gray-500"}`}>
                       {opt.label}
                     </span>
                   </button>
@@ -437,14 +437,14 @@ export default function DailyLogPage() {
                   isToday ? "bg-zinc-800 ring-1 ring-zinc-600" : "bg-zinc-900"
                 }`}
               >
-                <span className="text-gray-500 text-[9px] uppercase leading-none">{dayLabel}</span>
+                <span className="text-gray-500 text-[11px] uppercase leading-none">{dayLabel}</span>
                 <span className="text-gray-400 text-[11px] font-semibold">{dayNum}</span>
                 <span className="text-lg leading-none">{emoji ?? <span className="text-gray-700 text-xs">-</span>}</span>
                 {health && health.steps >= GOAL_STEPS && (
-                  <span className="text-[8px] text-green-400 font-bold leading-none">10k</span>
+                  <span className="text-[11px] text-green-400 font-bold leading-none">10k</span>
                 )}
                 {health && health.water_ml >= GOAL_GLASSES * GLASS_ML && (
-                  <span className="text-[8px] text-blue-400 font-bold leading-none">💧</span>
+                  <span className="text-[11px] text-blue-400 font-bold leading-none">💧</span>
                 )}
               </div>
             );

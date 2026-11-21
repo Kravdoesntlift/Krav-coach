@@ -41,7 +41,7 @@ export default function ClientGoals({ goals }: { goals: Goal[] }) {
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-white font-semibold text-sm">{goal.title}</span>
                     {goal.completed && (
-                      <span className="bg-green-500/20 text-green-400 text-[10px] px-2 py-0.5 rounded-full font-semibold">
+                      <span className="bg-green-500/20 text-green-400 text-[11px] px-2 py-0.5 rounded-full font-semibold">
                         ✓ Concluída
                       </span>
                     )}

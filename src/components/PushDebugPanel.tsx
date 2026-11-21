@@ -60,7 +60,7 @@ export default function PushDebugPanel() {
         <button
           onClick={fetchDebug}
           disabled={loading}
-          className="px-3 py-1 rounded-lg bg-zinc-700 text-gray-300 text-xs hover:bg-zinc-600 transition-colors"
+          className="tap-44 px-3 py-1 rounded-lg bg-zinc-700 text-gray-300 text-xs hover:bg-zinc-600 transition-colors"
         >
           {loading ? "..." : "Verificar estado"}
         </button>
@@ -83,13 +83,13 @@ export default function PushDebugPanel() {
                 <span className="text-gray-500">Subscrito em</span>
                 <span className="text-gray-300">{new Date(d.subscribedAt).toLocaleString("pt-PT")}</span>
               </div>
-              <p className="text-gray-600 font-mono text-[10px] truncate">{d.endpoint}</p>
+              <p className="text-gray-600 font-mono text-[11px] truncate">{d.endpoint}</p>
             </div>
           ))}
           {info.vapid.subject && (
             <div className="flex items-center justify-between py-1 border-b border-zinc-800">
               <span className="text-gray-500">VAPID subject</span>
-              <span className="text-gray-300 text-[10px] truncate max-w-[160px]">{info.vapid.subject}</span>
+              <span className="text-gray-300 text-[11px] truncate max-w-[160px]">{info.vapid.subject}</span>
             </div>
           )}
         </div>

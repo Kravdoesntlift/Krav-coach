@@ -132,13 +132,13 @@ export default function MuscleMap({ exerciseNames, loggedNames = [], lang = "pt"
       {/* ── Header ── */}
       <div className="px-4 pt-4 pb-2 flex items-start justify-between">
         <div>
-          <p className="text-[10px] font-semibold tracking-widest uppercase text-zinc-500">{lang === "en" ? "Active muscles" : "Músculos ativos"}</p>
+          <p className="text-[11px] font-semibold tracking-widest uppercase text-zinc-500">{lang === "en" ? "Active muscles" : "Músculos ativos"}</p>
           <h3 className="mt-0.5 text-base font-bold text-white leading-tight">{lang === "en" ? "This week" : "Esta semana"}</h3>
         </div>
         {totalMuscles > 0 && (
           <div className="text-right">
             <span className="text-xl font-black" style={{ color:"#C9A84C" }}>{pct}%</span>
-            <p className="text-[10px] text-zinc-500 mt-0.5">{doneMuscles}/{totalMuscles} {lang === "en" ? "groups" : "grupos"}</p>
+            <p className="text-[11px] text-zinc-500 mt-0.5">{doneMuscles}/{totalMuscles} {lang === "en" ? "groups" : "grupos"}</p>
           </div>
         )}
       </div>
@@ -214,8 +214,8 @@ export default function MuscleMap({ exerciseNames, loggedNames = [], lang = "pt"
         </div>
         <div className="relative">
           <div className="absolute top-2 left-0 right-0 flex justify-around z-10 pointer-events-none">
-            <span className="text-[9px] font-bold tracking-widest uppercase text-zinc-600">{lang === "en" ? "Front" : "Frente"}</span>
-            <span className="text-[9px] font-bold tracking-widest uppercase text-zinc-600">{lang === "en" ? "Back" : "Costas"}</span>
+            <span className="text-[11px] font-bold tracking-widest uppercase text-zinc-600">{lang === "en" ? "Front" : "Frente"}</span>
+            <span className="text-[11px] font-bold tracking-widest uppercase text-zinc-600">{lang === "en" ? "Back" : "Costas"}</span>
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

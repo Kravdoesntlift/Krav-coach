@@ -430,7 +430,7 @@ export default async function ClientDashboard() {
         {/* ── 1. GREETING ── compact, sets the tone */}
         <div className="flex items-center justify-between pt-1">
           <div className="space-y-0.5">
-            <p className="text-zinc-600 text-[10px] font-semibold tracking-[0.18em] uppercase">
+            <p className="text-zinc-600 text-[11px] font-semibold tracking-[0.18em] uppercase">
               {todayName} · {today.toLocaleDateString(lang === "en" ? "en-GB" : "pt-PT", { day: "numeric", month: "long" })}
             </p>
             <h1 className="text-[1.6rem] md:text-[2rem] font-black tracking-tight leading-[1.1]">

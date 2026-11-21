@@ -539,7 +539,7 @@ function MeasuresTab({ measurements, biometric }: { measurements: Measurement[];
                 className="rounded-2xl p-4 text-center space-y-1"
                 style={{ background: `${bmiColor}10`, border: `1px solid ${bmiColor}25` }}
               >
-                <p className="text-zinc-500 text-[10px] font-semibold tracking-widest uppercase">BMI</p>
+                <p className="text-zinc-500 text-[11px] font-semibold tracking-widest uppercase">BMI</p>
                 <p className="font-black text-3xl leading-none" style={{ color: bmiColor }}>{bmi}</p>
                 <p className="text-xs font-semibold" style={{ color: bmiColor }}>{bmiCategory}</p>
               </div>
@@ -550,7 +550,7 @@ function MeasuresTab({ measurements, biometric }: { measurements: Measurement[];
                   className="rounded-2xl p-4 text-center space-y-1"
                   style={{ background: `${bfColor}10`, border: `1px solid ${bfColor}25` }}
                 >
-                  <p className="text-zinc-500 text-[10px] font-semibold tracking-widest uppercase">
+                  <p className="text-zinc-500 text-[11px] font-semibold tracking-widest uppercase">
                     {isEN ? "Body Fat" : "Gordura"}
                   </p>
                   <p className="font-black text-3xl leading-none" style={{ color: bfColor }}>{bfPct}%</p>
@@ -566,7 +566,7 @@ function MeasuresTab({ measurements, biometric }: { measurements: Measurement[];
                   : "Adiciona a idade e sexo nas definições de nutrição para estimar a gordura corporal."}
               </p>
             ) : (
-              <p className="text-zinc-700 text-[10px] text-center leading-relaxed">
+              <p className="text-zinc-700 text-[11px] text-center leading-relaxed">
                 {isEN
                   ? "Estimate only. For accuracy, use DEXA scan or calipers."
                   : "Apenas estimativa. Para precisão, usa DEXA ou adipômetro."}

@@ -113,7 +113,7 @@ export default function BottomNav({ items, moreItems, userId, showLogout = true 
                   </span>
                   {badge > 0 && (
                     <span
-                      className="absolute -top-1 -right-2 min-w-[16px] h-4 px-0.5 rounded-full flex items-center justify-center text-[9px] font-black text-black"
+                      className="absolute -top-1 -right-2 min-w-[16px] h-4 px-0.5 rounded-full flex items-center justify-center text-[11px] font-black text-black"
                       style={{ background: "linear-gradient(135deg, #E8C96B, #C9A84C)" }}
                     >
                       {badge > 9 ? "9+" : badge}
@@ -121,7 +121,7 @@ export default function BottomNav({ items, moreItems, userId, showLogout = true 
                   )}
                 </span>
 
-                <span className={`text-[9px] font-semibold tracking-widest uppercase transition-colors duration-200 ${
+                <span className={`text-[11px] font-semibold tracking-widest uppercase transition-colors duration-200 ${
                   active ? "text-brand-gold" : "text-zinc-600 group-hover:text-zinc-400"
                 }`}>
                   {item.label}
@@ -145,7 +145,7 @@ export default function BottomNav({ items, moreItems, userId, showLogout = true 
               <span className={`transition-all duration-200 ${drawerOpen ? "rotate-45" : ""} ${drawerOpen || isMoreActive ? "text-brand-gold scale-110" : "text-zinc-500 group-hover:text-zinc-300"}`}>
                 <GridIcon />
               </span>
-              <span className={`text-[9px] font-semibold tracking-widest uppercase transition-colors duration-200 ${
+              <span className={`text-[11px] font-semibold tracking-widest uppercase transition-colors duration-200 ${
                 drawerOpen || isMoreActive ? "text-brand-gold" : "text-zinc-600 group-hover:text-zinc-400"
               }`}>
                 Mais

@@ -282,7 +282,7 @@ export default function MyWorkoutsPage() {
                     </div>
                     {(w.source !== "manual" || w.notes) && (
                       <div className="flex items-center gap-2 mt-1.5">
-                        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${src.cls}`}>
+                        <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-full ${src.cls}`}>
                           {src.label}
                         </span>
                         {w.notes && (

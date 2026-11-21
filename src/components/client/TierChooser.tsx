@@ -47,7 +47,7 @@ function TierCard({
           </span>
           {highlight && (
             <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+              className="text-[11px] font-bold px-2 py-0.5 rounded-full"
               style={{ background: "rgba(201,168,76,0.16)", color: "#C9A84C" }}
             >
               {COPY.recommended[lang]}

@@ -97,7 +97,7 @@ export default async function MealPlansPage() {
                   <div className="min-w-0 space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-semibold text-white truncate">{plan.name}</h3>
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${goalColor}`}>
+                      <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${goalColor}`}>
                         {goalLabel}
                       </span>
                     </div>

@@ -62,7 +62,7 @@ function MacroPill({ label, value, unit = "g", color }: {
 }) {
   if (value == null) return null;
   return (
-    <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold ${color}`}>
+    <span className={`inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[11px] font-semibold ${color}`}>
       {label}: {Math.round(value)}{unit}
     </span>
   );
@@ -187,7 +187,7 @@ export default async function MealPlanPage() {
                   <p className="text-zinc-500 text-sm mt-1 italic">{plan.notes}</p>
                 )}
               </div>
-              <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full shrink-0 ${GOAL_COLOR[plan.goal] ?? "text-zinc-400 bg-zinc-800"}`}>
+              <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full shrink-0 ${GOAL_COLOR[plan.goal] ?? "text-zinc-400 bg-zinc-800"}`}>
                 {goalLabel}
               </span>
             </div>
@@ -198,25 +198,25 @@ export default async function MealPlanPage() {
                 className="rounded-xl p-3"
                 style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.1)" }}
               >
-                <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest mb-2">
+                <p className="text-zinc-500 text-[11px] font-semibold uppercase tracking-widest mb-2">
                   {dailyLabel}
                 </p>
                 <div className="flex gap-4 flex-wrap">
                   <div className="text-center">
                     <p className="text-brand-gold font-bold text-xl">{Math.round(dailyTotals.calories)}</p>
-                    <p className="text-zinc-600 text-[10px]">kcal</p>
+                    <p className="text-zinc-600 text-[11px]">kcal</p>
                   </div>
                   <div className="text-center">
                     <p className="text-blue-400 font-bold text-xl">{Math.round(dailyTotals.protein_g)}g</p>
-                    <p className="text-zinc-600 text-[10px]">{lang === "pt" ? "proteína" : "protein"}</p>
+                    <p className="text-zinc-600 text-[11px]">{lang === "pt" ? "proteína" : "protein"}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-orange-400 font-bold text-xl">{Math.round(dailyTotals.carbs_g)}g</p>
-                    <p className="text-zinc-600 text-[10px]">{lang === "pt" ? "hidratos" : "carbs"}</p>
+                    <p className="text-zinc-600 text-[11px]">{lang === "pt" ? "hidratos" : "carbs"}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-pink-400 font-bold text-xl">{Math.round(dailyTotals.fat_g)}g</p>
-                    <p className="text-zinc-600 text-[10px]">{lang === "pt" ? "gordura" : "fat"}</p>
+                    <p className="text-zinc-600 text-[11px]">{lang === "pt" ? "gordura" : "fat"}</p>
                   </div>
                 </div>
               </div>

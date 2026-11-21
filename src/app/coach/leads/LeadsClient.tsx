@@ -81,7 +81,7 @@ function LeadRow({ lead }: { lead: Lead }) {
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <p className="font-bold text-white text-sm">{lead.name}</p>
             {/* Status badge */}
-            <span className="text-[10px] font-bold tracking-wide px-2 py-0.5 rounded-full"
+            <span className="text-[11px] font-bold tracking-wide px-2 py-0.5 rounded-full"
               style={{ background: cfg.bg, border: `1px solid ${cfg.border}`, color: cfg.text }}>
               {cfg.label}
             </span>
@@ -146,7 +146,7 @@ function LeadRow({ lead }: { lead: Lead }) {
               </button>
             ) : (
               <button onClick={handleDelete}
-                className="text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all"
+                className="tap-44 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all"
                 style={{ background: "rgba(239,68,68,0.15)", color: "#f87171", border: "1px solid rgba(239,68,68,0.3)" }}>
                 Confirmar
               </button>
@@ -224,7 +224,7 @@ export default function LeadsClient({ leads }: { leads: Lead[] }) {
               : { background: "transparent", color: "rgba(255,255,255,0.3)", border: "1px solid rgba(255,255,255,0.06)" }
             }>
             {t.label}
-            <span className="ml-1.5 text-[10px]" style={{ color: "rgba(255,255,255,0.3)" }}>
+            <span className="ml-1.5 text-[11px]" style={{ color: "rgba(255,255,255,0.3)" }}>
               {counts[t.key]}
             </span>
           </button>

@@ -48,7 +48,23 @@ const config: Config = {
         "gold-lg": "0 8px 48px rgba(201,168,76,0.40)",
         "card":    "0 8px 32px rgba(0,0,0,0.35)",
       },
+      // The motion system, reachable as Tailwind classes. The values live in
+      // globals.css :root and src/lib/motion.ts; these only point at them, so
+      // there is one place to change a curve and not three.
+      transitionDuration: {
+        instant:    "var(--dur-instant)",
+        snap:       "var(--dur-snap)",
+        base:       "var(--dur-base)",
+        considered: "var(--dur-considered)",
+        deliberate: "var(--dur-deliberate)",
+      },
       transitionTimingFunction: {
+        standard:   "var(--ease-standard)",
+        exit:       "var(--ease-exit)",
+        entrance:   "var(--ease-entrance)",
+        overshoot:  "var(--ease-overshoot)",
+        anticipate: "var(--ease-anticipate)",
+        // Kept: 73 components already use these two names.
         "spring": "cubic-bezier(0.34,1.56,0.64,1)",
         "smooth": "cubic-bezier(0.4,0,0.2,1)",
       },

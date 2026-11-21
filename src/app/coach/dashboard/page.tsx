@@ -433,7 +433,7 @@ export default async function CoachDashboard() {
             <p className="text-xs font-bold tracking-[0.14em] uppercase text-[#C9A84C]">
               Novos clientes
             </p>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-black text-black"
+            <span className="px-2 py-0.5 rounded-full text-[11px] font-black text-black"
               style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>
               {newClients.length}
             </span>
@@ -536,7 +536,7 @@ function StatCard({ label, value, sub, highlight }: {
 }) {
   return (
     <div className={`rounded-2xl p-4 stat-enter ${highlight ? "card-gold" : "card"}`}>
-      <p className="text-[10px] font-semibold text-zinc-500 tracking-[0.12em] uppercase mb-2">{label}</p>
+      <p className="text-[11px] font-semibold text-zinc-500 tracking-[0.12em] uppercase mb-2">{label}</p>
       <p className={`text-2xl font-black tracking-tight leading-none ${highlight ? "text-brand-gold" : "text-white"}`}>
         {value}
       </p>

@@ -141,10 +141,10 @@ function SessionCard({
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${type.color}`}>
+          <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${type.color}`}>
             {type.label}
           </span>
-          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${status.color}`}>
+          <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${status.color}`}>
             {status.label}
           </span>
         </div>
@@ -179,7 +179,7 @@ function SessionCard({
           <button
             onClick={handleComplete}
             disabled={pending}
-            className="text-xs px-3 py-1.5 rounded-lg bg-brand-gold text-black font-semibold hover:bg-brand-gold-dark transition-colors disabled:opacity-50"
+            className="tap-44 text-xs px-3 py-1.5 rounded-lg bg-brand-gold text-black font-semibold hover:bg-brand-gold-dark transition-colors disabled:opacity-50"
           >
             Concluída
           </button>

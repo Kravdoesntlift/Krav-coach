@@ -270,25 +270,25 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
       {/* Daily totals summary */}
       {(dailyTotals.calories > 0 || dailyTotals.protein_g > 0) && (
         <div className="card p-4">
-          <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest mb-3">
+          <p className="text-zinc-500 text-[11px] font-semibold uppercase tracking-widest mb-3">
             Total diário estimado
           </p>
           <div className="grid grid-cols-4 gap-2">
             <div className="text-center bg-zinc-800/50 rounded-xl py-2.5">
               <p className="text-brand-gold font-bold text-lg leading-tight">{Math.round(dailyTotals.calories)}</p>
-              <p className="text-zinc-600 text-[10px]">kcal</p>
+              <p className="text-zinc-600 text-[11px]">kcal</p>
             </div>
             <div className="text-center bg-zinc-800/50 rounded-xl py-2.5">
               <p className="text-blue-400 font-bold text-lg leading-tight">{Math.round(dailyTotals.protein_g)}g</p>
-              <p className="text-zinc-600 text-[10px]">prot</p>
+              <p className="text-zinc-600 text-[11px]">prot</p>
             </div>
             <div className="text-center bg-zinc-800/50 rounded-xl py-2.5">
               <p className="text-orange-400 font-bold text-lg leading-tight">{Math.round(dailyTotals.carbs_g)}g</p>
-              <p className="text-zinc-600 text-[10px]">hid</p>
+              <p className="text-zinc-600 text-[11px]">hid</p>
             </div>
             <div className="text-center bg-zinc-800/50 rounded-xl py-2.5">
               <p className="text-pink-400 font-bold text-lg leading-tight">{Math.round(dailyTotals.fat_g)}g</p>
-              <p className="text-zinc-600 text-[10px]">gord</p>
+              <p className="text-zinc-600 text-[11px]">gord</p>
             </div>
           </div>
         </div>
@@ -304,7 +304,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
             {/* Meal header */}
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest shrink-0">
+                <p className="text-zinc-500 text-[11px] font-semibold uppercase tracking-widest shrink-0">
                   Tipo
                 </p>
                 <select
@@ -351,7 +351,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
 
             {/* Foods */}
             <div className="space-y-3">
-              <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest">Alimentos</p>
+              <p className="text-zinc-500 text-[11px] font-semibold uppercase tracking-widest">Alimentos</p>
               {meal.foods.map((food, fi) => (
                 <div
                   key={fi}
@@ -379,7 +379,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
                   {/* Row 1: Quantidade + Kcal */}
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="text-[9px] font-semibold uppercase tracking-widest text-zinc-500 block mb-1">
+                      <label className="text-[11px] font-semibold uppercase tracking-widest text-zinc-500 block mb-1">
                         Quantidade
                       </label>
                       <input
@@ -390,7 +390,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
                       />
                     </div>
                     <div>
-                      <label className="text-[9px] font-semibold uppercase tracking-widest text-brand-gold block mb-1">
+                      <label className="text-[11px] font-semibold uppercase tracking-widest text-brand-gold block mb-1">
                         Kcal
                       </label>
                       <input
@@ -405,7 +405,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
                   {/* Row 2: Macros */}
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <label className="text-[9px] font-semibold uppercase tracking-widest text-blue-400 block mb-1">
+                      <label className="text-[11px] font-semibold uppercase tracking-widest text-blue-400 block mb-1">
                         Prot (g)
                       </label>
                       <input
@@ -417,7 +417,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
                       />
                     </div>
                     <div>
-                      <label className="text-[9px] font-semibold uppercase tracking-widest text-orange-400 block mb-1">
+                      <label className="text-[11px] font-semibold uppercase tracking-widest text-orange-400 block mb-1">
                         Hid (g)
                       </label>
                       <input
@@ -429,7 +429,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
                       />
                     </div>
                     <div>
-                      <label className="text-[9px] font-semibold uppercase tracking-widest text-pink-400 block mb-1">
+                      <label className="text-[11px] font-semibold uppercase tracking-widest text-pink-400 block mb-1">
                         Gord (g)
                       </label>
                       <input

@@ -54,7 +54,7 @@ export default function GuiaForm({ lang }: { lang: Lang }) {
   const field =
     "w-full px-4 py-3.5 rounded-xl text-sm font-medium text-white placeholder-zinc-700 outline-none transition-all";
   const fieldStyle = { background: "#141414", border: "1px solid rgba(255,255,255,0.07)" };
-  const labelClass = "text-[10px] font-black tracking-[0.2em] uppercase";
+  const labelClass = "text-[11px] font-black tracking-[0.2em] uppercase";
   const labelStyle = { color: "rgba(201,168,76,0.55)" };
 
   return (

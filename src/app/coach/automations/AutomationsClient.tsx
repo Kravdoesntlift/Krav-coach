@@ -345,11 +345,11 @@ function AutomationCard({
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-white font-semibold text-sm">{automation.name}</span>
           {automation.is_active ? (
-            <span className="text-[10px] font-semibold uppercase tracking-wider bg-brand-gold/10 text-brand-gold px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-semibold uppercase tracking-wider bg-brand-gold/10 text-brand-gold px-2 py-0.5 rounded-full">
               Ativa
             </span>
           ) : (
-            <span className="text-[10px] font-semibold uppercase tracking-wider bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-semibold uppercase tracking-wider bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full">
               Inativa
             </span>
           )}

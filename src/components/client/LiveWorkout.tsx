@@ -442,12 +442,12 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
               down what you lifted was to cancel your own rest. */}
           {restSet && setLogs[restSet.ex]?.[restSet.si] && (
             <div className="w-full max-w-[280px]">
-              <p className="text-zinc-600 text-[10px] font-semibold tracking-widest uppercase text-center mb-2">
+              <p className="text-zinc-600 text-[11px] font-semibold tracking-widest uppercase text-center mb-2">
                 {isEN ? `Set ${restSet.si + 1} · what you did` : `Série ${restSet.si + 1} · o que fizeste`}
               </p>
               <div className="flex items-center gap-2">
                 <div className="flex-1">
-                  <label className="block text-zinc-700 text-[10px] uppercase mb-1 text-center">
+                  <label className="block text-zinc-700 text-[11px] uppercase mb-1 text-center">
                     {isEN ? "Weight kg" : "Peso kg"}
                   </label>
                   <input type="number" inputMode="decimal" placeholder="-"
@@ -456,7 +456,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                     className="bg-zinc-800 border border-zinc-700/50 rounded-xl text-white text-base text-center w-full py-2.5 focus:outline-none focus:border-brand-gold/50" />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-zinc-700 text-[10px] uppercase mb-1 text-center">Reps</label>
+                  <label className="block text-zinc-700 text-[11px] uppercase mb-1 text-center">Reps</label>
                   <input type="number" inputMode="numeric"
                     value={setLogs[restSet.ex][restSet.si].reps}
                     onChange={(e) => updateLog(restSet.ex, restSet.si, "reps", e.target.value)}
@@ -503,7 +503,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                   <button key={emoji} onClick={() => setFeeling(emoji)}
                     className={`flex flex-col items-center py-3 rounded-2xl text-2xl transition-all active:scale-95 border ${feeling===emoji?"border-brand-gold":"border-zinc-800 bg-zinc-900"}`}
                     style={feeling===emoji?{background:"rgba(201,168,76,0.1)"}:{}}>
-                    {emoji}<span className="text-[10px] text-zinc-500 mt-1">{labels[i]}</span>
+                    {emoji}<span className="text-[11px] text-zinc-500 mt-1">{labels[i]}</span>
                   </button>
                 );
               })}
@@ -513,7 +513,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
             placeholder={isEN ? "Optional note..." : "Nota opcional..."} rows={2} maxLength={200}
             className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl px-4 py-3 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-brand-gold/50 resize-none" />
           <div className="rounded-2xl overflow-hidden border border-zinc-800">
-            <p className="text-zinc-500 text-[10px] font-semibold tracking-widest uppercase px-4 py-2.5 border-b border-zinc-800">
+            <p className="text-zinc-500 text-[11px] font-semibold tracking-widest uppercase px-4 py-2.5 border-b border-zinc-800">
               {isEN ? "Summary" : "Resumo"}
             </p>
             {sorted.map((ex, i) => {
@@ -556,7 +556,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
       {/* ── HEADER (shrink-0) ── */}
       <div className="shrink-0 flex items-center gap-2 px-4 py-3">
         <button onClick={onClose}
-          className="shrink-0 w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 active:scale-90">
+          className="tap-44 shrink-0 w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 active:scale-90">
           ✕
         </button>
         <div className="flex-1 flex items-center gap-1.5 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
@@ -581,7 +581,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
           {wakeLock && (
             <div className="flex items-center justify-end gap-1">
               <div className="w-1.5 h-1.5 rounded-full bg-brand-gold" style={{ boxShadow: "0 0 4px #C9A84C" }} />
-              <span className="text-[9px] text-brand-gold/60">{isEN ? "screen on" : "ecrã ativo"}</span>
+              <span className="text-[11px] text-brand-gold/60">{isEN ? "screen on" : "ecrã ativo"}</span>
             </div>
           )}
         </div>
@@ -594,7 +594,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
 
       {/* ── EXERCISE INFO (shrink-0) ── */}
       <div className="shrink-0 px-4 mb-3">
-        <p className="text-zinc-600 text-[10px] font-semibold uppercase tracking-widest mb-1">
+        <p className="text-zinc-600 text-[11px] font-semibold uppercase tracking-widest mb-1">
           {isEN ? `Exercise ${step+1} of ${totalSteps}` : `Exercício ${step+1} de ${totalSteps}`}
         </p>
         <h2 className="text-white font-black leading-tight" style={{ fontSize: "clamp(1.35rem,5.5vw,1.9rem)" }}>
@@ -616,7 +616,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
         {cur && (
           <div className="mt-2">
             {swapped && (
-              <p className="text-[10px] text-zinc-600 mb-1.5">
+              <p className="text-[11px] text-zinc-600 mb-1.5">
                 {isEN ? "Instead of" : "Em vez de"} <span className="text-zinc-500">{cur?.name}</span>
               </p>
             )}
@@ -654,12 +654,12 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                     >
                       <span className="font-semibold">{opt}</span>
                       {kind === "planned" && (
-                        <span className="ml-2 text-[10px] text-zinc-600">
+                        <span className="ml-2 text-[11px] text-zinc-600">
                           {isEN ? "planned" : "do plano"}
                         </span>
                       )}
                       {kind === "recent" && (
-                        <span className="ml-2 text-[10px] text-zinc-600">
+                        <span className="ml-2 text-[11px] text-zinc-600">
                           {isEN ? "used before" : "já usaste"}
                         </span>
                       )}
@@ -721,9 +721,9 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
       {/* ── COLUMN HEADERS (shrink-0) ── */}
       <div className="shrink-0 px-5 mb-2"
         style={{ display: "grid", gridTemplateColumns: "1.5rem 1fr 1fr 2.5rem", gap: "0.5rem" }}>
-        <span className="text-zinc-700 text-[10px] font-semibold uppercase">#</span>
-        <span className="text-zinc-700 text-[10px] font-semibold uppercase">{isEN ? "Weight kg" : "Peso kg"}</span>
-        <span className="text-zinc-700 text-[10px] font-semibold uppercase">Reps</span>
+        <span className="text-zinc-700 text-[11px] font-semibold uppercase">#</span>
+        <span className="text-zinc-700 text-[11px] font-semibold uppercase">{isEN ? "Weight kg" : "Peso kg"}</span>
+        <span className="text-zinc-700 text-[11px] font-semibold uppercase">Reps</span>
         <span />
       </div>
 

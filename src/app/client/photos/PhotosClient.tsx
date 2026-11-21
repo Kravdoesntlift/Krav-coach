@@ -117,7 +117,7 @@ function UploadSlot({
           style={{ aspectRatio: "3/4" }}
         >
           <span className="text-2xl">📸</span>
-          <span className="text-[10px]">{addLabel}</span>
+          <span className="text-[11px]">{addLabel}</span>
         </button>
       )}
     </div>
@@ -172,7 +172,7 @@ function AngleSlider({
       <div className="rounded-xl overflow-hidden bg-zinc-950 relative flex items-center justify-center text-zinc-800 text-xs" style={{ aspectRatio: "3/4" }}>
         <span className="opacity-40">📷</span>
         <div className="absolute bottom-1 left-0 right-0 text-center">
-          <span className="text-[9px] text-zinc-700 bg-black/60 px-1.5 py-0.5 rounded-full">{label}</span>
+          <span className="text-[11px] text-zinc-700 bg-black/60 px-1.5 py-0.5 rounded-full">{label}</span>
         </div>
       </div>
     );
@@ -185,12 +185,12 @@ function AngleSlider({
     return (
       <div className="rounded-xl overflow-hidden bg-zinc-950 relative" style={{ aspectRatio: "3/4" }}>
         <Image src={url} alt={label} fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" draggable={false} />
-        <div className={`absolute top-1.5 left-1.5 text-[9px] px-1.5 py-0.5 rounded-full font-bold ${goldBadge ? "text-black" : "bg-black/70 text-white"}`}
+        <div className={`absolute top-1.5 left-1.5 text-[11px] px-1.5 py-0.5 rounded-full font-bold ${goldBadge ? "text-black" : "bg-black/70 text-white"}`}
           style={goldBadge ? { background: "rgba(201,168,76,0.9)" } : undefined}>
           {badge}
         </div>
         <div className="absolute bottom-1 left-0 right-0 text-center">
-          <span className="text-[9px] text-zinc-500 bg-black/60 px-1.5 py-0.5 rounded-full">{label}</span>
+          <span className="text-[11px] text-zinc-500 bg-black/60 px-1.5 py-0.5 rounded-full">{label}</span>
         </div>
       </div>
     );
@@ -228,20 +228,20 @@ function AngleSlider({
 
       {/* Labels */}
       {pos > 15 && (
-        <div className="absolute top-1.5 left-1.5 bg-black/70 text-white text-[9px] px-1.5 py-0.5 rounded-full font-semibold pointer-events-none">
+        <div className="absolute top-1.5 left-1.5 bg-black/70 text-white text-[11px] px-1.5 py-0.5 rounded-full font-semibold pointer-events-none">
           {beforeLabel}
         </div>
       )}
       {pos < 85 && (
         <div
-          className="absolute top-1.5 right-1.5 text-black text-[9px] px-1.5 py-0.5 rounded-full font-bold pointer-events-none"
+          className="absolute top-1.5 right-1.5 text-black text-[11px] px-1.5 py-0.5 rounded-full font-bold pointer-events-none"
           style={{ background: "rgba(201,168,76,0.9)" }}
         >
           {afterLabel}
         </div>
       )}
       <div className="absolute bottom-1 left-0 right-0 text-center pointer-events-none">
-        <span className="text-[9px] text-zinc-400 bg-black/60 px-1.5 py-0.5 rounded-full">{label}</span>
+        <span className="text-[11px] text-zinc-400 bg-black/60 px-1.5 py-0.5 rounded-full">{label}</span>
       </div>
     </div>
   );
@@ -264,7 +264,7 @@ function SessionCompare({
       {/* Labels row */}
       <div className="grid grid-cols-3 gap-2">
         {angles.map((a) => (
-          <p key={a.key} className="text-zinc-500 text-[10px] font-semibold uppercase tracking-widest text-center">
+          <p key={a.key} className="text-zinc-500 text-[11px] font-semibold uppercase tracking-widest text-center">
             {a.label}
           </p>
         ))}
@@ -285,7 +285,7 @@ function SessionCompare({
         ))}
       </div>
 
-      <p className="text-zinc-700 text-[10px] text-center">
+      <p className="text-zinc-700 text-[11px] text-center">
         {fmtDate(before.date, locale)} → {fmtDate(after.date, locale)} · {dragLabel}
       </p>
     </div>
@@ -325,13 +325,13 @@ function SessionCard({
         <p className="text-white text-xs font-semibold">{fmtDate(session.date, locale)}</p>
         <div className="flex items-center gap-2">
           {isSelected && (
-            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+            <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${
               isSelected === "A" ? "bg-white text-black" : "bg-brand-gold text-black"
             }`}>
               {isSelected === "A" ? beforeLabel : afterLabel}
             </span>
           )}
-          <span className="text-zinc-600 text-[10px]">{photoCount}/3</span>
+          <span className="text-zinc-600 text-[11px]">{photoCount}/3</span>
         </div>
       </div>
 
@@ -359,7 +359,7 @@ function SessionCard({
                 </div>
               )}
               <div className="absolute bottom-1 left-0 right-0 text-center">
-                <span className="text-[9px] text-zinc-600 bg-black/60 px-1.5 py-0.5 rounded-full">
+                <span className="text-[11px] text-zinc-600 bg-black/60 px-1.5 py-0.5 rounded-full">
                   {a.label}
                 </span>
               </div>
@@ -535,7 +535,7 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
           ))}
         </div>
 
-        <p className="text-zinc-700 text-[10px] text-center">
+        <p className="text-zinc-700 text-[11px] text-center">
           {extra.optional_angles[lang]}
         </p>
 

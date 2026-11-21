@@ -455,7 +455,7 @@ export default async function OnlinePersonalTrainerPage() {
                       'Tap "Add", done! 🎉',
                     ].map((text, i) => (
                       <li key={i} className="flex items-start gap-3 text-xs text-zinc-400">
-                        <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
+                        <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px] font-black text-black mt-0.5"
                           style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>{i + 1}</span>
                         {text}
                       </li>
@@ -484,7 +484,7 @@ export default async function OnlinePersonalTrainerPage() {
                       'Tap "Install", done! 🎉',
                     ].map((text, i) => (
                       <li key={i} className="flex items-start gap-3 text-xs text-zinc-400">
-                        <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
+                        <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px] font-black text-black mt-0.5"
                           style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>{i + 1}</span>
                         {text}
                       </li>

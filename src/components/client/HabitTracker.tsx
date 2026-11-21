@@ -424,7 +424,7 @@ export default function HabitTracker({
                 const isToday = day.date === today;
                 return (
                   <div key={day.date} className="flex flex-col items-center gap-0.5">
-                    <span className="text-[9px] text-zinc-600 uppercase">
+                    <span className="text-[11px] text-zinc-600 uppercase">
                       {day.label}
                     </span>
                     <div

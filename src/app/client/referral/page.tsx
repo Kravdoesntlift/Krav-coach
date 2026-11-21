@@ -140,7 +140,7 @@ export default function ReferralPage() {
             >
               <code className="flex-1 text-brand-gold text-sm font-mono truncate">{referralUrl}</code>
               <span
-                className="shrink-0 text-[10px] font-bold px-2 py-1 rounded-lg"
+                className="shrink-0 text-[11px] font-bold px-2 py-1 rounded-lg"
                 style={{ background: "rgba(201,168,76,0.16)", color: "#C9A84C" }}
               >
                 {code?.code}

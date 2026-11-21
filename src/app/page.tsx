@@ -575,7 +575,7 @@ export default async function LandingPage({
                 <ol className="space-y-2.5">
                   {c.ios_steps.map((text, i) => (
                     <li key={i} className="flex items-start gap-3 text-xs text-zinc-400">
-                      <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
+                      <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px] font-black text-black mt-0.5"
                         style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>{i + 1}</span>
                       {text}
                     </li>
@@ -599,7 +599,7 @@ export default async function LandingPage({
                 <ol className="space-y-2.5">
                   {c.android_steps.map((text, i) => (
                     <li key={i} className="flex items-start gap-3 text-xs text-zinc-400">
-                      <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-black text-black mt-0.5"
+                      <span className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[11px] font-black text-black mt-0.5"
                         style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>{i + 1}</span>
                       {text}
                     </li>
@@ -662,7 +662,7 @@ export default async function LandingPage({
               style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.09)" }}>
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <div>
-                  <p className="text-[10px] font-black tracking-[0.18em] uppercase text-zinc-600">{c.book_eyebrow}</p>
+                  <p className="text-[11px] font-black tracking-[0.18em] uppercase text-zinc-600">{c.book_eyebrow}</p>
                   <h2 className="mt-1.5 text-2xl font-black text-white">{c.book_title}</h2>
                 </div>
                 <div className="flex items-baseline gap-1">

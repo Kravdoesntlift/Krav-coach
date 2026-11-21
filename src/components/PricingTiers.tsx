@@ -73,7 +73,7 @@ function Card({
     >
       {highlight && (
         <span
-          className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[10px] font-black tracking-[0.12em] uppercase text-black px-3 py-1 rounded-full whitespace-nowrap"
+          className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[11px] font-black tracking-[0.12em] uppercase text-black px-3 py-1 rounded-full whitespace-nowrap"
           style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C)" }}
         >
           {c.popular}
@@ -111,7 +111,7 @@ function Card({
         {info.includes[lang].map((item) => (
           <li key={item} className="flex items-start gap-2.5 text-[13px] text-zinc-300 leading-snug">
             <span
-              className="w-4 h-4 mt-0.5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold text-black"
+              className="w-4 h-4 mt-0.5 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold text-black"
               style={{
                 background: highlight
                   ? "linear-gradient(135deg,#E8C96B,#A8893A)"
@@ -128,7 +128,7 @@ function Card({
         {/* Said out loud, on the public page and not only after payment. */}
         {info.excludes?.[lang].map((item) => (
           <li key={item} className="flex items-start gap-2.5 text-[13px] text-zinc-600 leading-snug">
-            <span className="w-4 h-4 mt-0.5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold bg-white/[0.04] text-zinc-600">
+            <span className="w-4 h-4 mt-0.5 rounded-full flex items-center justify-center shrink-0 text-[11px] font-bold bg-white/[0.04] text-zinc-600">
               ✕
             </span>
             {item}

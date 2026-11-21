@@ -75,7 +75,7 @@ export default function OfflinePage() {
           <div className="flex items-center justify-between">
             <p className="text-zinc-500 text-xs font-semibold tracking-widest uppercase">Treino de hoje</p>
             {cachedDate && (
-              <p className="text-zinc-500 text-[10px]">Guardado {cachedDate}</p>
+              <p className="text-zinc-500 text-[11px]">Guardado {cachedDate}</p>
             )}
           </div>
 
@@ -129,7 +129,7 @@ export default function OfflinePage() {
                 {workout.weekDays.map((d, i) => (
                   <div
                     key={i}
-                    className="flex flex-col items-center gap-1 py-2 rounded-xl text-[10px] text-center"
+                    className="flex flex-col items-center gap-1 py-2 rounded-xl text-[11px] text-center"
                     style={{
                       background: d.isRest
                         ? "rgba(255,255,255,0.02)"

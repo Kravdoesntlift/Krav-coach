@@ -195,7 +195,7 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
             <button
               onClick={loadMore}
               disabled={loadingMore}
-              className="text-xs px-4 py-1.5 rounded-full border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors disabled:opacity-50"
+              className="tap-44 text-xs px-4 py-1.5 rounded-full border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors disabled:opacity-50"
             >
               {loadingMore ? extra.loading_more[lang] : extra.load_more[lang]}
             </button>
@@ -211,7 +211,7 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
             {/* Date divider */}
             <div className="flex items-center gap-3 my-4">
               <div className="flex-1 h-px bg-zinc-900" />
-              <span className="text-[10px] text-zinc-700 font-medium">{formatDate(date + "T12:00:00")}</span>
+              <span className="text-[11px] text-zinc-700 font-medium">{formatDate(date + "T12:00:00")}</span>
               <div className="flex-1 h-px bg-zinc-900" />
             </div>
 
@@ -233,7 +233,7 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
                     >
                       <p className="whitespace-pre-wrap break-words">{msg.content}</p>
                       {isLast && (
-                        <p className={`text-[10px] mt-1 ${isOwn ? "text-black/40 text-right" : "text-zinc-600"}`}>
+                        <p className={`text-[11px] mt-1 ${isOwn ? "text-black/40 text-right" : "text-zinc-600"}`}>
                           {formatTime(msg.created_at)}
                           {isOwn && msg.read_at && <span className="ml-1">✓✓</span>}
                         </p>

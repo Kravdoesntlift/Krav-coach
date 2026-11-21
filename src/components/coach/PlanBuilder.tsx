@@ -672,7 +672,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     {ex.video_url && (
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(201,168,76,0.1)", color: "#C9A84C" }}>
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(201,168,76,0.1)", color: "#C9A84C" }}>
                         vídeo
                       </span>
                     )}

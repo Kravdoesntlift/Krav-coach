@@ -151,7 +151,7 @@ export default function SuggestPlanButton({ clientId }: { clientId: string }) {
                       {day.exercises.map((ex, i) => (
                         <li key={i} className="flex items-start gap-2 text-xs text-zinc-400">
                           <span
-                            className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black text-black shrink-0 mt-0.5"
+                            className="w-4 h-4 rounded-full flex items-center justify-center text-[11px] font-black text-black shrink-0 mt-0.5"
                             style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
                           >
                             {i + 1}

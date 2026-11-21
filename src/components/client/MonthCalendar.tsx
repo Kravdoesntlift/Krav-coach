@@ -71,7 +71,7 @@ export default function MonthCalendar({ year, month, dayStatuses, todayStr, lang
       {/* ── Header ── */}
       <div className="px-4 pt-4 pb-2 flex items-start justify-between">
         <div>
-          <p className="text-[10px] font-semibold tracking-widest uppercase text-zinc-600">
+          <p className="text-[11px] font-semibold tracking-widest uppercase text-zinc-600">
             {isEN ? "Training calendar" : "Calendário de treinos"}
           </p>
           <h3 className="mt-0.5 text-base font-bold text-white">
@@ -84,12 +84,12 @@ export default function MonthCalendar({ year, month, dayStatuses, todayStr, lang
             <p className="text-xl font-black" style={{ color: "#C9A84C" }}>
               {completedCount}
             </p>
-            <p className="text-[10px] text-zinc-600 mt-0.5">{isEN ? "workouts" : "treinos"}</p>
+            <p className="text-[11px] text-zinc-600 mt-0.5">{isEN ? "workouts" : "treinos"}</p>
           </div>
           {missedCount > 0 && (
             <div className="text-right">
               <p className="text-xl font-black text-red-400">{missedCount}</p>
-              <p className="text-[10px] text-zinc-600 mt-0.5">{isEN ? "missed" : "falhados"}</p>
+              <p className="text-[11px] text-zinc-600 mt-0.5">{isEN ? "missed" : "falhados"}</p>
             </div>
           )}
         </div>
@@ -99,12 +99,12 @@ export default function MonthCalendar({ year, month, dayStatuses, todayStr, lang
       {scheduledDone > 0 && (
         <div className="px-4 mb-3">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] text-zinc-600">
+            <span className="text-[11px] text-zinc-600">
               {isEN
                 ? `${completedCount} of ${scheduledDone} workouts completed`
                 : `${completedCount} de ${scheduledDone} treinos concluídos`}
             </span>
-            <span className="text-[10px] font-bold" style={{ color: "#C9A84C" }}>
+            <span className="text-[11px] font-bold" style={{ color: "#C9A84C" }}>
               {pct}%
             </span>
           </div>
@@ -125,7 +125,7 @@ export default function MonthCalendar({ year, month, dayStatuses, todayStr, lang
       {/* ── Day-of-week headers ── */}
       <div className="grid grid-cols-7 px-3">
         {DOW_HEADERS.map((d, i) => (
-          <div key={i} className="text-center text-[9px] font-semibold text-zinc-700 pb-1">
+          <div key={i} className="text-center text-[11px] font-semibold text-zinc-700 pb-1">
             {d}
           </div>
         ))}
@@ -173,7 +173,7 @@ export default function MonthCalendar({ year, month, dayStatuses, todayStr, lang
         {legend.map(({ color, label }) => (
           <div key={label} className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-            <span className="text-[9px] text-zinc-600 font-medium">{label}</span>
+            <span className="text-[11px] text-zinc-600 font-medium">{label}</span>
           </div>
         ))}
       </div>

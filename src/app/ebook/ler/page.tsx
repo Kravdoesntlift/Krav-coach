@@ -39,7 +39,7 @@ function Section({ children, last = false, id }: { children: React.ReactNode; la
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] font-black uppercase tracking-[0.28em]" style={{ color: "rgba(201,168,76,0.75)" }}>
+    <p className="text-[11px] font-black uppercase tracking-[0.28em]" style={{ color: "rgba(201,168,76,0.75)" }}>
       {children}
     </p>
   );
@@ -118,7 +118,7 @@ export default async function EbookReaderPage({
     return (
       <main className="min-h-screen flex items-center justify-center px-6" style={{ background: "#08080a", color: "#fff" }}>
         <div className="max-w-md text-center space-y-4">
-          <p className="text-[10px] font-black uppercase tracking-[0.28em]" style={{ color: GOLD }}>KRAV</p>
+          <p className="text-[11px] font-black uppercase tracking-[0.28em]" style={{ color: GOLD }}>KRAV</p>
           <h1 className="text-2xl font-black">
             {lang === "en" ? "This link is not valid" : "Este link não é válido"}
           </h1>
@@ -153,7 +153,7 @@ export default async function EbookReaderPage({
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <span
-            className="rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em]"
+            className="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em]"
             style={{ background: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.3)", color: GOLD }}
           >
             {variant === "home" ? c.variantHome : c.variantGym}
@@ -205,7 +205,7 @@ export default async function EbookReaderPage({
             {c.rirRows.map((r) => (
               <div key={r.label} className="rounded-xl px-3 py-3 text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                 <p className="text-lg font-black" style={{ color: GOLD }}>{r.value}</p>
-                <p className="mt-0.5 text-[10px] leading-tight text-zinc-500">{r.label}</p>
+                <p className="mt-0.5 text-[11px] leading-tight text-zinc-500">{r.label}</p>
               </div>
             ))}
           </div>
@@ -249,7 +249,7 @@ export default async function EbookReaderPage({
         <p className="mt-3 text-sm leading-relaxed text-zinc-400">{c.logIntro}</p>
 
         <div className="mt-6 overflow-hidden rounded-2xl" style={{ border: "1px solid rgba(255,255,255,0.08)" }}>
-          <div className="flex gap-2 px-4 py-2.5 text-[10px] font-black uppercase tracking-wider"
+          <div className="flex gap-2 px-4 py-2.5 text-[11px] font-black uppercase tracking-wider"
             style={{ background: "rgba(201,168,76,0.1)", color: GOLD }}>
             {c.logHeaders.map((h, i) => (
               <span key={h} className={i === 0 ? "flex-1" : "w-[17%] shrink-0"}>{h}</span>

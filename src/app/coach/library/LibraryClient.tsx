@@ -99,7 +99,7 @@ function EditModal({
       <div className="w-full max-w-lg rounded-2xl p-6 space-y-4 animate-fade-in" style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)" }}>
         <div className="flex items-center justify-between">
           <h3 className="font-bold text-white text-lg">Editar exercício</h3>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">✕</button>
+          <button onClick={onClose} className="tap-44 w-8 h-8 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">✕</button>
         </div>
 
         <div className="space-y-3">
@@ -181,7 +181,7 @@ function ExerciseCard({
         {item.muscle_groups.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-1.5">
             {item.muscle_groups.slice(0, 3).map((mg) => (
-              <span key={mg} className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)", color: "#C9A84C" }}>
+              <span key={mg} className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)", color: "#C9A84C" }}>
                 {mg}
               </span>
             ))}
@@ -345,7 +345,7 @@ export default function LibraryClient({ items, coachId }: Props) {
                     <span className="font-bold text-white">{cat}</span>
                     <span className="text-xs text-zinc-500">{exs.length} exercício{exs.length !== 1 ? "s" : ""}</span>
                     {withVideo > 0 && (
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(201,168,76,0.1)", color: "#C9A84C" }}>
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "rgba(201,168,76,0.1)", color: "#C9A84C" }}>
                         {withVideo} vídeo{withVideo !== 1 ? "s" : ""}
                       </span>
                     )}

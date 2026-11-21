@@ -174,7 +174,7 @@ export default function PushNotificationToggle() {
           <button
             onClick={sendTest}
             disabled={testLoading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-white transition-colors"
+            className="tap-44 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-white transition-colors"
           >
             {testLoading ? "..." : "Testar"}
           </button>

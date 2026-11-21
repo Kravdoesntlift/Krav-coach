@@ -47,7 +47,7 @@ function MiniLineChart({
           return <circle key={i} cx={x} cy={y} r="3" fill={color} />;
         })}
       </svg>
-      <div className="flex justify-between text-[10px] text-zinc-600 mt-1">
+      <div className="flex justify-between text-[11px] text-zinc-600 mt-1">
         <span>{data[0].x}</span>
         <span>{last.x}</span>
       </div>
@@ -220,31 +220,31 @@ export default async function AnalyticsPage() {
         {/* Funnel stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
           <div className="rounded-2xl p-4" style={{ background: "rgba(18,18,20,0.8)", border: "1px solid rgba(201,168,76,0.28)" }}>
-            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Total leads</p>
+            <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Total leads</p>
             <p className="text-3xl font-black text-brand-gold">{leadsTotal}</p>
-            <p className="text-zinc-600 text-[10px] mt-0.5">pediram o guia</p>
+            <p className="text-zinc-600 text-[11px] mt-0.5">pediram o guia</p>
           </div>
           <div className="rounded-2xl p-4" style={{ background: "rgba(18,18,20,0.8)", border: "1px solid rgba(59,130,246,0.2)" }}>
-            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Por contactar</p>
+            <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Por contactar</p>
             <p className="text-3xl font-black" style={{ color: "#60a5fa" }}>{leadsNew}</p>
-            <p className="text-zinc-600 text-[10px] mt-0.5">novos</p>
+            <p className="text-zinc-600 text-[11px] mt-0.5">novos</p>
           </div>
           <div className="rounded-2xl p-4" style={{ background: "rgba(18,18,20,0.8)", border: "1px solid rgba(234,179,8,0.2)" }}>
-            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Contactados</p>
+            <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Contactados</p>
             <p className="text-3xl font-black" style={{ color: "#facc15" }}>{leadsContacted}</p>
-            <p className="text-zinc-600 text-[10px] mt-0.5">em progresso</p>
+            <p className="text-zinc-600 text-[11px] mt-0.5">em progresso</p>
           </div>
           <div className="rounded-2xl p-4" style={{ background: "rgba(18,18,20,0.8)", border: "1px solid rgba(34,197,94,0.2)" }}>
-            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Convertidos</p>
+            <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-widest mb-1">Convertidos</p>
             <p className="text-3xl font-black" style={{ color: "#4ade80" }}>{leadsConverted}</p>
-            <p className="text-zinc-600 text-[10px] mt-0.5">{conversionRate}% conversão</p>
+            <p className="text-zinc-600 text-[11px] mt-0.5">{conversionRate}% conversão</p>
           </div>
         </div>
 
         {/* Funnel bar */}
         {leadsTotal > 0 && (
           <div className="rounded-2xl p-4 mb-4" style={{ background: "rgba(18,18,20,0.8)", border: "1px solid rgba(39,39,42,0.5)" }}>
-            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-3">Funil de conversão</p>
+            <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-widest mb-3">Funil de conversão</p>
             <div className="space-y-2.5">
               {[
                 { label: "Pediram o guia", value: leadsTotal,     pct: 100,                                              color: "#C9A84C" },

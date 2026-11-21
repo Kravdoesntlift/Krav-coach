@@ -111,7 +111,7 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
       {item.label}
       {item.badge != null && item.badge > 0 && (
         <span
-          className="absolute -top-0.5 -right-0.5 min-w-[15px] h-[15px] px-0.5 rounded-full flex items-center justify-center text-[9px] font-black text-black"
+          className="absolute -top-0.5 -right-0.5 min-w-[15px] h-[15px] px-0.5 rounded-full flex items-center justify-center text-[11px] font-black text-black"
           style={{ background: "linear-gradient(135deg, #E8C96B, #C9A84C)" }}
         >
           {item.badge > 9 ? "9+" : item.badge}

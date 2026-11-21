@@ -28,7 +28,7 @@ export default function Program90Card({
         style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)" }}
       >
         <div className="space-y-1">
-          <p className="text-[10px] font-black tracking-[0.14em] uppercase text-brand-gold">
+          <p className="text-[11px] font-black tracking-[0.14em] uppercase text-brand-gold">
             {isEN ? "90 Days programme" : "Programa 90 Dias"}
           </p>
           <p className="text-zinc-300 text-xs leading-relaxed">
@@ -59,7 +59,7 @@ export default function Program90Card({
         className="rounded-2xl p-4 space-y-2"
         style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)" }}
       >
-        <p className="text-[10px] font-black tracking-[0.14em] uppercase text-brand-gold">
+        <p className="text-[11px] font-black tracking-[0.14em] uppercase text-brand-gold">
           {isEN ? "90 Days programme" : "Programa 90 Dias"}
         </p>
         <p className="text-zinc-300 text-xs leading-relaxed">
@@ -81,7 +81,7 @@ export default function Program90Card({
       style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)" }}
     >
       <div className="flex items-baseline justify-between gap-3">
-        <p className="text-[10px] font-black tracking-[0.14em] uppercase text-brand-gold">
+        <p className="text-[11px] font-black tracking-[0.14em] uppercase text-brand-gold">
           {isEN ? "90 Days programme" : "Programa 90 Dias"}
         </p>
         <p className="text-[11px] text-zinc-500">

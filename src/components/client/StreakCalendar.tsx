@@ -69,7 +69,7 @@ export default function StreakCalendar({ completedDates, currentStreak, longestS
             {/* Week day labels on left */}
             <div className="flex flex-col gap-1 mr-1">
               {DAY_LABELS.map((d) => (
-                <div key={d} className="h-[14px] text-[10px] text-gray-600 leading-none flex items-center">
+                <div key={d} className="h-[14px] text-[11px] text-gray-600 leading-none flex items-center">
                   {d}
                 </div>
               ))}
@@ -109,7 +109,7 @@ export default function StreakCalendar({ completedDates, currentStreak, longestS
               const d = new Date(firstDay.date);
               const isFirstWeekOfMonth = d.getDate() <= 7;
               return (
-                <div key={wi} className="flex-1 text-[9px] text-gray-600 truncate">
+                <div key={wi} className="flex-1 text-[11px] text-gray-600 truncate">
                   {isFirstWeekOfMonth ? d.toLocaleDateString(locale, { month: "short" }) : ""}
                 </div>
               );

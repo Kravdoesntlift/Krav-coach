@@ -39,7 +39,7 @@ export default function BasePlanNote({
       style={{ background: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.18)" }}
     >
       <div className="flex items-center gap-2">
-        <span className="text-[10px] font-black tracking-[0.14em] uppercase text-brand-gold">
+        <span className="text-[11px] font-black tracking-[0.14em] uppercase text-brand-gold">
           {isEN ? "Base plan" : "Plano base"}
         </span>
         {built && <span className="text-[11px] text-zinc-500">{built}</span>}

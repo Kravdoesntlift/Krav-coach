@@ -41,7 +41,7 @@ export default function ExerciseNotes({
           {chips.map((c, i) => (
             <span
               key={i}
-              className="text-[10px] leading-none px-2 py-1 rounded-md font-medium"
+              className="text-[11px] leading-none px-2 py-1 rounded-md font-medium"
               style={{
                 background: "rgba(255,255,255,0.05)",
                 border: "1px solid rgba(255,255,255,0.07)",
@@ -56,7 +56,7 @@ export default function ExerciseNotes({
 
       {technique && (
         <div
-          className="inline-flex items-center gap-1.5 text-[10px] leading-none px-2 py-1 rounded-md font-bold"
+          className="inline-flex items-center gap-1.5 text-[11px] leading-none px-2 py-1 rounded-md font-bold"
           style={{
             background: "rgba(201,168,76,0.1)",
             border: "1px solid rgba(201,168,76,0.28)",
@@ -79,7 +79,7 @@ export default function ExerciseNotes({
           <button
             type="button"
             onClick={() => setShowAlts((v) => !v)}
-            className="text-[10px] text-zinc-600 hover:text-zinc-400 transition-colors font-medium"
+            className="text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors font-medium"
           >
             {showAlts ? "▾" : "▸"} Alternativas ({alts.length})
           </button>

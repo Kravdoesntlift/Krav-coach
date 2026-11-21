@@ -41,7 +41,7 @@ export default async function CoachProfilePage() {
             <button
               type="submit"
               title="Terminar sessão"
-              className="flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-red-400 hover:bg-red-500/5 hover:border-red-500/20 transition-all duration-150"
+              className="tap-44 flex items-center justify-center w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-red-400 hover:bg-red-500/5 hover:border-red-500/20 transition-all duration-150"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -61,7 +61,7 @@ export default async function CoachProfilePage() {
           >
             <span className="text-2xl leading-none">{emoji}</span>
             <span className="text-white text-[11px] font-semibold leading-tight">{label}</span>
-            <span className="text-zinc-600 text-[10px] leading-tight">{sub}</span>
+            <span className="text-zinc-600 text-[11px] leading-tight">{sub}</span>
           </Link>
         ))}
       </div>

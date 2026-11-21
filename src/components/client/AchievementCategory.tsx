@@ -155,8 +155,8 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
                     />
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-600 text-[10px]">{a.progressLabel}</span>
-                    <span className="text-zinc-600 text-[10px]">{a.progress}%</span>
+                    <span className="text-zinc-600 text-[11px]">{a.progressLabel}</span>
+                    <span className="text-zinc-600 text-[11px]">{a.progress}%</span>
                   </div>
                 </div>
               )}

@@ -12,7 +12,7 @@ function Choice({ choice, label }: { choice: string; label: string }) {
       name="choice"
       value={choice}
       disabled={pending}
-      className="px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-300 bg-zinc-800 hover:bg-zinc-700 transition-colors disabled:opacity-50"
+      className="tap-44 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-300 bg-zinc-800 hover:bg-zinc-700 transition-colors disabled:opacity-50"
     >
       {label}
     </button>
@@ -57,7 +57,7 @@ export default function AccessControl({
   return (
     <div className="rounded-2xl p-4 space-y-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}>
       <div className="space-y-0.5">
-        <p className="text-[10px] font-black tracking-[0.14em] uppercase text-zinc-500">Acesso à app</p>
+        <p className="text-[11px] font-black tracking-[0.14em] uppercase text-zinc-500">Acesso à app</p>
         <p className="text-sm text-gray-300">{current}</p>
       </div>
 

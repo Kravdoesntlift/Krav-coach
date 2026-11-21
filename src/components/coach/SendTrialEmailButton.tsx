@@ -26,7 +26,7 @@ export default function SendTrialEmailButton({
     <button
       onClick={send}
       disabled={state === "sending" || state === "sent"}
-      className="text-xs px-3 py-1.5 rounded-lg border transition-all disabled:opacity-50"
+      className="tap-44 text-xs px-3 py-1.5 rounded-lg border transition-all disabled:opacity-50"
       style={
         state === "sent"
           ? { borderColor: "rgba(74,222,128,0.3)", color: "#4ade80", background: "rgba(74,222,128,0.07)" }

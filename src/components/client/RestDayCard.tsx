@@ -74,7 +74,7 @@ export default function RestDayCard({ label, nextTrainingDay }: Props) {
               {allDone ? "🌟" : "💤"}
             </div>
             <div>
-              <p className="text-zinc-500 text-[10px] font-semibold tracking-widest uppercase">
+              <p className="text-zinc-500 text-[11px] font-semibold tracking-widest uppercase">
                 {isEN ? "Today" : "Hoje"}
               </p>
               <h2 className="text-white font-black text-lg leading-tight">
@@ -84,7 +84,7 @@ export default function RestDayCard({ label, nextTrainingDay }: Props) {
           </div>
           {nextTrainingDay && (
             <div className="text-right shrink-0">
-              <p className="text-zinc-600 text-[10px]">{isEN ? "Next training" : "Próx. treino"}</p>
+              <p className="text-zinc-600 text-[11px]">{isEN ? "Next training" : "Próx. treino"}</p>
               <p className="text-blue-400 text-xs font-semibold">{nextTrainingDay}</p>
             </div>
           )}

@@ -2,6 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOTION SYSTEM
+   The same values as src/lib/motion.ts, as custom properties so any element
+   can reach them. Named after the job, never after the number, because the
+   moment a component picks "150ms" again the hierarchy is gone.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --dur-instant:    90ms;   /* a state flip nobody should notice */
+  --dur-snap:      160ms;   /* anything a finger just caused */
+  --dur-base:      260ms;   /* the honest middle */
+  --dur-considered:380ms;   /* an entrance allowed to be seen */
+  --dur-deliberate:560ms;   /* one orchestrated moment per view */
+
+  --ease-standard:   cubic-bezier(0.4, 0, 0.2, 1);        /* slow in, slow out */
+  --ease-exit:       cubic-bezier(0.4, 0, 1, 1);          /* gone, no settle */
+  --ease-entrance:   cubic-bezier(0.16, 1, 0.3, 1);       /* lands, not stops */
+  --ease-overshoot:  cubic-bezier(0.34, 1.56, 0.64, 1);   /* exaggerated feedback */
+  --ease-anticipate: cubic-bezier(0.68, -0.35, 0.27, 1.35); /* wind-up */
+
+  /* Solid drawing: one light source, from above. Every raised surface catches
+     it on the top edge and drops its shadow below. Fixed here so no component
+     invents a second sun. */
+  --lift-1: 0 1px 0 rgba(255,255,255,0.07) inset, 0 2px 10px rgba(0,0,0,0.35);
+  --lift-2: 0 1px 0 rgba(255,255,255,0.09) inset, 0 8px 28px rgba(0,0,0,0.45);
+  --lift-3: 0 1px 0 rgba(255,255,255,0.11) inset, 0 18px 50px rgba(0,0,0,0.55);
+}
+
 @layer base {
   html {
     @apply bg-black text-white;
@@ -26,6 +53,180 @@
 }
 
 @layer utilities {
+
+  /* ── Fitts's law, bigger hit areas ──────────────────────────
+     Grows the target a finger has to find without growing the thing that is
+     drawn. For the small icon controls where making the glyph 44px would
+     wreck the layout. */
+  .tap-44 {
+    position: relative;
+  }
+  .tap-44::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: max(100%, 44px);
+    transform: translate(-50%, -50%);
+  }
+
+  /* ── Squash and stretch ─────────────────────────────────────
+     A press compresses along the axis of the force. Not a uniform scale: a
+     real object under a thumb gets shorter and a little wider, which is the
+     whole point of the principle. */
+  .press-squash {
+    transition: transform var(--dur-snap) var(--ease-overshoot);
+  }
+  .press-squash:active:not(:disabled) {
+    transform: scale(1.012, 0.955);
+  }
+
+  /* ── Anticipation ───────────────────────────────────────────
+     A committing action winds up before it goes. Only on buttons that spend
+     money or send something, because the pause is the point: it is the last
+     moment to let go. */
+  .press-anticipate {
+    transition: transform var(--dur-base) var(--ease-anticipate),
+                box-shadow var(--dur-base) var(--ease-standard);
+  }
+  .press-anticipate:active:not(:disabled) {
+    transform: translateY(2px) scale(0.985);
+  }
+
+  /* ── Arcs ───────────────────────────────────────────────────
+     Nothing alive moves in a straight line. Two axes on different curves
+     bend the path: the horizontal arrives before the vertical, so the
+     element swings in rather than sliding. */
+  .enter-arc {
+    animation: enter-arc var(--dur-considered) var(--ease-entrance) both;
+  }
+  @keyframes enter-arc {
+    0%   { opacity: 0; transform: translate(-10px, 16px) rotate(-1.5deg); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+  }
+
+  /* ── Follow through ─────────────────────────────────────────
+     Applied with an inline animation-delay from staggerDelay(). Each item
+     starts before the one in front has landed. */
+  .enter-rise {
+    animation: enter-rise var(--dur-considered) var(--ease-entrance) both;
+  }
+  @keyframes enter-rise {
+    0%   { opacity: 0; transform: translateY(14px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Secondary action ───────────────────────────────────────
+     The small thing that moves because the big thing moved. A chevron turning
+     while its panel opens, on the panel's own clock. */
+  .secondary-turn {
+    transition: transform var(--dur-base) var(--ease-overshoot);
+  }
+  [data-open="true"] .secondary-turn,
+  [open] .secondary-turn,
+  details[open] .secondary-turn {
+    transform: rotate(180deg);
+  }
+
+  /* ── Exaggerated feedback ───────────────────────────────────
+     Reserved for a thing being finished. Overshoots, because a confirmation
+     that lands politely is not read as a reward. */
+  .confirm-pop {
+    animation: confirm-pop var(--dur-deliberate) var(--ease-overshoot) both;
+  }
+  @keyframes confirm-pop {
+    0%   { transform: scale(0.82); opacity: 0; }
+    55%  { transform: scale(1.06); opacity: 1; }
+    100% { transform: scale(1);    opacity: 1; }
+  }
+
+  /* ── Staging ────────────────────────────────────────────────
+     One focal point. Everything that is not the subject steps back, by
+     losing colour as well as light, so the eye has nowhere else to go. */
+  .stage-recede {
+    transition: opacity var(--dur-base) var(--ease-standard),
+                filter var(--dur-base) var(--ease-standard);
+  }
+  [data-staged="true"] .stage-recede {
+    opacity: 0.4;
+    filter: saturate(0.5);
+  }
+
+  /* ── Origin awareness ───────────────────────────────────────
+     A panel grows out of the thing that opened it, not out of the middle of
+     the screen. The opener sets --origin-x / --origin-y from its own
+     position, so the eye never loses the object it was looking at. */
+  .from-origin {
+    transform-origin: var(--origin-x, 50%) var(--origin-y, 50%);
+    animation: from-origin var(--dur-base) var(--ease-entrance) both;
+  }
+  @keyframes from-origin {
+    0%   { opacity: 0; transform: scale(0.92); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── Rubber banding ─────────────────────────────────────────
+     A limit should be felt, not announced. Pulling past the end resists and
+     springs back, which says "there is no more" without a line of copy. */
+  .rubber {
+    overscroll-behavior: contain;
+  }
+  .rubber-band {
+    animation: rubber-band var(--dur-considered) var(--ease-overshoot);
+  }
+  @keyframes rubber-band {
+    0%   { transform: translateX(0); }
+    30%  { transform: translateX(-9px); }
+    60%  { transform: translateX(4px); }
+    100% { transform: translateX(0); }
+  }
+
+  /* ── Von Restorff ───────────────────────────────────────────
+     The isolation effect: one thing that differs is the thing that is
+     remembered, and a second one cancels the first. Gold is that difference
+     in this app, so a view gets exactly one of these. Anything else that
+     wants attention takes .lift-2 and stays the colour of the rest. */
+  .restorff {
+    box-shadow: var(--lift-2), 0 0 0 1px rgba(201,168,76,0.35),
+                0 0 44px -12px rgba(201,168,76,0.5);
+  }
+
+  /* ── Interruptible motion ───────────────────────────────────
+     A person must never have to wait out an animation to act again. State
+     changes therefore use transition, which the browser reverses mid-flight
+     from wherever it had got to; keyframe animations are kept for entrances,
+     which nobody interrupts because they are already looking. This utility
+     marks a surface whose motion must stay cancellable. */
+  .interruptible {
+    transition: transform var(--dur-base) var(--ease-standard),
+                opacity var(--dur-base) var(--ease-standard);
+    animation: none;
+  }
+  .interruptible * {
+    pointer-events: auto;
+  }
+
+  /* ── Peak and end ───────────────────────────────────────────
+     An experience is remembered by its best moment and its last one, so the
+     budget goes there and nowhere else: finishing a session, finishing a
+     week. Slowest tier, biggest overshoot, used perhaps twice in the app. */
+  .peak-moment {
+    animation: peak-moment var(--dur-deliberate) var(--ease-overshoot) both;
+  }
+  @keyframes peak-moment {
+    0%   { opacity: 0; transform: scale(0.7) rotate(-6deg); }
+    45%  { opacity: 1; transform: scale(1.12) rotate(2deg); }
+    70%  { transform: scale(0.97) rotate(-1deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+
+  /* Depth tokens as utilities, so a component never writes its own shadow. */
+  .lift-1 { box-shadow: var(--lift-1); }
+  .lift-2 { box-shadow: var(--lift-2); }
+  .lift-3 { box-shadow: var(--lift-3); }
+
   .scrollbar-none {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -39,10 +240,18 @@
 
   /* ── Buttons ──────────────────────────────────────────────── */
   .btn-primary {
-    @apply text-black font-bold px-5 py-2.5 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden;
+    @apply text-black font-bold px-5 py-2.5 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden;
     background: linear-gradient(135deg, #E8C96B 0%, #C9A84C 50%, #A8893A 100%);
     box-shadow: 0 4px 20px rgba(201,168,76,0.28), 0 1px 0 rgba(255,255,255,0.12) inset;
     letter-spacing: -0.01em;
+    /* Fitts: the main action of a screen is never smaller than a thumb. */
+    min-height: 44px;
+    /* Two clocks, not one. The lift answers the finger at snap speed; the
+       light under it takes longer to catch up, which is follow through. */
+    transition:
+      transform var(--dur-snap) var(--ease-anticipate),
+      box-shadow var(--dur-base) var(--ease-standard),
+      filter var(--dur-instant) var(--ease-standard);
   }
   .btn-primary::after {
     content: '';
@@ -51,7 +260,7 @@
     background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.12) 50%, transparent 60%);
     background-size: 200% 100%;
     background-position: -200% center;
-    transition: background-position 0.5s;
+    transition: background-position var(--dur-deliberate) var(--ease-standard);
   }
   .btn-primary:hover:not(:disabled)::after {
     background-position: 200% center;
@@ -60,9 +269,13 @@
     box-shadow: 0 6px 28px rgba(201,168,76,0.4), 0 1px 0 rgba(255,255,255,0.12) inset;
     transform: translateY(-1px);
   }
+  /* Anticipation and squash together: it winds down into the press, gets
+     shorter and fractionally wider the way a real object under a thumb does,
+     and the shadow collapses because it moved towards the surface. */
   .btn-primary:active:not(:disabled) {
-    transform: translateY(0.5px);
-    box-shadow: 0 2px 12px rgba(201,168,76,0.22);
+    transform: translateY(2px) scale(1.008, 0.962);
+    box-shadow: 0 1px 6px rgba(201,168,76,0.2);
+    filter: brightness(0.97);
   }
 
   .btn-ghost {
@@ -80,6 +293,20 @@
       0 -1px 0 0 rgba(0,0,0,0.4) inset,
       0 8px 32px rgba(0,0,0,0.3);
     position: relative;
+    transition:
+      transform var(--dur-snap) var(--ease-overshoot),
+      box-shadow var(--dur-base) var(--ease-standard);
+  }
+  /* Solid drawing: a card pressed near its edge tips towards the finger
+     instead of shrinking uniformly, which is what tells the eye it is an
+     object with a thickness rather than a rectangle getting smaller. */
+  a:active > .card,
+  button:active > .card,
+  .card:active {
+    transform: perspective(900px) translateY(1px) scale(0.988) rotateX(1.4deg);
+    box-shadow:
+      0 1px 0 0 rgba(255,255,255,0.06) inset,
+      0 2px 12px rgba(0,0,0,0.4);
   }
 
   /* Gold-accented card: key info */
@@ -316,6 +543,44 @@
      hand it would just be every review twice. */
   .marquee-dup {
     display: none !important;
+  }
+
+  /* Motion system under Reduce Motion.
+     Not switched off: an entrance animation with `both` that is cancelled can
+     leave its element stranded, and a confirmation with no feedback at all is
+     worse than one that moves. Everything that travelled becomes a plain
+     fade, which is what Apple asks for and what the SwiftUI guidance says
+     too: replace motion with opacity, keep the meaning. */
+  .enter-arc,
+  .enter-rise,
+  .from-origin {
+    animation: reduced-fade var(--dur-base) var(--ease-standard) both !important;
+  }
+  .confirm-pop,
+  .peak-moment {
+    animation: reduced-fade var(--dur-snap) var(--ease-standard) both !important;
+  }
+  /* A limit still has to be felt. It flashes instead of bouncing. */
+  .rubber-band {
+    animation: reduced-nudge var(--dur-snap) var(--ease-standard);
+  }
+  @keyframes reduced-nudge {
+    50% { opacity: 0.55; }
+  }
+  @keyframes reduced-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* A press still has to answer, so the squash stays as a brightness change:
+     no travel, same confirmation that the tap registered. */
+  .press-squash:active:not(:disabled),
+  .press-anticipate:active:not(:disabled) {
+    transform: none !important;
+    filter: brightness(1.18);
+  }
+  .secondary-turn {
+    transition-duration: 1ms !important;
   }
 }
 

@@ -43,7 +43,7 @@ export default function WeeklyFunnel({ data }: { data: Data }) {
       <div className="card p-4 overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-[10px] uppercase tracking-wider text-zinc-600">
+            <tr className="text-[11px] uppercase tracking-wider text-zinc-600">
               <th className="text-left font-bold pb-2">Semana</th>
               {COLS.map((c) => (
                 <th key={c.key} className="text-right font-bold pb-2 px-2" style={{ color: c.color }}>
@@ -59,7 +59,7 @@ export default function WeeklyFunnel({ data }: { data: Data }) {
                 <tr key={r.weekStart} style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
                   <td className={`py-2 whitespace-nowrap ${last ? "text-white font-semibold" : "text-zinc-400"}`}>
                     {fmt(r.weekStart)}
-                    {last && <span className="ml-2 text-[10px] text-zinc-600">esta semana</span>}
+                    {last && <span className="ml-2 text-[11px] text-zinc-600">esta semana</span>}
                   </td>
                   {COLS.map((c) => {
                     const value = c.key === "books" && r.books === null ? null : (r[c.key] as number);

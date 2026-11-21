@@ -33,7 +33,7 @@ export default function DeletePlanButton({ planId, clientId, deletePlan }: Props
         <button
           onClick={handleDelete}
           disabled={loading}
-          className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded transition-colors disabled:opacity-50"
+          className="tap-44 text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded transition-colors disabled:opacity-50"
         >
           {loading ? "..." : "Apagar"}
         </button>

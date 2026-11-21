@@ -46,7 +46,7 @@ function Section({ children, last = false }: { children: React.ReactNode; last?:
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] font-black uppercase tracking-[0.28em]" style={{ color: "rgba(201,168,76,0.75)" }}>
+    <p className="text-[11px] font-black uppercase tracking-[0.28em]" style={{ color: "rgba(201,168,76,0.75)" }}>
       {children}
     </p>
   );
@@ -150,7 +150,7 @@ export default async function GuideReaderPage({
               style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
             >
               <p className="text-lg font-black" style={{ color: GOLD }}>{r.value}</p>
-              <p className="mt-0.5 text-[10px] leading-tight text-zinc-500">{r.label}</p>
+              <p className="mt-0.5 text-[11px] leading-tight text-zinc-500">{r.label}</p>
             </div>
           ))}
         </div>

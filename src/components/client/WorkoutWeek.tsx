@@ -477,7 +477,7 @@ function WorkoutDayCard({
                     rendered.push(
                       <div key={`ss-${group}-${i}`} className="relative border-l-2 border-orange-500/60 ml-0">
                         <div className="absolute left-0 top-2 -translate-x-1/2 z-10">
-                          <span className="bg-orange-500 text-black text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                          <span className="bg-orange-500 text-black text-[11px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
                             {group}
                           </span>
                         </div>
@@ -581,7 +581,7 @@ function WorkoutDayCard({
                 {sessionVolume && (
                   <div className="text-right">
                     <p className="text-brand-gold text-sm font-bold">{sessionVolume.toLocaleString("pt-PT")} kg</p>
-                    <p className="text-zinc-600 text-[10px]">{extra.volume_today[lang]}</p>
+                    <p className="text-zinc-600 text-[11px]">{extra.volume_today[lang]}</p>
                   </div>
                 )}
               </div>
@@ -936,7 +936,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
                   )}
                   {extra[tab.labelKey][lang]}
                   {badge && !isActive && (
-                    <span className={`text-[10px] px-1 py-0.5 rounded-full bg-zinc-700 ${tab.color}`}>
+                    <span className={`text-[11px] px-1 py-0.5 rounded-full bg-zinc-700 ${tab.color}`}>
                       {badge}
                     </span>
                   )}
@@ -957,14 +957,14 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
                     <span className="text-brand-gold text-sm">📈</span>
                     <div className="text-left">
                       <p className="text-brand-gold text-xs font-semibold">{extra.suggestion[lang]} {overload.weight_kg}kg × {overload.reps}</p>
-                      <p className="text-zinc-500 text-[10px]">{overload.reason} · {extra.overload_tap[lang]}</p>
+                      <p className="text-zinc-500 text-[11px]">{overload.reason} · {extra.overload_tap[lang]}</p>
                     </div>
                   </div>
                   <span className="text-zinc-600 group-hover:text-brand-gold text-xs transition-colors">↙</span>
                 </button>
               )}
               {lastVolume && (
-                <p className="text-zinc-600 text-[10px] text-center">
+                <p className="text-zinc-600 text-[11px] text-center">
                   {extra.last_vol[lang]} <span className="text-zinc-400 font-medium">{lastVolume.toLocaleString("pt-PT")} kg</span>
                 </p>
               )}
@@ -973,7 +973,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
               {sessionHistory.length > 0 && (
                 <div className="rounded-xl border border-zinc-700/50 overflow-hidden">
                   <div className="px-3 py-1.5 bg-zinc-800/60 border-b border-zinc-700/40">
-                    <p className="text-zinc-500 text-[10px] font-semibold uppercase tracking-wide">{extra.recent_sessions[lang]}</p>
+                    <p className="text-zinc-500 text-[11px] font-semibold uppercase tracking-wide">{extra.recent_sessions[lang]}</p>
                   </div>
                   <div className="divide-y divide-zinc-800/60">
                     {sessionHistory.map((h, i) => {
@@ -989,7 +989,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
                               </span>
                             )}
                             {h.vol > 0 && (
-                              <span className="text-zinc-600 text-[10px]">
+                              <span className="text-zinc-600 text-[11px]">
                                 {h.vol.toLocaleString("pt-PT")} {extra.vol_suffix[lang]}
                               </span>
                             )}

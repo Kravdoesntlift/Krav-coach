@@ -76,7 +76,7 @@ export default async function EbookThanksPage({
             </p>
             <div className="pt-2 text-left rounded-2xl p-5"
               style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.25)" }}>
-              <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: GOLD }}>
+              <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: GOLD }}>
                 {isEN ? "One more thing" : "Falta uma coisa"}
               </p>
               <p className="mt-2 text-sm font-bold text-white">

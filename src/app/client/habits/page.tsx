@@ -137,7 +137,7 @@ export default async function HabitsPage() {
                 <div className="text-brand-gold font-bold text-lg leading-none">
                   {h.streak}
                 </div>
-                <div className="text-zinc-500 text-[10px] uppercase tracking-wide">
+                <div className="text-zinc-500 text-[11px] uppercase tracking-wide">
                   {lang === "en" ? "day streak" : "dias seguidos"}
                 </div>
               </div>

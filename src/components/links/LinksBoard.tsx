@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { ebookPrice } from "@/lib/ebook/price";
 import { priceLabel } from "@/lib/billing/tiers";
+import { staggered } from "@/lib/motion";
 
 /* ─── Types ──────────────────────────────────────────────────────────────────── */
 interface CardData {
@@ -121,7 +122,7 @@ function MyProteinBg() {
         {/* Tag label */}
         <div className="flex items-center gap-1.5">
           <div className="h-px w-6" style={{ background: "rgba(201,168,76,0.4)" }}/>
-          <p className="text-[9px] font-black tracking-[0.32em] uppercase" style={{ color: "rgba(201,168,76,0.55)" }}>
+          <p className="text-[11px] font-black tracking-[0.32em] uppercase" style={{ color: "rgba(201,168,76,0.55)" }}>
             código exclusivo
           </p>
           <div className="h-px w-6" style={{ background: "rgba(201,168,76,0.4)" }}/>
@@ -145,7 +146,7 @@ function MyProteinBg() {
           <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
           </svg>
-          <p className="text-[9px] font-bold tracking-wide" style={{ color: "rgba(201,168,76,0.7)" }}>
+          <p className="text-[11px] font-bold tracking-wide" style={{ color: "rgba(201,168,76,0.7)" }}>
             aplica no checkout
           </p>
         </div>
@@ -321,7 +322,7 @@ function Badge({ text, color }: { text: string; color?: "gold" | "green" | "whit
     white: { background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)", color: "rgba(255,255,255,0.65)" },
   };
   return (
-    <span className="inline-block text-[9px] font-black tracking-[0.2em] uppercase px-2.5 py-1 rounded-full"
+    <span className="inline-block text-[11px] font-black tracking-[0.2em] uppercase px-2.5 py-1 rounded-full"
       style={styles[color ?? "gold"]}>
       {text}
     </span>
@@ -329,23 +330,35 @@ function Badge({ text, color }: { text: string; color?: "gold" | "green" | "whit
 }
 
 /* ─── Modal ──────────────────────────────────────────────────────────────────── */
-function Modal({ card, onClose }: { card: CardData; onClose: () => void }) {
+function Modal({ card, origin, onClose }: { card: CardData; origin: { x: string; y: string }; onClose: () => void }) {
   const m = card.modal!;
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in-fast"
       style={{ background: "rgba(0,0,0,0.92)", backdropFilter: "blur(24px)" }}
       onClick={onClose}>
-      <div className="w-full max-w-sm mx-4 mb-6 sm:mb-0 rounded-3xl overflow-hidden"
-        style={{ background: "#0f0c08", border: "1px solid rgba(201,168,76,0.22)", boxShadow: "0 0 80px rgba(0,0,0,0.9)" }}
+      <div className="w-full max-w-sm mx-4 mb-6 sm:mb-0 rounded-3xl overflow-hidden from-origin"
+        style={{
+          background: "#0f0c08",
+          border: "1px solid rgba(201,168,76,0.22)",
+          boxShadow: "0 0 80px rgba(0,0,0,0.9)",
+          // Set per open, read by the .from-origin keyframe.
+          ["--origin-x" as string]: origin.x,
+          ["--origin-y" as string]: origin.y,
+        }}
         onClick={(e) => e.stopPropagation()}>
 
         {/* Image header */}
         <div className="relative h-44 overflow-hidden" style={card.bgStyle}>
           {card.photo && <Image src={card.photo} alt={card.title} fill className="object-cover" style={{ objectPosition: card.photoPosition ?? "center", filter: "brightness(0.55) saturate(0.8)" }} />}
           {!card.photo && card.id === "pdf" && <GuiaBg />}
+          {/* The sheet drew a black band where the card draws its artwork:
+              the one surface that is meant to sell the book was the plainest
+              thing on the page. */}
+          {!card.photo && card.id === "ebook" && <EbookBg />}
+          {!card.photo && card.id === "community" && <CommunityBg />}
           <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #0f0c08 0%, transparent 55%)" }} />
           <button onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-zinc-500 hover:text-white z-10"
+            className="tap-44 absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-zinc-500 hover:text-white z-10"
             style={{ background: "rgba(0,0,0,0.6)" }}>
             <CloseIcon />
           </button>
@@ -358,7 +371,7 @@ function Modal({ card, onClose }: { card: CardData; onClose: () => void }) {
         <div className="p-6 space-y-5">
           <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>{m.desc}</p>
           <a href={m.href} target="_blank" rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl font-black text-sm active:scale-[0.98] transition-all"
+            className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl font-black text-sm press-anticipate"
             style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C,#A8893A)", color: "#000", boxShadow: "0 4px 28px rgba(201,168,76,0.22)" }}>
             {m.cta} <ArrowRight />
           </a>
@@ -370,14 +383,19 @@ function Modal({ card, onClose }: { card: CardData; onClose: () => void }) {
 }
 
 /* ─── Card ───────────────────────────────────────────────────────────────────── */
-function Card({ card, onOpen }: { card: CardData; onOpen?: () => void }) {
+function Card({ card, index, onOpen }: { card: CardData; index: number; onOpen?: (e: React.MouseEvent) => void }) {
   const inner = (
     <div className="rounded-2xl overflow-hidden"
       style={{
         background: "#0f0c08",
         border: card.featured ? "1.5px solid rgba(201,168,76,0.4)" : "1px solid rgba(255,255,255,0.07)",
         opacity: card.disabled ? 0.45 : 1,
-        boxShadow: card.featured ? "0 0 40px rgba(201,168,76,0.05), inset 0 1px 0 rgba(201,168,76,0.1)" : "none",
+        // Von Restorff: exactly one card carries the glow. A second would
+        // cancel the first and the page would be back to having no answer to
+        // "where do I look".
+        boxShadow: card.featured
+          ? "var(--lift-2), 0 0 0 1px rgba(201,168,76,0.35), 0 0 44px -12px rgba(201,168,76,0.5)"
+          : "var(--lift-1)",
       }}>
 
       {/* ── Image area ── */}
@@ -438,14 +456,19 @@ function Card({ card, onOpen }: { card: CardData; onOpen?: () => void }) {
     </div>
   );
 
+  // Follow through: each card starts before the one above it has landed, so
+  // the column reads as one group arriving rather than a list being filled.
+  const entrance = "enter-arc press-squash";
+  const delay = staggered(index);
+
   if (card.disabled) return <div className="cursor-not-allowed select-none">{inner}</div>;
   if (card.modal && onOpen) return (
-    <button className="w-full text-left active:scale-[0.99] transition-transform duration-150" onClick={onOpen}>{inner}</button>
+    <button className={`w-full text-left ${entrance}`} style={delay} onClick={onOpen}>{inner}</button>
   );
   const isInternal = card.href.startsWith("/");
   return (
     <a href={card.href} {...(!isInternal && { target: "_blank", rel: "noopener noreferrer" })}
-      className="block active:scale-[0.99] transition-transform duration-150">
+      className={`block ${entrance}`} style={delay}>
       {inner}
     </a>
   );
@@ -479,7 +502,7 @@ function SocialRow() {
           className="flex flex-col items-center gap-2 py-4 rounded-2xl active:scale-[0.98] transition-transform"
           style={{ background: "#0f0c08", border: "1px solid rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.4)" }}>
           {s.icon}
-          <span className="text-[10px] font-bold tracking-wide">{s.label}</span>
+          <span className="text-[11px] font-bold tracking-wide">{s.label}</span>
         </a>
       ))}
     </div>
@@ -490,6 +513,19 @@ function SocialRow() {
 export default function LinksBoard({ community }: { community: CommunityCopy }) {
   const CARDS = cards(community);
   const [openCard, setOpenCard] = useState<CardData | null>(null);
+  // Origin awareness: where the sheet should appear to come from. Taken from
+  // the card that was tapped, so the thing being opened never arrives from
+  // somewhere the eye was not already looking.
+  const [origin, setOrigin] = useState<{ x: string; y: string }>({ x: "50%", y: "50%" });
+
+  function openFrom(card: CardData, e: React.MouseEvent) {
+    const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setOrigin({
+      x: `${Math.round(r.left + r.width / 2)}px`,
+      y: `${Math.round(r.top + r.height / 2)}px`,
+    });
+    setOpenCard(card);
+  }
   const [imgError, setImgError] = useState(false);
 
   return (
@@ -538,7 +574,7 @@ export default function LinksBoard({ community }: { community: CommunityCopy }) 
             href="https://www.google.com/search?kgmid=/g/11nvv2h6db"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-[10px] font-bold px-3 py-1.5 rounded-full active:scale-95 transition-transform"
+            className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full active:scale-95 transition-transform"
             style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.55)" }}
           >
             <span style={{ color: "#C9A84C", letterSpacing: "0.05em" }}>★★★★★</span>
@@ -558,7 +594,7 @@ export default function LinksBoard({ community }: { community: CommunityCopy }) 
           {/* Tags */}
           <div className="flex gap-2">
             {["Treino", "Nutrição", "Resultados"].map((t) => (
-              <span key={t} className="text-[10px] font-bold px-3 py-1 rounded-full"
+              <span key={t} className="text-[11px] font-bold px-3 py-1 rounded-full"
                 style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)", color: "rgba(201,168,76,0.7)" }}>
                 {t}
               </span>
@@ -571,21 +607,22 @@ export default function LinksBoard({ community }: { community: CommunityCopy }) 
 
         {/* ── Cards ── */}
         <div className="w-full flex flex-col gap-3 pb-6">
-          {CARDS.map((card) => (
+          {CARDS.map((card, i) => (
             <Card key={card.id} card={card}
-              onOpen={card.modal ? () => setOpenCard(card) : undefined} />
+              index={i}
+              onOpen={card.modal ? (e) => openFrom(card, e) : undefined} />
           ))}
           <SocialRow />
         </div>
 
         {/* Footer */}
-        <p className="text-[10px] pb-8 tracking-widest uppercase text-center"
+        <p className="text-[11px] pb-8 tracking-widest uppercase text-center"
           style={{ color: "rgba(201,168,76,0.1)" }}>
           powered by <span className="font-black" style={{ color: "rgba(201,168,76,0.28)" }}>KRAV</span>
         </p>
       </div>
 
-      {openCard?.modal && <Modal card={openCard} onClose={() => setOpenCard(null)} />}
+      {openCard?.modal && <Modal card={openCard} origin={origin} onClose={() => setOpenCard(null)} />}
     </main>
   );
 }

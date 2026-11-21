@@ -26,7 +26,7 @@ export default async function PlanosPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6 py-2">
       <div className="space-y-2 text-center">
-        <p className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: "rgba(201,168,76,0.7)" }}>
+        <p className="text-[11px] font-black tracking-[0.2em] uppercase" style={{ color: "rgba(201,168,76,0.7)" }}>
           {isEN ? "Plans" : "Planos"}
         </p>
         <h1 className="text-2xl font-black tracking-tight text-white">

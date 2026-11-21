@@ -159,7 +159,7 @@ function SexCard({ selected, onClick, icon, label }: {
       <span className="text-3xl">{icon}</span>
       <span className="text-xs font-semibold" style={{ color: selected ? "#C9A84C" : "#71717a" }}>{label}</span>
       {selected && (
-        <span className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black text-black"
+        <span className="w-4 h-4 rounded-full flex items-center justify-center text-[11px] font-black text-black"
           style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>✓</span>
       )}
     </button>
@@ -481,7 +481,7 @@ export default function StartPage() {
                         boxShadow: quiz.sessionDuration === d ? "0 0 16px rgba(201,168,76,0.22)" : "none",
                       }}>
                       {d === 90 ? "90+" : d}<br />
-                      <span className="text-[10px] font-medium opacity-70">min</span>
+                      <span className="text-[11px] font-medium opacity-70">min</span>
                     </button>
                   ))}
                 </div>
@@ -565,7 +565,7 @@ export default function StartPage() {
                     the cheaper tier exists is one line on the landing hero. */}
                 <div className="rounded-2xl p-4 space-y-2.5"
                   style={{ background: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.16)" }}>
-                  <p className="text-[10px] font-black tracking-[0.14em] uppercase text-brand-gold text-center">
+                  <p className="text-[11px] font-black tracking-[0.14em] uppercase text-brand-gold text-center">
                     {tx(T.after_title, lang)}
                   </p>
                   <div className="flex items-start gap-2 text-xs">

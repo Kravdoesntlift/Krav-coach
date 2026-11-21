@@ -221,7 +221,7 @@ export default async function PendingPage({
           {isWelcome && (
             <div className="rounded-2xl p-4 text-left"
               style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.25)" }}>
-              <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: "#C9A84C" }}>
+              <p className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: "#C9A84C" }}>
                 {extra.follow_title[lang]}
               </p>
               <p className="mt-2 text-zinc-400 text-xs leading-relaxed">

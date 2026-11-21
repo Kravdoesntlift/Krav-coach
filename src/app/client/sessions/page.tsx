@@ -69,7 +69,7 @@ export default async function ClientSessionsPage() {
                     </p>
                   </div>
                   <span
-                    className={`text-[10px] font-semibold px-2.5 py-1 rounded-full shrink-0 ${
+                    className={`text-[11px] font-semibold px-2.5 py-1 rounded-full shrink-0 ${
                       isOnline
                         ? "text-blue-400 bg-blue-400/10"
                         : "text-brand-gold bg-brand-gold/10"

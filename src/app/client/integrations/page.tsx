@@ -131,7 +131,7 @@ function CopyBox({ url, lang }: { url: string; lang: "pt" | "en" }) {
     <div className="space-y-1.5">
       <p className="text-gray-500 text-[11px] font-medium uppercase tracking-wide">{t.your_link[lang]}</p>
       <div className="flex gap-2">
-        <div className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 font-mono text-[10px] text-gray-300 truncate">
+        <div className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2.5 font-mono text-[11px] text-gray-300 truncate">
           {url}
         </div>
         <button
@@ -345,8 +345,8 @@ function ProviderCard({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <p className="text-white font-semibold">{name}</p>
-          {comingSoon && <span className="text-[10px] bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full font-semibold">{t.coming_soon[lang]}</span>}
-          {connected && !comingSoon && <span className="text-[10px] bg-green-500/15 text-green-400 px-2 py-0.5 rounded-full font-semibold">{t.connected[lang]}</span>}
+          {comingSoon && <span className="text-[11px] bg-zinc-800 text-zinc-500 px-2 py-0.5 rounded-full font-semibold">{t.coming_soon[lang]}</span>}
+          {connected && !comingSoon && <span className="text-[11px] bg-green-500/15 text-green-400 px-2 py-0.5 rounded-full font-semibold">{t.connected[lang]}</span>}
         </div>
         <p className="text-gray-500 text-xs mt-0.5 leading-relaxed">{description}</p>
         {connected && lastSynced && (
@@ -360,19 +360,19 @@ function ProviderCard({
           {connected ? (
             <>
               {onSync && (
-                <button onClick={onSync} disabled={syncing} className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-brand-gold/10 text-brand-gold border border-brand-gold/20 hover:bg-brand-gold/20 transition-colors disabled:opacity-40">
+                <button onClick={onSync} disabled={syncing} className="tap-44 px-3 py-1.5 rounded-xl text-xs font-semibold bg-brand-gold/10 text-brand-gold border border-brand-gold/20 hover:bg-brand-gold/20 transition-colors disabled:opacity-40">
                   {syncing ? "…" : t.sync[lang]}
                 </button>
               )}
               {onDisconnect && (
-                <button onClick={onDisconnect} className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-800 text-gray-500 hover:text-red-400 transition-colors">
+                <button onClick={onDisconnect} className="tap-44 px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-800 text-gray-500 hover:text-red-400 transition-colors">
                   {t.disconnect[lang]}
                 </button>
               )}
             </>
           ) : (
             onConnect && (
-              <button onClick={onConnect} className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-800 text-gray-300 hover:bg-zinc-700 border border-zinc-700 transition-colors whitespace-nowrap">
+              <button onClick={onConnect} className="tap-44 px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-800 text-gray-300 hover:bg-zinc-700 border border-zinc-700 transition-colors whitespace-nowrap">
                 {t.connect[lang]}
               </button>
             )
@@ -499,7 +499,7 @@ export default function IntegrationsPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="text-white font-semibold">{lang === "pt" ? "Sincronização de Passos" : "Step Sync"}</p>
-                  <span className="text-[10px] bg-green-500/15 text-green-400 px-2 py-0.5 rounded-full font-semibold">{t.steps_connected[lang]}</span>
+                  <span className="text-[11px] bg-green-500/15 text-green-400 px-2 py-0.5 rounded-full font-semibold">{t.steps_connected[lang]}</span>
                 </div>
                 <p className="text-gray-500 text-xs mt-0.5">{t.steps_connected_desc[lang]}</p>
                 {lastStepSync && (

@@ -111,7 +111,7 @@ export default function CoachClientList({ clients, coachId, coachName }: Props) 
                     <Avatar name={client.full_name} avatarUrl={client.avatar_url} />
                     {client.unread > 0 && (
                       <span
-                        className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-black text-[9px] font-black flex items-center justify-center"
+                        className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-black text-[11px] font-black flex items-center justify-center"
                         style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C)" }}
                       >
                         {client.unread > 9 ? "9+" : client.unread}
@@ -124,35 +124,35 @@ export default function CoachClientList({ clients, coachId, coachName }: Props) 
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <p className="text-white font-medium text-sm truncate">{client.full_name}</p>
                       {client.trialDaysLeft !== null && client.trialDaysLeft !== undefined && client.trialDaysLeft > 0 && (
-                        <span className="text-[9px] bg-[#C9A84C]/15 text-[#C9A84C] border border-[#C9A84C]/30 px-1.5 py-0.5 rounded-full shrink-0 font-bold">
+                        <span className="text-[11px] bg-[#C9A84C]/15 text-[#C9A84C] border border-[#C9A84C]/30 px-1.5 py-0.5 rounded-full shrink-0 font-bold">
                           Trial · {client.trialDaysLeft}d
                         </span>
                       )}
                       {client.trialDaysLeft !== null && client.trialDaysLeft !== undefined && client.trialDaysLeft <= 0 && (
-                        <span className="text-[9px] bg-red-900/30 text-red-400 border border-red-700/30 px-1.5 py-0.5 rounded-full shrink-0 font-bold">
+                        <span className="text-[11px] bg-red-900/30 text-red-400 border border-red-700/30 px-1.5 py-0.5 rounded-full shrink-0 font-bold">
                           Trial expirado
                         </span>
                       )}
                       {/* What they pay for. "App" means the plan is written by
                           the app: doing it by hand is unpaid work. */}
                       {client.tier === "app" && (
-                        <span className="text-[9px] bg-zinc-800 text-zinc-300 border border-zinc-700 px-1.5 py-0.5 rounded-full shrink-0 font-bold">
+                        <span className="text-[11px] bg-zinc-800 text-zinc-300 border border-zinc-700 px-1.5 py-0.5 rounded-full shrink-0 font-bold">
                           App
                         </span>
                       )}
                       {client.tier === "coaching" && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded-full shrink-0 font-bold"
+                        <span className="text-[11px] px-1.5 py-0.5 rounded-full shrink-0 font-bold"
                           style={{ background: "rgba(201,168,76,0.16)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.3)" }}>
                           1:1
                         </span>
                       )}
                       {client.needsAttention && client.status !== "cancelled" && (
-                        <span className="text-[9px] bg-yellow-900/40 text-yellow-400 border border-yellow-700/40 px-1.5 py-0.5 rounded-full shrink-0">
+                        <span className="text-[11px] bg-yellow-900/40 text-yellow-400 border border-yellow-700/40 px-1.5 py-0.5 rounded-full shrink-0">
                           Sem check-in
                         </span>
                       )}
                       {client.renewsSoon && (
-                        <span className="text-[9px] bg-orange-900/40 text-orange-400 border border-orange-700/40 px-1.5 py-0.5 rounded-full shrink-0">
+                        <span className="text-[11px] bg-orange-900/40 text-orange-400 border border-orange-700/40 px-1.5 py-0.5 rounded-full shrink-0">
                           Renova em breve
                         </span>
                       )}
@@ -167,7 +167,7 @@ export default function CoachClientList({ clients, coachId, coachName }: Props) 
                             style={{ width: `${pct}%` }}
                           />
                         </div>
-                        <span className="text-[10px] text-zinc-600">
+                        <span className="text-[11px] text-zinc-600">
                           {client.completedDays}/{client.totalDays}
                         </span>
                         {client.checkin && (
@@ -179,7 +179,7 @@ export default function CoachClientList({ clients, coachId, coachName }: Props) 
                         )}
                       </div>
                     ) : (
-                      <p className="text-zinc-700 text-[10px] mt-1">Sem plano esta semana</p>
+                      <p className="text-zinc-700 text-[11px] mt-1">Sem plano esta semana</p>
                     )}
                   </div>
 

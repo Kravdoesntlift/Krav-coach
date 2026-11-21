@@ -314,7 +314,7 @@ export default async function ClientDetailPage({
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {(onboarding.fitness_level ?? ob.level) && (
                 <div className="bg-zinc-800/60 rounded-xl p-3">
-                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Nível</p>
+                  <p className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Nível</p>
                   <p className="text-white text-sm font-semibold capitalize">
                     {onboarding.fitness_level ?? ob.level as string}
                   </p>
@@ -322,43 +322,43 @@ export default async function ClientDetailPage({
               )}
               {onboarding.availability && (
                 <div className="bg-zinc-800/60 rounded-xl p-3">
-                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Disponibilidade</p>
+                  <p className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Disponibilidade</p>
                   <p className="text-white text-sm font-semibold">{onboarding.availability} dias/sem</p>
                 </div>
               )}
               {ob.session_duration != null && (
                 <div className="bg-zinc-800/60 rounded-xl p-3">
-                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Duração sessão</p>
+                  <p className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Duração sessão</p>
                   <p className="text-white text-sm font-semibold">{String(ob.session_duration)} min</p>
                 </div>
               )}
               {ob.biological_sex != null && (
                 <div className="bg-zinc-800/60 rounded-xl p-3">
-                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Sexo</p>
+                  <p className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Sexo</p>
                   <p className="text-white text-sm font-semibold">{sexLabel[String(ob.biological_sex)] ?? String(ob.biological_sex)}</p>
                 </div>
               )}
               {ob.age != null && (
                 <div className="bg-zinc-800/60 rounded-xl p-3">
-                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Idade</p>
+                  <p className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Idade</p>
                   <p className="text-white text-sm font-semibold">{String(ob.age)} anos</p>
                 </div>
               )}
               {ob.height_cm != null && (
                 <div className="bg-zinc-800/60 rounded-xl p-3">
-                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Altura</p>
+                  <p className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Altura</p>
                   <p className="text-white text-sm font-semibold">{String(ob.height_cm)} cm</p>
                 </div>
               )}
               {ob.current_weight_kg != null && (
                 <div className="bg-zinc-800/60 rounded-xl p-3">
-                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Peso inicial</p>
+                  <p className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Peso inicial</p>
                   <p className="text-white text-sm font-semibold">{String(ob.current_weight_kg)} kg</p>
                 </div>
               )}
               {onboarding.equipment && (
                 <div className="bg-zinc-800/60 rounded-xl p-3">
-                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Equipamento</p>
+                  <p className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1">Equipamento</p>
                   <p className="text-white text-sm font-semibold">{onboarding.equipment}</p>
                 </div>
               )}
@@ -366,7 +366,7 @@ export default async function ClientDetailPage({
 
             {chosenDays.length > 0 && (
               <div>
-                <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Dias que pode treinar</p>
+                <p className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-2">Dias que pode treinar</p>
                 <div className="grid grid-cols-7 gap-1.5 max-w-sm">
                   {WEEK_ORDER_MON_FIRST.map((day) => {
                     const name = DAY_NAMES[day];
@@ -388,7 +388,7 @@ export default async function ClientDetailPage({
 
             {(onboarding.goals_text ?? ob.goal) && (
               <div>
-                <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-1.5">Objetivo</p>
+                <p className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider mb-1.5">Objetivo</p>
                 <p className="text-zinc-300 text-sm leading-relaxed">
                   {onboarding.goals_text ?? String(ob.goal ?? "").replace("_", " ")}
                 </p>
@@ -396,7 +396,7 @@ export default async function ClientDetailPage({
             )}
             {onboarding.injuries && (
               <div>
-                <p className="text-[10px] font-semibold text-red-400/70 uppercase tracking-wider mb-1.5">⚠ Lesões / Limitações</p>
+                <p className="text-[11px] font-semibold text-red-400/70 uppercase tracking-wider mb-1.5">⚠ Lesões / Limitações</p>
                 <p className="text-zinc-300 text-sm leading-relaxed">{onboarding.injuries}</p>
               </div>
             )}
@@ -466,7 +466,7 @@ export default async function ClientDetailPage({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-white text-sm font-medium truncate">{w.title}</span>
-                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${srcColor}`}>
+                      <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-full ${srcColor}`}>
                         {(w.source ?? "manual").replace("_", " ")}
                       </span>
                     </div>
