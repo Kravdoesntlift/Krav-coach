@@ -4,6 +4,7 @@ import { ebookCopy, ebookPrice, EBOOK } from "@/lib/ebook/content";
 import { buyEbookAction } from "./actions";
 import { SITE_URL, absoluteUrl } from "@/lib/seo";
 import { priceLabel } from "@/lib/billing/tiers";
+import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
 import { cohortState, cohortStartLabel, cohortName, COHORT_WEEKS } from "@/lib/community";
 
@@ -41,6 +42,19 @@ const T = {
     cta: `Comprar por €${ebookPrice("pt")}`,
     cta_note: "Pagamento único. O link chega ao teu email em segundos.",
     credit_note: "E se mais tarde quiseres a app ou o coaching, os €15 são descontados no primeiro mês.",
+    peek_eyebrow: "Vê antes de pagares",
+    peek_title: "Cinco páginas, como elas são",
+    peek_sub: (n: number) => `Não são amostras feitas para a página de vendas. São cinco das ${n} páginas do livro, impressas do próprio livro.`,
+    peek_pages: [
+      "O índice inteiro. Dezasseis partes, não três dicas.",
+      "A técnica dos seis movimentos, ponto por ponto.",
+      "Uma semana escrita exercício a exercício, com séries e repetições.",
+      "A folha de registo, feita para imprimir e levar.",
+      "A versão de casa, substituição a substituição.",
+    ],
+    peek_rest: (n: number) => `Mais ${n} páginas lá dentro.`,
+    peek_hint: "Arrasta para o lado →",
+    reassure: (price: string) => `Pagamento seguro por Stripe · entrega imediata por email · €${price} uma vez, sem subscrição`,
     cohort_eyebrow: "Arranque com data",
     cohort_title: (label: string) => `A próxima turma começa a ${label}`,
     cohort_before: (days: number, label: string) =>
@@ -52,7 +66,7 @@ const T = {
     cohort_days_label: "até ao arranque",
     cohort_cta: "Ver a turma e o canal",
     cohort_bonus: "Incluído na compra: deixas o teu Instagram no checkout e entras nos meus amigos chegados durante as treze semanas. É lá que ponho o acompanhamento da turma, as correções e o que não vai para o feed.",
-    pills: ["13 semanas", "Ginásio ou casa", "PT e EN"],
+    pills: [`${EBOOK.pages} páginas`, "13 semanas", "Ginásio ou casa", "PT e EN"],
     problem_title: "O problema não é falta de informação",
     problem: [
       "Há vinte mil vídeos sobre como treinar peito. Não há um único que te diga o que fazer na semana 7 depois do que fizeste na semana 6.",
@@ -93,6 +107,19 @@ const T = {
     cta: `Buy for €${ebookPrice("en")}`,
     cta_note: "One payment. The link reaches your inbox in seconds.",
     credit_note: "And if you later want the app or the coaching, the €15 comes off your first month.",
+    peek_eyebrow: "See it before you pay",
+    peek_title: "Five pages, exactly as they are",
+    peek_sub: (n: number) => `Not samples made for a sales page. Five of the book's ${n} pages, printed from the book itself.`,
+    peek_pages: [
+      "The whole contents. Sixteen parts, not three tips.",
+      "The technique of the six movements, point by point.",
+      "One week written out exercise by exercise, with sets and reps.",
+      "The log sheet, made to be printed and carried.",
+      "The home version, swap by swap.",
+    ],
+    peek_rest: (n: number) => `${n} more pages inside.`,
+    peek_hint: "Swipe to see more →",
+    reassure: (price: string) => `Secure payment via Stripe · delivered by email at once · €${price} once, no subscription`,
     cohort_eyebrow: "A dated start",
     cohort_title: (label: string) => `The next group starts on ${label}`,
     cohort_before: (days: number, label: string) =>
@@ -104,7 +131,7 @@ const T = {
     cohort_days_label: "until we start",
     cohort_cta: "See the group and the channel",
     cohort_bonus: "Included with the book: leave your Instagram at checkout and you join my close friends list for the thirteen weeks. That is where the group gets followed week by week, with corrections and everything that does not go on the feed.",
-    pills: ["13 weeks", "Gym or home", "PT and EN"],
+    pills: [`${EBOOK.pages} pages`, "13 weeks", "Gym or home", "PT and EN"],
     problem_title: "The problem is not a lack of information",
     problem: [
       "There are twenty thousand videos on how to train chest. There is not one that tells you what to do in week 7 given what you did in week 6.",
@@ -231,9 +258,55 @@ export default async function EbookSalesPage({
                   {t.cta}
                 </button>
               </form>
-              <p className="mt-3 text-xs text-zinc-600">{t.cta_note}</p>
+              <p className="mt-3 text-xs text-zinc-600 max-w-xs mx-auto leading-relaxed">{t.reassure(price)}</p>
               <p className="mt-1.5 text-xs" style={{ color: "rgba(201,168,76,0.75)" }}>{t.credit_note}</p>
             </ScrollReveal>
+          </section>
+
+          {/* ── FIVE PAGES ──────────────────────────────────────── */}
+          {/* Nobody buys a document they have not seen. These are printed
+              from the book itself, so what is shown is what arrives. */}
+          <section className="pb-16">
+            <div className="max-w-2xl mx-auto px-5">
+              <ScrollReveal direction="up">
+                <p className="text-[11px] font-black tracking-[0.2em] uppercase" style={{ color: GOLD }}>
+                  {t.peek_eyebrow}
+                </p>
+                <h2 className="mt-3 text-2xl font-black tracking-tight">{t.peek_title}</h2>
+                <p className="mt-3 text-sm leading-relaxed text-zinc-400">{t.peek_sub(EBOOK.pages)}</p>
+              </ScrollReveal>
+            </div>
+
+            <div className="mt-6 overflow-x-auto scrollbar-none rubber"
+              style={{ scrollSnapType: "x mandatory" }}>
+              <div className="flex gap-4 px-5 pb-2" style={{ width: "max-content" }}>
+                {t.peek_pages.map((caption, i) => (
+                  <figure key={caption} className="w-[66vw] max-w-[280px] shrink-0"
+                    style={{ scrollSnapAlign: "center" }}>
+                    <div className="rounded-2xl overflow-hidden lift-2"
+                      style={{ border: "1px solid rgba(255,255,255,0.1)", background: "#0a0a0c" }}>
+                      <Image
+                        src={`/ebook/previa/pagina-${i + 1}.webp`}
+                        alt={caption}
+                        width={900}
+                        height={1273}
+                        className="w-full h-auto"
+                        sizes="(max-width: 640px) 66vw, 280px"
+                      />
+                    </div>
+                    <figcaption className="mt-2.5 text-xs leading-relaxed text-zinc-500">
+                      <span className="font-bold text-zinc-400">{String(i + 1).padStart(2, "0")}</span>{" "}
+                      {caption}
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </div>
+
+            <div className="max-w-2xl mx-auto px-5 mt-4 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-bold text-white">{t.peek_rest(EBOOK.pages - 5)}</p>
+              <p className="text-xs text-zinc-600">{t.peek_hint}</p>
+            </div>
           </section>
 
           {/* ── THE GROUP ───────────────────────────────────────── */}
@@ -412,7 +485,7 @@ export default async function EbookSalesPage({
                     {t.cta}
                   </button>
                 </form>
-                <p className="text-xs text-zinc-600">{t.final_note}</p>
+                <p className="text-xs text-zinc-600 max-w-xs mx-auto leading-relaxed">{t.reassure(price)}</p>
                 <p className="text-xs" style={{ color: "rgba(201,168,76,0.75)" }}>{t.credit_note}</p>
 
                 <div className="flex items-start gap-2.5 py-3 px-4 rounded-2xl text-left"
