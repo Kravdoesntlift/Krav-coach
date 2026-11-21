@@ -406,7 +406,7 @@ details[open] .secondary-turn {
     70%  { box-shadow: 0 0 0 16px rgba(201,168,76,0); }
     100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); }
   }
-  .pulse-gold { animation: gold-pulse 0.65s ease-out; }
+  .pulse-gold { animation: gold-pulse var(--dur-deliberate) var(--ease-exit); }
 
   /* Pop/bounce */
   @keyframes pop {
@@ -414,7 +414,7 @@ details[open] .secondary-turn {
     60%  { transform: scale(1.12); }
     100% { transform: scale(1); opacity: 1; }
   }
-  .pop { animation: pop 0.38s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .pop { animation: pop var(--dur-considered) var(--ease-overshoot) both; }
 
   /* Skeleton shimmer */
   @keyframes shimmer {
@@ -455,28 +455,28 @@ details[open] .secondary-turn {
     0%   { opacity: 0; transform: scale(0.88) translateY(8px); }
     100% { opacity: 1; transform: scale(1) translateY(0); }
   }
-  .scale-in { animation: scale-in 0.38s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .scale-in { animation: scale-in var(--dur-considered) var(--ease-overshoot) both; }
 
   /* Slide up from bottom: drawer */
   @keyframes slide-up-from-bottom {
     0%   { opacity: 0; transform: translateY(24px); }
     100% { opacity: 1; transform: translateY(0); }
   }
-  .slide-up-enter { animation: slide-up-from-bottom 0.32s cubic-bezier(0.34,1.4,0.64,1) both; }
+  .slide-up-enter { animation: slide-up-from-bottom var(--dur-base) var(--ease-overshoot) both; }
 
   /* Stat count enter */
   @keyframes stat-enter {
     0%   { opacity: 0; transform: translateY(14px) scale(0.88); }
     100% { opacity: 1; transform: translateY(0) scale(1); }
   }
-  .stat-enter { animation: stat-enter 0.48s cubic-bezier(0.34,1.4,0.64,1) both; }
+  .stat-enter { animation: stat-enter var(--dur-considered) var(--ease-overshoot) both; }
 
   /* Number tick: subtle number change */
   @keyframes num-tick {
     0%   { opacity: 0; transform: translateY(8px); }
     100% { opacity: 1; transform: translateY(0); }
   }
-  .num-tick { animation: num-tick 0.22s ease-out both; }
+  .num-tick { animation: num-tick var(--dur-base) var(--ease-exit) both; }
 
   /* Glow pulse: ambient breathe */
   @keyframes glow-breathe {
@@ -501,11 +501,14 @@ details[open] .secondary-turn {
 
   /* ── View Transitions ─────────────────────────────────────── */
   @media (prefers-reduced-motion: no-preference) {
+    /* The most-seen motion in the app: every navigation. The page leaving
+       does not settle, because it is gone; the page arriving decelerates,
+       because it has to land. */
     ::view-transition-old(root) {
-      animation: 150ms ease-out both vt-out;
+      animation: var(--dur-snap) var(--ease-exit) both vt-out;
     }
     ::view-transition-new(root) {
-      animation: 220ms ease-out both vt-in;
+      animation: var(--dur-base) var(--ease-entrance) both vt-in;
     }
     @keyframes vt-out {
       to { opacity: 0; transform: translateY(-3px) scale(0.995); }
@@ -647,7 +650,7 @@ details[open] .secondary-turn {
   .stat-enter,
   .num-tick {
     animation-name: fade-in-fast !important;
-    animation-duration: 0.15s !important;
+    animation-duration: var(--dur-snap) !important;
   }
 
   /* Colour and opacity transitions stay; nothing should slide or spring. */
@@ -655,7 +658,7 @@ details[open] .secondary-turn {
   *::before,
   *::after {
     transition-property: opacity, color, background-color, border-color, box-shadow !important;
-    transition-duration: 0.12s !important;
+    transition-duration: var(--dur-instant) !important;
     animation-iteration-count: 1 !important;
   }
 
