@@ -1,13 +1,30 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { DURATION, EASE } from "@/lib/motion";
+
+/**
+ * A section that arrives when it is scrolled to.
+ *
+ * It used to set its own 600ms and its own curve inline, which put every
+ * marketing page outside the motion system, and inline styles do not read a
+ * media query, so Reduce Motion was ignored on the landing page, the book
+ * page and the community page: somebody who had asked the operating system to
+ * stop things moving watched everything slide anyway.
+ *
+ * The transform is now dropped entirely for those people, keeping the fade so
+ * the section still announces itself, and willChange is released once the
+ * reveal is over rather than leaving every section promoted to its own layer
+ * for the life of the page.
+ */
 
 interface Props {
   children: React.ReactNode;
   className?: string;
   delay?: number;
   direction?: "up" | "left" | "right" | "none";
-  distance?: number; // px to travel, default 28
+  /** px to travel. */
+  distance?: number;
 }
 
 export default function ScrollReveal({
@@ -18,42 +35,58 @@ export default function ScrollReveal({
   distance = 28,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
-  // Start visible on SSR; JS will hide then animate in once mounted
+  // Visible during server render; hidden only once JS is here to bring it back.
   const [ready, setReady] = useState(false);
-
-  const getTransform = () => {
-    if (direction === "up")    return `translateY(${distance}px)`;
-    if (direction === "left")  return `translateX(-${distance}px)`;
-    if (direction === "right") return `translateX(${distance}px)`;
-    return "none";
-  };
 
   useEffect(() => {
     setReady(true);
     const el = ref.current;
     if (!el) return;
 
-    // Apply hidden state now that JS is running
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Arcs: the horizontal arrives before the vertical, so a section rising
+    // into place curves rather than slides. Skipped when motion is reduced.
+    const from =
+      calm || direction === "none"
+        ? "none"
+        : direction === "up"
+        ? `translate3d(-6px, ${distance}px, 0)`
+        : direction === "left"
+        ? `translate3d(-${distance}px, 4px, 0)`
+        : `translate3d(${distance}px, 4px, 0)`;
+
     el.style.opacity = "0";
-    el.style.transform = getTransform();
+    el.style.transform = from;
+
+    const duration = calm ? DURATION.base : DURATION.deliberate;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          el.style.transition = `opacity 0.6s cubic-bezier(0.22,1,0.36,1), transform 0.6s cubic-bezier(0.22,1,0.36,1)`;
-          el.style.transitionDelay = `${delay}ms`;
-          el.style.opacity = "1";
-          el.style.transform = "none";
-          // Animate in only once: stop observing after reveal
-          observer.disconnect();
-        }
+        if (!entry.isIntersecting) return;
+        el.style.transition =
+          `opacity ${duration}ms ${EASE.entrance}, transform ${duration}ms ${EASE.entrance}`;
+        el.style.transitionDelay = `${delay}ms`;
+        el.style.opacity = "1";
+        el.style.transform = "none";
+
+        // Let the compositor go once the section has landed. Leaving
+        // will-change on is a layer per section for the rest of the visit.
+        const release = () => {
+          el.style.willChange = "auto";
+          el.removeEventListener("transitionend", release);
+        };
+        el.addEventListener("transitionend", release);
+        window.setTimeout(release, duration + delay + 120);
+
+        observer.disconnect();
       },
-      { threshold: 0.08 }
+      { threshold: 0.08 },
     );
 
     observer.observe(el);
     return () => observer.disconnect();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

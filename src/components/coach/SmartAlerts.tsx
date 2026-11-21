@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { acknowledgeAlert, undoAcknowledgeAlert } from "@/app/coach/alerts/actions";
+import { staggered } from "@/lib/motion";
 
 interface Alert {
   type: "no_checkin" | "renewal" | "overdue_renewal" | "no_completion" | "perfect_week" | "pr_week" | "at_risk" | "trial_ending" | "trial_lost";
@@ -151,12 +152,13 @@ export default function SmartAlerts({ alerts, handled = [] }: Props) {
         </p>
       ) : (
         <div className="space-y-2">
-          {visible.map((alert) => {
+          {visible.map((alert, i) => {
             const cfg = ALERT_CONFIG[alert.type];
             return (
               <div
                 key={keyOf(alert)}
-                className={`duration-base ease-standard flex items-start gap-3 p-3 rounded-xl border ${cfg.border} ${cfg.bg} transition-opacity`}
+                style={staggered(i)}
+                className={`duration-base ease-standard flex items-start gap-3 p-3 rounded-xl border enter-rise ${cfg.border} ${cfg.bg} transition-opacity`}
               >
                 <span className="text-base shrink-0 mt-0.5">{cfg.icon}</span>
                 <Link href={`/coach/clients/${alert.clientId}`} className="flex-1 min-w-0 hover:opacity-80 transition-opacity duration-base ease-standard">

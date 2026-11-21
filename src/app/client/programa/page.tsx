@@ -10,6 +10,7 @@ import {
   program90WeekFromName,
 } from "@/lib/training/program90";
 import Program90Card from "@/components/client/Program90Card";
+import { staggered } from "@/lib/motion";
 
 /**
  * The thirteen weeks on one page: what is done, where they are, what is next.
@@ -125,17 +126,22 @@ export default async function ProgramaPage() {
       )}
 
       <ol className="space-y-2">
-        {weeks.map((w) => {
+        {weeks.map((w, i) => {
           const isCurrent = w.status === "current";
           return (
             <li
               key={w.n}
-              className="rounded-2xl px-4 py-3 flex items-center gap-3"
-              style={
-                isCurrent
-                  ? { background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.3)" }
-                  : { background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)" }
-              }
+              className="rounded-2xl px-4 py-3 flex items-center gap-3 enter-rise"
+              style={{
+                ...staggered(i),
+                ...(isCurrent
+                  // The week the programme is on is the one thing on this
+                  // screen allowed to glow. Thirteen rows competing would
+                  // leave the eye with nowhere to land.
+                  ? { background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.3)",
+                      boxShadow: "var(--lift-2), 0 0 0 1px rgba(201,168,76,0.35), 0 0 44px -14px rgba(201,168,76,0.5)" }
+                  : { background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)" }),
+              }}
             >
               <span
                 className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-xs font-black"
