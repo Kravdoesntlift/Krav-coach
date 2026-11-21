@@ -19,7 +19,7 @@ export default function MonthlyReport({ month, year, totalWorkouts, totalPRs, we
     <div className="relative border border-brand-gold/40 bg-gradient-to-br from-brand-gold/10 to-transparent rounded-2xl p-5 space-y-4">
       <button
         onClick={() => setDismissed(true)}
-        className="absolute top-3 right-3 text-gray-600 hover:text-white text-sm transition-colors"
+        className="absolute top-3 right-3 text-gray-600 hover:text-white text-sm transition-colors duration-instant ease-standard"
       >
         ✕
       </button>

@@ -30,7 +30,7 @@ export function PaywallSubscribeButton({
     <button
       type="submit"
       disabled={pending}
-      className="w-full font-bold py-3.5 rounded-xl transition-all text-center text-sm disabled:opacity-70 disabled:cursor-not-allowed"
+      className="w-full font-bold py-3.5 rounded-xl transition-all text-center text-sm disabled:opacity-70 disabled:cursor-not-allowed duration-base ease-standard"
       style={style}
     >
       {pending ? (

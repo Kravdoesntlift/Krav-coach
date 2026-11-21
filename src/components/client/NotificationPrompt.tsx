@@ -150,7 +150,7 @@ export default function NotificationPrompt() {
                 <button
                   onClick={enable}
                   disabled={loading}
-                  className="w-full py-3.5 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110 disabled:opacity-60"
+                  className="w-full py-3.5 rounded-2xl font-bold text-black text-base transition-all hover:brightness-110 disabled:opacity-60 squash duration-base ease-standard"
                   style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
                 >
                   {loading
@@ -159,7 +159,7 @@ export default function NotificationPrompt() {
                 </button>
                 <button
                   onClick={dismiss}
-                  className="w-full py-3 rounded-2xl text-zinc-500 text-sm hover:text-zinc-300 transition-colors"
+                  className="w-full py-3 rounded-2xl text-zinc-500 text-sm hover:text-zinc-300 transition-colors duration-instant ease-standard"
                 >
                   {isEN ? "Maybe later" : "Talvez mais tarde"}
                 </button>

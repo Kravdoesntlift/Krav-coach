@@ -257,7 +257,7 @@ export default async function AnalyticsPage() {
                     <span className="font-bold text-white">{value} <span className="text-zinc-600 font-normal">({pct}%)</span></span>
                   </div>
                   <div className="h-2 rounded-full" style={{ background: "rgba(255,255,255,0.05)" }}>
-                    <div className="h-2 rounded-full transition-all" style={{ width: `${pct}%`, background: color, opacity: 0.8 }} />
+                    <div className="h-2 rounded-full transition-all duration-base ease-standard" style={{ width: `${pct}%`, background: color, opacity: 0.8 }} />
                   </div>
                 </div>
               ))}

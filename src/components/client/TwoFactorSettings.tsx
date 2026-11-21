@@ -171,7 +171,7 @@ export default function TwoFactorSettings() {
         <button
           onClick={handleEnable}
           disabled={busy}
-          className="w-full py-2.5 rounded-xl bg-[#C9A84C] hover:bg-[#A8893A] text-black text-sm font-semibold transition-colors disabled:opacity-50"
+          className="w-full py-2.5 rounded-xl bg-[#C9A84C] hover:bg-[#A8893A] text-black text-sm font-semibold transition-colors disabled:opacity-50 duration-instant ease-standard"
         >
           {busy ? c("loading") : c("enable")}
         </button>
@@ -218,12 +218,12 @@ export default function TwoFactorSettings() {
                 setError(null);
               }}
               placeholder="000000"
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2.5 text-white text-center text-xl font-mono tracking-widest focus:outline-none focus:border-[#C9A84C] transition-colors"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2.5 text-white text-center text-xl font-mono tracking-widest focus:outline-none focus:border-[#C9A84C] transition-colors duration-instant ease-standard"
             />
             <button
               onClick={handleVerify}
               disabled={otpCode.length !== 6 || busy}
-              className="w-full py-2.5 rounded-xl bg-[#C9A84C] hover:bg-[#A8893A] text-black text-sm font-semibold transition-colors disabled:opacity-50"
+              className="w-full py-2.5 rounded-xl bg-[#C9A84C] hover:bg-[#A8893A] text-black text-sm font-semibold transition-colors disabled:opacity-50 duration-instant ease-standard"
             >
               {busy ? c("loading") : c("verify")}
             </button>
@@ -237,7 +237,7 @@ export default function TwoFactorSettings() {
           {stage === "active" && (
             <button
               onClick={() => { setError(null); setStage("confirming-disable"); }}
-              className="w-full py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 hover:text-red-400 hover:border-red-500/30 text-sm font-semibold transition-all"
+              className="w-full py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 hover:text-red-400 hover:border-red-500/30 text-sm font-semibold transition-all duration-base ease-standard"
             >
               {c("disable")}
             </button>
@@ -248,14 +248,14 @@ export default function TwoFactorSettings() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setStage("active")}
-                  className="flex-1 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 text-sm font-semibold transition-all"
+                  className="flex-1 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 text-sm font-semibold transition-all duration-base ease-standard"
                 >
                   {c("cancel")}
                 </button>
                 <button
                   onClick={handleDisable}
                   disabled={busy}
-                  className="flex-1 py-2.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-400 text-sm font-semibold transition-all disabled:opacity-50"
+                  className="flex-1 py-2.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 text-red-400 text-sm font-semibold transition-all disabled:opacity-50 duration-base ease-standard"
                 >
                   {busy ? c("loading") : c("confirm_disable")}
                 </button>

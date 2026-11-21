@@ -172,7 +172,7 @@ export default function OfflinePage() {
       {/* Retry */}
       <button
         onClick={() => window.location.reload()}
-        className="mt-6 w-full py-4 rounded-2xl font-black text-black text-sm transition-all active:scale-95"
+        className="mt-6 w-full py-4 rounded-2xl font-black text-black text-sm transition-all squash duration-base ease-standard"
         style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
       >
         Tentar novamente

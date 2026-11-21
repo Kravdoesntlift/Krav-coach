@@ -150,7 +150,7 @@ export default function TestimonialForm({ testimonial, lang }: Props) {
         <button
           type="submit"
           disabled={isPending || content.trim().length < 30}
-          className="w-full py-3 rounded-xl font-bold text-sm text-black disabled:opacity-50 transition-opacity hover:opacity-90"
+          className="w-full py-3 rounded-xl font-bold text-sm text-black disabled:opacity-50 transition-opacity hover:opacity-90 duration-base ease-standard"
           style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
         >
           {isPending ? copy.submitting[lang] : copy.submit[lang]}

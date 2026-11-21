@@ -106,7 +106,7 @@ export default function LoginPage() {
                 <label htmlFor="password" className="label mb-0">Password</label>
                 <Link
                   href="/auth/forgot-password"
-                  className="text-zinc-600 hover:text-brand-gold text-xs transition-colors"
+                  className="text-zinc-600 hover:text-brand-gold text-xs transition-colors duration-instant ease-standard"
                 >
                   Esqueceste a password?
                 </Link>
@@ -148,7 +148,7 @@ export default function LoginPage() {
 
         <p className="text-center text-zinc-600 text-sm mt-5">
           Ainda não tens conta?{" "}
-          <Link href="/start" className="text-brand-gold hover:text-brand-gold-light transition-colors font-medium">
+          <Link href="/start" className="text-brand-gold hover:text-brand-gold-light transition-colors font-medium duration-instant ease-standard">
             Registar
           </Link>
         </p>

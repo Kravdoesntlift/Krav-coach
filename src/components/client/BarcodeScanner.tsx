@@ -222,7 +222,7 @@ export default function BarcodeScanner({ onFound, onClose }: Props) {
         style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%)" }}>
         <button
           onClick={() => { stopScanner(); onClose(); }}
-          className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium transition-colors"
+          className="flex items-center gap-1.5 text-white/80 hover:text-white text-sm font-medium transition-colors duration-instant ease-standard"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 18l-6-6 6-6" />
@@ -356,19 +356,19 @@ export default function BarcodeScanner({ onFound, onClose }: Props) {
                     placeholder="Ex: 5601234567890"
                     value={manualCode}
                     onChange={(e) => setManualCode(e.target.value.replace(/\D/g, "").slice(0, 14))}
-                    className="w-full px-4 py-3.5 rounded-2xl bg-zinc-900 border border-zinc-700 text-white text-center text-lg tracking-widest font-mono placeholder:text-zinc-700 focus:outline-none focus:border-brand-gold/50 transition-colors"
+                    className="w-full px-4 py-3.5 rounded-2xl bg-zinc-900 border border-zinc-700 text-white text-center text-lg tracking-widest font-mono placeholder:text-zinc-700 focus:outline-none focus:border-brand-gold/50 transition-colors duration-instant ease-standard"
                   />
                 </div>
                 <button
                   onClick={submitManual}
                   disabled={manualCode.trim().length < 8}
-                  className="w-full py-3.5 rounded-2xl font-bold text-black text-sm disabled:opacity-40 transition-all"
+                  className="w-full py-3.5 rounded-2xl font-bold text-black text-sm disabled:opacity-40 transition-all duration-base ease-standard"
                   style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
                 >
                   {extra.search_product[lang]}
                 </button>
                 {state !== "error" && (
-                  <button onClick={retry} className="w-full py-2.5 text-zinc-500 text-sm font-medium hover:text-zinc-300 transition-colors">
+                  <button onClick={retry} className="w-full py-2.5 text-zinc-500 text-sm font-medium hover:text-zinc-300 transition-colors duration-instant ease-standard">
                     {extra.back_to_scan[lang]}
                   </button>
                 )}
@@ -384,7 +384,7 @@ export default function BarcodeScanner({ onFound, onClose }: Props) {
                     {extra.try_again[lang]}
                   </button>
                 )}
-                <label className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl border border-zinc-700 text-zinc-200 text-sm font-semibold cursor-pointer hover:bg-zinc-800/60 transition-colors">
+                <label className="flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl border border-zinc-700 text-zinc-200 text-sm font-semibold cursor-pointer hover:bg-zinc-800/60 transition-colors duration-instant ease-standard">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
                     <polyline points="21 15 16 10 5 21"/>
@@ -392,7 +392,7 @@ export default function BarcodeScanner({ onFound, onClose }: Props) {
                   {extra.photo_barcode[lang]}
                   <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFile} />
                 </label>
-                <button onClick={() => setShowManual(true)} className="w-full py-2.5 text-zinc-600 text-xs font-medium hover:text-zinc-400 transition-colors">
+                <button onClick={() => setShowManual(true)} className="w-full py-2.5 text-zinc-600 text-xs font-medium hover:text-zinc-400 transition-colors duration-instant ease-standard">
                   {extra.enter_manually[lang]}
                 </button>
               </div>
@@ -406,7 +406,7 @@ export default function BarcodeScanner({ onFound, onClose }: Props) {
         <div className="shrink-0 px-5 pb-12 pt-4 space-y-3"
           style={{ background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 100%)" }}>
 
-          <label className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-2xl cursor-pointer transition-all active:scale-[0.98]"
+          <label className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-2xl cursor-pointer transition-all active:scale-[0.98] duration-base ease-standard"
             style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
@@ -417,7 +417,7 @@ export default function BarcodeScanner({ onFound, onClose }: Props) {
           </label>
 
           <button onClick={() => setShowManual(true)}
-            className="w-full text-center text-zinc-600 text-xs py-1 hover:text-zinc-400 transition-colors">
+            className="w-full text-center text-zinc-600 text-xs py-1 hover:text-zinc-400 transition-colors duration-instant ease-standard">
             {extra.enter_manually[lang]}
           </button>
         </div>
@@ -438,18 +438,18 @@ export default function BarcodeScanner({ onFound, onClose }: Props) {
               placeholder="Ex: 5601234567890"
               value={manualCode}
               onChange={(e) => setManualCode(e.target.value.replace(/\D/g, "").slice(0, 14))}
-              className="w-full px-4 py-3.5 rounded-2xl bg-zinc-900 border border-zinc-700 text-white text-center text-lg tracking-widest font-mono placeholder:text-zinc-700 focus:outline-none focus:border-brand-gold/50 transition-colors"
+              className="w-full px-4 py-3.5 rounded-2xl bg-zinc-900 border border-zinc-700 text-white text-center text-lg tracking-widest font-mono placeholder:text-zinc-700 focus:outline-none focus:border-brand-gold/50 transition-colors duration-instant ease-standard"
             />
           </div>
           <button
             onClick={submitManual}
             disabled={manualCode.trim().length < 8}
-            className="w-full py-3.5 rounded-2xl font-bold text-black text-sm disabled:opacity-40 transition-all"
+            className="w-full py-3.5 rounded-2xl font-bold text-black text-sm disabled:opacity-40 transition-all duration-base ease-standard"
             style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
           >
             {extra.search_product[lang]}
           </button>
-          <button onClick={() => setShowManual(false)} className="w-full py-2 text-zinc-600 text-sm text-center hover:text-zinc-400 transition-colors">
+          <button onClick={() => setShowManual(false)} className="w-full py-2 text-zinc-600 text-sm text-center hover:text-zinc-400 transition-colors duration-instant ease-standard">
             {extra.cancel[lang]}
           </button>
         </div>

@@ -95,7 +95,7 @@ export default async function BillingPage() {
         {/* Header */}
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm text-zinc-500">
-            <Link href="/coach/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+            <Link href="/coach/dashboard" className="hover:text-white transition-colors duration-instant ease-standard">Dashboard</Link>
             <span>/</span>
             <span className="text-zinc-300">Pagamentos</span>
           </div>

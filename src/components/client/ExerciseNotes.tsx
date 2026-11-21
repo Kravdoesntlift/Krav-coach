@@ -79,7 +79,7 @@ export default function ExerciseNotes({
           <button
             type="button"
             onClick={() => setShowAlts((v) => !v)}
-            className="text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors font-medium"
+            className="text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors font-medium duration-instant ease-standard"
           >
             {showAlts ? "▾" : "▸"} Alternativas ({alts.length})
           </button>

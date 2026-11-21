@@ -236,7 +236,7 @@ export default function SignupPage() {
 
               <p className="text-zinc-600 text-[11px] text-center leading-relaxed">
                 Ao criares conta, aceitas a nossa{" "}
-                <Link href="/privacy" className="text-zinc-400 underline hover:text-white transition-colors">
+                <Link href="/privacy" className="text-zinc-400 underline hover:text-white transition-colors duration-instant ease-standard">
                   Política de Privacidade
                 </Link>
               </p>
@@ -246,7 +246,7 @@ export default function SignupPage() {
 
         <p className="text-center text-zinc-600 text-sm mt-5">
           Já tens conta?{" "}
-          <Link href="/auth/login" className="text-brand-gold hover:text-brand-gold-light transition-colors font-medium">
+          <Link href="/auth/login" className="text-brand-gold hover:text-brand-gold-light transition-colors font-medium duration-instant ease-standard">
             Entrar
           </Link>
         </p>

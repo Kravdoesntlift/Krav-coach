@@ -30,7 +30,7 @@ export default function BroadcastForm() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 hover:text-white text-sm transition-colors"
+        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 hover:text-white text-sm transition-colors duration-instant ease-standard"
       >
         <span>📢</span>
         Mensagem em massa
@@ -42,7 +42,7 @@ export default function BroadcastForm() {
     <div className="card p-5 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-white font-semibold">Mensagem em massa</h3>
-        <button onClick={() => setOpen(false)} className="text-gray-600 hover:text-white text-sm transition-colors" aria-label="Fechar">✕</button>
+        <button onClick={() => setOpen(false)} className="text-gray-600 hover:text-white text-sm transition-colors duration-instant ease-standard" aria-label="Fechar">✕</button>
       </div>
 
       {/* Target selector */}
@@ -54,7 +54,7 @@ export default function BroadcastForm() {
           <button
             key={opt.value}
             onClick={() => setTarget(opt.value)}
-            className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${
+            className={`duration-instant ease-standard flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${
               target === opt.value
                 ? "bg-brand-gold text-black"
                 : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
@@ -71,7 +71,7 @@ export default function BroadcastForm() {
         placeholder="Escreve a tua mensagem..."
         rows={4}
         maxLength={500}
-        className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-gold transition-colors resize-none"
+        className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-gold transition-colors resize-none duration-instant ease-standard"
       />
       <div className="flex items-center justify-between">
         <span className="text-gray-600 text-xs">{message.length}/500</span>
@@ -84,7 +84,7 @@ export default function BroadcastForm() {
       <button
         onClick={handleSend}
         disabled={!message.trim() || sending}
-        className="w-full py-2.5 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-semibold transition-colors disabled:opacity-40"
+        className="w-full py-2.5 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-semibold transition-colors disabled:opacity-40 duration-instant ease-standard"
       >
         {sending ? "A enviar..." : "Enviar mensagem"}
       </button>

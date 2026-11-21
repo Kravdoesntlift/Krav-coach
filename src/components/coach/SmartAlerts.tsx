@@ -156,10 +156,10 @@ export default function SmartAlerts({ alerts, handled = [] }: Props) {
             return (
               <div
                 key={keyOf(alert)}
-                className={`flex items-start gap-3 p-3 rounded-xl border ${cfg.border} ${cfg.bg} transition-opacity`}
+                className={`duration-base ease-standard flex items-start gap-3 p-3 rounded-xl border ${cfg.border} ${cfg.bg} transition-opacity`}
               >
                 <span className="text-base shrink-0 mt-0.5">{cfg.icon}</span>
-                <Link href={`/coach/clients/${alert.clientId}`} className="flex-1 min-w-0 hover:opacity-80 transition-opacity">
+                <Link href={`/coach/clients/${alert.clientId}`} className="flex-1 min-w-0 hover:opacity-80 transition-opacity duration-base ease-standard">
                   <p className={`text-sm font-semibold ${cfg.color}`}>{alert.clientName}</p>
                   <p className="text-gray-400 text-xs mt-0.5">{alert.detail}</p>
                 </Link>
@@ -167,7 +167,7 @@ export default function SmartAlerts({ alerts, handled = [] }: Props) {
                   onClick={() => markHandled(alert)}
                   disabled={isPending}
                   title={RETURNS[alert.type]}
-                  className="shrink-0 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition-colors disabled:opacity-50"
+                  className="shrink-0 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition-colors disabled:opacity-50 duration-instant ease-standard"
                   style={{
                     background: "rgba(255,255,255,0.05)",
                     border: "1px solid rgba(255,255,255,0.12)",
@@ -186,7 +186,7 @@ export default function SmartAlerts({ alerts, handled = [] }: Props) {
       {sorted.length > MAX_COLLAPSED && (
         <button
           onClick={() => setExpanded((v) => !v)}
-          className="mt-2 w-full py-2 rounded-xl text-xs font-semibold text-zinc-500 hover:text-zinc-300 transition-colors border border-zinc-800 hover:border-zinc-700"
+          className="mt-2 w-full py-2 rounded-xl text-xs font-semibold text-zinc-500 hover:text-zinc-300 transition-colors border border-zinc-800 hover:border-zinc-700 duration-instant ease-standard"
         >
           {expanded ? "Ver menos ▲" : `Ver mais ${hidden} alerta${hidden !== 1 ? "s" : ""} ▼`}
         </button>
@@ -197,7 +197,7 @@ export default function SmartAlerts({ alerts, handled = [] }: Props) {
         <div className="mt-3">
           <button
             onClick={() => setShowHandled((v) => !v)}
-            className="w-full py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:text-zinc-400 transition-colors"
+            className="w-full py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:text-zinc-400 transition-colors duration-instant ease-standard"
           >
             {showHandled ? "Esconder tratados ▲" : `Tratados (${done.length}) ▼`}
           </button>
@@ -218,7 +218,7 @@ export default function SmartAlerts({ alerts, handled = [] }: Props) {
                   <button
                     onClick={() => restore(alert)}
                     disabled={isPending}
-                    className="shrink-0 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-zinc-500 hover:text-zinc-300 transition-colors disabled:opacity-50"
+                    className="shrink-0 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-zinc-500 hover:text-zinc-300 transition-colors disabled:opacity-50 duration-instant ease-standard"
                     style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}
                   >
                     Repor

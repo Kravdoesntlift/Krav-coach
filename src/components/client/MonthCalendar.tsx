@@ -110,7 +110,7 @@ export default function MonthCalendar({ year, month, dayStatuses, todayStr, lang
           </div>
           <div className="h-0.5 bg-zinc-800 rounded-full overflow-hidden">
             <div
-              className="h-full rounded-full transition-all duration-700"
+              className="h-full rounded-full transition-all duration-deliberate ease-standard"
               style={{
                 width: `${pct}%`,
                 background: pct === 100

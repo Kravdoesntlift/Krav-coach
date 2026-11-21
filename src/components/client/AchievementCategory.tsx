@@ -57,7 +57,7 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
               </span>
             )}
             <span
-              className="text-zinc-600 text-xs transition-transform duration-300"
+              className="text-zinc-600 text-xs transition-transform duration-base ease-overshoot"
               style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", display: "inline-block" }}
             >
               ▼
@@ -68,7 +68,7 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
         {/* Mini progress bar */}
         <div className="mb-3 h-0.5 bg-zinc-800 rounded-full overflow-hidden">
           <div
-            className="h-full rounded-full transition-all duration-700"
+            className="h-full rounded-full transition-all duration-deliberate ease-standard"
             style={{
               width: `${catPct}%`,
               background: allUnlocked
@@ -92,7 +92,7 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
           {items.map((a) => (
             <div
               key={a.id}
-              className={`rounded-2xl p-3.5 transition-all ${
+              className={`duration-base ease-standard rounded-2xl p-3.5 transition-all ${
                 a.unlocked ? "border border-brand-gold/25" : "border border-zinc-800/50"
               }`}
               style={{
@@ -104,7 +104,7 @@ export default function AchievementCategory({ meta, items, clientName }: Props) 
               <div className="flex items-center gap-3">
                 {/* Icon */}
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 transition-all ${
+                  className={`duration-base ease-standard w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 transition-all ${
                     a.unlocked ? "" : "grayscale opacity-35"
                   }`}
                   style={{

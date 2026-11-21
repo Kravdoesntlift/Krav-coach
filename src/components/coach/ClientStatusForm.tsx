@@ -57,7 +57,7 @@ export default function ClientStatusForm({ clientId, currentStatus, renewsAt }: 
           <button
             key={s}
             onClick={() => setStatus(s)}
-            className={`py-2.5 rounded-xl text-xs font-semibold transition-colors ${
+            className={`duration-instant ease-standard py-2.5 rounded-xl text-xs font-semibold transition-colors ${
               status === s ? "bg-brand-gold text-black" : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
             }`}
           >
@@ -98,7 +98,7 @@ export default function ClientStatusForm({ clientId, currentStatus, renewsAt }: 
       <button
         onClick={save}
         disabled={saving}
-        className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50 ${
+        className={`duration-instant ease-standard w-full py-2.5 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50 ${
           saved ? "bg-green-600 text-white" : "btn-primary"
         }`}
       >

@@ -37,7 +37,7 @@ export default function CoachFeedbackBanner({ message, weekStart }: Props) {
     <div className="relative border border-brand-gold/30 bg-brand-gold/5 rounded-2xl p-4">
       <button
         onClick={dismiss}
-        className="absolute top-3 right-3 text-gray-600 hover:text-white text-sm transition-colors leading-none"
+        className="absolute top-3 right-3 text-gray-600 hover:text-white text-sm transition-colors leading-none duration-instant ease-standard"
         aria-label={extra.close[lang]}
       >
         ✕

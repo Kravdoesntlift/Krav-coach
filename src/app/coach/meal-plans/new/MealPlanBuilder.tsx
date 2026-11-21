@@ -244,7 +244,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
                 key={g.value}
                 type="button"
                 onClick={() => setGoal(g.value)}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-colors
+                className={`duration-instant ease-standard px-4 py-2 rounded-xl text-sm font-semibold border transition-colors
                   ${goal === g.value
                     ? "bg-brand-gold text-black border-brand-gold"
                     : "bg-transparent text-zinc-400 border-zinc-700 hover:border-zinc-500"
@@ -321,7 +321,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
                 <button
                   type="button"
                   onClick={() => removeMeal(mi)}
-                  className="text-zinc-600 hover:text-red-400 transition-colors text-sm shrink-0"
+                  className="text-zinc-600 hover:text-red-400 transition-colors text-sm shrink-0 duration-instant ease-standard"
                 >
                   Remover
                 </button>
@@ -369,7 +369,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
                       <button
                         type="button"
                         onClick={() => removeFood(mi, fi)}
-                        className="w-9 h-9 flex items-center justify-center rounded-xl text-zinc-600 hover:text-red-400 hover:bg-zinc-800 transition-colors shrink-0"
+                        className="w-9 h-9 flex items-center justify-center rounded-xl text-zinc-600 hover:text-red-400 hover:bg-zinc-800 transition-colors shrink-0 duration-instant ease-standard"
                       >
                         ✕
                       </button>
@@ -454,7 +454,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
               <button
                 type="button"
                 onClick={() => addFood(mi)}
-                className="w-full py-2 rounded-xl text-xs text-zinc-500 hover:text-zinc-300 transition-colors border border-dashed border-zinc-800 hover:border-zinc-600"
+                className="w-full py-2 rounded-xl text-xs text-zinc-500 hover:text-zinc-300 transition-colors border border-dashed border-zinc-800 hover:border-zinc-600 duration-instant ease-standard"
               >
                 + Adicionar alimento
               </button>
@@ -467,7 +467,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
       <button
         type="button"
         onClick={addMeal}
-        className="w-full py-3 rounded-xl text-sm text-zinc-400 hover:text-white transition-colors border border-dashed border-zinc-800 hover:border-zinc-600"
+        className="w-full py-3 rounded-xl text-sm text-zinc-400 hover:text-white transition-colors border border-dashed border-zinc-800 hover:border-zinc-600 duration-instant ease-standard"
       >
         + Adicionar refeição
       </button>
@@ -483,7 +483,7 @@ export default function MealPlanBuilder({ clients }: { clients: ClientOption[] }
         <button
           type="button"
           onClick={() => router.back()}
-          className="w-full sm:w-auto px-4 py-3 sm:py-2 rounded-xl text-sm text-zinc-400 hover:text-white transition-colors border border-zinc-800 sm:border-transparent"
+          className="w-full sm:w-auto px-4 py-3 sm:py-2 rounded-xl text-sm text-zinc-400 hover:text-white transition-colors border border-zinc-800 sm:border-transparent duration-instant ease-standard"
         >
           Cancelar
         </button>

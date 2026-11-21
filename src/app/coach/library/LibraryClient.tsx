@@ -99,7 +99,7 @@ function EditModal({
       <div className="w-full max-w-lg rounded-2xl p-6 space-y-4 animate-fade-in" style={{ background: "#111114", border: "1px solid rgba(255,255,255,0.08)" }}>
         <div className="flex items-center justify-between">
           <h3 className="font-bold text-white text-lg">Editar exercício</h3>
-          <button onClick={onClose} className="tap-44 w-8 h-8 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">✕</button>
+          <button onClick={onClose} className="tap-44 w-8 h-8 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors duration-instant ease-standard">✕</button>
         </div>
 
         <div className="space-y-3">
@@ -124,7 +124,7 @@ function EditModal({
         {error && <p className="text-red-400 text-sm">{error}</p>}
 
         <div className="flex justify-end gap-3 pt-2">
-          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm text-zinc-400 hover:text-white transition-colors">Cancelar</button>
+          <button onClick={onClose} className="px-4 py-2 rounded-xl text-sm text-zinc-400 hover:text-white transition-colors duration-instant ease-standard">Cancelar</button>
           <button onClick={handleSave} disabled={pending} className="btn-primary text-sm">{pending ? "A guardar..." : "Guardar"}</button>
         </div>
       </div>
@@ -155,10 +155,10 @@ function ExerciseCard({
   return (
     <div className="card p-4 flex flex-col gap-3 relative group">
       {/* Action buttons */}
-      <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-base ease-standard">
         <button
           onClick={() => onEdit(item)}
-          className="w-7 h-7 flex items-center justify-center rounded-full bg-zinc-800 text-zinc-400 hover:bg-brand-gold/20 hover:text-brand-gold transition-colors"
+          className="w-7 h-7 flex items-center justify-center rounded-full bg-zinc-800 text-zinc-400 hover:bg-brand-gold/20 hover:text-brand-gold transition-colors duration-instant ease-standard"
           title="Editar"
         >
           <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 fill-current">
@@ -168,7 +168,7 @@ function ExerciseCard({
         <button
           onClick={handleDelete}
           disabled={pending}
-          className={`w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold transition-colors ${confirmDelete ? "bg-red-500 text-white" : "bg-zinc-800 text-zinc-400 hover:bg-red-500/20 hover:text-red-400"}`}
+          className={`duration-instant ease-standard w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold transition-colors ${confirmDelete ? "bg-red-500 text-white" : "bg-zinc-800 text-zinc-400 hover:bg-red-500/20 hover:text-red-400"}`}
           title={confirmDelete ? "Confirmar eliminação" : "Eliminar"}
           onBlur={() => setConfirmDelete(false)}
         >
@@ -199,7 +199,7 @@ function ExerciseCard({
           Ver vídeo
         </a>
       ) : (
-        <button onClick={() => onEdit(item)} className="flex items-center gap-1 text-xs text-zinc-600 hover:text-zinc-400 transition-colors w-fit mt-auto">
+        <button onClick={() => onEdit(item)} className="flex items-center gap-1 text-xs text-zinc-600 hover:text-zinc-400 transition-colors w-fit mt-auto duration-instant ease-standard">
           <svg viewBox="0 0 16 16" className="w-3 h-3 fill-current"><path d="M8 1a.5.5 0 0 1 .5.5v6h6a.5.5 0 0 1 0 1h-6v6a.5.5 0 0 1-1 0v-6h-6a.5.5 0 0 1 0-1h6v-6A.5.5 0 0 1 8 1"/></svg>
           Adicionar vídeo
         </button>
@@ -281,7 +281,7 @@ export default function LibraryClient({ items, coachId }: Props) {
           <button
             onClick={() => { setSeedMsg(null); startTransition(async () => { const res = await seedDefaultLibrary(); setSeedMsg(res.error ? res.error : `✅ ${res.count} exercícios importados!`); }); }}
             disabled={pending}
-            className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-semibold border transition-all"
+            className="whitespace-nowrap px-4 py-2 rounded-xl text-sm font-semibold border transition-all duration-base ease-standard"
             style={{ borderColor: "rgba(201,168,76,0.28)", color: "#C9A84C", background: "rgba(201,168,76,0.05)" }}
           >
             {pending ? "A importar..." : "⬇ Importar biblioteca padrão"}
@@ -315,7 +315,7 @@ export default function LibraryClient({ items, coachId }: Props) {
           </div>
           {formError && <p className="text-red-400 text-sm">{formError}</p>}
           <div className="flex justify-end gap-3">
-            <button onClick={() => { setShowForm(false); setForm(EMPTY_FORM); setFormError(null); }} className="px-4 py-2 rounded-xl text-sm text-zinc-400 hover:text-white transition-colors">Cancelar</button>
+            <button onClick={() => { setShowForm(false); setForm(EMPTY_FORM); setFormError(null); }} className="px-4 py-2 rounded-xl text-sm text-zinc-400 hover:text-white transition-colors duration-instant ease-standard">Cancelar</button>
             <button onClick={handleAdd} disabled={pending} className="btn-primary text-sm">{pending ? "A guardar..." : "Guardar exercício"}</button>
           </div>
         </div>
@@ -338,7 +338,7 @@ export default function LibraryClient({ items, coachId }: Props) {
                 {/* Group header */}
                 <button
                   onClick={() => toggleGroup(cat)}
-                  className="w-full flex items-center justify-between px-5 py-3.5 transition-colors hover:bg-white/[0.03]"
+                  className="w-full flex items-center justify-between px-5 py-3.5 transition-colors hover:bg-white/[0.03] duration-instant ease-standard"
                   style={{ background: "rgba(255,255,255,0.02)" }}
                 >
                   <div className="flex items-center gap-3">
@@ -350,7 +350,7 @@ export default function LibraryClient({ items, coachId }: Props) {
                       </span>
                     )}
                   </div>
-                  <svg viewBox="0 0 20 20" className={`w-4 h-4 fill-zinc-500 transition-transform duration-200 ${isCollapsed ? "-rotate-90" : ""}`}>
+                  <svg viewBox="0 0 20 20" className={`ease-overshoot w-4 h-4 fill-zinc-500 transition-transform duration-snap ${isCollapsed ? "-rotate-90" : ""}`}>
                     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 0 1 1.414 0L10 10.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 0 1 0-1.414z" clipRule="evenodd" />
                   </svg>
                 </button>

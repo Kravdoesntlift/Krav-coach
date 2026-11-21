@@ -87,14 +87,14 @@ export default function PushPrompt() {
           <div className="flex gap-2 mt-3">
             <button
               onClick={dismiss}
-              className="flex-1 py-1.5 rounded-xl bg-zinc-800 text-zinc-400 text-xs hover:bg-zinc-700 transition-colors"
+              className="flex-1 py-1.5 rounded-xl bg-zinc-800 text-zinc-400 text-xs hover:bg-zinc-700 transition-colors duration-instant ease-standard"
             >
               Agora não
             </button>
             <button
               onClick={enable}
               disabled={loading}
-              className="flex-1 py-1.5 rounded-xl text-black text-xs font-bold transition-all disabled:opacity-60"
+              className="flex-1 py-1.5 rounded-xl text-black text-xs font-bold transition-all disabled:opacity-60 duration-base ease-standard"
               style={{ background: "linear-gradient(135deg,#E2C060,#A8893A)" }}
             >
               {loading ? "..." : "Ativar"}

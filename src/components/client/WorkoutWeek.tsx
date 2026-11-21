@@ -117,7 +117,7 @@ export default function WorkoutWeek({ plan, clientId, coachId }: Props) {
         {trainDays.length > 0 && (
           <button
             onClick={() => setWeekOpen((o) => !o)}
-            className="w-full text-left card-gold p-4 md:p-5 flex items-center gap-4 md:gap-5 transition-all"
+            className="w-full text-left card-gold p-4 md:p-5 flex items-center gap-4 md:gap-5 transition-all duration-base ease-standard"
           >
             <ProgressRing value={pct} size={72} strokeWidth={6} />
             <div className="flex-1 min-w-0">
@@ -137,7 +137,7 @@ export default function WorkoutWeek({ plan, clientId, coachId }: Props) {
                   {Array.from({ length: trainDays.length }).map((_, i) => (
                     <div
                       key={i}
-                      className={`h-1 flex-1 rounded-full transition-all duration-500 ${
+                      className={`ease-standard h-1 flex-1 rounded-full transition-all duration-considered ${
                         i < completedCount ? "bg-brand-gold" : "bg-zinc-800"
                       }`}
                       style={{ transitionDelay: `${i * 80}ms` }}
@@ -189,7 +189,7 @@ function Chevron({ open, className = "" }: { open: boolean; className?: string }
     <svg
       viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
-      className={`w-4 h-4 text-zinc-600 transition-transform duration-300 ease-smooth ${open ? "rotate-180" : ""} ${className}`}
+      className={`ease-overshoot w-4 h-4 text-zinc-600 transition-transform duration-base ease-smooth ${open ? "rotate-180" : ""} ${className}`}
     >
       <path d="m6 9 6 6 6-6" />
     </svg>
@@ -392,7 +392,7 @@ function WorkoutDayCard({
         onClose={() => setLiveMode(false)}
       />
     )}
-    <div className={`card overflow-hidden transition-all ${isToday ? "border-zinc-600" : ""} ${completed ? "opacity-70" : ""}`}>
+    <div className={`duration-base ease-standard card overflow-hidden transition-all ${isToday ? "border-zinc-600" : ""} ${completed ? "opacity-70" : ""}`}>
       {/* Header */}
       <div
         role="button"
@@ -440,7 +440,7 @@ function WorkoutDayCard({
           {!completed && exercises.length > 0 && (
             <button
               onClick={(e) => { e.stopPropagation(); setLiveMode(true); }}
-              className={`px-2.5 py-1 rounded-lg border text-xs font-semibold transition-colors ${
+              className={`duration-instant ease-standard px-2.5 py-1 rounded-lg border text-xs font-semibold transition-colors ${
                 hasUnfinished
                   ? "bg-brand-gold text-black border-brand-gold hover:brightness-110"
                   : "bg-brand-gold/10 border-brand-gold/30 text-brand-gold hover:bg-brand-gold/20"
@@ -513,7 +513,7 @@ function WorkoutDayCard({
             ) : (
               <button
                 onClick={() => setShowTimer(true)}
-                className="w-full py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-gray-400 hover:text-white text-sm transition-colors"
+                className="w-full py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-gray-400 hover:text-white text-sm transition-colors duration-instant ease-standard"
               >
                 {extra.rest_timer_lbl[lang]}
               </button>
@@ -534,7 +534,7 @@ function WorkoutDayCard({
                       key={emoji}
                       type="button"
                       onClick={() => setFeeling(emoji)}
-                      className={`flex-1 flex flex-col items-center py-2 rounded-lg text-lg transition-colors ${
+                      className={`duration-instant ease-standard flex-1 flex flex-col items-center py-2 rounded-lg text-lg transition-colors ${
                         feeling === emoji
                           ? "bg-brand-gold/20 ring-1 ring-brand-gold"
                           : "bg-zinc-700 hover:bg-zinc-600"
@@ -551,19 +551,19 @@ function WorkoutDayCard({
                   onChange={(e) => setNote(e.target.value)}
                   placeholder={extra.quick_note[lang]}
                   maxLength={120}
-                  className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-gold transition-colors"
+                  className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-gold transition-colors duration-instant ease-standard"
                 />
                 <div className="flex gap-2">
                   <button
                     onClick={() => setShowFeedback(false)}
-                    className="flex-1 py-2 rounded-lg bg-zinc-700 text-gray-400 text-sm transition-colors hover:bg-zinc-600"
+                    className="flex-1 py-2 rounded-lg bg-zinc-700 text-gray-400 text-sm transition-colors hover:bg-zinc-600 duration-instant ease-standard"
                   >
                     {t("cancel")}
                   </button>
                   <button
                     onClick={() => feeling && saveComplete(feeling, note)}
                     disabled={!feeling || loading}
-                    className="flex-1 py-2 rounded-lg bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-semibold transition-colors disabled:opacity-40"
+                    className="flex-1 py-2 rounded-lg bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-semibold transition-colors disabled:opacity-40 duration-instant ease-standard"
                   >
                     {loading ? "..." : extra.confirm_btn[lang]}
                   </button>
@@ -614,7 +614,7 @@ function WorkoutDayCard({
             <button
               onClick={completed ? undoComplete : handleComplete}
               disabled={loading}
-              className={`w-full py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 ${
+              className={`duration-instant ease-standard w-full py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 ${
                 pulsing ? "pulse-gold" : ""
               } ${
                 completed
@@ -896,7 +896,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
           </div>
           <button
             onClick={() => setShowLog((v) => !v)}
-            className={`w-7 h-7 rounded-full flex items-center justify-center transition-colors text-xs font-bold ${showLog ? "bg-brand-gold text-black" : "bg-zinc-700 text-gray-400 hover:bg-zinc-600"}`}
+            className={`duration-instant ease-standard w-7 h-7 rounded-full flex items-center justify-center transition-colors text-xs font-bold ${showLog ? "bg-brand-gold text-black" : "bg-zinc-700 text-gray-400 hover:bg-zinc-600"}`}
             title={extra.register_weights[lang]}
           >
             ✎
@@ -904,7 +904,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
           {hasVideo && (
             <button
               onClick={() => setExpanded((e) => !e)}
-              className="w-7 h-7 rounded-full bg-red-600 hover:bg-red-500 flex items-center justify-center transition-colors"
+              className="w-7 h-7 rounded-full bg-red-600 hover:bg-red-500 flex items-center justify-center transition-colors duration-instant ease-standard"
               title={extra.watch_video_arrow[lang]}
             >
               <span className="text-white text-xs">▶</span>
@@ -951,7 +951,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
               {overload && (
                 <button
                   onClick={applyOverload}
-                  className="w-full flex items-center justify-between px-3 py-2 bg-brand-gold/10 border border-brand-gold/20 rounded-xl hover:bg-brand-gold/15 transition-colors group"
+                  className="w-full flex items-center justify-between px-3 py-2 bg-brand-gold/10 border border-brand-gold/20 rounded-xl hover:bg-brand-gold/15 transition-colors group duration-instant ease-standard"
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-brand-gold text-sm">📈</span>
@@ -960,7 +960,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
                       <p className="text-zinc-500 text-[11px]">{overload.reason} · {extra.overload_tap[lang]}</p>
                     </div>
                   </div>
-                  <span className="text-zinc-600 group-hover:text-brand-gold text-xs transition-colors">↙</span>
+                  <span className="text-zinc-600 group-hover:text-brand-gold text-xs transition-colors duration-instant ease-standard">↙</span>
                 </button>
               )}
               {lastVolume && (
@@ -1016,7 +1016,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
               <div key={i} className="flex items-center gap-2">
                 <button
                   onClick={() => { haptic(HAPTIC.tap); updateSet(activeTab, i, "done", !s.done); }}
-                  className={`w-5 h-5 rounded-full border-2 shrink-0 transition-colors ${
+                  className={`duration-instant ease-standard w-5 h-5 rounded-full border-2 shrink-0 transition-colors ${
                     s.done ? activeTabMeta.doneColor : "border-zinc-600"
                   }`}
                 />
@@ -1032,7 +1032,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
                   value={s.weight_kg}
                   onChange={(e) => updateSet(activeTab, i, "weight_kg", e.target.value)}
                   placeholder="kg"
-                  className={`w-16 bg-zinc-700 border border-zinc-600 rounded-lg px-2 py-1 text-white text-xs text-center focus:outline-none transition-colors ${
+                  className={`duration-instant ease-standard w-16 bg-zinc-700 border border-zinc-600 rounded-lg px-2 py-1 text-white text-xs text-center focus:outline-none transition-colors ${
                     activeTab === "warmup" ? "focus:border-sky-500" :
                     activeTab === "dropset" ? "focus:border-orange-500" :
                     "focus:border-brand-gold"
@@ -1043,7 +1043,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
                   value={s.reps}
                   onChange={(e) => updateSet(activeTab, i, "reps", e.target.value)}
                   placeholder="reps"
-                  className={`w-14 bg-zinc-700 border border-zinc-600 rounded-lg px-2 py-1 text-white text-xs text-center focus:outline-none transition-colors ${
+                  className={`duration-instant ease-standard w-14 bg-zinc-700 border border-zinc-600 rounded-lg px-2 py-1 text-white text-xs text-center focus:outline-none transition-colors ${
                     activeTab === "warmup" ? "focus:border-sky-500" :
                     activeTab === "dropset" ? "focus:border-orange-500" :
                     "focus:border-brand-gold"
@@ -1053,7 +1053,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
                 {(activeTab !== "working" || currentSets.length > 1) && (
                   <button
                     onClick={() => removeSet(activeTab, i)}
-                    className="w-5 h-5 rounded-full bg-zinc-700 hover:bg-red-500/20 text-zinc-500 hover:text-red-400 flex items-center justify-center text-xs shrink-0 transition-colors"
+                    className="w-5 h-5 rounded-full bg-zinc-700 hover:bg-red-500/20 text-zinc-500 hover:text-red-400 flex items-center justify-center text-xs shrink-0 transition-colors duration-instant ease-standard"
                   >
                     ×
                   </button>
@@ -1064,7 +1064,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
             {/* Add set button */}
             <button
               onClick={() => addSet(activeTab)}
-              className={`w-full py-1.5 rounded-lg text-xs font-medium border border-dashed transition-colors mt-1 ${
+              className={`duration-instant ease-standard w-full py-1.5 rounded-lg text-xs font-medium border border-dashed transition-colors mt-1 ${
                 activeTab === "warmup"   ? "border-sky-700 text-sky-600 hover:border-sky-500 hover:text-sky-400" :
                 activeTab === "dropset" ? "border-orange-700 text-orange-600 hover:border-orange-500 hover:text-orange-400" :
                 "border-zinc-600 text-zinc-500 hover:border-zinc-400 hover:text-zinc-300"
@@ -1077,7 +1077,7 @@ function ExerciseRow({ exercise, dayId, clientId }: { exercise: Exercise; dayId:
             <button
               onClick={saveLog}
               disabled={saving}
-              className={`w-full py-1.5 rounded-lg text-xs font-semibold mt-1 transition-colors ${
+              className={`duration-instant ease-standard w-full py-1.5 rounded-lg text-xs font-semibold mt-1 transition-colors ${
                 saved ? "bg-green-600 text-white" : "bg-brand-gold hover:bg-brand-gold-dark text-black"
               }`}
             >
@@ -1184,7 +1184,7 @@ function RestTimer({ onClose }: { onClose: () => void }) {
     <div className="bg-zinc-800 rounded-xl p-4 space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">{extra.rest_timer_title[lang]}</p>
-        <button onClick={onClose} className="text-gray-600 hover:text-white text-xs transition-colors">{extra.close_btn[lang]}</button>
+        <button onClick={onClose} className="text-gray-600 hover:text-white text-xs transition-colors duration-instant ease-standard">{extra.close_btn[lang]}</button>
       </div>
 
       {/* Presets */}
@@ -1194,7 +1194,7 @@ function RestTimer({ onClose }: { onClose: () => void }) {
             <button
               key={s}
               onClick={() => setSeconds(s)}
-              className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+              className={`duration-instant ease-standard px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
                 seconds === s ? "bg-brand-gold text-black" : "bg-zinc-700 text-gray-300 hover:bg-zinc-600"
               }`}
             >
@@ -1217,7 +1217,7 @@ function RestTimer({ onClose }: { onClose: () => void }) {
         {!running && remaining === null ? (
           <button
             onClick={() => start(seconds)}
-            className="flex-1 py-2 bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-semibold rounded-lg transition-colors"
+            className="flex-1 py-2 bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-semibold rounded-lg transition-colors duration-instant ease-standard"
           >
             {extra.start_btn[lang].replace("▶ ", "")}
           </button>
@@ -1225,13 +1225,13 @@ function RestTimer({ onClose }: { onClose: () => void }) {
           <>
             <button
               onClick={() => setRunning((r) => !r)}
-              className="flex-1 py-2 bg-zinc-700 hover:bg-zinc-600 text-white text-sm font-semibold rounded-lg transition-colors"
+              className="flex-1 py-2 bg-zinc-700 hover:bg-zinc-600 text-white text-sm font-semibold rounded-lg transition-colors duration-instant ease-standard"
             >
               {running ? extra.pause_btn[lang] : extra.continue_btn[lang]}
             </button>
             <button
               onClick={reset}
-              className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-gray-400 text-sm rounded-lg transition-colors"
+              className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-gray-400 text-sm rounded-lg transition-colors duration-instant ease-standard"
             >
               {extra.reset_btn[lang]}
             </button>

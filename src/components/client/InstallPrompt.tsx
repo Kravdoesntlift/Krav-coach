@@ -119,7 +119,7 @@ export default function InstallPrompt() {
             </p>
           </div>
         </div>
-        <button onClick={dismiss} className="tap-44 text-zinc-600 hover:text-zinc-400 transition-colors p-1 -m-1 shrink-0" aria-label={isEN ? "Close" : "Fechar"}>
+        <button onClick={dismiss} className="tap-44 text-zinc-600 hover:text-zinc-400 transition-colors p-1 -m-1 shrink-0 duration-instant ease-standard" aria-label={isEN ? "Close" : "Fechar"}>
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
           </svg>
@@ -132,7 +132,7 @@ export default function InstallPrompt() {
           {deferredPrompt ? (
             <button
               onClick={installAndroid}
-              className="w-full py-2.5 rounded-xl text-black text-sm font-bold transition-all active:scale-95 hover:brightness-110"
+              className="w-full py-2.5 rounded-xl text-black text-sm font-bold transition-all hover:brightness-110 squash duration-base ease-standard"
               style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
             >
               {isEN ? "Install now" : "Instalar agora"}

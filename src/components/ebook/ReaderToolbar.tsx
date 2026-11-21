@@ -56,7 +56,7 @@ export default function ReaderToolbar({
         <button
           type="button"
           onClick={() => window.print()}
-          className="ml-auto rounded-full px-4 py-1.5 text-[11px] font-bold text-zinc-300 transition-colors hover:text-white"
+          className="ml-auto rounded-full px-4 py-1.5 text-[11px] font-bold text-zinc-300 transition-colors hover:text-white duration-instant ease-standard"
           style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)" }}
         >
           {isEN ? "Save as PDF" : "Guardar em PDF"}

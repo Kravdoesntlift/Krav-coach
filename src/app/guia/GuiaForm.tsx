@@ -120,7 +120,7 @@ export default function GuiaForm({ lang }: { lang: Lang }) {
                   role="radio"
                   aria-checked={selected}
                   onClick={() => setPlace(option.value)}
-                  className="flex flex-col items-center gap-1 rounded-xl py-3 text-[11px] font-bold transition-all active:scale-95"
+                  className="flex flex-col items-center gap-1 rounded-xl py-3 text-[11px] font-bold transition-all squash duration-base ease-standard"
                   style={{
                     background: selected ? "rgba(201,168,76,0.12)" : "#141414",
                     border: `1px solid ${selected ? "rgba(201,168,76,0.45)" : "rgba(255,255,255,0.07)"}`,
@@ -143,7 +143,7 @@ export default function GuiaForm({ lang }: { lang: Lang }) {
         <button
           type="submit"
           disabled={pending}
-          className="w-full py-4 rounded-2xl font-black text-sm tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 mt-1"
+          className="w-full py-4 rounded-2xl font-black text-sm tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 mt-1 duration-base ease-standard"
           style={{
             background: pending
               ? "rgba(201,168,76,0.28)"

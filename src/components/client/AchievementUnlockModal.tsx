@@ -96,7 +96,7 @@ export default function AchievementUnlockModal({ achievements, seenAchievements 
               {queue.map((_, i) => (
                 <div
                   key={i}
-                  className="w-1.5 h-1.5 rounded-full transition-all"
+                  className="w-1.5 h-1.5 rounded-full transition-all duration-base ease-standard"
                   style={{ background: i === idx ? "#C9A84C" : "rgba(201,168,76,0.28)" }}
                 />
               ))}
@@ -106,7 +106,7 @@ export default function AchievementUnlockModal({ achievements, seenAchievements 
           {/* CTA */}
           <button
             onClick={next}
-            className="w-full py-3.5 rounded-2xl text-black font-bold text-sm transition-all active:scale-95"
+            className="w-full py-3.5 rounded-2xl text-black font-bold text-sm transition-all squash duration-base ease-standard"
             style={{ background: "linear-gradient(135deg,#E2C060,#A8893A)" }}
           >
             {idx + 1 < queue.length

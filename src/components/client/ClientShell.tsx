@@ -97,7 +97,7 @@ export function ClientShell({
                 the whole point of the cheaper tier is that it is offered. */}
             <Link
               href="/client/planos"
-              className="shrink-0 text-xs font-bold text-black bg-[#C9A84C] rounded-lg px-3 py-1.5 hover:bg-[#A8893A] transition-colors"
+              className="shrink-0 text-xs font-bold text-black bg-[#C9A84C] rounded-lg px-3 py-1.5 hover:bg-[#A8893A] transition-colors duration-instant ease-standard"
             >
               {t("subscribe")}
             </Link>

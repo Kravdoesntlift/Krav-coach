@@ -80,7 +80,7 @@ export default function Navbar({ profile, navItems }: NavbarProps) {
           <form action={logout}>
             <button
               type="submit"
-              className="text-xs text-zinc-600 hover:text-zinc-300 transition-colors font-medium"
+              className="text-xs text-zinc-600 hover:text-zinc-300 transition-colors font-medium duration-instant ease-standard"
             >
               {lang === "en" ? "Sign out" : "Sair"}
             </button>
@@ -96,7 +96,7 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
   return (
     <Link
       href={item.href!}
-      className={`relative px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+      className={`ease-standard relative px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-snap ${
         active
           ? "text-white bg-white/[0.07]"
           : "text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.04]"
@@ -138,7 +138,7 @@ function DropdownItem({ item, pathname }: { item: NavItem; pathname: string }) {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 ${
+        className={`ease-standard flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-snap ${
           isChildActive
             ? "text-white bg-white/[0.07]"
             : "text-zinc-500 hover:text-zinc-200 hover:bg-white/[0.04]"
@@ -146,7 +146,7 @@ function DropdownItem({ item, pathname }: { item: NavItem; pathname: string }) {
       >
         {item.label}
         <svg
-          className={`w-3 h-3 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          className={`ease-overshoot w-3 h-3 transition-transform duration-snap ${open ? "rotate-180" : ""}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -169,7 +169,7 @@ function DropdownItem({ item, pathname }: { item: NavItem; pathname: string }) {
                 key={child.href}
                 href={child.href}
                 onClick={() => setOpen(false)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm transition-colors ${
+                className={`duration-instant ease-standard flex items-center gap-2 px-4 py-2.5 text-sm transition-colors ${
                   active
                     ? "text-brand-gold bg-brand-gold/8"
                     : "text-zinc-400 hover:text-white hover:bg-white/[0.05]"

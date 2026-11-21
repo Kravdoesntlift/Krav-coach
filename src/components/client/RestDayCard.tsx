@@ -100,7 +100,7 @@ export default function RestDayCard({ label, nextTrainingDay }: Props) {
           </div>
           <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
             <div
-              className="h-full rounded-full transition-all duration-500"
+              className="h-full rounded-full transition-all duration-considered ease-standard"
               style={{
                 width: `${pct}%`,
                 background: allDone
@@ -119,7 +119,7 @@ export default function RestDayCard({ label, nextTrainingDay }: Props) {
               <button
                 key={act.id}
                 onClick={() => toggle(act.id)}
-                className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl transition-all text-left active:scale-[0.98]"
+                className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl transition-all text-left active:scale-[0.98] duration-base ease-standard"
                 style={{
                   background: done
                     ? "rgba(96,165,250,0.08)"
@@ -128,7 +128,7 @@ export default function RestDayCard({ label, nextTrainingDay }: Props) {
                 }}
               >
                 <div
-                  className="w-8 h-8 rounded-xl flex items-center justify-center text-base shrink-0 transition-all"
+                  className="w-8 h-8 rounded-xl flex items-center justify-center text-base shrink-0 transition-all duration-base ease-standard"
                   style={{ background: done ? "rgba(96,165,250,0.15)" : "rgba(39,39,42,0.9)" }}
                 >
                   {done ? (
@@ -139,7 +139,7 @@ export default function RestDayCard({ label, nextTrainingDay }: Props) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p
-                    className={`text-sm font-semibold transition-colors ${
+                    className={`duration-instant ease-standard text-sm font-semibold transition-colors ${
                       done ? "text-zinc-500 line-through" : "text-white"
                     }`}
                   >

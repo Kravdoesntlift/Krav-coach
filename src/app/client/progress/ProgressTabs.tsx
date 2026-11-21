@@ -49,7 +49,7 @@ export default function ProgressTabs({ exercises, measurements, completedDates, 
       <div className="flex gap-1 bg-zinc-900 border border-zinc-800 rounded-xl p-1 overflow-x-auto">
         <button
           onClick={() => setTab("timeline")}
-          className={`flex-none px-3 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
+          className={`duration-instant ease-standard flex-none px-3 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
             tab === "timeline" ? "bg-brand-gold text-black" : "text-gray-400 hover:text-white"
           }`}
         >
@@ -57,7 +57,7 @@ export default function ProgressTabs({ exercises, measurements, completedDates, 
         </button>
         <button
           onClick={() => setTab("force")}
-          className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
+          className={`duration-instant ease-standard flex-1 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
             tab === "force" ? "bg-brand-gold text-black" : "text-gray-400 hover:text-white"
           }`}
         >
@@ -65,7 +65,7 @@ export default function ProgressTabs({ exercises, measurements, completedDates, 
         </button>
         <button
           onClick={() => setTab("streak")}
-          className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
+          className={`duration-instant ease-standard flex-1 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
             tab === "streak" ? "bg-brand-gold text-black" : "text-gray-400 hover:text-white"
           }`}
         >
@@ -73,7 +73,7 @@ export default function ProgressTabs({ exercises, measurements, completedDates, 
         </button>
         <button
           onClick={() => setTab("measures")}
-          className={`flex-none px-3 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
+          className={`duration-instant ease-standard flex-none px-3 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
             tab === "measures" ? "bg-brand-gold text-black" : "text-gray-400 hover:text-white"
           }`}
         >
@@ -285,7 +285,7 @@ function ExerciseCard({ name, points }: { name: string; points: ExercisePoint[] 
           <button
             key={opt.key}
             onClick={() => setMetric(opt.key)}
-            className={`flex-1 py-1 rounded-md text-xs font-semibold transition-colors ${
+            className={`duration-instant ease-standard flex-1 py-1 rounded-md text-xs font-semibold transition-colors ${
               metric === opt.key ? "bg-zinc-600 text-white" : "text-gray-500 hover:text-gray-300"
             }`}
           >

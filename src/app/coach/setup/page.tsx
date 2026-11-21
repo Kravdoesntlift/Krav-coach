@@ -51,7 +51,7 @@ function CheckItem({
       {!done && action && (
         <Link
           href={action.href}
-          className="flex-none px-3 py-1.5 rounded-xl text-xs font-semibold text-black transition-all active:scale-95"
+          className="flex-none px-3 py-1.5 rounded-xl text-xs font-semibold text-black transition-all squash duration-base ease-standard"
           style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
         >
           {action.label}
@@ -148,7 +148,7 @@ export default async function CoachSetupPage() {
         </div>
         <div className="h-2 rounded-full bg-zinc-800 overflow-hidden">
           <div
-            className="h-full rounded-full transition-all duration-700"
+            className="h-full rounded-full transition-all duration-deliberate ease-standard"
             style={{
               width: `${progress}%`,
               background: allDone
@@ -175,7 +175,7 @@ export default async function CoachSetupPage() {
           <p className="text-zinc-500 text-sm mt-1">Estás pronto para receber e acompanhar clientes.</p>
           <Link
             href="/coach/dashboard"
-            className="inline-block mt-4 px-6 py-3 rounded-2xl font-bold text-black text-sm transition-all active:scale-95"
+            className="inline-block mt-4 px-6 py-3 rounded-2xl font-bold text-black text-sm transition-all squash duration-base ease-standard"
             style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
           >
             Ir para o Dashboard
@@ -196,7 +196,7 @@ export default async function CoachSetupPage() {
             <Link
               key={link.href}
               href={link.href}
-              className="rounded-2xl p-4 transition-colors hover:border-zinc-600"
+              className="rounded-2xl p-4 transition-colors hover:border-zinc-600 duration-instant ease-standard"
               style={{ background: "rgba(18,18,20,0.8)", border: "1px solid rgba(39,39,42,0.5)" }}
             >
               <p className="text-sm font-semibold text-white">{link.label}</p>

@@ -168,12 +168,12 @@ export default function ResultsClient({ items }: Props) {
               role="switch"
               aria-checked={form.is_public}
               onClick={() => setForm((prev) => ({ ...prev, is_public: !prev.is_public }))}
-              className={`relative w-11 h-6 rounded-full transition-colors ${
+              className={`duration-instant ease-standard relative w-11 h-6 rounded-full transition-colors ${
                 form.is_public ? "bg-brand-gold" : "bg-zinc-700"
               }`}
             >
               <span
-                className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                className={`duration-snap ease-overshoot absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
                   form.is_public ? "translate-x-5" : "translate-x-0"
                 }`}
               />
@@ -194,7 +194,7 @@ export default function ResultsClient({ items }: Props) {
             <button
               type="button"
               onClick={() => { setShowForm(false); setError(null); setForm(EMPTY_FORM); }}
-              className="px-4 py-2 rounded-xl text-sm text-zinc-400 hover:text-white transition-colors"
+              className="px-4 py-2 rounded-xl text-sm text-zinc-400 hover:text-white transition-colors duration-instant ease-standard"
             >
               Cancelar
             </button>
@@ -264,7 +264,7 @@ export default function ResultsClient({ items }: Props) {
                 <button
                   onClick={() => handleToggle(item.id, item.is_public)}
                   disabled={isPending}
-                  className={`text-xs px-2 py-1 rounded-lg transition-colors ${
+                  className={`duration-instant ease-standard text-xs px-2 py-1 rounded-lg transition-colors ${
                     item.is_public
                       ? "bg-green-900/40 text-green-400 hover:bg-green-900/60"
                       : "bg-zinc-800 text-zinc-500 hover:text-white"
@@ -275,7 +275,7 @@ export default function ResultsClient({ items }: Props) {
                 <button
                   onClick={() => handleDelete(item.id)}
                   disabled={isPending}
-                  className="text-xs text-red-500 hover:text-red-400 transition-colors"
+                  className="text-xs text-red-500 hover:text-red-400 transition-colors duration-instant ease-standard"
                 >
                   Eliminar
                 </button>

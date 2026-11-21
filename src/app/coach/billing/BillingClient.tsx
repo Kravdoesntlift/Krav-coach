@@ -207,7 +207,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...`}
               />
               <button
                 onClick={copyLink}
-                className="shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition-all"
+                className="shrink-0 px-3 py-2 rounded-xl text-xs font-bold transition-all duration-base ease-standard"
                 style={{ background: copied ? "rgba(34,197,94,0.15)" : "rgba(201,168,76,0.16)", color: copied ? "#4ade80" : "#C9A84C", border: `1px solid ${copied ? "rgba(34,197,94,0.3)" : "rgba(201,168,76,0.28)"}` }}
               >
                 {copied ? "Copiado ✓" : "Copiar"}
@@ -218,14 +218,14 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...`}
                 href={`https://wa.me/?text=${encodeURIComponent(`Olá! Aqui está o teu link de pagamento para o KRAV Premium Coaching (€${amount}/mês): ${generatedLink}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-white transition-all"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-white transition-all duration-base ease-standard"
                 style={{ background: "rgba(37,211,102,0.15)", border: "1px solid rgba(37,211,102,0.3)" }}
               >
                 📱 Partilhar no WhatsApp
               </a>
               <a
                 href={`mailto:${selectedClient?.email ?? ""}?subject=KRAV Premium Coaching, Link de Pagamento&body=${encodeURIComponent(`Olá!\n\nAqui está o teu link de pagamento para o KRAV Premium Coaching (€${amount}/mês):\n\n${generatedLink}\n\nQualquer dúvida, fala comigo.\n\nKrav`)}`}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-300 transition-all"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-zinc-300 transition-all duration-base ease-standard"
                 style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
               >
                 ✉️ Enviar por Email
@@ -277,7 +277,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...`}
                     <button
                       onClick={() => handlePortal(client.id)}
                       disabled={isPending}
-                      className="shrink-0 px-3 py-2 rounded-xl text-xs font-semibold border border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500 transition-colors disabled:opacity-50"
+                      className="shrink-0 px-3 py-2 rounded-xl text-xs font-semibold border border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500 transition-colors disabled:opacity-50 duration-instant ease-standard"
                     >
                       Portal Stripe
                     </button>

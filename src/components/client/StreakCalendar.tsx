@@ -86,7 +86,7 @@ export default function StreakCalendar({ completedDates, currentStreak, longestS
                       <div
                         key={day.date}
                         title={`${day.label}${done ? " ✓" : ""}`}
-                        className={`h-[14px] w-full rounded-sm transition-colors ${
+                        className={`duration-instant ease-standard h-[14px] w-full rounded-sm transition-colors ${
                           done
                             ? "bg-brand-gold"
                             : isToday

@@ -80,7 +80,7 @@ export default function ChallengeCards({ challenges, progress: initialProgress, 
         const done = prog?.completed ?? false;
 
         return (
-          <div key={c.id} className={`card p-4 transition-colors ${done ? "border-green-500/30" : ""}`}>
+          <div key={c.id} className={`duration-instant ease-standard card p-4 transition-colors ${done ? "border-green-500/30" : ""}`}>
             <div className="flex items-start justify-between gap-3 mb-3">
               <div className="flex-1 min-w-0">
                 <p className="text-white text-sm font-semibold">{c.title}</p>
@@ -101,7 +101,7 @@ export default function ChallengeCards({ challenges, progress: initialProgress, 
             {/* Progress bar */}
             <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden mb-3">
               <div
-                className={`h-full rounded-full transition-all duration-500 ${done ? "bg-green-500" : "bg-brand-gold"}`}
+                className={`ease-standard h-full rounded-full transition-all duration-considered ${done ? "bg-green-500" : "bg-brand-gold"}`}
                 style={{ width: `${pct}%` }}
               />
             </div>
@@ -115,7 +115,7 @@ export default function ChallengeCards({ challenges, progress: initialProgress, 
               <button
                 onClick={() => increment(c)}
                 disabled={loading === c.id}
-                className="w-full py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-gray-300 hover:text-white text-sm transition-colors disabled:opacity-50"
+                className="w-full py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-gray-300 hover:text-white text-sm transition-colors disabled:opacity-50 duration-instant ease-standard"
               >
                 {loading === c.id ? "..." : (isEN ? "+ Log progress" : "+ Registar progresso")}
               </button>

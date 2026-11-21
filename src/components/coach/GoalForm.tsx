@@ -79,7 +79,7 @@ export default function GoalForm({ clientId, initialGoals }: Props) {
         <h3 className="text-white font-semibold text-sm">Metas do cliente</h3>
         <button
           onClick={() => { setOpen((v) => !v); setActionError(null); }}
-          className="text-xs px-3 py-1.5 rounded-lg bg-brand-gold/10 border border-brand-gold/30 text-brand-gold hover:bg-brand-gold/20 transition-colors"
+          className="text-xs px-3 py-1.5 rounded-lg bg-brand-gold/10 border border-brand-gold/30 text-brand-gold hover:bg-brand-gold/20 transition-colors duration-instant ease-standard"
         >
           + Nova meta
         </button>
@@ -167,7 +167,7 @@ export default function GoalForm({ clientId, initialGoals }: Props) {
           const daysLeft = goal.deadline ? Math.ceil((new Date(goal.deadline).getTime() - Date.now()) / 86400000) : null;
 
           return (
-            <div key={goal.id} className={`rounded-xl p-3 border transition-colors ${goal.completed ? "bg-green-500/10 border-green-500/20" : "bg-zinc-800 border-zinc-700"}`}>
+            <div key={goal.id} className={`duration-instant ease-standard rounded-xl p-3 border transition-colors ${goal.completed ? "bg-green-500/10 border-green-500/20" : "bg-zinc-800 border-zinc-700"}`}>
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -191,12 +191,12 @@ export default function GoalForm({ clientId, initialGoals }: Props) {
                 <div className="flex gap-1 shrink-0">
                   <button
                     onClick={() => handleToggleComplete(goal)}
-                    className={`w-7 h-7 rounded-lg text-xs flex items-center justify-center transition-colors ${goal.completed ? "bg-green-500/20 text-green-400" : "bg-zinc-700 text-gray-400 hover:text-green-400"}`}
+                    className={`duration-instant ease-standard w-7 h-7 rounded-lg text-xs flex items-center justify-center transition-colors ${goal.completed ? "bg-green-500/20 text-green-400" : "bg-zinc-700 text-gray-400 hover:text-green-400"}`}
                     aria-label={goal.completed ? "Marcar como incompleta" : "Marcar como concluída"}
                   >✓</button>
                   <button
                     onClick={() => handleDelete(goal.id)}
-                    className="w-7 h-7 rounded-lg bg-zinc-700 text-gray-400 hover:text-red-400 text-xs flex items-center justify-center transition-colors"
+                    className="w-7 h-7 rounded-lg bg-zinc-700 text-gray-400 hover:text-red-400 text-xs flex items-center justify-center transition-colors duration-instant ease-standard"
                     aria-label="Eliminar meta"
                   >✕</button>
                 </div>
@@ -204,7 +204,7 @@ export default function GoalForm({ clientId, initialGoals }: Props) {
               {goal.target_value != null && (
                 <div className="mt-2 h-1.5 bg-zinc-700 rounded-full overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all duration-500 ${goal.completed ? "bg-green-500" : "bg-brand-gold"}`}
+                    className={`ease-standard h-full rounded-full transition-all duration-considered ${goal.completed ? "bg-green-500" : "bg-brand-gold"}`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>

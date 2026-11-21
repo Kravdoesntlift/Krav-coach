@@ -160,7 +160,7 @@ export default function PrivacyPage() {
         </div>
 
         <div className="text-center">
-          <Link href="/" className="text-zinc-600 text-xs hover:text-zinc-400 transition-colors">
+          <Link href="/" className="text-zinc-600 text-xs hover:text-zinc-400 transition-colors duration-instant ease-standard">
             ← Voltar à página inicial
           </Link>
         </div>

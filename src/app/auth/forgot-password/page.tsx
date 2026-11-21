@@ -93,7 +93,7 @@ export default function ForgotPasswordPage() {
             </div>
             <Link
               href="/auth/login"
-              className="inline-block w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm font-medium transition-colors"
+              className="inline-block w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm font-medium transition-colors duration-instant ease-standard"
             >
               Voltar ao login
             </Link>
@@ -158,7 +158,7 @@ export default function ForgotPasswordPage() {
         )}
 
         <p className="text-center text-zinc-600 text-sm mt-5">
-          <Link href="/auth/login" className="text-brand-gold hover:text-brand-gold-light transition-colors font-medium">
+          <Link href="/auth/login" className="text-brand-gold hover:text-brand-gold-light transition-colors font-medium duration-instant ease-standard">
             ← Voltar ao login
           </Link>
         </p>

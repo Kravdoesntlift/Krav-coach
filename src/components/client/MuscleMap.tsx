@@ -149,7 +149,7 @@ export default function MuscleMap({ exerciseNames, loggedNames = [], lang = "pt"
           <button
             key={v}
             onClick={() => setView(v)}
-            className={`flex-1 py-1.5 rounded-[10px] text-xs font-bold transition-all duration-200 ${
+            className={`ease-standard flex-1 py-1.5 rounded-[10px] text-xs font-bold transition-all duration-snap ${
               view === v ? "bg-brand-gold text-black shadow-sm" : "text-zinc-500"
             }`}
           >
@@ -241,7 +241,7 @@ export default function MuscleMap({ exerciseNames, loggedNames = [], lang = "pt"
         <div className="px-4 mb-3">
           <div className="h-1 rounded-full bg-zinc-800 overflow-hidden">
             <div
-              className="h-full rounded-full transition-all duration-700"
+              className="h-full rounded-full transition-all duration-deliberate ease-standard"
               style={{ width:`${pct}%`, background:"linear-gradient(90deg,#A8893A,#C9A84C,#E2C060)" }}
             />
           </div>

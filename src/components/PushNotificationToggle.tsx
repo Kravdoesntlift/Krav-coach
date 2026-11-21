@@ -150,7 +150,7 @@ export default function PushNotificationToggle() {
         <button
           onClick={toggle}
           disabled={loading}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm transition-colors ${
+          className={`duration-instant ease-standard flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm transition-colors ${
             permDenied
               ? "bg-red-500/10 border border-red-500/30 text-red-400"
               : subscribed
@@ -174,7 +174,7 @@ export default function PushNotificationToggle() {
           <button
             onClick={sendTest}
             disabled={testLoading}
-            className="tap-44 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-white transition-colors"
+            className="tap-44 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-white transition-colors duration-instant ease-standard"
           >
             {testLoading ? "..." : "Testar"}
           </button>

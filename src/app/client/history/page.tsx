@@ -82,7 +82,7 @@ export default async function HistoryPage() {
                 {/* Progress bar */}
                 <div className="h-1 bg-zinc-800 rounded-full mb-4 overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all ${pct === 100 ? "bg-green-400" : "bg-brand-gold"}`}
+                    className={`duration-base ease-standard h-full rounded-full transition-all ${pct === 100 ? "bg-green-400" : "bg-brand-gold"}`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>

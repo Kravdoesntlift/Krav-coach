@@ -114,7 +114,7 @@ export default async function CoachClientReportPage({
   return (
     <>
       <div className="no-print mb-2">
-        <a href={`/coach/clients/${clientId}`} className="text-zinc-500 text-sm hover:text-zinc-300 transition-colors">
+        <a href={`/coach/clients/${clientId}`} className="text-zinc-500 text-sm hover:text-zinc-300 transition-colors duration-instant ease-standard">
           ← Voltar ao cliente
         </a>
       </div>

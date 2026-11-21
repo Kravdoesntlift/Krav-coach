@@ -66,7 +66,7 @@ export default function PhotoLightbox({ photos }: Props) {
         </div>
         <button
           onClick={close}
-          className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-colors"
+          className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-colors duration-instant ease-standard"
           style={{ background: "rgba(201,168,76,0.22)", border: "1px solid rgba(201,168,76,0.4)" }}
           aria-label="Fechar"
         >
@@ -119,7 +119,7 @@ export default function PhotoLightbox({ photos }: Props) {
                 sizes="(max-width: 640px) 50vw, 33vw"
               />
             </div>
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-instant ease-standard" />
             <div className="absolute bottom-0 left-0 right-0 px-3 py-2 bg-gradient-to-t from-black/80 to-transparent">
               <p className="text-white text-xs font-medium">{formatDate(photo.taken_at)}</p>
               {photo.caption && <p className="text-gray-300 text-[11px] truncate">{photo.caption}</p>}

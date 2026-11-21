@@ -7,6 +7,7 @@ import { useLang } from "@/lib/i18n/useLang";
 import { finishWorkout } from "@/app/client/workout/actions";
 import ExerciseNotes from "@/components/client/ExerciseNotes";
 import { parseExerciseNote } from "@/lib/exercise-notes";
+import { staggered } from "@/lib/motion";
 
 function beep(freq = 880, vol = 0.35) {
   try {
@@ -469,7 +470,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
           <div className="flex gap-2">
             {[30, 60, 90, 120].map((s) => (
               <button key={s} onClick={() => { setRestDur(s); setRestLeft(s); }}
-                className="rounded-2xl text-sm font-bold transition-all active:scale-95"
+                className="rounded-2xl text-sm font-bold transition-all squash duration-base ease-standard"
                 style={{ width: 56, paddingTop: 10, paddingBottom: 10,
                   ...(restDur === s
                     ? { background: "linear-gradient(135deg,#E8C96B,#A8893A)", color: "#000" }
@@ -478,7 +479,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
             ))}
           </div>
           <button onClick={skipRest}
-            className="px-8 rounded-2xl border border-zinc-800 bg-zinc-900 text-white text-sm font-semibold active:scale-95"
+            className="px-8 rounded-2xl border border-zinc-800 bg-zinc-900 text-white text-sm font-semibold squash transition-transform duration-snap ease-overshoot"
             style={{ paddingTop: 12, paddingBottom: 12 }}>
             {isEN ? "Skip →" : "Saltar →"}
           </button>
@@ -490,9 +491,16 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
         <div className="absolute inset-0 z-30 bg-black overflow-y-auto flex flex-col gap-5"
           style={{ padding: "max(1.5rem, env(safe-area-inset-top,0px)) 1.25rem max(1.5rem, env(safe-area-inset-bottom,0px))" }}>
           <div className="text-center pt-2">
-            <p className="text-5xl mb-3">🏆</p>
-            <h2 className="text-white text-2xl font-black">{isEN ? "Workout done!" : "Treino concluído!"}</h2>
-            <p className="text-brand-gold text-sm font-semibold mt-1">⏱ {fmt(elapsed)} {isEN ? "of training" : "de treino"}</p>
+            {/* The peak of the whole product. The trophy overshoots and
+                settles, the title and the time follow it rather than arrive
+                with it, which is what reads as a moment instead of a screen. */}
+            <p className="text-5xl mb-3 peak-moment">🏆</p>
+            <h2 className="text-white text-2xl font-black enter-rise" style={staggered(2)}>
+              {isEN ? "Workout done!" : "Treino concluído!"}
+            </h2>
+            <p className="text-brand-gold text-sm font-semibold mt-1 enter-rise" style={staggered(4)}>
+              ⏱ {fmt(elapsed)} {isEN ? "of training" : "de treino"}
+            </p>
           </div>
           <div>
             <p className="text-zinc-500 text-xs font-semibold tracking-widest uppercase mb-3">{isEN ? "How did it go?" : "Como correu?"}</p>
@@ -501,8 +509,8 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                 const labels = isEN ? ["Heavy","Ok","Good","Top"] : ["Pesado","Ok","Bem","Top"];
                 return (
                   <button key={emoji} onClick={() => setFeeling(emoji)}
-                    className={`flex flex-col items-center py-3 rounded-2xl text-2xl transition-all active:scale-95 border ${feeling===emoji?"border-brand-gold":"border-zinc-800 bg-zinc-900"}`}
-                    style={feeling===emoji?{background:"rgba(201,168,76,0.1)"}:{}}>
+                    className={`duration-base ease-standard flex flex-col items-center py-3 rounded-2xl text-2xl transition-all squash enter-rise border min-h-[44px] ${feeling===emoji?"border-brand-gold":"border-zinc-800 bg-zinc-900"}`}
+                    style={{ ...staggered(i + 6), ...(feeling===emoji?{background:"rgba(201,168,76,0.1)"}:{}) }}>
                     {emoji}<span className="text-[11px] text-zinc-500 mt-1">{labels[i]}</span>
                   </button>
                 );
@@ -546,7 +554,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
             </div>
           )}
           <button onClick={handleFinish} disabled={saving}
-            className="w-full rounded-2xl font-black text-black text-base transition-all active:scale-[0.98] disabled:opacity-50"
+            className="w-full rounded-2xl font-black text-black text-base transition-all active:scale-[0.98] disabled:opacity-50 duration-base ease-standard"
             style={{ paddingTop: 16, paddingBottom: 16, background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>
             {saving ? (isEN ? "Saving..." : "A guardar...") : (isEN ? "Save workout" : "Guardar treino")}
           </button>
@@ -556,7 +564,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
       {/* ── HEADER (shrink-0) ── */}
       <div className="shrink-0 flex items-center gap-2 px-4 py-3">
         <button onClick={onClose}
-          className="tap-44 shrink-0 w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 active:scale-90">
+          className="tap-44 shrink-0 w-9 h-9 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 squash transition-transform duration-snap ease-overshoot">
           ✕
         </button>
         <div className="flex-1 flex items-center gap-1.5 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
@@ -565,7 +573,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
             const active = i === step;
             return (
               <button key={i} onClick={() => setStep(i)}
-                className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black active:scale-90"
+                className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black squash transition-transform duration-snap ease-overshoot"
                 style={active
                   ? { background: "linear-gradient(135deg,#E8C96B,#A8893A)", color: "#000" }
                   : done
@@ -623,7 +631,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
             <button
               type="button"
               onClick={() => { setSwapOpen((v) => !v); setCustomOpen(false); }}
-              className="inline-flex items-center gap-1.5 rounded-lg text-[11px] font-bold transition-all active:scale-95"
+              className="inline-flex items-center gap-1.5 rounded-lg text-[11px] font-bold transition-all squash duration-base ease-standard"
               style={{
                 padding: "6px 10px",
                 background: swapped ? "rgba(201,168,76,0.1)" : "rgba(255,255,255,0.04)",
@@ -644,7 +652,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                       key={`${kind}-${opt}`}
                       type="button"
                       onClick={() => chooseExercise(opt)}
-                      className="w-full text-left rounded-xl text-xs transition-all active:scale-[0.98]"
+                      className="w-full text-left rounded-xl text-xs transition-all active:scale-[0.98] duration-base ease-standard"
                       style={{
                         padding: "10px 12px",
                         background: active ? "rgba(201,168,76,0.1)" : "rgba(255,255,255,0.03)",
@@ -686,7 +694,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                     <button
                       type="submit"
                       disabled={!customName.trim()}
-                      className="rounded-xl text-xs font-bold px-3 transition-all active:scale-95 disabled:opacity-30"
+                      className="rounded-xl text-xs font-bold px-3 transition-all disabled:opacity-30 squash duration-base ease-standard"
                       style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)", color: "#000" }}
                     >
                       OK
@@ -696,7 +704,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
                   <button
                     type="button"
                     onClick={() => setCustomOpen(true)}
-                    className="w-full text-left rounded-xl text-xs transition-all active:scale-[0.98]"
+                    className="w-full text-left rounded-xl text-xs transition-all active:scale-[0.98] duration-base ease-standard"
                     style={{
                       padding: "10px 12px",
                       background: "rgba(255,255,255,0.02)",
@@ -754,7 +762,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
               className="bg-zinc-800 border border-zinc-700/40 rounded-xl text-white text-sm text-center w-full focus:outline-none focus:border-brand-gold/40"
               style={{ padding: "0.5rem 0.25rem" }} />
             <button onClick={() => toggleSet(step, si)}
-              className="flex items-center justify-center text-sm font-black rounded-full transition-all active:scale-90"
+              className="flex items-center justify-center text-sm font-black rounded-full transition-all squash duration-base ease-standard"
               style={{ width: 40, height: 40, flexShrink: 0,
                 ...(s.done
                   ? { background: "linear-gradient(135deg,#E8C96B,#A8893A)", color: "#000" }
@@ -772,7 +780,7 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
           <span className="text-zinc-600 text-xs shrink-0">⏱</span>
           {[30, 60, 90, 120].map((s) => (
             <button key={s} onClick={() => { setRestDur(s); startRest(s); }}
-              className="flex-1 rounded-xl text-xs font-bold transition-all active:scale-95"
+              className="flex-1 rounded-xl text-xs font-bold transition-all squash duration-base ease-standard"
               style={{ paddingTop: 8, paddingBottom: 8,
                 ...(restDur === s
                   ? { background: "rgba(201,168,76,0.1)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.28)" }
@@ -791,19 +799,19 @@ export default function LiveWorkout({ exercises, dayId, clientId, dayLabel, onCo
       <div className="shrink-0 px-4 pt-3 pb-3" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
         <div className="flex gap-2">
           <button onClick={() => setStep((s) => s - 1)} disabled={step === 0}
-            className="rounded-2xl text-sm font-bold transition-all active:scale-95 disabled:opacity-20"
+            className="rounded-2xl text-sm font-bold transition-all disabled:opacity-20 squash duration-base ease-standard"
             style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 14, paddingBottom: 14, background: "#18181b", color: "#a1a1aa", border: "1px solid #27272a" }}>
             ← {isEN ? "Prev" : "Ant"}
           </button>
           {step < totalSteps - 1 ? (
             <button onClick={() => setStep((s) => s + 1)}
-              className="flex-1 rounded-2xl font-black text-sm transition-all active:scale-[0.98]"
+              className="flex-1 rounded-2xl font-black text-sm transition-all active:scale-[0.98] duration-base ease-standard"
               style={{ paddingTop: 14, paddingBottom: 14, background: "linear-gradient(135deg,#E8C96B,#A8893A)", color: "#000" }}>
               {isEN ? "Next →" : "Próximo →"}
             </button>
           ) : (
             <button onClick={() => setFinishing(true)}
-              className="flex-1 rounded-2xl font-black text-sm transition-all active:scale-[0.98]"
+              className="flex-1 rounded-2xl font-black text-sm transition-all active:scale-[0.98] duration-base ease-standard"
               style={{ paddingTop: 14, paddingBottom: 14, background: "linear-gradient(135deg,#E8C96B,#A8893A)", color: "#000" }}>
               {isEN ? "Finish 🏆" : "Terminar 🏆"}
             </button>

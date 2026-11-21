@@ -195,7 +195,7 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
             <button
               onClick={loadMore}
               disabled={loadingMore}
-              className="tap-44 text-xs px-4 py-1.5 rounded-full border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors disabled:opacity-50"
+              className="tap-44 text-xs px-4 py-1.5 rounded-full border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors disabled:opacity-50 duration-instant ease-standard"
             >
               {loadingMore ? extra.loading_more[lang] : extra.load_more[lang]}
             </button>
@@ -268,14 +268,14 @@ export default function ChatWindow({ currentUserId, currentUserName, otherUser, 
           placeholder={t("message_placeholder")}
           rows={1}
           maxLength={2000}
-          className="flex-1 bg-zinc-800/60 border border-zinc-700/60 rounded-2xl px-4 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-brand-gold/50 resize-none transition-colors overflow-hidden"
+          className="flex-1 bg-zinc-800/60 border border-zinc-700/60 rounded-2xl px-4 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-brand-gold/50 resize-none transition-colors overflow-hidden duration-instant ease-standard"
           style={{ minHeight: "40px", maxHeight: "120px" }}
         />
         <button
           onClick={send}
           disabled={!text.trim() || sending}
           aria-label={extra.send_label[lang]}
-          className="w-10 h-10 rounded-2xl flex items-center justify-center text-black font-bold transition-all active:scale-95 disabled:opacity-30 shrink-0"
+          className="w-10 h-10 rounded-2xl flex items-center justify-center text-black font-bold transition-all disabled:opacity-30 shrink-0 squash duration-base ease-standard"
           style={{ background: "linear-gradient(135deg,#E2C060,#A8893A)" }}
         >
           ↑

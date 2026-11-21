@@ -34,7 +34,7 @@ export default function MonthPicker({ current, options, monthNames }: Props) {
       <button
         onClick={prev}
         disabled={!hasPrev}
-        className="tap-44 w-8 h-8 flex items-center justify-center rounded-full bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="tap-44 w-8 h-8 flex items-center justify-center rounded-full bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-instant ease-standard"
         aria-label="Mês anterior"
       >
         ‹
@@ -45,7 +45,7 @@ export default function MonthPicker({ current, options, monthNames }: Props) {
       <button
         onClick={next}
         disabled={!hasNext}
-        className="tap-44 w-8 h-8 flex items-center justify-center rounded-full bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="tap-44 w-8 h-8 flex items-center justify-center rounded-full bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-instant ease-standard"
         aria-label="Próximo mês"
       >
         ›

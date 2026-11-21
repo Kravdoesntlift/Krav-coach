@@ -27,11 +27,11 @@ export default async function NewMealPlanPage() {
     <div className="space-y-6 page-enter">
       <div>
         <nav className="flex items-center gap-2 text-xs text-zinc-500 mb-3">
-          <Link href="/coach/dashboard" className="hover:text-zinc-300 transition-colors">
+          <Link href="/coach/dashboard" className="hover:text-zinc-300 transition-colors duration-instant ease-standard">
             Dashboard
           </Link>
           <span>/</span>
-          <Link href="/coach/meal-plans" className="hover:text-zinc-300 transition-colors">
+          <Link href="/coach/meal-plans" className="hover:text-zinc-300 transition-colors duration-instant ease-standard">
             Planos Alimentares
           </Link>
           <span>/</span>

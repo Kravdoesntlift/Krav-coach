@@ -29,7 +29,7 @@ export default async function AutomationsPage() {
     <div className="page-enter space-y-8">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-zinc-500">
-        <Link href="/coach/dashboard" className="hover:text-brand-gold transition-colors">
+        <Link href="/coach/dashboard" className="hover:text-brand-gold transition-colors duration-instant ease-standard">
           Dashboard
         </Link>
         <span>/</span>

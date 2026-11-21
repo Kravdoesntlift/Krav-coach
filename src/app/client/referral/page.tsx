@@ -150,7 +150,7 @@ export default function ReferralPage() {
             <div className="flex gap-2">
               <button
                 onClick={copyLink}
-                className="flex-1 py-3 rounded-xl text-sm font-bold transition-colors"
+                className="flex-1 py-3 rounded-xl text-sm font-bold transition-colors duration-instant ease-standard"
                 style={
                   copied
                     ? { background: "rgba(34,197,94,0.15)", color: "#22c55e", border: "1px solid rgba(34,197,94,0.3)" }
@@ -161,7 +161,7 @@ export default function ReferralPage() {
               </button>
               <button
                 onClick={shareLink}
-                className="flex-1 py-3 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors"
+                className="flex-1 py-3 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors duration-instant ease-standard"
               >
                 {extra.share[lang]}
               </button>

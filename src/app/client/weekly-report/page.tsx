@@ -80,7 +80,7 @@ function EnergyBar({ value }: { value: number }) {
       {[1, 2, 3, 4, 5].map((i) => (
         <div
           key={i}
-          className={`h-2 flex-1 rounded-full transition-all ${
+          className={`duration-base ease-standard h-2 flex-1 rounded-full transition-all ${
             i <= filled ? "bg-brand-gold" : "bg-zinc-700"
           }`}
         />
@@ -162,7 +162,7 @@ export default async function WeeklyReportPage() {
             <div className="space-y-1.5">
               <div className="h-2.5 bg-zinc-800 rounded-full overflow-hidden">
                 <div
-                  className="h-full rounded-full transition-all duration-700"
+                  className="h-full rounded-full transition-all duration-deliberate ease-standard"
                   style={{
                     width: `${workoutPct}%`,
                     background: "linear-gradient(90deg, #A8893A, #C9A84C, #E8C96B)",

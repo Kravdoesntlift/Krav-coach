@@ -60,7 +60,7 @@ export default async function SessionsPage() {
       {/* Header + breadcrumb */}
       <div>
         <nav className="flex items-center gap-2 text-xs text-zinc-500 mb-3">
-          <Link href="/coach/dashboard" className="hover:text-zinc-300 transition-colors">
+          <Link href="/coach/dashboard" className="hover:text-zinc-300 transition-colors duration-instant ease-standard">
             Dashboard
           </Link>
           <span>/</span>

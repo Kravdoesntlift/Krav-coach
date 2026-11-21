@@ -54,7 +54,7 @@ export default function RefundAndCancelButton({ clientId, clientName }: Props) {
     return (
       <button
         onClick={() => setStep("confirm1")}
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold text-red-400 border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 transition-colors"
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-sm font-semibold text-red-400 border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 transition-colors duration-instant ease-standard"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" />
@@ -85,13 +85,13 @@ export default function RefundAndCancelButton({ clientId, clientName }: Props) {
         <div className="flex gap-2">
           <button
             onClick={reset}
-            className="flex-1 py-2.5 rounded-xl text-sm text-zinc-400 border border-zinc-700 hover:border-zinc-600 transition-colors"
+            className="flex-1 py-2.5 rounded-xl text-sm text-zinc-400 border border-zinc-700 hover:border-zinc-600 transition-colors duration-instant ease-standard"
           >
             Cancelar
           </button>
           <button
             onClick={() => setStep("confirm2")}
-            className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-red-400 bg-red-500/10 border border-red-500/25 hover:bg-red-500/20 transition-colors"
+            className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-red-400 bg-red-500/10 border border-red-500/25 hover:bg-red-500/20 transition-colors duration-instant ease-standard"
           >
             Continuar →
           </button>
@@ -117,19 +117,19 @@ export default function RefundAndCancelButton({ clientId, clientName }: Props) {
           onChange={(e) => setTyped(e.target.value)}
           placeholder="CONFIRMAR"
           autoFocus
-          className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-red-500/50 transition-colors placeholder-zinc-600 font-mono"
+          className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-red-500/50 transition-colors placeholder-zinc-600 font-mono duration-instant ease-standard"
         />
         <div className="flex gap-2">
           <button
             onClick={reset}
-            className="flex-1 py-2.5 rounded-xl text-sm text-zinc-400 border border-zinc-700 hover:border-zinc-600 transition-colors"
+            className="flex-1 py-2.5 rounded-xl text-sm text-zinc-400 border border-zinc-700 hover:border-zinc-600 transition-colors duration-instant ease-standard"
           >
             Cancelar
           </button>
           <button
             onClick={execute}
             disabled={!valid}
-            className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed duration-instant ease-standard"
           >
             Reembolsar e cancelar
           </button>
@@ -168,7 +168,7 @@ export default function RefundAndCancelButton({ clientId, clientName }: Props) {
       <div className="rounded-2xl border border-red-500/20 bg-red-500/5 p-5 space-y-3">
         <p className="text-red-400 font-bold text-sm">Erro</p>
         <p className="text-zinc-400 text-xs leading-relaxed">{errorMsg}</p>
-        <button onClick={reset} className="text-xs text-zinc-500 hover:text-white transition-colors">
+        <button onClick={reset} className="text-xs text-zinc-500 hover:text-white transition-colors duration-instant ease-standard">
           ← Voltar
         </button>
       </div>

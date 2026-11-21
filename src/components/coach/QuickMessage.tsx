@@ -69,7 +69,7 @@ export default function QuickMessage({ coachId, coachName, clientId, clientName 
       {/* Toggle button */}
       <button
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen((v) => !v); }}
-        className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm transition-all ${
+        className={`duration-base ease-standard w-8 h-8 rounded-xl flex items-center justify-center text-sm transition-all ${
           open ? "bg-brand-gold text-black" : "bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white"
         }`}
         title={`Mensagem rápida para ${clientName}`}
@@ -101,19 +101,19 @@ export default function QuickMessage({ coachId, coachName, clientId, clientName 
                   onKeyDown={handleKey}
                   placeholder="Escreve uma mensagem..."
                   rows={3}
-                  className="w-full bg-zinc-800/60 border border-zinc-700/60 rounded-xl px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-brand-gold/50 resize-none transition-colors"
+                  className="w-full bg-zinc-800/60 border border-zinc-700/60 rounded-xl px-3 py-2.5 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-brand-gold/50 resize-none transition-colors duration-instant ease-standard"
                 />
                 <div className="flex gap-2">
                   <button
                     onClick={() => setOpen(false)}
-                    className="flex-1 py-2 rounded-xl bg-zinc-800 text-zinc-400 text-xs hover:bg-zinc-700 transition-colors"
+                    className="flex-1 py-2 rounded-xl bg-zinc-800 text-zinc-400 text-xs hover:bg-zinc-700 transition-colors duration-instant ease-standard"
                   >
                     Cancelar
                   </button>
                   <button
                     onClick={send}
                     disabled={!text.trim() || sending}
-                    className="flex-1 py-2 rounded-xl text-black text-xs font-bold transition-all disabled:opacity-40"
+                    className="flex-1 py-2 rounded-xl text-black text-xs font-bold transition-all disabled:opacity-40 duration-base ease-standard"
                     style={{ background: "linear-gradient(135deg,#E2C060,#A8893A)" }}
                   >
                     {sending ? "..." : "Enviar ↑"}

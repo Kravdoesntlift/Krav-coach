@@ -388,10 +388,10 @@ export default async function CoachDashboard() {
             <PushNotificationToggle />
             <NotifyButton label="Notificar todos" />
             <BroadcastForm />
-            <Link href="/coach/testimonials" className="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm font-medium transition-colors">
+            <Link href="/coach/testimonials" className="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm font-medium transition-colors duration-instant ease-standard">
               ⭐ Testemunhos
             </Link>
-            <Link href="/coach/manage-clients" className="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm font-medium transition-colors">
+            <Link href="/coach/manage-clients" className="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm font-medium transition-colors duration-instant ease-standard">
               👥 Gerir Clientes
             </Link>
             <Link href="/coach/plans/new" className="btn-primary text-sm">+ Novo Plano</Link>
@@ -465,7 +465,7 @@ export default async function CoachDashboard() {
                   <SuggestPlanButton clientId={nc.id} />
                   <Link
                     href={`/coach/clients/${nc.id}`}
-                    className="px-3 py-2 rounded-xl bg-zinc-800 text-zinc-300 text-sm font-medium hover:bg-zinc-700 transition-colors whitespace-nowrap"
+                    className="px-3 py-2 rounded-xl bg-zinc-800 text-zinc-300 text-sm font-medium hover:bg-zinc-700 transition-colors whitespace-nowrap duration-instant ease-standard"
                   >
                     Ver perfil
                   </Link>

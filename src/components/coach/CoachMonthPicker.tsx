@@ -27,7 +27,7 @@ export default function CoachMonthPicker({ clientId, current, options, monthName
       <button
         onClick={() => hasPrev && router.push(`${base}?m=${options[idx + 1]}`)}
         disabled={!hasPrev}
-        className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-instant ease-standard"
       >
         ‹
       </button>
@@ -37,7 +37,7 @@ export default function CoachMonthPicker({ clientId, current, options, monthName
       <button
         onClick={() => hasNext && router.push(`${base}?m=${options[idx - 1]}`)}
         disabled={!hasNext}
-        className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+        className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-800 text-gray-400 hover:text-white hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-instant ease-standard"
       >
         ›
       </button>

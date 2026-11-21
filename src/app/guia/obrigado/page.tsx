@@ -73,7 +73,7 @@ export default async function ObrigadoPage({
           </p>
           <Link
             href={startUrl}
-            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-black text-sm transition-all active:scale-[0.98]"
+            className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl font-black text-sm transition-all active:scale-[0.98] duration-base ease-standard"
             style={{
               background: "linear-gradient(135deg, #E8C96B 0%, #C9A84C 60%, #A8893A 100%)",
               color: "#000",
@@ -86,7 +86,7 @@ export default async function ObrigadoPage({
 
         <Link
           href="/links"
-          className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+          className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors duration-instant ease-standard"
         >
           {T.back[lang]}
         </Link>

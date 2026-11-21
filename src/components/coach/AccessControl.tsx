@@ -12,7 +12,7 @@ function Choice({ choice, label }: { choice: string; label: string }) {
       name="choice"
       value={choice}
       disabled={pending}
-      className="tap-44 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-300 bg-zinc-800 hover:bg-zinc-700 transition-colors disabled:opacity-50"
+      className="tap-44 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-300 bg-zinc-800 hover:bg-zinc-700 transition-colors disabled:opacity-50 duration-instant ease-standard"
     >
       {label}
     </button>

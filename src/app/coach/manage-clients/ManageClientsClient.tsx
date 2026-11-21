@@ -157,7 +157,7 @@ function ClientCard({
                 });
               }}
               disabled={pending}
-              className="px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-semibold hover:bg-green-500/20 transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-semibold hover:bg-green-500/20 transition-colors disabled:opacity-50 duration-instant ease-standard"
             >
               {pending ? "..." : "✓ Ativar"}
             </button>
@@ -167,7 +167,7 @@ function ClientCard({
             <button key={a.assigned_role}
               onClick={() => handleUnassign(a.assigned_role)}
               disabled={pending}
-              className="px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs hover:bg-red-500/20 transition-colors disabled:opacity-50">
+              className="px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs hover:bg-red-500/20 transition-colors disabled:opacity-50 duration-instant ease-standard">
               {pending ? "..." : `Remover`}
             </button>
           ))}
@@ -186,20 +186,20 @@ function ClientCard({
                 <button
                   onClick={handleAssign}
                   disabled={pending}
-                  className="tap-44 px-3 py-1.5 rounded-lg bg-brand-gold hover:bg-brand-gold-dark text-black text-xs font-semibold transition-colors disabled:opacity-50"
+                  className="tap-44 px-3 py-1.5 rounded-lg bg-brand-gold hover:bg-brand-gold-dark text-black text-xs font-semibold transition-colors disabled:opacity-50 duration-instant ease-standard"
                 >
                   {pending ? "A guardar..." : "Confirmar"}
                 </button>
                 <button
                   onClick={() => { setShowRoleSelect(false); setActionError(null); }}
-                  className="w-6 h-6 rounded-full bg-zinc-700 text-zinc-400 text-xs hover:bg-zinc-600 transition-colors flex items-center justify-center"
+                  className="w-6 h-6 rounded-full bg-zinc-700 text-zinc-400 text-xs hover:bg-zinc-600 transition-colors flex items-center justify-center duration-instant ease-standard"
                   aria-label="Cancelar"
                 >×</button>
               </div>
             ) : (
               <button
                 onClick={() => setShowRoleSelect(true)}
-                className="px-3 py-1.5 rounded-lg bg-zinc-800 border border-zinc-600 text-gray-300 text-xs hover:border-brand-gold hover:text-brand-gold transition-colors"
+                className="px-3 py-1.5 rounded-lg bg-zinc-800 border border-zinc-600 text-gray-300 text-xs hover:border-brand-gold hover:text-brand-gold transition-colors duration-instant ease-standard"
               >
                 + Atribuir
               </button>
@@ -210,7 +210,7 @@ function ClientCard({
           <div className="relative">
             <button
               onClick={() => { setShowMenu((v) => !v); setConfirmDelete(false); }}
-              className="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white text-sm flex items-center justify-center transition-colors"
+              className="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white text-sm flex items-center justify-center transition-colors duration-instant ease-standard"
             >⋯</button>
 
             {showMenu && (
@@ -231,7 +231,7 @@ function ClientCard({
                       });
                     }}
                     disabled={pending}
-                    className="w-full text-left px-4 py-2.5 text-xs text-green-400 hover:bg-green-500/10 transition-colors flex items-center gap-2.5 disabled:opacity-50"
+                    className="w-full text-left px-4 py-2.5 text-xs text-green-400 hover:bg-green-500/10 transition-colors flex items-center gap-2.5 disabled:opacity-50 duration-instant ease-standard"
                   >
                     <span>♻️</span> Restaurar
                   </button>
@@ -247,7 +247,7 @@ function ClientCard({
                       });
                     }}
                     disabled={pending}
-                    className="w-full text-left px-4 py-2.5 text-xs text-zinc-300 hover:bg-zinc-700/60 transition-colors flex items-center gap-2.5 disabled:opacity-50"
+                    className="w-full text-left px-4 py-2.5 text-xs text-zinc-300 hover:bg-zinc-700/60 transition-colors flex items-center gap-2.5 disabled:opacity-50 duration-instant ease-standard"
                   >
                     <span>📦</span> Arquivar
                   </button>
@@ -272,13 +272,13 @@ function ClientCard({
                           });
                         }}
                         disabled={pending}
-                        className="flex-1 px-2 py-1.5 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 text-[11px] font-semibold hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                        className="flex-1 px-2 py-1.5 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 text-[11px] font-semibold hover:bg-red-500/30 transition-colors disabled:opacity-50 duration-instant ease-standard"
                       >
                         {pending ? "..." : "Confirmar"}
                       </button>
                       <button
                         onClick={() => setConfirmDelete(false)}
-                        className="px-2 py-1.5 rounded-lg bg-zinc-700 text-zinc-400 text-[11px] hover:bg-zinc-600 transition-colors"
+                        className="px-2 py-1.5 rounded-lg bg-zinc-700 text-zinc-400 text-[11px] hover:bg-zinc-600 transition-colors duration-instant ease-standard"
                       >
                         Cancelar
                       </button>
@@ -287,7 +287,7 @@ function ClientCard({
                 ) : (
                   <button
                     onClick={() => setConfirmDelete(true)}
-                    className="w-full text-left px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-2.5"
+                    className="w-full text-left px-4 py-2.5 text-xs text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-2.5 duration-instant ease-standard"
                   >
                     <span>🗑</span> Eliminar conta
                   </button>
@@ -385,7 +385,7 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
           </p>
         </div>
         <button onClick={copyInvite}
-          className={`shrink-0 px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+          className={`duration-instant ease-standard shrink-0 px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
             copied ? "bg-green-600 text-white" : "bg-brand-gold hover:bg-brand-gold-dark text-black"
           }`}>
           {copied ? "✓ Copiado!" : "Copiar"}
@@ -396,14 +396,14 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
       <div className="flex gap-2 flex-wrap">
         <button
           onClick={() => setTab("mine")}
-          className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+          className={`duration-instant ease-standard px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
             tab === "mine" ? "bg-brand-gold text-black" : "bg-zinc-800 text-zinc-400 hover:text-white"
           }`}>
           Os meus ({mine.length})
         </button>
         <button
           onClick={() => setTab("all")}
-          className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+          className={`duration-instant ease-standard px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
             tab === "all" ? "bg-zinc-600 text-white" : "bg-zinc-800 text-zinc-400 hover:text-white"
           }`}>
           Disponíveis ({others.length})
@@ -411,7 +411,7 @@ export default function ManageClientsClient({ allClients, coachId, inviteUrl }: 
         {archived.length > 0 && (
           <button
             onClick={() => setTab("archived")}
-            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+            className={`duration-instant ease-standard px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
               tab === "archived" ? "bg-zinc-600 text-white" : "bg-zinc-800 text-zinc-400 hover:text-white"
             }`}>
             📦 Arquivo ({archived.length})

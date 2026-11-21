@@ -69,7 +69,7 @@ export default function ClientGoals({ goals }: { goals: Goal[] }) {
                   </div>
                   <div className="h-2 bg-zinc-700 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-700 ${goal.completed ? "bg-green-500" : "bg-brand-gold"}`}
+                      className={`ease-standard h-full rounded-full transition-all duration-deliberate ${goal.completed ? "bg-green-500" : "bg-brand-gold"}`}
                       style={{ width: `${pct}%` }}
                     />
                   </div>

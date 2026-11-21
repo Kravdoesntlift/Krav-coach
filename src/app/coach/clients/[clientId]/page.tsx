@@ -172,7 +172,7 @@ export default async function ClientDetailPage({
     <div className="space-y-10 page-enter">
       {/* Header */}
       <div className="flex items-center gap-4 flex-wrap">
-        <Link href="/coach/dashboard" className="text-gray-500 hover:text-white text-sm transition-colors">
+        <Link href="/coach/dashboard" className="text-gray-500 hover:text-white text-sm transition-colors duration-instant ease-standard">
           &larr; Clientes
         </Link>
         <div className="w-px h-4 bg-zinc-700" />
@@ -220,13 +220,13 @@ export default async function ClientDetailPage({
         <div className="ml-auto flex gap-2">
           <Link
             href={`/coach/clients/${clientId}/chat`}
-            className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm transition-colors"
+            className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm transition-colors duration-instant ease-standard"
           >
             💬 Chat
           </Link>
           <Link
             href={`/coach/clients/${clientId}/report`}
-            className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm transition-colors"
+            className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm transition-colors duration-instant ease-standard"
           >
             📄 Relatório
           </Link>
@@ -238,7 +238,7 @@ export default async function ClientDetailPage({
           {latestPlan && (
             <Link
               href={`/coach/plans/new?client=${clientId}&from=${latestPlan.id}`}
-              className="text-sm px-4 py-2 rounded-xl font-semibold transition-colors"
+              className="text-sm px-4 py-2 rounded-xl font-semibold transition-colors duration-instant ease-standard"
               style={{
                 background: "rgba(255,255,255,0.05)",
                 border: "1px solid rgba(255,255,255,0.1)",
@@ -653,7 +653,7 @@ export default async function ClientDetailPage({
                   <div className="flex items-center gap-2 pt-1 border-t border-zinc-800">
                     <Link
                       href={`/coach/plans/${plan.id}/edit`}
-                      className="text-xs text-gray-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-zinc-800 transition-colors"
+                      className="text-xs text-gray-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-zinc-800 transition-colors duration-instant ease-standard"
                     >
                       Editar
                     </Link>

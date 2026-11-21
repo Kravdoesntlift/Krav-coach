@@ -107,7 +107,7 @@ export default async function HabitsPage() {
       <div className="sticky top-0 z-10 bg-black/90 backdrop-blur border-b border-zinc-800 px-4 py-3 flex items-center gap-3">
         <Link
           href="/client/dashboard"
-          className="p-2 rounded-xl bg-zinc-900 text-zinc-400 hover:text-white transition-colors"
+          className="p-2 rounded-xl bg-zinc-900 text-zinc-400 hover:text-white transition-colors duration-instant ease-standard"
         >
           <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none">
             <path

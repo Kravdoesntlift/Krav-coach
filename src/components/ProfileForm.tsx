@@ -154,7 +154,7 @@ export default function ProfileForm({ profile, email }: Props) {
                 <label className="label">
                   {extra.slug_label[lang]} <span className="text-gray-600 text-[11px]">{extra.slug_hint[lang]}</span>
                 </label>
-                <div className="flex items-center gap-0 rounded-xl overflow-hidden border border-zinc-700 focus-within:border-brand-gold/50 transition-colors">
+                <div className="flex items-center gap-0 rounded-xl overflow-hidden border border-zinc-700 focus-within:border-brand-gold/50 transition-colors duration-instant ease-standard">
                   <span className="bg-zinc-800 text-zinc-500 text-xs px-3 py-2.5 border-r border-zinc-700 whitespace-nowrap shrink-0">
                     kravcoaching.com/p/
                   </span>

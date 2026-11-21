@@ -29,7 +29,7 @@ export default function PayLinkButton({ link }: { link: string }) {
     <div className="flex flex-col items-end gap-1">
       <button
         onClick={copy}
-        className="text-sm px-4 py-2 rounded-xl font-semibold transition-colors"
+        className="text-sm px-4 py-2 rounded-xl font-semibold transition-colors duration-instant ease-standard"
         style={{
           background: copied ? "rgba(34,197,94,0.12)" : "rgba(255,255,255,0.05)",
           border: `1px solid ${copied ? "rgba(34,197,94,0.35)" : "rgba(255,255,255,0.1)"}`,

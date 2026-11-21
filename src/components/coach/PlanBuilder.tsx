@@ -408,7 +408,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
               type="button"
               onClick={generateWithAI}
               disabled={aiGenerating || !clientId}
-              className="w-full py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-40 flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-40 flex items-center justify-center gap-2 duration-base ease-standard"
               style={{ background: "linear-gradient(135deg,rgba(201,168,76,0.16),rgba(201,168,76,0.1))", border: "1px solid rgba(201,168,76,0.28)", color: "#C9A84C" }}
             >
               {aiGenerating ? (
@@ -435,7 +435,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
           <button
             type="button"
             onClick={() => setShowTemplates((v) => !v)}
-            className="w-full flex items-center justify-between text-sm text-gray-400 hover:text-white transition-colors"
+            className="w-full flex items-center justify-between text-sm text-gray-400 hover:text-white transition-colors duration-instant ease-standard"
           >
             <span className="font-medium text-white">Carregar template</span>
             <span>{showTemplates ? "▲" : "▼"}</span>
@@ -447,7 +447,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                   key={t.id}
                   type="button"
                   onClick={() => loadTemplate(t)}
-                  className="w-full text-left px-4 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white text-sm transition-colors"
+                  className="w-full text-left px-4 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white text-sm transition-colors duration-instant ease-standard"
                 >
                   {t.name}
                   <span className="text-gray-500 ml-2 text-xs">{t.days.length} dias</span>
@@ -466,7 +466,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
             <button
               key={d} type="button"
               onClick={() => (selectedDays.has(d) ? removeDay(d) : addDay(d))}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`duration-instant ease-standard px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 selectedDays.has(d) ? "bg-brand-gold text-black" : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
               }`}
             >
@@ -483,7 +483,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
             <h3 className="text-white font-semibold">{DAY_NAMES_FULL[day.day_of_week]}</h3>
             <button
               type="button" onClick={() => removeDay(day.day_of_week)}
-              className="text-xs text-gray-500 hover:text-brand-gold transition-colors"
+              className="text-xs text-gray-500 hover:text-brand-gold transition-colors duration-instant ease-standard"
             >
               Remover dia
             </button>
@@ -493,9 +493,9 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
           <label className="flex items-center gap-3 cursor-pointer select-none">
             <div
               onClick={() => updateDay(day.day_of_week, { is_rest: !day.is_rest, exercises: day.is_rest ? day.exercises : [] })}
-              className={`w-10 h-5 rounded-full transition-colors relative ${day.is_rest ? "bg-brand-gold" : "bg-zinc-700"}`}
+              className={`duration-instant ease-standard w-10 h-5 rounded-full transition-colors relative ${day.is_rest ? "bg-brand-gold" : "bg-zinc-700"}`}
             >
-              <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${day.is_rest ? "left-5" : "left-0.5"}`} />
+              <div className={`duration-base ease-standard absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${day.is_rest ? "left-5" : "left-0.5"}`} />
             </div>
             <span className="text-sm text-gray-400">
               {day.is_rest ? <span className="text-brand-gold">Dia de descanso</span> : "Treino"}
@@ -520,7 +520,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                       <span className="text-xs text-gray-500 font-medium">Exercício {i + 1}</span>
                       <button
                         type="button" onClick={() => removeExercise(day.day_of_week, i)}
-                        className="text-xs text-gray-600 hover:text-brand-gold transition-colors"
+                        className="text-xs text-gray-600 hover:text-brand-gold transition-colors duration-instant ease-standard"
                       >
                         Remover
                       </button>
@@ -529,7 +529,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                     <input
                       type="text" value={ex.name}
                       onChange={(e) => updateExercise(day.day_of_week, i, { name: e.target.value })}
-                      className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-gold transition-colors"
+                      className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-gold transition-colors duration-instant ease-standard"
                       placeholder="Nome do exercício"
                     />
 
@@ -539,7 +539,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                         <input
                           type="number" min="1" value={ex.sets}
                           onChange={(e) => updateExercise(day.day_of_week, i, { sets: e.target.value })}
-                          className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-gold transition-colors"
+                          className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-gold transition-colors duration-instant ease-standard"
                         />
                       </div>
                       <div className="flex-1">
@@ -547,7 +547,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                         <input
                           type="text" value={ex.reps}
                           onChange={(e) => updateExercise(day.day_of_week, i, { reps: e.target.value })}
-                          className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-gold transition-colors"
+                          className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-brand-gold transition-colors duration-instant ease-standard"
                           placeholder="ex: 10, 8-12"
                         />
                       </div>
@@ -556,7 +556,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                     <input
                       type="text" value={ex.notes}
                       onChange={(e) => updateExercise(day.day_of_week, i, { notes: e.target.value })}
-                      className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-gold transition-colors"
+                      className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-gold transition-colors duration-instant ease-standard"
                       placeholder="Notas (ex: 2 min descanso)"
                     />
 
@@ -565,7 +565,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                       <input
                         type="url" value={ex.video_url}
                         onChange={(e) => updateExercise(day.day_of_week, i, { video_url: e.target.value })}
-                        className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-gold transition-colors"
+                        className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-brand-gold transition-colors duration-instant ease-standard"
                         placeholder="Link do vídeo (YouTube, opcional)"
                       />
                     </div>
@@ -576,7 +576,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                         type="text" maxLength={1}
                         value={ex.superset_group ?? ""}
                         onChange={(e) => updateExercise(day.day_of_week, i, { superset_group: e.target.value.toUpperCase() })}
-                        className="w-12 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm text-center focus:outline-none focus:border-orange-500 transition-colors"
+                        className="w-12 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-white text-sm text-center focus:outline-none focus:border-orange-500 transition-colors duration-instant ease-standard"
                         placeholder="A"
                       />
                       <span className="text-zinc-600 text-xs">Mesma letra = superset</span>
@@ -587,7 +587,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                 <div className="flex gap-2">
                   <button
                     type="button" onClick={() => addExercise(day.day_of_week)}
-                    className="flex-1 py-2.5 rounded-lg border border-dashed border-zinc-700 text-gray-500 hover:border-zinc-500 hover:text-gray-300 text-sm transition-colors"
+                    className="flex-1 py-2.5 rounded-lg border border-dashed border-zinc-700 text-gray-500 hover:border-zinc-500 hover:text-gray-300 text-sm transition-colors duration-instant ease-standard"
                   >
                     + Escrever exercício
                   </button>
@@ -595,7 +595,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                     <button
                       type="button"
                       onClick={() => { setLibraryPicker(day.day_of_week); setLibrarySearch(""); }}
-                      className="px-4 py-2.5 rounded-lg border text-sm font-semibold transition-colors"
+                      className="px-4 py-2.5 rounded-lg border text-sm font-semibold transition-colors duration-instant ease-standard"
                       style={{ borderColor: "rgba(201,168,76,0.4)", color: "#C9A84C", background: "rgba(201,168,76,0.05)" }}
                     >
                       📚 Da biblioteca
@@ -620,7 +620,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
             type="button"
             onClick={saveAsTemplate}
             disabled={savingTemplate}
-            className={`flex-1 py-3 rounded-xl border text-sm font-semibold transition-colors ${templateSaved ? "border-green-500 text-green-400" : "border-zinc-600 text-gray-400 hover:border-zinc-400 hover:text-white"}`}
+            className={`duration-instant ease-standard flex-1 py-3 rounded-xl border text-sm font-semibold transition-colors ${templateSaved ? "border-green-500 text-green-400" : "border-zinc-600 text-gray-400 hover:border-zinc-400 hover:text-white"}`}
           >
             {templateSaved ? "Template guardado!" : savingTemplate ? "..." : "Guardar como template"}
           </button>
@@ -639,7 +639,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
             <h3 className="font-bold text-white">Importar da biblioteca</h3>
-            <button onClick={() => setLibraryPicker(null)} className="w-8 h-8 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">✕</button>
+            <button onClick={() => setLibraryPicker(null)} className="w-8 h-8 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors duration-instant ease-standard">✕</button>
           </div>
           {/* Search */}
           <div className="px-5 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
@@ -664,7 +664,7 @@ export default function PlanBuilder({ coachId, clients, preselectedClientId, exi
                   key={ex.id}
                   type="button"
                   onClick={() => importFromLibrary(libraryPicker, ex)}
-                  className="w-full text-left px-4 py-3 rounded-xl flex items-center justify-between gap-3 transition-colors hover:bg-white/[0.05] active:scale-[0.98]"
+                  className="w-full text-left px-4 py-3 rounded-xl flex items-center justify-between gap-3 transition-colors hover:bg-white/[0.05] active:scale-[0.98] duration-instant ease-standard"
                 >
                   <div className="min-w-0">
                     <p className="text-white text-sm font-semibold truncate">{ex.name}</p>

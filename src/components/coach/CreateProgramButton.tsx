@@ -26,7 +26,7 @@ export default function CreateProgramButton({ planId }: { planId: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-400 hover:text-white transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-400 hover:text-white transition-colors duration-instant ease-standard"
         style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
         title="Criar programa multi-semana"
       >
@@ -60,7 +60,7 @@ export default function CreateProgramButton({ planId }: { planId: string }) {
                   key={w}
                   type="button"
                   onClick={() => setWeeks(w)}
-                  className="py-3 rounded-2xl font-bold text-sm transition-all"
+                  className="py-3 rounded-2xl font-bold text-sm transition-all duration-base ease-standard"
                   style={weeks === w
                     ? { background: "linear-gradient(135deg,#E8C96B,#A8893A)", color: "#000" }
                     : { background: "rgba(255,255,255,0.05)", color: "#a1a1aa", border: "1px solid rgba(255,255,255,0.08)" }
@@ -79,7 +79,7 @@ export default function CreateProgramButton({ planId }: { planId: string }) {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="flex-none px-4 py-3 rounded-2xl bg-zinc-800 text-zinc-400 text-sm font-semibold hover:bg-zinc-700 transition-colors"
+                className="flex-none px-4 py-3 rounded-2xl bg-zinc-800 text-zinc-400 text-sm font-semibold hover:bg-zinc-700 transition-colors duration-instant ease-standard"
               >
                 Cancelar
               </button>
@@ -87,7 +87,7 @@ export default function CreateProgramButton({ planId }: { planId: string }) {
                 type="button"
                 onClick={handleCreate}
                 disabled={isPending || done}
-                className="flex-1 py-3 rounded-2xl font-bold text-black text-sm transition-all disabled:opacity-60 active:scale-95"
+                className="flex-1 py-3 rounded-2xl font-bold text-black text-sm transition-all disabled:opacity-60 squash duration-base ease-standard"
                 style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
               >
                 {done ? "✓ Criado!" : isPending ? "A criar..." : `Criar ${weeks} semanas`}

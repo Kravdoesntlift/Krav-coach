@@ -89,7 +89,7 @@ export default function OnboardingForm({ clientId }: { clientId: string }) {
       {/* Progress */}
       <div className="flex gap-1.5 mb-8">
         {[1, 2, 3, 4].map((s) => (
-          <div key={s} className={`flex-1 h-1 rounded-full transition-colors ${s <= step ? "bg-brand-gold" : "bg-zinc-700"}`} />
+          <div key={s} className={`duration-instant ease-standard flex-1 h-1 rounded-full transition-colors ${s <= step ? "bg-brand-gold" : "bg-zinc-700"}`} />
         ))}
       </div>
 
@@ -104,7 +104,7 @@ export default function OnboardingForm({ clientId }: { clientId: string }) {
               <button
                 key={g.value}
                 onClick={() => setGoal(g.value)}
-                className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border transition-colors text-left ${
+                className={`duration-instant ease-standard w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border transition-colors text-left ${
                   goal === g.value ? "border-brand-gold bg-brand-gold/10 text-white" : "border-zinc-700 text-gray-300 hover:border-zinc-500"
                 }`}
               >
@@ -134,7 +134,7 @@ export default function OnboardingForm({ clientId }: { clientId: string }) {
               <button
                 key={l.value}
                 onClick={() => setLevel(l.value)}
-                className={`w-full flex flex-col px-4 py-3.5 rounded-xl border transition-colors text-left ${
+                className={`duration-instant ease-standard w-full flex flex-col px-4 py-3.5 rounded-xl border transition-colors text-left ${
                   level === l.value ? "border-brand-gold bg-brand-gold/10" : "border-zinc-700 hover:border-zinc-500"
                 }`}
               >
@@ -161,7 +161,7 @@ export default function OnboardingForm({ clientId }: { clientId: string }) {
               <button
                 key={i}
                 onClick={() => toggleDay(i)}
-                className={`min-h-[44px] rounded-xl text-xs font-bold transition-colors ${
+                className={`duration-instant ease-standard min-h-[44px] rounded-xl text-xs font-bold transition-colors ${
                   availableDays.includes(i) ? "bg-brand-gold text-black" : "bg-zinc-800 text-gray-400 hover:bg-zinc-700"
                 }`}
               >

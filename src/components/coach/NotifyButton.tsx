@@ -38,7 +38,7 @@ export default function NotifyButton({ clientId, label }: Props) {
     <div className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-gray-400 hover:text-white text-xs font-medium transition-colors"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-gray-400 hover:text-white text-xs font-medium transition-colors duration-instant ease-standard"
       >
         🔔 {label ?? "Notificar"}
       </button>
@@ -52,7 +52,7 @@ export default function NotifyButton({ clientId, label }: Props) {
               <button
                 key={t.value}
                 onClick={() => setType(t.value)}
-                className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-colors ${
+                className={`duration-instant ease-standard w-full text-left px-3 py-2 rounded-xl text-sm transition-colors ${
                   type === t.value ? "bg-brand-gold/10 text-brand-gold border border-brand-gold/30" : "bg-zinc-800 text-gray-300 hover:bg-zinc-700"
                 }`}
               >

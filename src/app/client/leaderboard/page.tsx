@@ -193,7 +193,7 @@ export default function LeaderboardPage() {
           <div key={entry.rank}>
             <button
               onClick={() => setExpanded(expanded === entry.rank ? null : entry.rank)}
-              className={`w-full rounded-2xl p-4 flex items-center gap-3 transition-colors text-left ${
+              className={`duration-instant ease-standard w-full rounded-2xl p-4 flex items-center gap-3 transition-colors text-left ${
                 entry.isMe
                   ? "bg-brand-gold/8 border border-brand-gold/20"
                   : "bg-zinc-900 border border-zinc-800 hover:border-zinc-700"
@@ -222,7 +222,7 @@ export default function LeaderboardPage() {
 
               {/* Expand chevron */}
               <svg
-                className={`w-4 h-4 text-gray-600 transition-transform ${expanded === entry.rank ? "rotate-180" : ""}`}
+                className={`duration-snap ease-overshoot w-4 h-4 text-gray-600 transition-transform ${expanded === entry.rank ? "rotate-180" : ""}`}
                 fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />

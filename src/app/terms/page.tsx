@@ -166,10 +166,10 @@ export default function TermsPage() {
         </div>
 
         <div className="flex justify-center gap-6 text-xs text-zinc-600">
-          <Link href="/privacy" className="hover:text-zinc-400 transition-colors">
+          <Link href="/privacy" className="hover:text-zinc-400 transition-colors duration-instant ease-standard">
             Política de Privacidade
           </Link>
-          <Link href="/" className="hover:text-zinc-400 transition-colors">
+          <Link href="/" className="hover:text-zinc-400 transition-colors duration-instant ease-standard">
             ← Página inicial
           </Link>
         </div>

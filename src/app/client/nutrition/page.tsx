@@ -125,7 +125,7 @@ function MacroBar({ label, current, target, color }: { label: string; current: n
         <span className={color}>{current} / {target}</span>
       </div>
       <div className="h-1.5 rounded-full bg-zinc-800 overflow-hidden">
-        <div className={`h-full rounded-full transition-all ${pct >= 100 ? "bg-green-500" : ""}`}
+        <div className={`duration-base ease-standard h-full rounded-full transition-all ${pct >= 100 ? "bg-green-500" : ""}`}
           style={{ width: `${pct}%`, background: pct >= 100 ? undefined : "linear-gradient(90deg,#E8C96B,#A8893A)" }} />
       </div>
     </div>
@@ -552,7 +552,7 @@ function FoodSearch({
           {/* Header */}
           <div className="flex items-center justify-between">
             <p className="text-white font-semibold text-sm">{extra.add_to_meal[lang]} {mealName}</p>
-            <button onClick={onClose} className="text-zinc-600 hover:text-white text-sm transition-colors">{extra.close[lang]}</button>
+            <button onClick={onClose} className="text-zinc-600 hover:text-white text-sm transition-colors duration-instant ease-standard">{extra.close[lang]}</button>
           </div>
 
           {/* Tabs */}
@@ -561,7 +561,7 @@ function FoodSearch({
               <button
                 key={key}
                 onClick={() => setTab(key)}
-                className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                className={`duration-instant ease-standard flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${
                   tab === key ? "bg-brand-gold text-black" : "text-zinc-500 hover:text-zinc-300"
                 }`}
               >
@@ -609,7 +609,7 @@ function FoodSearch({
                   type="button"
                   onClick={() => setShowScanner(true)}
                   title={extra.scan_barcode_title[lang]}
-                  className="flex items-center justify-center w-11 h-11 rounded-xl bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-brand-gold hover:border-brand-gold/40 transition-colors shrink-0"
+                  className="flex items-center justify-center w-11 h-11 rounded-xl bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-brand-gold hover:border-brand-gold/40 transition-colors shrink-0 duration-instant ease-standard"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
                     <path d="M3 9V6a1 1 0 0 1 1-1h3M3 15v3a1 1 0 0 0 1 1h3M15 5h3a1 1 0 0 1 1 1v3M15 19h3a1 1 0 0 0 1-1v-3"/>
@@ -631,7 +631,7 @@ function FoodSearch({
                     <button
                       key={f.id}
                       onClick={() => { setSelected(f); if (f.servingSize) setGrams(String(f.servingSize)); }}
-                      className="w-full text-left px-3 py-3 rounded-xl hover:bg-zinc-800 transition-colors"
+                      className="w-full text-left px-3 py-3 rounded-xl hover:bg-zinc-800 transition-colors duration-instant ease-standard"
                     >
                       <div className="flex items-center gap-1.5">
                         {f.source === "custom" && (
@@ -740,7 +740,7 @@ function FoodSearch({
 
                   <button
                     onClick={handleAdd}
-                    className="w-full py-3.5 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors"
+                    className="w-full py-3.5 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors duration-instant ease-standard"
                   >
                     {extra.add_to_meal[lang]} {mealName}
                   </button>
@@ -809,7 +809,7 @@ function FoodSearch({
               <button
                 onClick={handleCreateFood}
                 disabled={cfSaving}
-                className="w-full py-3.5 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors disabled:opacity-40"
+                className="w-full py-3.5 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors disabled:opacity-40 duration-instant ease-standard"
               >
                 {cfSaving ? extra.saving[lang] : extra.save_and_select[lang]}
               </button>
@@ -864,10 +864,10 @@ function FoodSearch({
                                     : extra.per_portion[lang]}
                                 </p>
                                 <div className="flex gap-3 mt-1 flex-wrap">
-                                  {perPort.cal  != null && <span className="text-brand-gold  text-xs">{perPort.cal} kcal</span>}
-                                  {perPort.prot != null && <span className="text-blue-400   text-xs">{perPort.prot}g {extra.prot_abbr[lang]}</span>}
+                                  {perPort.cal  != null && <span className="text-brand-gold text-xs">{perPort.cal} kcal</span>}
+                                  {perPort.prot != null && <span className="text-blue-400 text-xs">{perPort.prot}g {extra.prot_abbr[lang]}</span>}
                                   {perPort.carbs != null && <span className="text-orange-400 text-xs">{perPort.carbs}g {extra.hid_abbr[lang]}</span>}
-                                  {perPort.fat  != null && <span className="text-pink-400   text-xs">{perPort.fat}g {extra.gord_abbr[lang]}</span>}
+                                  {perPort.fat  != null && <span className="text-pink-400 text-xs">{perPort.fat}g {extra.gord_abbr[lang]}</span>}
                                 </div>
                               </div>
                               <button
@@ -919,7 +919,7 @@ function FoodSearch({
                               <button
                                 key={f.id}
                                 onClick={() => { setIngSelected(f); setIngQuery(""); setIngResults([]); }}
-                                className="w-full text-left px-3 py-2 hover:bg-zinc-800 transition-colors rounded-xl"
+                                className="w-full text-left px-3 py-2 hover:bg-zinc-800 transition-colors rounded-xl duration-instant ease-standard"
                               >
                                 <p className="text-white text-xs">{f.name}</p>
                                 <p className="text-zinc-600 text-[11px]">{f.per100g.calories} kcal · {f.per100g.protein}g {extra.prot_abbr[lang]} /100g</p>
@@ -1010,7 +1010,7 @@ function FoodSearch({
                   <button
                     onClick={handleSaveRecipe}
                     disabled={recipeSaving}
-                    className="w-full py-3.5 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors disabled:opacity-40"
+                    className="w-full py-3.5 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors disabled:opacity-40 duration-instant ease-standard"
                   >
                     {recipeSaving ? extra.saving[lang] : extra.save_recipe[lang]}
                   </button>
@@ -1140,7 +1140,7 @@ function GoalsSetup({ existing, onSave, onClose, lang }: {
               <div className="flex gap-2 mt-1">
                 {(["M", "F"] as const).map((s) => (
                   <button key={s} type="button" onClick={() => setSex(s)}
-                    className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${sex === s ? "bg-brand-gold text-black" : "bg-zinc-800 text-zinc-400"}`}>
+                    className={`duration-instant ease-standard flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors ${sex === s ? "bg-brand-gold text-black" : "bg-zinc-800 text-zinc-400"}`}>
                     {s === "M" ? extra.sex_m[lang] : extra.sex_f[lang]}
                   </button>
                 ))}
@@ -1153,7 +1153,7 @@ function GoalsSetup({ existing, onSave, onClose, lang }: {
             <div className="space-y-1.5 mt-1">
               {Object.entries(ACTIVITY_LABELS).map(([k, v]) => (
                 <button key={k} type="button" onClick={() => setActivity(k as ClientNutritionGoals["activity_level"])}
-                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition-colors ${activity === k ? "bg-brand-gold text-black font-semibold" : "bg-zinc-800/60 text-zinc-400 hover:text-white"}`}>
+                  className={`duration-instant ease-standard w-full text-left px-3 py-2.5 rounded-xl text-sm transition-colors ${activity === k ? "bg-brand-gold text-black font-semibold" : "bg-zinc-800/60 text-zinc-400 hover:text-white"}`}>
                   {v[lang]}
                 </button>
               ))}
@@ -1165,7 +1165,7 @@ function GoalsSetup({ existing, onSave, onClose, lang }: {
             <div className="grid grid-cols-3 gap-2 mt-1">
               {Object.entries(GOAL_LABELS).map(([k, v]) => (
                 <button key={k} type="button" onClick={() => setGoal(k as ClientNutritionGoals["goal"])}
-                  className={`py-3 rounded-xl text-xs font-semibold transition-colors ${goal === k ? "bg-brand-gold text-black" : "bg-zinc-800/60 text-zinc-400 hover:text-white"}`}>
+                  className={`duration-instant ease-standard py-3 rounded-xl text-xs font-semibold transition-colors ${goal === k ? "bg-brand-gold text-black" : "bg-zinc-800/60 text-zinc-400 hover:text-white"}`}>
                   {v[lang]}
                 </button>
               ))}
@@ -1175,7 +1175,7 @@ function GoalsSetup({ existing, onSave, onClose, lang }: {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="w-full py-3.5 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors disabled:opacity-40"
+            className="w-full py-3.5 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors disabled:opacity-40 duration-instant ease-standard"
           >
             {saving ? extra.saving[lang] : extra.save[lang]}
           </button>
@@ -1368,7 +1368,7 @@ export default function NutritionPage() {
         </div>
         <button
           onClick={() => setShowGoalsModal(true)}
-          className="text-xs text-zinc-500 hover:text-brand-gold transition-colors mt-1"
+          className="text-xs text-zinc-500 hover:text-brand-gold transition-colors mt-1 duration-instant ease-standard"
         >
           {extra.goals_btn[lang]}
         </button>
@@ -1376,13 +1376,13 @@ export default function NutritionPage() {
 
       {/* Day navigator */}
       <div className="flex items-center justify-between">
-        <button onClick={() => changeDay(-1)} className="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center transition-colors text-lg leading-none">‹</button>
+        <button onClick={() => changeDay(-1)} className="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center transition-colors text-lg leading-none duration-instant ease-standard">‹</button>
         <div className="text-center">
           <p className="text-white text-sm font-semibold capitalize">{fmtDate(date, lang)}</p>
           {isToday && <p className="text-brand-gold text-[11px]">{extra.today_label[lang]}</p>}
         </div>
         <button onClick={() => changeDay(1)} disabled={isToday}
-          className="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center transition-colors disabled:opacity-30 text-lg leading-none">›</button>
+          className="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center transition-colors disabled:opacity-30 text-lg leading-none duration-instant ease-standard">›</button>
       </div>
 
       {/* Goals / progress bars */}
@@ -1402,7 +1402,7 @@ export default function NutritionPage() {
       {!loading && !goals && (
         <button
           onClick={() => setShowGoalsModal(true)}
-          className="w-full py-3 rounded-xl text-sm transition-colors text-zinc-400 hover:text-white"
+          className="w-full py-3 rounded-xl text-sm transition-colors text-zinc-400 hover:text-white duration-instant ease-standard"
           style={{ background: "rgba(201,168,76,0.05)", border: "1px dashed rgba(201,168,76,0.28)" }}
         >
           {extra.setup_goals_btn[lang]}
@@ -1417,7 +1417,7 @@ export default function NutritionPage() {
             <button
               key={m}
               onClick={() => setActiveMeal(m)}
-              className="py-3 rounded-xl text-xs font-medium text-zinc-400 hover:text-white transition-colors"
+              className="py-3 rounded-xl text-xs font-medium text-zinc-400 hover:text-white transition-colors duration-instant ease-standard"
               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
             >
               {m}
@@ -1426,7 +1426,7 @@ export default function NutritionPage() {
         </div>
         <button
           onClick={() => setShowManual((v) => !v)}
-          className="w-full py-2.5 rounded-xl text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+          className="w-full py-2.5 rounded-xl text-xs text-zinc-500 hover:text-zinc-300 transition-colors duration-instant ease-standard"
         >
           {showManual ? extra.manual_cancel[lang] : extra.manual_open[lang]}
         </button>
@@ -1438,7 +1438,7 @@ export default function NutritionPage() {
           <div className="flex flex-wrap gap-2">
             {MEAL_PRESETS.map((m) => (
               <button key={m} type="button" onClick={() => setMealName(m)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${mealName === m ? "bg-brand-gold text-black" : "bg-zinc-800 text-zinc-400 hover:text-white"}`}>
+                className={`duration-instant ease-standard px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${mealName === m ? "bg-brand-gold text-black" : "bg-zinc-800 text-zinc-400 hover:text-white"}`}>
                 {m}
               </button>
             ))}
@@ -1490,22 +1490,22 @@ export default function NutritionPage() {
                 </div>
                 {pendingDeleteId === log.id ? (
                   <div className="flex items-center gap-1 shrink-0">
-                    <button onClick={() => confirmDeleteLog(log.id)} className="text-red-400 text-xs px-2 py-0.5 rounded bg-red-400/10 hover:bg-red-400/20 transition-colors">
+                    <button onClick={() => confirmDeleteLog(log.id)} className="text-red-400 text-xs px-2 py-0.5 rounded bg-red-400/10 hover:bg-red-400/20 transition-colors duration-instant ease-standard">
                       {lang === "en" ? "Delete" : "Apagar"}
                     </button>
-                    <button onClick={() => setPendingDeleteId(null)} className="text-zinc-500 text-xs px-2 py-0.5 rounded hover:text-white transition-colors">✕</button>
+                    <button onClick={() => setPendingDeleteId(null)} className="text-zinc-500 text-xs px-2 py-0.5 rounded hover:text-white transition-colors duration-instant ease-standard">✕</button>
                   </div>
                 ) : (
-                  <button onClick={() => setPendingDeleteId(log.id)} className="shrink-0 text-zinc-700 hover:text-red-400 text-xs transition-colors">✕</button>
+                  <button onClick={() => setPendingDeleteId(log.id)} className="shrink-0 text-zinc-700 hover:text-red-400 text-xs transition-colors duration-instant ease-standard">✕</button>
                 )}
               </div>
               {(log.calories || log.protein_g || log.carbs_g || log.fat_g) && (
                 <div className="flex gap-3 pt-1 border-t border-zinc-800/60 flex-wrap">
-                  {log.calories  != null && <span className="text-brand-gold  text-xs font-semibold">{log.calories} kcal</span>}
-                  {log.protein_g != null && <span className="text-blue-400   text-xs">{log.protein_g}g {extra.prot_abbr[lang]}</span>}
+                  {log.calories  != null && <span className="text-brand-gold text-xs font-semibold">{log.calories} kcal</span>}
+                  {log.protein_g != null && <span className="text-blue-400 text-xs">{log.protein_g}g {extra.prot_abbr[lang]}</span>}
                   {log.carbs_g   != null && <span className="text-orange-400 text-xs">{log.carbs_g}g {extra.hid_abbr[lang]}</span>}
-                  {log.fat_g     != null && <span className="text-pink-400   text-xs">{log.fat_g}g {extra.gord_abbr[lang]}</span>}
-                  {log.fiber_g   != null && <span className="text-green-400  text-xs">{log.fiber_g}g {extra.fiber_abbr[lang]}</span>}
+                  {log.fat_g     != null && <span className="text-pink-400 text-xs">{log.fat_g}g {extra.gord_abbr[lang]}</span>}
+                  {log.fiber_g   != null && <span className="text-green-400 text-xs">{log.fiber_g}g {extra.fiber_abbr[lang]}</span>}
                 </div>
               )}
               {/* Micronutrients row */}

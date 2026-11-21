@@ -83,7 +83,7 @@ export default function CoachClientList({ clients, coachId, coachName }: Props) 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Pesquisar cliente..."
-            className="pl-8 pr-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-zinc-600 transition-colors w-48"
+            className="pl-8 pr-4 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-white text-sm placeholder-zinc-600 focus:outline-none focus:border-zinc-600 transition-colors w-48 duration-instant ease-standard"
           />
         </div>
       </div>
@@ -104,7 +104,7 @@ export default function CoachClientList({ clients, coachId, coachName }: Props) 
               <div key={client.id} className="relative">
                 <Link
                   href={`/coach/clients/${client.id}`}
-                  className="card p-4 flex items-center gap-3 hover:border-zinc-700/80 hover:shadow-card transition-all group block"
+                  className="card p-4 flex items-center gap-3 hover:border-zinc-700/80 hover:shadow-card transition-all group block duration-base ease-standard"
                 >
                   {/* Avatar + unread badge */}
                   <div className="relative shrink-0">
@@ -163,7 +163,7 @@ export default function CoachClientList({ clients, coachId, coachName }: Props) 
                       <div className="flex items-center gap-2 mt-1.5">
                         <div className="flex-1 h-1 bg-zinc-800 rounded-full overflow-hidden max-w-[80px]">
                           <div
-                            className={`h-full rounded-full transition-all ${pct === 100 ? "bg-green-400" : "bg-brand-gold"}`}
+                            className={`duration-base ease-standard h-full rounded-full transition-all ${pct === 100 ? "bg-green-400" : "bg-brand-gold"}`}
                             style={{ width: `${pct}%` }}
                           />
                         </div>
@@ -186,7 +186,7 @@ export default function CoachClientList({ clients, coachId, coachName }: Props) 
                   {/* Status + arrow */}
                   <div className="flex items-center gap-2 shrink-0 pr-8">
                     <div className={`w-2 h-2 rounded-full ${statusCfg.dot}`} title={statusCfg.label} />
-                    <span className="text-zinc-700 group-hover:text-zinc-400 text-xs transition-colors">→</span>
+                    <span className="text-zinc-700 group-hover:text-zinc-400 text-xs transition-colors duration-instant ease-standard">→</span>
                   </div>
                 </Link>
 

@@ -212,7 +212,7 @@ export default function PersonalRecords({ clientId, initialRecords }: Props) {
                         <button
                           onClick={() => handleDelete(r.id)}
                           disabled={deletingId === r.id}
-                          className="text-gray-700 hover:text-red-400 text-xs transition-colors"
+                          className="text-gray-700 hover:text-red-400 text-xs transition-colors duration-instant ease-standard"
                         >
                           {deletingId === r.id ? "..." : "×"}
                         </button>

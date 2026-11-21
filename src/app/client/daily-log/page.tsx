@@ -88,7 +88,7 @@ function StepsInput({ steps, onChange, lang }: { steps: number; onChange: (v: nu
       {/* Progress bar */}
       <div className="relative h-2.5 bg-zinc-800 rounded-full overflow-hidden">
         <div
-          className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
+          className="absolute inset-y-0 left-0 rounded-full transition-all duration-considered ease-standard"
           style={{ width: `${pct}%`, backgroundColor: color }}
         />
       </div>
@@ -112,7 +112,7 @@ function StepsInput({ steps, onChange, lang }: { steps: number; onChange: (v: nu
           <button
             key={n}
             onClick={() => onChange(Math.min(99999, steps + n))}
-            className="flex-1 py-2 rounded-xl text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-gray-300 transition-colors"
+            className="flex-1 py-2 rounded-xl text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-gray-300 transition-colors duration-instant ease-standard"
           >
             +{n >= 1000 ? `${n / 1000}k` : n}
           </button>
@@ -140,7 +140,7 @@ function WaterTracker({ glasses, onChange, lang }: { glasses: number; onChange: 
             <button
               key={i}
               onClick={() => onChange(filled && i === glasses - 1 ? glasses - 1 : i + 1)}
-              className={`flex-1 min-w-[calc(12.5%-8px)] aspect-square rounded-xl flex flex-col items-center justify-center transition-all duration-150 border ${
+              className={`ease-standard flex-1 min-w-[calc(12.5%-8px)] aspect-square rounded-xl flex flex-col items-center justify-center transition-all duration-snap border ${
                 filled
                   ? "bg-blue-500/20 border-blue-400/40 text-blue-400"
                   : "bg-zinc-800/50 border-zinc-700/50 text-zinc-700"
@@ -160,7 +160,7 @@ function WaterTracker({ glasses, onChange, lang }: { glasses: number; onChange: 
         <button
           onClick={() => onChange(Math.max(0, glasses - 1))}
           disabled={glasses === 0}
-          className="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 text-white font-bold text-lg flex items-center justify-center transition-colors"
+          className="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 text-white font-bold text-lg flex items-center justify-center transition-colors duration-instant ease-standard"
         >
           −
         </button>
@@ -170,7 +170,7 @@ function WaterTracker({ glasses, onChange, lang }: { glasses: number; onChange: 
         </div>
         <button
           onClick={() => onChange(glasses + 1)}
-          className="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-lg flex items-center justify-center transition-colors"
+          className="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-lg flex items-center justify-center transition-colors duration-instant ease-standard"
         >
           +
         </button>
@@ -355,7 +355,7 @@ export default function DailyLogPage() {
                   <button
                     key={opt.value}
                     onClick={() => setEnergy(opt.value)}
-                    className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-xl transition-all duration-150 ${
+                    className={`ease-standard flex-1 flex flex-col items-center gap-1 py-3 rounded-xl transition-all duration-snap ${
                       selected ? "ring-2 ring-brand-gold scale-110 bg-zinc-800" : "bg-zinc-800/50 hover:bg-zinc-800"
                     }`}
                   >
@@ -403,7 +403,7 @@ export default function DailyLogPage() {
                   setSteps(healthLog?.steps ?? 0);
                   setGlasses(healthLog ? Math.round(healthLog.water_ml / GLASS_ML) : 0);
                 }}
-                className="flex-1 py-3 rounded-xl text-sm font-semibold text-gray-400 bg-zinc-800 hover:bg-zinc-700 transition-colors"
+                className="flex-1 py-3 rounded-xl text-sm font-semibold text-gray-400 bg-zinc-800 hover:bg-zinc-700 transition-colors duration-instant ease-standard"
               >
                 {t("cancel")}
               </button>

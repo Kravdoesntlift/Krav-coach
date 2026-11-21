@@ -51,14 +51,14 @@ export default function AvatarUpload({ currentUrl, fullName }: Props) {
           <img
             src={url}
             alt={fullName}
-            className="w-16 h-16 rounded-full object-cover border-2 border-zinc-700 group-hover:border-brand-gold transition-colors"
+            className="w-16 h-16 rounded-full object-cover border-2 border-zinc-700 group-hover:border-brand-gold transition-colors duration-instant ease-standard"
           />
         ) : (
-          <div className="w-16 h-16 rounded-full bg-zinc-800 border-2 border-zinc-700 group-hover:border-brand-gold transition-colors flex items-center justify-center text-white font-bold text-xl">
+          <div className="w-16 h-16 rounded-full bg-zinc-800 border-2 border-zinc-700 group-hover:border-brand-gold transition-colors flex items-center justify-center text-white font-bold text-xl duration-instant ease-standard">
             {initials}
           </div>
         )}
-        <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-base ease-standard">
           <span className="text-white text-xs font-medium">{loading ? "..." : "Alterar"}</span>
         </div>
       </button>
@@ -68,7 +68,7 @@ export default function AvatarUpload({ currentUrl, fullName }: Props) {
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="text-xs text-gray-500 hover:text-brand-gold transition-colors mt-0.5"
+          className="text-xs text-gray-500 hover:text-brand-gold transition-colors mt-0.5 duration-instant ease-standard"
         >
           {loading ? "A carregar..." : "Alterar foto"}
         </button>

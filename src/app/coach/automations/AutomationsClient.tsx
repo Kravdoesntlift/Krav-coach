@@ -269,7 +269,7 @@ export default function AutomationsClient({ initialAutomations }: Props) {
             <button
               onClick={handleCancel}
               disabled={isPending}
-              className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm font-medium transition-colors"
+              className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-gray-300 text-sm font-medium transition-colors duration-instant ease-standard"
             >
               Cancelar
             </button>
@@ -336,7 +336,7 @@ function AutomationCard({
 
   return (
     <div
-      className={`card rounded-2xl p-4 flex flex-col sm:flex-row sm:items-start gap-4 transition-opacity ${
+      className={`duration-base ease-standard card rounded-2xl p-4 flex flex-col sm:flex-row sm:items-start gap-4 transition-opacity ${
         isDeleting ? "opacity-40" : ""
       }`}
     >
@@ -367,12 +367,12 @@ function AutomationCard({
           onClick={() => onToggle(automation.id, automation.is_active)}
           disabled={isToggling || isDeleting}
           aria-label={automation.is_active ? "Desativar" : "Ativar"}
-          className={`relative w-10 h-6 rounded-full transition-colors focus:outline-none ${
+          className={`duration-instant ease-standard relative w-10 h-6 rounded-full transition-colors focus:outline-none ${
             automation.is_active ? "bg-brand-gold" : "bg-zinc-700"
           } ${isToggling ? "opacity-60" : ""}`}
         >
           <span
-            className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+            className={`duration-snap ease-overshoot absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
               automation.is_active ? "translate-x-4" : "translate-x-0"
             }`}
           />
@@ -387,13 +387,13 @@ function AutomationCard({
                 onDelete(automation.id);
               }}
               disabled={isDeleting}
-              className="text-xs font-semibold text-red-400 hover:text-red-300 transition-colors"
+              className="text-xs font-semibold text-red-400 hover:text-red-300 transition-colors duration-instant ease-standard"
             >
               Confirmar
             </button>
             <button
               onClick={() => setConfirmDelete(false)}
-              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors ml-1"
+              className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors ml-1 duration-instant ease-standard"
             >
               Cancelar
             </button>
@@ -403,7 +403,7 @@ function AutomationCard({
             onClick={() => setConfirmDelete(true)}
             disabled={isDeleting}
             aria-label="Eliminar"
-            className="text-zinc-600 hover:text-red-400 transition-colors p-1"
+            className="text-zinc-600 hover:text-red-400 transition-colors p-1 duration-instant ease-standard"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

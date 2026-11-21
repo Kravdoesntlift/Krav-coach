@@ -173,7 +173,7 @@ export default async function EbookReaderPage({
                 >
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span className="text-sm text-zinc-300 group-hover:text-white transition-colors">{item}</span>
+                <span className="text-sm text-zinc-300 group-hover:text-white transition-colors duration-instant ease-standard">{item}</span>
               </a>
             ))}
           </div>

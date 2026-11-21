@@ -156,7 +156,7 @@ export default function ShareAchievement({ title, description, icon, clientName 
       {/* Close button: always visible */}
       <button
         onClick={close}
-        className="fixed top-5 right-5 w-10 h-10 rounded-full flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+        className="fixed top-5 right-5 w-10 h-10 rounded-full flex items-center justify-center text-zinc-400 hover:text-white transition-colors duration-instant ease-standard"
         style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", zIndex: 10000 }}
       >
         ✕
@@ -214,7 +214,7 @@ export default function ShareAchievement({ title, description, icon, clientName 
           <div className="flex gap-3 mt-5 w-full">
             <button
               onClick={close}
-              className="flex-1 py-3 rounded-2xl text-zinc-400 text-sm font-medium transition-colors hover:text-white"
+              className="flex-1 py-3 rounded-2xl text-zinc-400 text-sm font-medium transition-colors hover:text-white duration-instant ease-standard"
               style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
             >
               Fechar
@@ -222,7 +222,7 @@ export default function ShareAchievement({ title, description, icon, clientName 
             <button
               onClick={generateImage}
               disabled={generating}
-              className="flex-1 py-3 rounded-2xl text-black text-sm font-bold transition-all disabled:opacity-50"
+              className="flex-1 py-3 rounded-2xl text-black text-sm font-bold transition-all disabled:opacity-50 duration-base ease-standard"
               style={{ background: "linear-gradient(135deg, #E8C96B, #C9A84C)", boxShadow: "0 4px 20px rgba(201,168,76,0.28)" }}
             >
               {generating ? (
@@ -245,14 +245,14 @@ export default function ShareAchievement({ title, description, icon, clientName 
           <div className="flex gap-2 w-full">
             <button
               onClick={() => setStage("reveal")}
-              className="flex-1 py-3 rounded-2xl text-zinc-400 text-sm font-medium transition-colors hover:text-white"
+              className="flex-1 py-3 rounded-2xl text-zinc-400 text-sm font-medium transition-colors hover:text-white duration-instant ease-standard"
               style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
             >
               ← Voltar
             </button>
             <button
               onClick={download}
-              className="flex-1 py-3 rounded-2xl text-white text-sm font-medium transition-colors"
+              className="flex-1 py-3 rounded-2xl text-white text-sm font-medium transition-colors duration-instant ease-standard"
               style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)" }}
             >
               Guardar
@@ -281,7 +281,7 @@ export default function ShareAchievement({ title, description, icon, clientName 
       <canvas ref={canvasRef} className="hidden" aria-hidden="true" />
       <button
         onClick={() => setStage("reveal")}
-        className="text-xs text-zinc-500 hover:text-brand-gold transition-colors font-medium"
+        className="text-xs text-zinc-500 hover:text-brand-gold transition-colors font-medium duration-instant ease-standard"
       >
         Ver
       </button>

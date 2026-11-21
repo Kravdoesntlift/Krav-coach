@@ -238,7 +238,7 @@ export default async function PendingPage({
         {/* Chat link */}
         <a
           href="/client/chat"
-          className="inline-flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-bold text-black text-sm transition-all active:scale-95 hover:brightness-110"
+          className="inline-flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-bold text-black text-sm transition-all hover:brightness-110 squash duration-base ease-standard"
           style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
         >
           {extra.chat_cta[lang]}

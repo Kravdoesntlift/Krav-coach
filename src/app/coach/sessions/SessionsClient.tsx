@@ -179,7 +179,7 @@ function SessionCard({
           <button
             onClick={handleComplete}
             disabled={pending}
-            className="tap-44 text-xs px-3 py-1.5 rounded-lg bg-brand-gold text-black font-semibold hover:bg-brand-gold-dark transition-colors disabled:opacity-50"
+            className="tap-44 text-xs px-3 py-1.5 rounded-lg bg-brand-gold text-black font-semibold hover:bg-brand-gold-dark transition-colors disabled:opacity-50 duration-instant ease-standard"
           >
             Concluída
           </button>
@@ -187,7 +187,7 @@ function SessionCard({
             onClick={handleCancel}
             disabled={pending}
             onBlur={() => setConfirmCancel(false)}
-            className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors disabled:opacity-50
+            className={`duration-instant ease-standard text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors disabled:opacity-50
               ${confirmCancel
                 ? "bg-red-500 text-white"
                 : "bg-zinc-800 text-zinc-300 hover:bg-red-500/20 hover:text-red-400"
@@ -203,7 +203,7 @@ function SessionCard({
           <button
             onClick={handleDelete}
             disabled={pending}
-            className="text-xs text-zinc-600 hover:text-red-400 transition-colors"
+            className="text-xs text-zinc-600 hover:text-red-400 transition-colors duration-instant ease-standard"
           >
             Eliminar
           </button>
@@ -324,7 +324,7 @@ function NewSessionForm({
         {/* Link / location */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="label mb-0 transition-all">
+            <label className="label mb-0 transition-all duration-base ease-standard">
               {form.session_type === "online" ? "Link da videochamada" : "Localização"}
             </label>
             {form.session_type === "online" && (
@@ -337,7 +337,7 @@ function NewSessionForm({
                     location_or_link: `https://meet.jit.si/krav-${roomId}`,
                   }));
                 }}
-                className="text-[11px] px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20 transition-colors font-medium whitespace-nowrap"
+                className="text-[11px] px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/20 transition-colors font-medium whitespace-nowrap duration-instant ease-standard"
               >
                 🎥 Gerar sala Jitsi
               </button>
@@ -345,7 +345,7 @@ function NewSessionForm({
           </div>
           <input
             type="text"
-            className="input w-full transition-all"
+            className="input w-full transition-all duration-base ease-standard"
             placeholder={
               form.session_type === "online"
                 ? "https://meet.google.com/... ou https://zoom.us/..."
@@ -365,7 +365,7 @@ function NewSessionForm({
             <button
               key={t}
               onClick={() => setForm((f) => ({ ...f, session_type: t }))}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-colors capitalize
+              className={`duration-instant ease-standard px-4 py-2 rounded-xl text-sm font-semibold border transition-colors capitalize
                 ${form.session_type === t
                   ? "bg-brand-gold text-black border-brand-gold"
                   : "bg-transparent text-zinc-400 border-zinc-700 hover:border-zinc-500"
@@ -393,7 +393,7 @@ function NewSessionForm({
       <div className="flex justify-end gap-3">
         <button
           onClick={onCancel}
-          className="px-4 py-2 rounded-xl text-sm text-zinc-400 hover:text-white transition-colors"
+          className="px-4 py-2 rounded-xl text-sm text-zinc-400 hover:text-white transition-colors duration-instant ease-standard"
         >
           Cancelar
         </button>
@@ -459,7 +459,7 @@ export default function SessionsClient({ sessions, clients, coachId }: Props) {
             <button
               key={key}
               onClick={() => setTab(key)}
-              className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors
+              className={`duration-instant ease-standard px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors
                 ${tab === key
                   ? "bg-brand-gold text-black"
                   : "text-zinc-400 hover:text-white"

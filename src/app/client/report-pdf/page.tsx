@@ -55,7 +55,7 @@ export default function ReportPDFPage() {
               <button
                 key={ym}
                 onClick={() => setSelected(ym)}
-                className={`px-3 py-3 rounded-xl text-sm font-medium text-left transition-colors capitalize ${
+                className={`duration-instant ease-standard px-3 py-3 rounded-xl text-sm font-medium text-left transition-colors capitalize ${
                   selected === ym
                     ? "bg-brand-gold text-black font-bold"
                     : "bg-zinc-800/60 text-zinc-400 hover:text-white hover:bg-zinc-700/60"

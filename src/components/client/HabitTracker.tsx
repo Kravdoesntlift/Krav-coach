@@ -236,7 +236,7 @@ export default function HabitTracker({
             setNewName("");
             setNewEmoji(EMOJI_OPTIONS[0]);
           }}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-gold text-black text-sm font-semibold hover:bg-brand-gold-dark transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-gold text-black text-sm font-semibold hover:bg-brand-gold-dark transition-colors duration-instant ease-standard"
         >
           <span className="text-base leading-none">+</span>
           {t("add_habit")}
@@ -252,7 +252,7 @@ export default function HabitTracker({
               <button
                 key={em}
                 onClick={() => setNewEmoji(em)}
-                className={`text-2xl p-2 rounded-xl transition-all ${
+                className={`duration-base ease-standard text-2xl p-2 rounded-xl transition-all ${
                   newEmoji === em
                     ? "bg-brand-gold/20 ring-1 ring-brand-gold scale-110"
                     : "bg-zinc-800 hover:bg-zinc-700"
@@ -280,13 +280,13 @@ export default function HabitTracker({
             <button
               onClick={() => handleCreate(newName, newEmoji)}
               disabled={saving || !newName.trim()}
-              className="flex-1 py-2 rounded-xl bg-brand-gold text-black text-sm font-semibold disabled:opacity-40 hover:bg-brand-gold-dark transition-colors"
+              className="flex-1 py-2 rounded-xl bg-brand-gold text-black text-sm font-semibold disabled:opacity-40 hover:bg-brand-gold-dark transition-colors duration-instant ease-standard"
             >
               {saving ? "..." : t("save")}
             </button>
             <button
               onClick={() => setShowAddForm(false)}
-              className="px-4 py-2 rounded-xl bg-zinc-800 text-zinc-400 text-sm hover:bg-zinc-700 transition-colors"
+              className="px-4 py-2 rounded-xl bg-zinc-800 text-zinc-400 text-sm hover:bg-zinc-700 transition-colors duration-instant ease-standard"
             >
               {t("cancel")}
             </button>
@@ -308,7 +308,7 @@ export default function HabitTracker({
               <button
                 key={i}
                 onClick={() => handleCreate(lang === "en" ? s.name_en : s.name_pt, s.emoji)}
-                className="w-full flex items-center gap-3 p-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 transition-colors text-left"
+                className="w-full flex items-center gap-3 p-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 transition-colors text-left duration-instant ease-standard"
               >
                 <span className="text-xl">{s.emoji}</span>
                 <span className="text-sm text-zinc-300">
@@ -332,7 +332,7 @@ export default function HabitTracker({
         return (
           <div
             key={habit.id}
-            className={`card p-4 transition-all ${
+            className={`duration-base ease-standard card p-4 transition-all ${
               checked ? "border-brand-gold/40" : "border-zinc-800"
             }`}
           >
@@ -341,7 +341,7 @@ export default function HabitTracker({
               <button
                 onClick={() => handleToggle(habit.id)}
                 disabled={toggling}
-                className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
+                className={`duration-base ease-standard w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
                   checked
                     ? "bg-brand-gold border-brand-gold text-black"
                     : "border-zinc-600 hover:border-brand-gold"
@@ -363,7 +363,7 @@ export default function HabitTracker({
               {/* Emoji + Name */}
               <span className="text-xl">{habit.emoji}</span>
               <span
-                className={`flex-1 text-sm font-medium transition-colors ${
+                className={`duration-instant ease-standard flex-1 text-sm font-medium transition-colors ${
                   checked ? "text-zinc-400 line-through" : "text-white"
                 }`}
               >
@@ -383,13 +383,13 @@ export default function HabitTracker({
                   <button
                     onClick={() => handleDelete(habit.id)}
                     disabled={deleting}
-                    className="text-xs px-2 py-1 rounded-lg bg-red-900/60 text-red-400 hover:bg-red-900 transition-colors"
+                    className="text-xs px-2 py-1 rounded-lg bg-red-900/60 text-red-400 hover:bg-red-900 transition-colors duration-instant ease-standard"
                   >
                     {t("confirm")}
                   </button>
                   <button
                     onClick={() => setConfirmDelete(null)}
-                    className="text-xs px-2 py-1 rounded-lg bg-zinc-800 text-zinc-400 hover:bg-zinc-700 transition-colors"
+                    className="text-xs px-2 py-1 rounded-lg bg-zinc-800 text-zinc-400 hover:bg-zinc-700 transition-colors duration-instant ease-standard"
                   >
                     ✕
                   </button>
@@ -397,7 +397,7 @@ export default function HabitTracker({
               ) : (
                 <button
                   onClick={() => setConfirmDelete(habit.id)}
-                  className="p-1.5 rounded-lg text-zinc-600 hover:text-red-400 hover:bg-zinc-800 transition-colors"
+                  className="p-1.5 rounded-lg text-zinc-600 hover:text-red-400 hover:bg-zinc-800 transition-colors duration-instant ease-standard"
                   aria-label="Delete habit"
                 >
                   <svg
@@ -428,7 +428,7 @@ export default function HabitTracker({
                       {day.label}
                     </span>
                     <div
-                      className={`w-5 h-5 rounded-full transition-colors ${
+                      className={`duration-instant ease-standard w-5 h-5 rounded-full transition-colors ${
                         done
                           ? "bg-brand-gold"
                           : isToday

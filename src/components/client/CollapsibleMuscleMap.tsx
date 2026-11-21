@@ -24,7 +24,7 @@ export default function CollapsibleMuscleMap({ exerciseNames, loggedNames }: Pro
       {/* Toggle button */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all"
+        className="w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-base ease-standard"
         style={{
           background: open
             ? "linear-gradient(160deg,#1a1a1a 0%,#111111 100%)"
@@ -46,7 +46,7 @@ export default function CollapsibleMuscleMap({ exerciseNames, loggedNames }: Pro
           </div>
         </div>
         <span
-          className="text-zinc-500 text-xs font-semibold transition-transform duration-300"
+          className="text-zinc-500 text-xs font-semibold transition-transform duration-base ease-overshoot"
           style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", display:"inline-block" }}
         >
           ▼

@@ -19,14 +19,14 @@ export default function NotFound() {
         <div className="flex flex-col gap-3">
           <Link
             href="/"
-            className="inline-flex items-center justify-center px-6 py-3 rounded-2xl font-bold text-black text-sm transition-all hover:brightness-110"
+            className="inline-flex items-center justify-center px-6 py-3 rounded-2xl font-bold text-black text-sm transition-all hover:brightness-110 duration-base ease-standard"
             style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
           >
             Voltar ao início
           </Link>
           <Link
             href="/auth/login"
-            className="text-sm text-zinc-500 hover:text-white transition-colors"
+            className="text-sm text-zinc-500 hover:text-white transition-colors duration-instant ease-standard"
           >
             Entrar na app →
           </Link>

@@ -139,7 +139,7 @@ function Card({
       <div className="mt-auto pt-1">
         <Link
           href={href}
-          className={`block text-center w-full py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-95 ${
+          className={`duration-base ease-standard block text-center w-full py-3.5 rounded-2xl font-bold text-sm transition-all squash ${
             highlight ? "text-black hover:brightness-110" : "text-white hover:bg-white/[0.06]"
           }`}
           style={

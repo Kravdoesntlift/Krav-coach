@@ -46,7 +46,7 @@ export default function TrialFeedbackSection() {
               onClick={() => setRating(s)}
               onMouseEnter={() => setHovered(s)}
               onMouseLeave={() => setHovered(0)}
-              className="text-3xl transition-transform active:scale-90"
+              className="text-3xl transition-transform squash duration-snap ease-overshoot"
               aria-label={`${s} estrelas`}
             >
               <span style={{ color: s <= (hovered || rating) ? "#C9A84C" : "#3f3f46" }}>★</span>
@@ -69,13 +69,13 @@ export default function TrialFeedbackSection() {
         <div className="flex gap-2">
           <label className="flex-1">
             <input type="radio" name="would_recommend" value="yes" className="sr-only peer" />
-            <div className="text-center rounded-xl border border-zinc-700 py-2.5 text-sm text-zinc-500 cursor-pointer peer-checked:border-green-500/50 peer-checked:bg-green-500/10 peer-checked:text-green-400 transition-all select-none">
+            <div className="text-center rounded-xl border border-zinc-700 py-2.5 text-sm text-zinc-500 cursor-pointer peer-checked:border-green-500/50 peer-checked:bg-green-500/10 peer-checked:text-green-400 transition-all select-none duration-base ease-standard">
               👍 Recomendaria
             </div>
           </label>
           <label className="flex-1">
             <input type="radio" name="would_recommend" value="no" className="sr-only peer" />
-            <div className="text-center rounded-xl border border-zinc-700 py-2.5 text-sm text-zinc-500 cursor-pointer peer-checked:border-red-500/50 peer-checked:bg-red-500/10 peer-checked:text-red-400 transition-all select-none">
+            <div className="text-center rounded-xl border border-zinc-700 py-2.5 text-sm text-zinc-500 cursor-pointer peer-checked:border-red-500/50 peer-checked:bg-red-500/10 peer-checked:text-red-400 transition-all select-none duration-base ease-standard">
               👎 Não recomendaria
             </div>
           </label>
@@ -94,7 +94,7 @@ export default function TrialFeedbackSection() {
         <button
           type="submit"
           disabled={pending || rating === 0}
-          className="w-full rounded-xl border border-zinc-700 text-zinc-300 text-sm font-semibold py-3 hover:border-zinc-500 hover:text-white disabled:opacity-40 transition-all active:scale-95"
+          className="w-full rounded-xl border border-zinc-700 text-zinc-300 text-sm font-semibold py-3 hover:border-zinc-500 hover:text-white disabled:opacity-40 transition-all squash duration-base ease-standard"
         >
           {pending ? "A enviar..." : "Enviar feedback →"}
         </button>

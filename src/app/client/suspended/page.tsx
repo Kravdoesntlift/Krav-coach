@@ -50,7 +50,7 @@ export default async function SuspendedPage() {
 
         <div className="h-px bg-zinc-800" />
         <form action={logout}>
-          <button type="submit" className="text-sm text-gray-500 hover:text-white transition-colors">
+          <button type="submit" className="text-sm text-gray-500 hover:text-white transition-colors duration-instant ease-standard">
             {extra.logout[lang]}
           </button>
         </form>

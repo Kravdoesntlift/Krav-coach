@@ -10,7 +10,7 @@ function Submit({ label, pendingLabel }: { label: string; pendingLabel: string }
     <button
       type="submit"
       disabled={pending}
-      className="w-full rounded-xl py-3 text-sm font-bold text-black transition-all active:scale-95 disabled:opacity-60"
+      className="w-full rounded-xl py-3 text-sm font-bold text-black transition-all disabled:opacity-60 squash duration-base ease-standard"
       style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
     >
       {pending ? pendingLabel : label}

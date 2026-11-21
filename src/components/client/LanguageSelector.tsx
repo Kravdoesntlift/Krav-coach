@@ -10,7 +10,7 @@ export default function LanguageSelector() {
       <div className="flex gap-3">
         <button
           onClick={() => setLang("pt")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`duration-instant ease-standard px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             lang === "pt"
               ? "bg-[#C9A84C] text-black"
               : "bg-zinc-800 text-gray-400 hover:text-white"
@@ -20,7 +20,7 @@ export default function LanguageSelector() {
         </button>
         <button
           onClick={() => setLang("en")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`duration-instant ease-standard px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             lang === "en"
               ? "bg-[#C9A84C] text-black"
               : "bg-zinc-800 text-gray-400 hover:text-white"

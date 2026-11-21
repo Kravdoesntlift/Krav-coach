@@ -33,13 +33,13 @@ export default function DeletePlanButton({ planId, clientId, deletePlan }: Props
         <button
           onClick={handleDelete}
           disabled={loading}
-          className="tap-44 text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded transition-colors disabled:opacity-50"
+          className="tap-44 text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded transition-colors disabled:opacity-50 duration-instant ease-standard"
         >
           {loading ? "..." : "Apagar"}
         </button>
         <button
           onClick={() => setConfirming(false)}
-          className="text-xs text-gray-500 hover:text-white px-2 py-1 rounded transition-colors"
+          className="text-xs text-gray-500 hover:text-white px-2 py-1 rounded transition-colors duration-instant ease-standard"
         >
           Cancelar
         </button>
@@ -50,7 +50,7 @@ export default function DeletePlanButton({ planId, clientId, deletePlan }: Props
   return (
     <button
       onClick={() => setConfirming(true)}
-      className="text-xs text-gray-600 hover:text-red-400 px-3 py-1.5 rounded-lg hover:bg-zinc-800 transition-colors"
+      className="text-xs text-gray-600 hover:text-red-400 px-3 py-1.5 rounded-lg hover:bg-zinc-800 transition-colors duration-instant ease-standard"
     >
       Apagar
     </button>

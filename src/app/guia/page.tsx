@@ -109,7 +109,7 @@ export default async function GuiaPage({
         {/* Idioma: um link, para a página continuar a ser renderizada no servidor */}
         <Link
           href={`/guia?lang=${other}`}
-          className="absolute top-6 right-6 z-20 px-3 py-1.5 rounded-full text-[11px] font-black tracking-widest uppercase transition-colors"
+          className="absolute top-6 right-6 z-20 px-3 py-1.5 rounded-full text-[11px] font-black tracking-widest uppercase transition-colors duration-instant ease-standard"
           style={{
             background: "rgba(255,255,255,0.04)",
             border: "1px solid rgba(255,255,255,0.09)",

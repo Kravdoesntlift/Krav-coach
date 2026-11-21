@@ -68,7 +68,7 @@ export default function SuggestPlanButton({ clientId }: { clientId: string }) {
         type="button"
         onClick={handleGenerate}
         disabled={loading}
-        className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold transition-all active:scale-95 hover:bg-[#C9A84C]/10 disabled:opacity-50 disabled:pointer-events-none"
+        className="inline-flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold transition-all hover:bg-[#C9A84C]/10 disabled:opacity-50 disabled:pointer-events-none squash duration-base ease-standard"
         style={{ border: "1px solid #C9A84C", color: "#C9A84C" }}
       >
         {loading ? (
@@ -119,7 +119,7 @@ export default function SuggestPlanButton({ clientId }: { clientId: string }) {
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="text-zinc-500 hover:text-white transition-colors text-lg shrink-0"
+                className="text-zinc-500 hover:text-white transition-colors text-lg shrink-0 duration-instant ease-standard"
               >
                 ✕
               </button>
@@ -175,14 +175,14 @@ export default function SuggestPlanButton({ clientId }: { clientId: string }) {
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                className="flex-none px-4 py-3 rounded-2xl bg-zinc-800 text-zinc-400 text-sm font-semibold hover:bg-zinc-700 transition-colors"
+                className="flex-none px-4 py-3 rounded-2xl bg-zinc-800 text-zinc-400 text-sm font-semibold hover:bg-zinc-700 transition-colors duration-instant ease-standard"
               >
                 Fechar
               </button>
               <button
                 type="button"
                 onClick={handleUsePlan}
-                className="flex-1 py-3 rounded-2xl font-bold text-black text-sm transition-all active:scale-95 hover:brightness-110"
+                className="flex-1 py-3 rounded-2xl font-bold text-black text-sm transition-all hover:brightness-110 squash duration-base ease-standard"
                 style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
               >
                 Usar este plano

@@ -499,7 +499,7 @@ function SocialRow() {
     <div className="grid grid-cols-3 gap-3">
       {socials.map((s) => (
         <a key={s.id} href={s.href} target="_blank" rel="noopener noreferrer"
-          className="flex flex-col items-center gap-2 py-4 rounded-2xl active:scale-[0.98] transition-transform"
+          className="flex flex-col items-center gap-2 py-4 rounded-2xl active:scale-[0.98] transition-transform duration-snap ease-overshoot"
           style={{ background: "#0f0c08", border: "1px solid rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.4)" }}>
           {s.icon}
           <span className="text-[11px] font-bold tracking-wide">{s.label}</span>
@@ -574,7 +574,7 @@ export default function LinksBoard({ community }: { community: CommunityCopy }) 
             href="https://www.google.com/search?kgmid=/g/11nvv2h6db"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full active:scale-95 transition-transform"
+            className="flex items-center gap-1.5 text-[11px] font-bold px-3 py-1.5 rounded-full transition-transform squash duration-snap ease-overshoot"
             style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.55)" }}
           >
             <span style={{ color: "#C9A84C", letterSpacing: "0.05em" }}>★★★★★</span>
@@ -583,7 +583,7 @@ export default function LinksBoard({ community }: { community: CommunityCopy }) 
 
           {/* Trial pill */}
           <a href="/start"
-            className="flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-black active:scale-95 transition-transform"
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-black transition-transform squash duration-snap ease-overshoot"
             style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C)", color: "#000", boxShadow: "0 2px 20px rgba(201,168,76,0.28)" }}>
             <span>7 dias grátis</span>
             <span style={{ opacity: 0.6 }}>·</span>

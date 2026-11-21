@@ -279,7 +279,7 @@ export default function CoachChallengesPage() {
                 <button
                   onClick={() => handleAnnounce(entry.clientId)}
                   disabled={announcing && announcingId === entry.clientId}
-                  className="ml-2 px-3 py-1.5 rounded-xl text-xs font-semibold bg-brand-gold/10 text-brand-gold border border-brand-gold/20 hover:bg-brand-gold/20 transition-colors disabled:opacity-40 whitespace-nowrap"
+                  className="ml-2 px-3 py-1.5 rounded-xl text-xs font-semibold bg-brand-gold/10 text-brand-gold border border-brand-gold/20 hover:bg-brand-gold/20 transition-colors disabled:opacity-40 whitespace-nowrap duration-instant ease-standard"
                 >
                   {announcing && announcingId === entry.clientId ? "…" : "Anunciar"}
                 </button>

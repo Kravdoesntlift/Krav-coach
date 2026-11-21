@@ -33,7 +33,7 @@ export default function DuplicatePlanButton({ planId, duplicatePlan }: Props) {
       <button
         onClick={handle}
         disabled={loading}
-        className="tap-44 text-xs text-gray-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-zinc-800 transition-colors disabled:opacity-50"
+        className="tap-44 text-xs text-gray-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-zinc-800 transition-colors disabled:opacity-50 duration-instant ease-standard"
       >
         {loading ? "..." : "Duplicar para próx. semana"}
       </button>

@@ -137,7 +137,7 @@ export default function MacroGoalsCoach({ clientId }: Props) {
             )}
           </div>
         </div>
-        <svg className={`w-4 h-4 text-zinc-500 transition-transform ${open ? "rotate-180" : ""}`}
+        <svg className={`duration-snap ease-overshoot w-4 h-4 text-zinc-500 transition-transform ${open ? "rotate-180" : ""}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
@@ -153,7 +153,7 @@ export default function MacroGoalsCoach({ clientId }: Props) {
                 <button
                   key={k} type="button"
                   onClick={() => setGoal(k)}
-                  className={`flex-1 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                  className={`duration-instant ease-standard flex-1 py-2 rounded-xl text-xs font-semibold transition-colors ${
                     goal === k
                       ? "bg-brand-gold/20 text-brand-gold border border-brand-gold/30"
                       : "bg-zinc-800 text-zinc-400 hover:text-white"

@@ -118,7 +118,7 @@ function Card({ t, isEN, fluid = false }: { t: PublicTestimonial; isEN: boolean;
 
   return (
     <figure
-      className={`relative flex flex-col overflow-hidden rounded-[22px] p-6 border border-white/[0.07] hover:border-brand-gold/25 transition-colors duration-500 ${
+      className={`ease-standard relative flex flex-col overflow-hidden rounded-[22px] p-6 border border-white/[0.07] hover:border-brand-gold/25 transition-colors duration-considered ${
         fluid ? "w-full" : WIDTH[size]
       }`}
       style={{
@@ -167,7 +167,7 @@ function Card({ t, isEN, fluid = false }: { t: PublicTestimonial; isEN: boolean;
                   href={GOOGLE_BUSINESS_URL}
                   target="_blank"
                   rel="noopener noreferrer nofollow"
-                  className="hover:text-brand-gold transition-colors"
+                  className="hover:text-brand-gold transition-colors duration-instant ease-standard"
                 >
                   {isEN ? "Review on Google ↗" : "Avaliação no Google ↗"}
                 </a>

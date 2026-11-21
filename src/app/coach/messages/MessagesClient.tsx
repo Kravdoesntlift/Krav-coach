@@ -79,7 +79,7 @@ export default function MessagesClient({ convos }: { convos: Convo[] }) {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Pesquisar..."
-              className="bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-brand-gold/50 transition-colors w-44"
+              className="bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-brand-gold/50 transition-colors w-44 duration-instant ease-standard"
             />
           </div>
         )}
@@ -113,7 +113,7 @@ export default function MessagesClient({ convos }: { convos: Convo[] }) {
             return (
               <div
                 key={c.clientId}
-                className="flex items-center gap-3 p-3 rounded-2xl transition-all"
+                className="flex items-center gap-3 p-3 rounded-2xl transition-all duration-base ease-standard"
                 style={{
                   background: c.unread > 0
                     ? "linear-gradient(135deg,rgba(201,168,76,0.05),rgba(10,10,10,0.9))"
@@ -177,7 +177,7 @@ export default function MessagesClient({ convos }: { convos: Convo[] }) {
                 <Link
                   href={`/coach/clients/${c.clientId}`}
                   title="Ver perfil completo"
-                  className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-zinc-600 hover:text-brand-gold hover:bg-zinc-800 transition-all"
+                  className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-zinc-600 hover:text-brand-gold hover:bg-zinc-800 transition-all duration-base ease-standard"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>

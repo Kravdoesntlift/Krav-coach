@@ -91,7 +91,7 @@ export default function TodayCard({ day, clientId, isCompleted, completedCount, 
           <div className="flex items-center gap-2">
             <div className="flex-1 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full transition-all duration-700"
+                className="h-full rounded-full transition-all duration-deliberate ease-standard"
                 style={{ width: `${pct}%`, background: pct === 100 ? "#4ade80" : "linear-gradient(90deg,#E8C96B,#C9A84C)" }}
               />
             </div>
@@ -121,7 +121,7 @@ export default function TodayCard({ day, clientId, isCompleted, completedCount, 
           {!done ? (
             <button
               onClick={() => { haptic(HAPTIC.light); setLiveMode(true); }}
-              className="w-full py-3 rounded-2xl font-black text-black text-sm tracking-wide transition-all active:scale-95"
+              className="w-full py-3 rounded-2xl font-black text-black text-sm tracking-wide transition-all squash duration-base ease-standard"
               style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
             >
               {isEN ? "▶ Start workout" : "▶ Iniciar treino"}

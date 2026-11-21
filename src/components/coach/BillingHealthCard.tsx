@@ -76,7 +76,7 @@ export default function BillingHealthCard({
         <button
           onClick={runSync}
           disabled={isPending}
-          className="shrink-0 text-xs font-bold px-3 py-2 rounded-xl bg-zinc-800 text-zinc-200 hover:bg-zinc-700 transition-colors disabled:opacity-50"
+          className="shrink-0 text-xs font-bold px-3 py-2 rounded-xl bg-zinc-800 text-zinc-200 hover:bg-zinc-700 transition-colors disabled:opacity-50 duration-instant ease-standard"
         >
           {isPending ? "A sincronizar…" : "Sincronizar agora"}
         </button>

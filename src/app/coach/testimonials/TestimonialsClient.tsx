@@ -166,7 +166,7 @@ export default function TestimonialsClient({ testimonials, clients }: Props) {
     ) : (
       <button
         onClick={() => setConfirmDelete(id)}
-        className="text-xs text-zinc-600 hover:text-red-400 transition-colors"
+        className="text-xs text-zinc-600 hover:text-red-400 transition-colors duration-instant ease-standard"
       >
         Eliminar
       </button>
@@ -178,7 +178,7 @@ export default function TestimonialsClient({ testimonials, clients }: Props) {
       <button
         onClick={() => handleToggle(t.id, t.is_public)}
         disabled={isPending}
-        className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-colors ${
+        className={`duration-instant ease-standard text-xs px-3 py-1.5 rounded-full font-semibold transition-colors ${
           t.is_public
             ? "bg-brand-gold/20 text-brand-gold hover:bg-brand-gold/30"
             : "bg-zinc-800 text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300"
@@ -225,7 +225,7 @@ export default function TestimonialsClient({ testimonials, clients }: Props) {
             </code>
             <button
               onClick={copiarLink}
-              className="shrink-0 px-3 py-2 rounded-lg text-xs font-bold bg-zinc-800 text-zinc-200 hover:bg-zinc-700 transition-colors"
+              className="shrink-0 px-3 py-2 rounded-lg text-xs font-bold bg-zinc-800 text-zinc-200 hover:bg-zinc-700 transition-colors duration-instant ease-standard"
             >
               {copiado ? "Copiado" : "Copiar"}
             </button>
@@ -237,14 +237,14 @@ export default function TestimonialsClient({ testimonials, clients }: Props) {
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => setShowForm(true)}
-            className="px-4 py-2 rounded-xl font-bold text-sm text-black transition-opacity hover:opacity-90"
+            className="px-4 py-2 rounded-xl font-bold text-sm text-black transition-opacity hover:opacity-90 duration-base ease-standard"
             style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
           >
             + Pedir Testemunho
           </button>
           <button
             onClick={openGoogleForm}
-            className="px-4 py-2 rounded-xl font-bold text-sm text-zinc-200 bg-zinc-800 hover:bg-zinc-700 transition-colors"
+            className="px-4 py-2 rounded-xl font-bold text-sm text-zinc-200 bg-zinc-800 hover:bg-zinc-700 transition-colors duration-instant ease-standard"
           >
             + Avaliação do Google
           </button>
@@ -339,7 +339,7 @@ export default function TestimonialsClient({ testimonials, clients }: Props) {
                   setForm(EMPTY_FORM);
                   setError(null);
                 }}
-                className="px-4 py-2 rounded-xl font-medium text-sm text-zinc-400 bg-zinc-800 hover:bg-zinc-700 transition-colors"
+                className="px-4 py-2 rounded-xl font-medium text-sm text-zinc-400 bg-zinc-800 hover:bg-zinc-700 transition-colors duration-instant ease-standard"
               >
                 Cancelar
               </button>
@@ -391,7 +391,7 @@ export default function TestimonialsClient({ testimonials, clients }: Props) {
                       aria-checked={gForm.rating === n}
                       aria-label={`${n} ${n === 1 ? "estrela" : "estrelas"}`}
                       onClick={() => setGForm((p) => ({ ...p, rating: n }))}
-                      className={`w-9 h-[42px] text-xl transition-colors ${
+                      className={`duration-instant ease-standard w-9 h-[42px] text-xl transition-colors ${
                         n <= gForm.rating ? "text-brand-gold" : "text-zinc-700 hover:text-zinc-500"
                       }`}
                     >
@@ -445,7 +445,7 @@ export default function TestimonialsClient({ testimonials, clients }: Props) {
                   setGForm(EMPTY_GOOGLE);
                   setGError(null);
                 }}
-                className="px-4 py-2 rounded-xl font-medium text-sm text-zinc-400 bg-zinc-800 hover:bg-zinc-700 transition-colors"
+                className="px-4 py-2 rounded-xl font-medium text-sm text-zinc-400 bg-zinc-800 hover:bg-zinc-700 transition-colors duration-instant ease-standard"
               >
                 Cancelar
               </button>

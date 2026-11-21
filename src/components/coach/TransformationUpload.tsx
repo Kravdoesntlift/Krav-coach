@@ -48,7 +48,7 @@ function SlotUpload({
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={loading}
-        className="relative group w-full rounded-xl overflow-hidden bg-zinc-900 border border-zinc-700 hover:border-brand-gold/50 transition-colors"
+        className="relative group w-full rounded-xl overflow-hidden bg-zinc-900 border border-zinc-700 hover:border-brand-gold/50 transition-colors duration-instant ease-standard"
         style={{ aspectRatio: "3/4" }}
       >
         {url ? (
@@ -64,7 +64,7 @@ function SlotUpload({
           </div>
         )}
         {url && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-base ease-standard">
             <span className="text-white text-xs font-semibold">{loading ? "A carregar..." : "Alterar"}</span>
           </div>
         )}

@@ -123,7 +123,7 @@ export default async function ClientLayout({
           </div>
           <div className="h-px bg-zinc-800" />
           <form action={logout}>
-            <button type="submit" className="text-sm text-gray-500 hover:text-white transition-colors">
+            <button type="submit" className="text-sm text-gray-500 hover:text-white transition-colors duration-instant ease-standard">
               Terminar sessão
             </button>
           </form>
@@ -236,7 +236,7 @@ function Paywall({
           href="https://instagram.com/kravdoesntlift"
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full border border-zinc-800 text-gray-500 text-sm font-medium py-3 rounded-xl hover:border-zinc-700 hover:text-white transition-colors"
+          className="block w-full border border-zinc-800 text-gray-500 text-sm font-medium py-3 rounded-xl hover:border-zinc-700 hover:text-white transition-colors duration-instant ease-standard"
         >
           {isEN ? "Talk to the coach on Instagram" : "Falar com o coach no Instagram"}
         </a>
@@ -245,7 +245,7 @@ function Paywall({
 
         <div className="h-px bg-zinc-800" />
         <form action={logoutAction}>
-          <button type="submit" className="text-sm text-gray-600 hover:text-white transition-colors">
+          <button type="submit" className="text-sm text-gray-600 hover:text-white transition-colors duration-instant ease-standard">
             {isEN ? "Log out" : "Terminar sessão"}
           </button>
         </form>

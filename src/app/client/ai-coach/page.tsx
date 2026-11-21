@@ -174,7 +174,7 @@ export default function AICoachPage() {
             <button
               key={s}
               onClick={() => send(s)}
-              className="shrink-0 px-3 py-2 rounded-xl text-xs text-zinc-300 hover:text-white transition-colors whitespace-nowrap"
+              className="shrink-0 px-3 py-2 rounded-xl text-xs text-zinc-300 hover:text-white transition-colors whitespace-nowrap duration-instant ease-standard"
               style={{ background: "rgba(39,39,42,0.8)", border: "1px solid rgba(63,63,70,0.5)" }}
             >
               {s}
@@ -206,7 +206,7 @@ export default function AICoachPage() {
         <button
           onClick={() => send()}
           disabled={!input.trim() || loading}
-          className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-95 disabled:opacity-30"
+          className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-30 squash duration-base ease-standard"
           style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

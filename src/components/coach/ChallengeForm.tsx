@@ -80,7 +80,7 @@ export default function ChallengeForm({ coachId, clientId, weekStart, existing }
           </div>
           <button
             onClick={() => handleDelete(c.id)}
-            className="text-gray-600 hover:text-red-400 text-xs transition-colors shrink-0"
+            className="text-gray-600 hover:text-red-400 text-xs transition-colors shrink-0 duration-instant ease-standard"
           >
             Remover
           </button>
@@ -96,7 +96,7 @@ export default function ChallengeForm({ coachId, clientId, weekStart, existing }
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Título do desafio"
             maxLength={80}
-            className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-gold transition-colors"
+            className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-gold transition-colors duration-instant ease-standard"
           />
           <input
             type="text"
@@ -104,7 +104,7 @@ export default function ChallengeForm({ coachId, clientId, weekStart, existing }
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Descrição (opcional)"
             maxLength={150}
-            className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-gold transition-colors"
+            className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-brand-gold transition-colors duration-instant ease-standard"
           />
           <div className="flex gap-2">
             <select
@@ -129,14 +129,14 @@ export default function ChallengeForm({ coachId, clientId, weekStart, existing }
           <div className="flex gap-2">
             <button
               onClick={() => setOpen(false)}
-              className="flex-1 py-2 rounded-lg bg-zinc-700 text-gray-400 text-sm hover:bg-zinc-600 transition-colors"
+              className="flex-1 py-2 rounded-lg bg-zinc-700 text-gray-400 text-sm hover:bg-zinc-600 transition-colors duration-instant ease-standard"
             >
               Cancelar
             </button>
             <button
               onClick={handleCreate}
               disabled={!title.trim() || saving}
-              className="flex-1 py-2 rounded-lg bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-semibold transition-colors disabled:opacity-40"
+              className="flex-1 py-2 rounded-lg bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-semibold transition-colors disabled:opacity-40 duration-instant ease-standard"
             >
               {saving ? "A criar..." : "Criar desafio"}
             </button>
@@ -145,7 +145,7 @@ export default function ChallengeForm({ coachId, clientId, weekStart, existing }
       ) : (
         <button
           onClick={() => setOpen(true)}
-          className="w-full py-2.5 rounded-xl border border-dashed border-zinc-700 text-gray-500 hover:text-white hover:border-zinc-500 text-sm transition-colors"
+          className="w-full py-2.5 rounded-xl border border-dashed border-zinc-700 text-gray-500 hover:text-white hover:border-zinc-500 text-sm transition-colors duration-instant ease-standard"
         >
           + Adicionar desafio
         </button>

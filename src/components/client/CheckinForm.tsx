@@ -40,12 +40,12 @@ function EmojiScale({ opts, value, onChange }: {
         const active = value === v;
         return (
           <button key={v} type="button" onClick={() => onChange(active ? 0 : v)}
-            className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl transition-all active:scale-95"
+            className="flex-1 flex flex-col items-center gap-1.5 py-3 rounded-2xl transition-all squash duration-base ease-standard"
             style={{
               background: active ? "rgba(201,168,76,0.16)" : "rgba(39,39,42,0.6)",
               border: active ? "1px solid rgba(201,168,76,0.55)" : "1px solid rgba(63,63,70,0.4)",
             }}>
-            <span className={`text-xl transition-transform ${active ? "scale-110" : "grayscale opacity-50"}`}>{emoji}</span>
+            <span className={`duration-snap ease-overshoot text-xl transition-transform ${active ? "scale-110" : "grayscale opacity-50"}`}>{emoji}</span>
             <span className="text-[11px] font-semibold leading-tight text-center"
               style={{ color: active ? "#C9A84C" : "#52525b" }}>{label}</span>
           </button>
@@ -71,12 +71,12 @@ function NutritionButtons({ value, onChange, lang }: {
         const active = value === v;
         return (
           <button key={v} type="button" onClick={() => onChange(active ? null : v)}
-            className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl transition-all active:scale-95"
+            className="flex-1 flex flex-col items-center gap-2 py-4 rounded-2xl transition-all squash duration-base ease-standard"
             style={{
               background: active ? bg : "rgba(39,39,42,0.6)",
               border: `1px solid ${active ? border : "rgba(63,63,70,0.4)"}`,
             }}>
-            <span className={`text-2xl transition-transform ${active ? "scale-110" : "grayscale opacity-40"}`}>{emoji}</span>
+            <span className={`duration-snap ease-overshoot text-2xl transition-transform ${active ? "scale-110" : "grayscale opacity-40"}`}>{emoji}</span>
             <span className="text-xs font-semibold" style={{ color: active ? color : "#52525b" }}>{label}</span>
           </button>
         );
@@ -214,7 +214,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
         </div>
         <h2 className="text-white font-black text-xl mb-2">{L.checkin_sent[lang]}</h2>
         <p className="text-zinc-500 text-sm mb-8">{L.coach_sees[lang]}</p>
-        <button onClick={() => setSuccess(false)} className="text-sm text-zinc-600 hover:text-white transition-colors">
+        <button onClick={() => setSuccess(false)} className="text-sm text-zinc-600 hover:text-white transition-colors duration-instant ease-standard">
           {L.edit_answer[lang]}
         </button>
       </div>
@@ -237,7 +237,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
           <div className="flex items-center gap-3">
             <input type="number" step="0.1" min="0" value={weight}
               onChange={(e) => setWeight(e.target.value)} placeholder="ex: 75.5"
-              className="flex-1 bg-zinc-800/60 border border-zinc-700/60 rounded-2xl px-4 py-3 text-white text-lg font-bold text-center placeholder-zinc-700 focus:outline-none focus:border-brand-gold/50 transition-colors" />
+              className="flex-1 bg-zinc-800/60 border border-zinc-700/60 rounded-2xl px-4 py-3 text-white text-lg font-bold text-center placeholder-zinc-700 focus:outline-none focus:border-brand-gold/50 transition-colors duration-instant ease-standard" />
             <span className="text-zinc-500 text-sm font-medium">{t("kg")}</span>
           </div>
         </Section>
@@ -291,7 +291,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
         <button type="button" onClick={() => setShowMeasures((s) => !s)}
           className="w-full flex items-center justify-between">
           <p className="text-xs font-semibold tracking-widest uppercase text-zinc-500">{L.body_measures[lang]}</p>
-          <span className="text-zinc-600 text-xs transition-transform duration-300"
+          <span className="text-zinc-600 text-xs transition-transform duration-base ease-overshoot"
             style={{ transform: showMeasures ? "rotate(180deg)" : "rotate(0)", display: "inline-block" }}>▼</span>
         </button>
         {showMeasures && (
@@ -301,7 +301,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
                 <p className="text-[11px] text-zinc-600 text-center">{label} ({t("cm")})</p>
                 <input type="number" step="0.1" min="0" value={value}
                   onChange={(e) => set(e.target.value)} placeholder={ph}
-                  className="w-full bg-zinc-800/60 border border-zinc-700/60 rounded-xl px-2 py-2.5 text-white text-sm font-bold text-center placeholder-zinc-700 focus:outline-none focus:border-brand-gold/50 transition-colors" />
+                  className="w-full bg-zinc-800/60 border border-zinc-700/60 rounded-xl px-2 py-2.5 text-white text-sm font-bold text-center placeholder-zinc-700 focus:outline-none focus:border-brand-gold/50 transition-colors duration-instant ease-standard" />
               </div>
             ))}
           </div>
@@ -313,7 +313,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
         <Section label={L.notes_for_coach[lang]}>
           <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3}
             placeholder={t("notes_placeholder")}
-            className="w-full bg-zinc-800/60 border border-zinc-700/60 rounded-2xl px-4 py-3 text-white text-sm placeholder-zinc-700 focus:outline-none focus:border-brand-gold/50 transition-colors resize-none" />
+            className="w-full bg-zinc-800/60 border border-zinc-700/60 rounded-2xl px-4 py-3 text-white text-sm placeholder-zinc-700 focus:outline-none focus:border-brand-gold/50 transition-colors resize-none duration-instant ease-standard" />
         </Section>
       </Card>
 
@@ -324,7 +324,7 @@ export default function CheckinForm({ clientId, weekStart, existing }: Props) {
       )}
 
       <button type="submit" disabled={loading}
-        className="w-full py-4 rounded-2xl text-black font-bold text-sm transition-all active:scale-95 disabled:opacity-50"
+        className="w-full py-4 rounded-2xl text-black font-bold text-sm transition-all disabled:opacity-50 squash duration-base ease-standard"
         style={{ background: "linear-gradient(135deg,#E2C060,#A8893A)" }}>
         {loading ? L.saving[lang] : existing ? L.update_checkin[lang] : L.send_checkin[lang]}
       </button>

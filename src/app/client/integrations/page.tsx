@@ -136,7 +136,7 @@ function CopyBox({ url, lang }: { url: string; lang: "pt" | "en" }) {
         </div>
         <button
           onClick={copy}
-          className={`px-4 py-2.5 rounded-xl text-xs font-semibold flex-shrink-0 transition-colors ${
+          className={`duration-instant ease-standard px-4 py-2.5 rounded-xl text-xs font-semibold flex-shrink-0 transition-colors ${
             copied ? "bg-green-500/20 text-green-400" : "bg-brand-gold/10 text-brand-gold border border-brand-gold/20 hover:bg-brand-gold/20"
           }`}
         >
@@ -189,7 +189,7 @@ function IphoneSection({ token, lang }: { token: string; lang: "pt" | "en" }) {
       {/* Step indicator */}
       <div className="flex gap-1">
         {([1, 2] as const).map((s) => (
-          <div key={s} className={`flex-1 h-1 rounded-full transition-colors ${s <= step ? "bg-brand-gold" : "bg-zinc-800"}`} />
+          <div key={s} className={`duration-instant ease-standard flex-1 h-1 rounded-full transition-colors ${s <= step ? "bg-brand-gold" : "bg-zinc-800"}`} />
         ))}
       </div>
 
@@ -251,10 +251,10 @@ function IphoneSection({ token, lang }: { token: string; lang: "pt" | "en" }) {
             {t.s2_done[l]}
           </div>
           <div className="flex gap-2">
-            <button onClick={() => setStep(1)} className="flex-1 py-2.5 rounded-xl text-sm text-gray-400 bg-zinc-800 hover:bg-zinc-700 transition-colors">
+            <button onClick={() => setStep(1)} className="flex-1 py-2.5 rounded-xl text-sm text-gray-400 bg-zinc-800 hover:bg-zinc-700 transition-colors duration-instant ease-standard">
               {t.back[l]}
             </button>
-            <button onClick={() => setStep(1)} className="flex-1 py-2.5 rounded-xl text-sm text-green-400 bg-green-500/10 border border-green-500/20 hover:bg-green-500/15 transition-colors font-semibold">
+            <button onClick={() => setStep(1)} className="flex-1 py-2.5 rounded-xl text-sm text-green-400 bg-green-500/10 border border-green-500/20 hover:bg-green-500/15 transition-colors font-semibold duration-instant ease-standard">
               {t.done[l]}
             </button>
           </div>
@@ -360,19 +360,19 @@ function ProviderCard({
           {connected ? (
             <>
               {onSync && (
-                <button onClick={onSync} disabled={syncing} className="tap-44 px-3 py-1.5 rounded-xl text-xs font-semibold bg-brand-gold/10 text-brand-gold border border-brand-gold/20 hover:bg-brand-gold/20 transition-colors disabled:opacity-40">
+                <button onClick={onSync} disabled={syncing} className="tap-44 px-3 py-1.5 rounded-xl text-xs font-semibold bg-brand-gold/10 text-brand-gold border border-brand-gold/20 hover:bg-brand-gold/20 transition-colors disabled:opacity-40 duration-instant ease-standard">
                   {syncing ? "…" : t.sync[lang]}
                 </button>
               )}
               {onDisconnect && (
-                <button onClick={onDisconnect} className="tap-44 px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-800 text-gray-500 hover:text-red-400 transition-colors">
+                <button onClick={onDisconnect} className="tap-44 px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-800 text-gray-500 hover:text-red-400 transition-colors duration-instant ease-standard">
                   {t.disconnect[lang]}
                 </button>
               )}
             </>
           ) : (
             onConnect && (
-              <button onClick={onConnect} className="tap-44 px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-800 text-gray-300 hover:bg-zinc-700 border border-zinc-700 transition-colors whitespace-nowrap">
+              <button onClick={onConnect} className="tap-44 px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-800 text-gray-300 hover:bg-zinc-700 border border-zinc-700 transition-colors whitespace-nowrap duration-instant ease-standard">
                 {t.connect[lang]}
               </button>
             )
@@ -510,7 +510,7 @@ export default function IntegrationsPage() {
               </div>
               <button
                 onClick={() => setShowHealthSection(true)}
-                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-800 text-gray-500 hover:text-gray-300 transition-colors flex-shrink-0"
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-800 text-gray-500 hover:text-gray-300 transition-colors flex-shrink-0 duration-instant ease-standard"
               >
                 {t.steps_reconfigure[lang]}
               </button>
@@ -526,7 +526,7 @@ export default function IntegrationsPage() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => { setPlatform("iphone"); setShowHealthSection(true); }}
-                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-zinc-800 hover:bg-zinc-700 transition-colors border border-zinc-700"
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-zinc-800 hover:bg-zinc-700 transition-colors border border-zinc-700 duration-instant ease-standard"
               >
                 <span className="text-2xl">🍎</span>
                 <span className="text-white text-sm font-semibold">iPhone</span>
@@ -534,7 +534,7 @@ export default function IntegrationsPage() {
               </button>
               <button
                 onClick={() => { setPlatform("android"); setShowHealthSection(true); }}
-                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-zinc-800 hover:bg-zinc-700 transition-colors border border-zinc-700"
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-zinc-800 hover:bg-zinc-700 transition-colors border border-zinc-700 duration-instant ease-standard"
               >
                 <span className="text-2xl">🤖</span>
                 <span className="text-white text-sm font-semibold">Android</span>
@@ -549,13 +549,13 @@ export default function IntegrationsPage() {
             <div className="flex gap-1 bg-zinc-800/50 rounded-xl p-1">
               <button
                 onClick={() => setPlatform("iphone")}
-                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${platform === "iphone" ? "bg-zinc-700 text-white" : "text-gray-500 hover:text-gray-300"}`}
+                className={`duration-instant ease-standard flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${platform === "iphone" ? "bg-zinc-700 text-white" : "text-gray-500 hover:text-gray-300"}`}
               >
                 🍎 {t.iphone_tab[lang]}
               </button>
               <button
                 onClick={() => setPlatform("android")}
-                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${platform === "android" ? "bg-zinc-700 text-white" : "text-gray-500 hover:text-gray-300"}`}
+                className={`duration-instant ease-standard flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${platform === "android" ? "bg-zinc-700 text-white" : "text-gray-500 hover:text-gray-300"}`}
               >
                 🤖 {t.android_tab[lang]}
               </button>
@@ -569,7 +569,7 @@ export default function IntegrationsPage() {
 
             <button
               onClick={() => setShowHealthSection(false)}
-              className="w-full py-2 text-xs text-gray-600 hover:text-gray-400 transition-colors"
+              className="w-full py-2 text-xs text-gray-600 hover:text-gray-400 transition-colors duration-instant ease-standard"
             >
               {t.back[lang]}
             </button>

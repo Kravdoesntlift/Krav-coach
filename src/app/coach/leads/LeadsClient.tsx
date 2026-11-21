@@ -72,7 +72,7 @@ function LeadRow({ lead }: { lead: Lead }) {
   }
 
   return (
-    <div className={`rounded-2xl border p-4 transition-all ${isPending ? "opacity-50" : ""}`}
+    <div className={`duration-base ease-standard rounded-2xl border p-4 transition-all ${isPending ? "opacity-50" : ""}`}
       style={{ background: "#0f0f0f", borderColor: "rgba(255,255,255,0.07)" }}>
 
       {/* Main row */}
@@ -87,7 +87,7 @@ function LeadRow({ lead }: { lead: Lead }) {
             </span>
           </div>
           <a href={`mailto:${lead.email}`}
-            className="text-xs hover:text-brand-gold transition-colors"
+            className="text-xs hover:text-brand-gold transition-colors duration-instant ease-standard"
             style={{ color: "rgba(255,255,255,0.4)" }}>
             {lead.email}
           </a>
@@ -110,21 +110,21 @@ function LeadRow({ lead }: { lead: Lead }) {
           <div className="flex gap-1.5">
             {status !== "contacted" && status !== "converted" && (
               <button onClick={() => handleStatus("contacted")}
-                className="text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all active:scale-95"
+                className="text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all squash duration-base ease-standard"
                 style={{ background: "rgba(234,179,8,0.1)", border: "1px solid rgba(234,179,8,0.25)", color: "#facc15" }}>
                 Contactado
               </button>
             )}
             {status !== "converted" && (
               <button onClick={() => handleStatus("converted")}
-                className="text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all active:scale-95"
+                className="text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all squash duration-base ease-standard"
                 style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)", color: "#4ade80" }}>
                 Cliente ✓
               </button>
             )}
             {status !== "new" && (
               <button onClick={() => handleStatus("new")}
-                className="text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all active:scale-95"
+                className="text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all squash duration-base ease-standard"
                 style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#71717a" }}>
                 Novo
               </button>
@@ -134,19 +134,19 @@ function LeadRow({ lead }: { lead: Lead }) {
           {/* Secondary actions */}
           <div className="flex gap-1.5">
             <button onClick={() => setShowNotes(!showNotes)}
-              className="text-[11px] px-2.5 py-1.5 rounded-lg transition-all"
+              className="text-[11px] px-2.5 py-1.5 rounded-lg transition-all duration-base ease-standard"
               style={{ background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.35)", border: "1px solid rgba(255,255,255,0.07)" }}>
               {showNotes ? "Fechar" : "Notas"}
             </button>
             {!confirmDelete ? (
               <button onClick={() => setConfirmDelete(true)}
-                className="text-[11px] px-2.5 py-1.5 rounded-lg transition-all"
+                className="text-[11px] px-2.5 py-1.5 rounded-lg transition-all duration-base ease-standard"
                 style={{ background: "rgba(239,68,68,0.07)", color: "rgba(239,68,68,0.5)", border: "1px solid rgba(239,68,68,0.15)" }}>
                 Apagar
               </button>
             ) : (
               <button onClick={handleDelete}
-                className="tap-44 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all"
+                className="tap-44 text-[11px] font-bold px-2.5 py-1.5 rounded-lg transition-all duration-base ease-standard"
                 style={{ background: "rgba(239,68,68,0.15)", color: "#f87171", border: "1px solid rgba(239,68,68,0.3)" }}>
                 Confirmar
               </button>
@@ -174,7 +174,7 @@ function LeadRow({ lead }: { lead: Lead }) {
             style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)" }}
           />
           <button onClick={handleNotesSave}
-            className="text-[11px] font-bold px-3 py-2 rounded-xl transition-all"
+            className="text-[11px] font-bold px-3 py-2 rounded-xl transition-all duration-base ease-standard"
             style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.28)", color: "#C9A84C" }}>
             Guardar
           </button>
@@ -218,7 +218,7 @@ export default function LeadsClient({ leads }: { leads: Lead[] }) {
       <div className="flex gap-2 flex-wrap">
         {tabs.map((t) => (
           <button key={t.key} onClick={() => setFilter(t.key)}
-            className="text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all"
+            className="text-[11px] font-bold px-3 py-1.5 rounded-xl transition-all duration-base ease-standard"
             style={filter === t.key
               ? { background: "rgba(255,255,255,0.08)", color: t.color, border: "1px solid rgba(255,255,255,0.12)" }
               : { background: "transparent", color: "rgba(255,255,255,0.3)", border: "1px solid rgba(255,255,255,0.06)" }

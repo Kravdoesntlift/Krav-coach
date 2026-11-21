@@ -106,14 +106,14 @@ function UploadSlot({
           <Image src={preview} alt={angle.label} fill className="object-cover" />
           <button
             onClick={() => { onClear(); if (ref.current) ref.current.value = ""; }}
-            className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/70 text-white text-xs flex items-center justify-center hover:bg-black transition-colors"
+            className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/70 text-white text-xs flex items-center justify-center hover:bg-black transition-colors duration-instant ease-standard"
             aria-label={removeLabel}
           >✕</button>
         </div>
       ) : (
         <button
           onClick={() => ref.current?.click()}
-          className="w-full border-2 border-dashed border-zinc-700 hover:border-zinc-500 rounded-xl flex flex-col items-center justify-center gap-1.5 text-zinc-600 hover:text-zinc-400 transition-colors"
+          className="w-full border-2 border-dashed border-zinc-700 hover:border-zinc-500 rounded-xl flex flex-col items-center justify-center gap-1.5 text-zinc-600 hover:text-zinc-400 transition-colors duration-instant ease-standard"
           style={{ aspectRatio: "3/4" }}
         >
           <span className="text-2xl">📸</span>
@@ -310,7 +310,7 @@ function SessionCard({
 
   return (
     <div
-      className={`rounded-2xl overflow-hidden transition-all ${
+      className={`duration-base ease-standard rounded-2xl overflow-hidden transition-all ${
         compareMode ? "cursor-pointer" : ""
       } ${
         isSelected === "A" ? "ring-2 ring-white" :
@@ -514,7 +514,7 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
         <div className="flex items-center justify-between">
           <p className="text-white font-semibold text-sm">{extra.new_session[lang]}</p>
           {hasAnySlot && (
-            <button onClick={resetUpload} className="text-zinc-600 hover:text-zinc-400 text-xs transition-colors">
+            <button onClick={resetUpload} className="text-zinc-600 hover:text-zinc-400 text-xs transition-colors duration-instant ease-standard">
               {extra.clear[lang]}
             </button>
           )}
@@ -544,7 +544,7 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
         <button
           onClick={handleSubmit}
           disabled={!hasAnySlot || uploading}
-          className="w-full py-3 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors disabled:opacity-30"
+          className="w-full py-3 rounded-xl bg-brand-gold hover:bg-brand-gold-dark text-black text-sm font-bold transition-colors disabled:opacity-30 duration-instant ease-standard"
         >
           {uploading ? extra.saving[lang] : extra.save_session[lang]}
         </button>
@@ -567,14 +567,14 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
               </div>
               <button
                 onClick={() => setLightbox(null)}
-                className="w-9 h-9 rounded-full bg-zinc-800 text-gray-400 hover:text-white flex items-center justify-center text-sm transition-colors"
+                className="w-9 h-9 rounded-full bg-zinc-800 text-gray-400 hover:text-white flex items-center justify-center text-sm transition-colors duration-instant ease-standard"
                 aria-label={t("close")}
               >✕</button>
             </div>
             <Image src={lightbox.photo_url} alt="" width={800} height={1200} className="w-full rounded-2xl object-contain" />
             <button
               onClick={() => deletePhoto(lightbox.id, lightbox.photo_url)}
-              className="w-full py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm hover:bg-red-500/20 transition-colors"
+              className="w-full py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm hover:bg-red-500/20 transition-colors duration-instant ease-standard"
             >
               {extra.delete_photo[lang]}
             </button>
@@ -615,7 +615,7 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
                   setSessionA(null);
                   setSessionB(null);
                 }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                className={`duration-instant ease-standard px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                   compareMode ? "bg-brand-gold text-black" : "bg-zinc-800 text-zinc-400 hover:text-white"
                 }`}
               >
@@ -648,7 +648,7 @@ export default function PhotosClient({ clientId, initialPhotos }: Props) {
                   />
                   <button
                     onClick={() => { setSessionA(null); setSessionB(null); }}
-                    className="w-full py-2.5 bg-zinc-800 text-gray-400 rounded-xl text-xs hover:bg-zinc-700 transition-colors"
+                    className="w-full py-2.5 bg-zinc-800 text-gray-400 rounded-xl text-xs hover:bg-zinc-700 transition-colors duration-instant ease-standard"
                   >
                     {extra.choose_other[lang]}
                   </button>

@@ -192,7 +192,7 @@ export default function PDFGenerator({ month }: { month: string }) {
     <button
       onClick={generate}
       disabled={status === "loading"}
-      className="w-full py-3.5 rounded-xl text-sm font-bold transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2"
+      className="w-full py-3.5 rounded-xl text-sm font-bold transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2 duration-base ease-standard"
       style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)", color: "#000" }}
     >
       {status === "loading" && (

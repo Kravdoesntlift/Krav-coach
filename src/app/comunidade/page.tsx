@@ -168,7 +168,7 @@ export default async function CommunityPage({
               <Link href="/comunidade?lang=en" className={`px-3 py-1 text-xs font-bold ${isEN ? "text-black" : "text-zinc-500"}`}
                 style={isEN ? { background: "linear-gradient(135deg,#E8C96B,#C9A84C)" } : undefined}>EN</Link>
             </div>
-            <Link href={isEN ? "/?lang=en" : "/"} className="text-zinc-500 hover:text-white text-sm transition-colors">
+            <Link href={isEN ? "/?lang=en" : "/"} className="text-zinc-500 hover:text-white text-sm transition-colors duration-instant ease-standard">
               {t.nav_app}
             </Link>
           </div>
@@ -190,7 +190,7 @@ export default async function CommunityPage({
                 href={COMMUNITY_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-8 inline-flex w-full sm:w-auto items-center justify-center px-10 py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110"
+                className="mt-8 inline-flex w-full sm:w-auto items-center justify-center px-10 py-4 rounded-2xl font-bold text-black text-base transition-all hover:brightness-110 squash duration-base ease-standard"
                 style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
               >
                 {t.join_cta}
@@ -198,7 +198,7 @@ export default async function CommunityPage({
             ) : (
               <Link
                 href={`/guia${suffix}`}
-                className="mt-8 inline-flex w-full sm:w-auto items-center justify-center px-10 py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110"
+                className="mt-8 inline-flex w-full sm:w-auto items-center justify-center px-10 py-4 rounded-2xl font-bold text-black text-base transition-all hover:brightness-110 squash duration-base ease-standard"
                 style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
               >
                 {t.soon_cta}

@@ -60,7 +60,7 @@ export default function PushDebugPanel() {
         <button
           onClick={fetchDebug}
           disabled={loading}
-          className="tap-44 px-3 py-1 rounded-lg bg-zinc-700 text-gray-300 text-xs hover:bg-zinc-600 transition-colors"
+          className="tap-44 px-3 py-1 rounded-lg bg-zinc-700 text-gray-300 text-xs hover:bg-zinc-600 transition-colors duration-instant ease-standard"
         >
           {loading ? "..." : "Verificar estado"}
         </button>
@@ -99,7 +99,7 @@ export default function PushDebugPanel() {
         <button
           onClick={sendTest}
           disabled={loading}
-          className="w-full py-2 rounded-lg bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-semibold hover:bg-brand-gold/20 transition-colors disabled:opacity-40"
+          className="w-full py-2 rounded-lg bg-brand-gold/10 border border-brand-gold/30 text-brand-gold text-xs font-semibold hover:bg-brand-gold/20 transition-colors disabled:opacity-40 duration-instant ease-standard"
         >
           📨 Enviar notificação de teste para mim
         </button>

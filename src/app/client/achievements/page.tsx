@@ -100,7 +100,7 @@ export default async function AchievementsPage() {
         <div className="flex items-center gap-3">
           <div className="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
             <div
-              className="h-full rounded-full transition-all duration-700"
+              className="h-full rounded-full transition-all duration-deliberate ease-standard"
               style={{ width:`${totalPct}%`, background:"linear-gradient(90deg,#A8893A,#C9A84C,#E2C060)" }}
             />
           </div>

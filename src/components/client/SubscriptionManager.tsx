@@ -96,7 +96,7 @@ export default function SubscriptionManager({ hasSubscription, status, renewsAt,
       <button
         onClick={openPortal}
         disabled={isPending}
-        className="w-full py-2.5 rounded-xl text-sm font-semibold border border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500 transition-all disabled:opacity-50"
+        className="w-full py-2.5 rounded-xl text-sm font-semibold border border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500 transition-all disabled:opacity-50 duration-base ease-standard"
       >
         {isPending
           ? (isEN ? "Opening..." : "A abrir...")

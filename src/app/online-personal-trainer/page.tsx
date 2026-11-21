@@ -206,11 +206,11 @@ export default async function OnlinePersonalTrainerPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/personal-trainer-online"
-                className="text-xs font-bold tracking-widest uppercase px-2.5 py-1 rounded-lg border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors"
+                className="text-xs font-bold tracking-widest uppercase px-2.5 py-1 rounded-lg border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors duration-instant ease-standard"
               >
                 PT
               </Link>
-              <Link href="/auth/login" className="text-sm text-zinc-400 hover:text-white transition-colors">
+              <Link href="/auth/login" className="text-sm text-zinc-400 hover:text-white transition-colors duration-instant ease-standard">
                 Log in →
               </Link>
             </div>
@@ -256,7 +256,7 @@ export default async function OnlinePersonalTrainerPage() {
                 <div className="flex flex-col items-center gap-2">
                   <Link
                     href="/start?lang=en"
-                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110 w-full sm:w-auto"
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-black text-base transition-all hover:brightness-110 w-full sm:w-auto squash duration-base ease-standard"
                     style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
                   >
                     Start free 7-day trial →
@@ -266,7 +266,7 @@ export default async function OnlinePersonalTrainerPage() {
 
                 <Link
                   href="/auth/login"
-                  className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-semibold text-zinc-500 text-sm border border-zinc-800 hover:border-zinc-600 hover:text-white transition-all"
+                  className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-semibold text-zinc-500 text-sm border border-zinc-800 hover:border-zinc-600 hover:text-white transition-all duration-base ease-standard"
                 >
                   I already have an account
                 </Link>
@@ -581,7 +581,7 @@ export default async function OnlinePersonalTrainerPage() {
                     style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                     <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none select-none">
                       <span className="text-white text-sm font-semibold pr-4">{item.q}</span>
-                      <span className="text-zinc-500 text-lg shrink-0 transition-transform group-open:rotate-45">+</span>
+                      <span className="text-zinc-500 text-lg shrink-0 transition-transform group-open:rotate-45 duration-snap ease-overshoot">+</span>
                     </summary>
                     <div className="px-5 pb-4">
                       <p className="text-zinc-400 text-sm leading-relaxed">{item.a}</p>
@@ -603,8 +603,8 @@ export default async function OnlinePersonalTrainerPage() {
               KRAV<span style={{ color: "#A8893A" }}>.</span>
             </span>
             <div className="flex gap-4">
-              <Link href="/auth/login" className="hover:text-zinc-400 transition-colors">Log in</Link>
-              <Link href="/start?lang=en" className="hover:text-zinc-400 transition-colors">Sign up</Link>
+              <Link href="/auth/login" className="hover:text-zinc-400 transition-colors duration-instant ease-standard">Log in</Link>
+              <Link href="/start?lang=en" className="hover:text-zinc-400 transition-colors duration-instant ease-standard">Sign up</Link>
             </div>
           </footer>
 

@@ -64,7 +64,7 @@ export default async function EbookThanksPage({
             </p>
             <Link
               href={href}
-              className="block w-full rounded-2xl px-6 py-4 text-base font-bold text-black transition-all active:scale-95 hover:brightness-110"
+              className="block w-full rounded-2xl px-6 py-4 text-base font-bold text-black transition-all hover:brightness-110 squash duration-base ease-standard"
               style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
             >
               {isEN ? "Read 90 Days →" : "Ler os 90 Dias →"}

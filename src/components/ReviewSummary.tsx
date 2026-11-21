@@ -49,7 +49,7 @@ export default function ReviewSummary({ reviews, isEN }: Props) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${score} ${isEN ? "out of 5" : "em 5"}, ${label}`}
-      className="group mx-auto flex w-fit items-center gap-3.5 rounded-full py-2 pl-2 pr-5 border border-white/[0.08] hover:border-brand-gold/30 transition-colors duration-300"
+      className="group mx-auto flex w-fit items-center gap-3.5 rounded-full py-2 pl-2 pr-5 border border-white/[0.08] hover:border-brand-gold/30 transition-colors duration-base ease-standard"
       style={{ background: "rgba(255,255,255,0.03)" }}
     >
       <span className="flex -space-x-2" aria-hidden="true">
@@ -86,7 +86,7 @@ export default function ReviewSummary({ reviews, isEN }: Props) {
           </span>
           <span className="text-white text-sm font-bold tabular-nums">{score}</span>
         </span>
-        <span className="text-zinc-500 text-xs mt-1 group-hover:text-zinc-300 transition-colors">{label} ↗</span>
+        <span className="text-zinc-500 text-xs mt-1 group-hover:text-zinc-300 transition-colors duration-instant ease-standard">{label} ↗</span>
       </span>
     </a>
   );

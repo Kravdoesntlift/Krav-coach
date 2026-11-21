@@ -124,7 +124,7 @@ export default function MyWorkoutsPage() {
         </div>
         <button
           onClick={() => { setShowForm((v) => !v); setError(null); }}
-          className="shrink-0 h-10 px-4 rounded-xl text-sm font-bold text-black transition-opacity active:opacity-70"
+          className="shrink-0 h-10 px-4 rounded-xl text-sm font-bold text-black transition-opacity active:opacity-70 duration-base ease-standard"
           style={{ background: "linear-gradient(135deg,#C9A84C,#A8893A)" }}
         >
           {showForm ? (isEN ? "Cancel" : "Cancelar") : (isEN ? "+ Log" : "+ Adicionar")}
@@ -149,7 +149,7 @@ export default function MyWorkoutsPage() {
                     key={opt.value}
                     type="button"
                     onClick={() => setType(opt.value)}
-                    className="flex flex-col items-center gap-1 py-3 rounded-xl border transition-all active:scale-95"
+                    className="flex flex-col items-center gap-1 py-3 rounded-xl border transition-all squash duration-base ease-standard"
                     style={type === opt.value
                       ? { background: "rgba(201,168,76,0.16)", border: "1px solid rgba(201,168,76,0.55)" }
                       : { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }
@@ -273,7 +273,7 @@ export default function MyWorkoutsPage() {
                         <button
                           onClick={() => handleDelete(w.id)}
                           disabled={deleting === w.id}
-                          className="text-zinc-600 hover:text-red-400 transition-colors text-xl leading-none shrink-0 -mt-0.5 px-1"
+                          className="text-zinc-600 hover:text-red-400 transition-colors text-xl leading-none shrink-0 -mt-0.5 px-1 duration-instant ease-standard"
                           aria-label="Apagar"
                         >
                           {deleting === w.id ? "…" : "×"}

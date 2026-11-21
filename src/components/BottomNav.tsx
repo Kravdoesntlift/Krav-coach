@@ -100,15 +100,15 @@ export default function BottomNav({ items, moreItems, userId, showLogout = true 
               >
                 {/* Active indicator line */}
                 <span
-                  className={`absolute top-0 inset-x-[30%] h-[2px] rounded-b-full transition-all duration-300 ${
+                  className={`ease-standard absolute top-0 inset-x-[30%] h-[2px] rounded-b-full transition-all duration-base ${
                     active ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
                   }`}
                   style={{ background: "linear-gradient(90deg, transparent, #C9A84C, transparent)" }}
                 />
 
                 {/* Icon */}
-                <span className={`relative transition-all duration-200 ${active ? "scale-110" : "scale-100 group-active:scale-95"}`}>
-                  <span className={`block transition-colors duration-200 ${active ? "text-brand-gold" : "text-zinc-500 group-hover:text-zinc-300"}`}>
+                <span className={`ease-standard relative transition-all duration-snap ${active ? "scale-110" : "scale-100 group-active:scale-95"}`}>
+                  <span className={`ease-standard block transition-colors duration-snap ${active ? "text-brand-gold" : "text-zinc-500 group-hover:text-zinc-300"}`}>
                     {item.icon}
                   </span>
                   {badge > 0 && (
@@ -121,7 +121,7 @@ export default function BottomNav({ items, moreItems, userId, showLogout = true 
                   )}
                 </span>
 
-                <span className={`text-[11px] font-semibold tracking-widest uppercase transition-colors duration-200 ${
+                <span className={`ease-standard text-[11px] font-semibold tracking-widest uppercase transition-colors duration-snap ${
                   active ? "text-brand-gold" : "text-zinc-600 group-hover:text-zinc-400"
                 }`}>
                   {item.label}
@@ -137,15 +137,15 @@ export default function BottomNav({ items, moreItems, userId, showLogout = true 
               className="flex-1 flex flex-col items-center justify-center gap-1.5 relative group"
             >
               <span
-                className={`absolute top-0 inset-x-[30%] h-[2px] rounded-b-full transition-all duration-300 ${
+                className={`ease-standard absolute top-0 inset-x-[30%] h-[2px] rounded-b-full transition-all duration-base ${
                   drawerOpen || isMoreActive ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
                 }`}
                 style={{ background: "linear-gradient(90deg, transparent, #C9A84C, transparent)" }}
               />
-              <span className={`transition-all duration-200 ${drawerOpen ? "rotate-45" : ""} ${drawerOpen || isMoreActive ? "text-brand-gold scale-110" : "text-zinc-500 group-hover:text-zinc-300"}`}>
+              <span className={`ease-standard transition-all duration-snap ${drawerOpen ? "rotate-45" : ""} ${drawerOpen || isMoreActive ? "text-brand-gold scale-110" : "text-zinc-500 group-hover:text-zinc-300"}`}>
                 <GridIcon />
               </span>
-              <span className={`text-[11px] font-semibold tracking-widest uppercase transition-colors duration-200 ${
+              <span className={`ease-standard text-[11px] font-semibold tracking-widest uppercase transition-colors duration-snap ${
                 drawerOpen || isMoreActive ? "text-brand-gold" : "text-zinc-600 group-hover:text-zinc-400"
               }`}>
                 Mais
@@ -167,7 +167,7 @@ export default function BottomNav({ items, moreItems, userId, showLogout = true 
           )}
 
           <div
-            className={`fixed bottom-[60px] left-0 right-0 z-40 md:hidden rounded-t-3xl transition-transform duration-300 ease-out ${
+            className={`fixed bottom-[60px] left-0 right-0 z-40 md:hidden rounded-t-3xl transition-transform duration-base ease-out ${
               drawerOpen ? "translate-y-0" : "translate-y-full"
             }`}
             style={{
@@ -188,13 +188,13 @@ export default function BottomNav({ items, moreItems, userId, showLogout = true 
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex flex-col items-center gap-2.5 py-4 px-3 rounded-2xl transition-all active:scale-95 ${
+                    className={`duration-base ease-standard flex flex-col items-center gap-2.5 py-4 px-3 rounded-2xl transition-all squash ${
                       active
                         ? "bg-brand-gold/12 border border-brand-gold/25"
                         : "bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06]"
                     }`}
                   >
-                    <span className={`text-2xl leading-none transition-colors ${active ? "text-brand-gold" : "text-zinc-300"}`}>
+                    <span className={`duration-instant ease-standard text-2xl leading-none transition-colors ${active ? "text-brand-gold" : "text-zinc-300"}`}>
                       {item.icon}
                     </span>
                     <span className={`text-[11px] font-semibold text-center leading-tight ${active ? "text-brand-gold" : "text-zinc-400"}`}>
@@ -210,7 +210,7 @@ export default function BottomNav({ items, moreItems, userId, showLogout = true 
                 <form action={logout} className="w-full">
                   <button
                     type="submit"
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold text-zinc-500 hover:text-red-400 hover:bg-red-500/5 transition-all active:scale-95"
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold text-zinc-500 hover:text-red-400 hover:bg-red-500/5 transition-all squash duration-base ease-standard"
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>

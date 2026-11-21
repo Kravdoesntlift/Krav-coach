@@ -31,7 +31,7 @@ export default function PublicLinkCard({ coachId, slug }: { coachId: string; slu
         <span className="text-zinc-400 text-xs truncate flex-1 font-mono">{path}</span>
         <button
           onClick={copy}
-          className={`shrink-0 px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
+          className={`duration-instant ease-standard shrink-0 px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
             copied
               ? "bg-green-500/20 text-green-400 border border-green-500/30"
               : "bg-brand-gold/10 text-brand-gold border border-brand-gold/30 hover:bg-brand-gold/20"
@@ -51,7 +51,7 @@ export default function PublicLinkCard({ coachId, slug }: { coachId: string; slu
         href={fullUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="block text-center text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+        className="block text-center text-xs text-zinc-600 hover:text-zinc-400 transition-colors duration-instant ease-standard"
       >
         Pré-visualizar página →
       </a>

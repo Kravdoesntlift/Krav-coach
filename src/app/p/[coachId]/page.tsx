@@ -159,7 +159,7 @@ export default async function CoachPublicPage({
         {/* CTA (above the fold) */}
         <Link
           href={`/auth/signup?coach=${coachId}`}
-          className="block w-full text-center py-4 rounded-2xl font-black text-black text-base tracking-wide transition-transform active:scale-95"
+          className="block w-full text-center py-4 rounded-2xl font-black text-black text-base tracking-wide transition-transform squash duration-snap ease-overshoot"
           style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
         >
           Começar trial gratuito
@@ -294,7 +294,7 @@ export default async function CoachPublicPage({
                           href={GOOGLE_BUSINESS_URL}
                           target="_blank"
                           rel="noopener noreferrer nofollow"
-                          className="text-[11px] text-zinc-500 hover:text-brand-gold transition-colors"
+                          className="text-[11px] text-zinc-500 hover:text-brand-gold transition-colors duration-instant ease-standard"
                         >
                           Avaliação no Google ↗
                         </a>
@@ -325,13 +325,13 @@ export default async function CoachPublicPage({
           </div>
           <Link
             href={`/auth/signup?coach=${coachId}`}
-            className="block w-full text-center py-4 rounded-2xl font-black text-black text-base tracking-wide transition-transform active:scale-95"
+            className="block w-full text-center py-4 rounded-2xl font-black text-black text-base tracking-wide transition-transform squash duration-snap ease-overshoot"
             style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
           >
             Começar trial gratuito
           </Link>
           <p className="text-zinc-600 text-xs text-center">
-            Já tens conta? <Link href="/auth/login" className="text-zinc-400 hover:text-white transition-colors underline">Entra aqui</Link>
+            Já tens conta? <Link href="/auth/login" className="text-zinc-400 hover:text-white transition-colors underline duration-instant ease-standard">Entra aqui</Link>
           </p>
         </div>
 
@@ -341,7 +341,7 @@ export default async function CoachPublicPage({
             <span className="font-black tracking-tighter">KRAV<span style={{ color: "#C9A84C" }}>.</span></span>
           </span>
           <span className="w-px h-3 bg-zinc-800" />
-          <Link href="/privacy" className="hover:text-zinc-500 transition-colors">
+          <Link href="/privacy" className="hover:text-zinc-500 transition-colors duration-instant ease-standard">
             Privacidade
           </Link>
         </div>

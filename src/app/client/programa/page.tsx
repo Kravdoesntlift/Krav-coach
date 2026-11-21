@@ -182,7 +182,7 @@ export default async function ProgramaPage() {
       {state.finished && <Program90Card lang={lang} state={state} />}
 
       <div className="pt-1">
-        <Link href="/client/dashboard" className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors">
+        <Link href="/client/dashboard" className="text-sm text-zinc-500 hover:text-zinc-300 transition-colors duration-instant ease-standard">
           ← {isEN ? "Back to today" : "Voltar ao treino de hoje"}
         </Link>
       </div>

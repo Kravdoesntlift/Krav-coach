@@ -310,19 +310,19 @@ export default async function LandingPage({
             {isEN ? (
               <Link
                 href="/"
-                className="text-xs font-bold tracking-widest uppercase px-2.5 py-1 rounded-lg border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors"
+                className="text-xs font-bold tracking-widest uppercase px-2.5 py-1 rounded-lg border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors duration-instant ease-standard"
               >
                 PT
               </Link>
             ) : (
               <Link
                 href="/?lang=en"
-                className="text-xs font-bold tracking-widest uppercase px-2.5 py-1 rounded-lg border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors"
+                className="text-xs font-bold tracking-widest uppercase px-2.5 py-1 rounded-lg border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors duration-instant ease-standard"
               >
                 EN
               </Link>
             )}
-            <Link href="/auth/login" className="text-sm text-zinc-400 hover:text-white transition-colors">
+            <Link href="/auth/login" className="text-sm text-zinc-400 hover:text-white transition-colors duration-instant ease-standard">
               {c.login}
             </Link>
           </div>
@@ -364,7 +364,7 @@ export default async function LandingPage({
               <div className="flex flex-col items-center gap-2">
                 <Link
                   href={signupUrlWithLang}
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110 w-full sm:w-auto"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-black text-base transition-all hover:brightness-110 w-full sm:w-auto squash duration-base ease-standard"
                   style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
                 >
                   {c.cta_primary}
@@ -374,7 +374,7 @@ export default async function LandingPage({
 
               <Link
                 href="/auth/login"
-                className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-semibold text-zinc-500 text-sm border border-zinc-800 hover:border-zinc-600 hover:text-white transition-all"
+                className="inline-flex items-center justify-center px-6 py-2.5 rounded-xl font-semibold text-zinc-500 text-sm border border-zinc-800 hover:border-zinc-600 hover:text-white transition-all duration-base ease-standard"
               >
                 {c.cta_login}
               </Link>
@@ -453,7 +453,7 @@ export default async function LandingPage({
                 {/* Anyone who has read this far is asking who he is. */}
                 <Link
                   href="/sobre"
-                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-gold hover:brightness-125 transition-all"
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-gold hover:brightness-125 transition-all duration-base ease-standard"
                 >
                   {isEN ? "How I work" : "Como trabalho"}
                   <span aria-hidden="true">→</span>
@@ -684,7 +684,7 @@ export default async function LandingPage({
 
               <Link
                 href={isEN ? "/ebook?lang=en" : "/ebook"}
-                className="mt-6 block w-full rounded-2xl py-3.5 text-center text-sm font-bold text-white transition-all active:scale-95 hover:bg-white/[0.06]"
+                className="mt-6 block w-full rounded-2xl py-3.5 text-center text-sm font-bold text-white transition-all hover:bg-white/[0.06] squash duration-base ease-standard"
                 style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.14)" }}
               >
                 {c.book_cta} →
@@ -713,7 +713,7 @@ export default async function LandingPage({
                   style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none select-none">
                     <span className="text-white text-sm font-semibold pr-4">{item.q}</span>
-                    <span className="text-zinc-500 text-lg shrink-0 transition-transform group-open:rotate-45">+</span>
+                    <span className="text-zinc-500 text-lg shrink-0 transition-transform group-open:rotate-45 duration-snap ease-overshoot">+</span>
                   </summary>
                   <div className="px-5 pb-4">
                     <p className="text-zinc-400 text-sm leading-relaxed">{item.a}</p>
@@ -735,8 +735,8 @@ export default async function LandingPage({
             KRAV<span style={{ color: "#A8893A" }}>.</span>
           </span>
           <div className="flex gap-4">
-            <Link href="/auth/login" className="hover:text-zinc-400 transition-colors">{c.footer_login}</Link>
-            <Link href={signupUrlWithLang} className="hover:text-zinc-400 transition-colors">{c.footer_signup}</Link>
+            <Link href="/auth/login" className="hover:text-zinc-400 transition-colors duration-instant ease-standard">{c.footer_login}</Link>
+            <Link href={signupUrlWithLang} className="hover:text-zinc-400 transition-colors duration-instant ease-standard">{c.footer_signup}</Link>
           </div>
         </footer>
 

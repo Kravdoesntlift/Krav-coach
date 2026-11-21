@@ -128,7 +128,7 @@ function OptionCard({ selected, onClick, icon, label, sub }: {
 }) {
   return (
     <button type="button" onClick={onClick}
-      className="w-full flex items-center gap-4 p-4 rounded-2xl transition-all text-left active:scale-[0.98]"
+      className="w-full flex items-center gap-4 p-4 rounded-2xl transition-all text-left active:scale-[0.98] duration-base ease-standard"
       style={{
         background: selected ? "rgba(201,168,76,0.1)" : "rgba(255,255,255,0.03)",
         border: selected ? "1.5px solid #C9A84C" : "1.5px solid rgba(255,255,255,0.08)",
@@ -151,7 +151,7 @@ function SexCard({ selected, onClick, icon, label }: {
 }) {
   return (
     <button type="button" onClick={onClick}
-      className="flex-1 flex flex-col items-center gap-2 py-5 rounded-2xl transition-all active:scale-95"
+      className="flex-1 flex flex-col items-center gap-2 py-5 rounded-2xl transition-all squash duration-base ease-standard"
       style={{
         background: selected ? "rgba(201,168,76,0.1)" : "rgba(255,255,255,0.03)",
         border: selected ? "1.5px solid #C9A84C" : "1.5px solid rgba(255,255,255,0.08)",
@@ -173,7 +173,7 @@ function NumberInput({ label, value, onChange, unit, placeholder, min, max }: {
   return (
     <div className="space-y-1.5">
       <label className="block text-[11px] text-zinc-500 font-semibold uppercase tracking-wide">{label}</label>
-      <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-3 focus-within:border-[#C9A84C] transition-colors">
+      <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 rounded-2xl px-4 py-3 focus-within:border-[#C9A84C] transition-colors duration-instant ease-standard">
         <input
           type="number" min={min} max={max} value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -195,7 +195,7 @@ function ProgressBar({ step, lang }: { step: number; lang: Lang }) {
         <span>{pct}%</span>
       </div>
       <div className="w-full h-1.5 rounded-full bg-zinc-800 overflow-hidden">
-        <div className="h-full rounded-full transition-all duration-500"
+        <div className="h-full rounded-full transition-all duration-considered ease-standard"
           style={{ width: `${pct}%`, background: "linear-gradient(90deg,#E8C96B,#C9A84C)" }} />
       </div>
     </div>
@@ -207,7 +207,7 @@ function LangToggle({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void 
     <div className="flex items-center gap-0 rounded-full overflow-hidden border border-zinc-700 text-[11px] font-black">
       {(["pt", "en"] as Lang[]).map((l) => (
         <button key={l} type="button" onClick={() => setLang(l)}
-          className="px-3 py-1.5 transition-all"
+          className="px-3 py-1.5 transition-all duration-base ease-standard"
           style={{ background: lang === l ? "#C9A84C" : "transparent", color: lang === l ? "#000" : "#71717a" }}>
           {l.toUpperCase()}
         </button>
@@ -256,7 +256,7 @@ function DayPicker({ selected, onChange, lang }: {
             key={day}
             type="button"
             onClick={() => toggle(day)}
-            className="flex flex-col items-center gap-1.5 py-3 rounded-2xl transition-all duration-200 active:scale-90"
+            className="flex flex-col items-center gap-1.5 py-3 rounded-2xl transition-all duration-snap squash ease-standard"
             style={{
               background: isSelected
                 ? "linear-gradient(160deg,#E8C96B,#C9A84C)"
@@ -461,7 +461,7 @@ export default function StartPage() {
               <div className="space-y-4">
                 <p className="text-[11px] text-zinc-500 font-semibold uppercase tracking-wide">{tx(T.days_label, lang)}</p>
                 <DayPicker selected={quiz.selectedDays} onChange={(d) => set("selectedDays", d)} lang={lang} />
-                <p className="text-center text-sm font-semibold transition-colors"
+                <p className="text-center text-sm font-semibold transition-colors duration-instant ease-standard"
                   style={{ color: quiz.selectedDays.length > 0 ? "#C9A84C" : "#52525b" }}>
                   {T.days_sub[lang](quiz.selectedDays.length)}
                 </p>
@@ -473,7 +473,7 @@ export default function StartPage() {
                 <div className="grid grid-cols-4 gap-2">
                   {([30, 45, 60, 90] as const).map((d) => (
                     <button key={d} type="button" onClick={() => set("sessionDuration", d)}
-                      className="py-4 rounded-2xl font-bold text-sm transition-all active:scale-95"
+                      className="py-4 rounded-2xl font-bold text-sm transition-all squash duration-base ease-standard"
                       style={{
                         background: quiz.sessionDuration === d ? "linear-gradient(135deg,#E8C96B,#C9A84C)" : "rgba(255,255,255,0.04)",
                         border: `1px solid ${quiz.sessionDuration === d ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.07)"}`,
@@ -496,11 +496,11 @@ export default function StartPage() {
                 {!quiz.noInjuries && (
                   <textarea value={quiz.injuries} onChange={(e) => set("injuries", e.target.value)}
                     placeholder={tx(T.injuries_placeholder, lang)} rows={4}
-                    className="w-full rounded-2xl px-4 py-3 text-sm bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-600 resize-none focus:outline-none focus:border-[#C9A84C] transition-colors" />
+                    className="w-full rounded-2xl px-4 py-3 text-sm bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-600 resize-none focus:outline-none focus:border-[#C9A84C] transition-colors duration-instant ease-standard" />
                 )}
                 <label className="flex items-center gap-3 cursor-pointer select-none">
                   <div onClick={() => { set("noInjuries", !quiz.noInjuries); if (!quiz.noInjuries) set("injuries", ""); }}
-                    className="w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 cursor-pointer"
+                    className="w-5 h-5 rounded-md flex items-center justify-center transition-all shrink-0 cursor-pointer duration-base ease-standard"
                     style={{
                       background: quiz.noInjuries ? "linear-gradient(135deg,#E8C96B,#A8893A)" : "transparent",
                       border: quiz.noInjuries ? "none" : "1.5px solid rgba(255,255,255,0.25)",
@@ -537,25 +537,25 @@ export default function StartPage() {
                   <label className="block text-xs text-zinc-500 mb-1.5 font-medium">{tx(T.full_name, lang)}</label>
                   <input type="text" value={quiz.fullName} onChange={(e) => set("fullName", e.target.value)}
                     placeholder={tx(T.name_ph, lang)} autoComplete="name"
-                    className="w-full rounded-2xl px-4 py-3 text-sm bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-600 focus:outline-none focus:border-[#C9A84C] transition-colors" />
+                    className="w-full rounded-2xl px-4 py-3 text-sm bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-600 focus:outline-none focus:border-[#C9A84C] transition-colors duration-instant ease-standard" />
                 </div>
                 <div>
                   <label className="block text-xs text-zinc-500 mb-1.5 font-medium">{tx(T.email_lbl, lang)}</label>
                   <input type="email" value={quiz.email} onChange={(e) => set("email", e.target.value)}
                     placeholder="email@example.com" autoComplete="email"
-                    className="w-full rounded-2xl px-4 py-3 text-sm bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-600 focus:outline-none focus:border-[#C9A84C] transition-colors" />
+                    className="w-full rounded-2xl px-4 py-3 text-sm bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-600 focus:outline-none focus:border-[#C9A84C] transition-colors duration-instant ease-standard" />
                 </div>
                 <div>
                   <label className="block text-xs text-zinc-500 mb-1.5 font-medium">{tx(T.password_lbl, lang)}</label>
                   <input type="password" value={quiz.password} onChange={(e) => set("password", e.target.value)}
                     placeholder={tx(T.password_ph, lang)} autoComplete="new-password"
-                    className="w-full rounded-2xl px-4 py-3 text-sm bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-600 focus:outline-none focus:border-[#C9A84C] transition-colors" />
+                    className="w-full rounded-2xl px-4 py-3 text-sm bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-600 focus:outline-none focus:border-[#C9A84C] transition-colors duration-instant ease-standard" />
                 </div>
                 <div>
                   <label className="block text-xs text-zinc-500 mb-1.5 font-medium">{tx(T.confirm_pw, lang)}</label>
                   <input type="password" value={quiz.confirmPassword} onChange={(e) => set("confirmPassword", e.target.value)}
                     placeholder={tx(T.confirm_pw_ph, lang)} autoComplete="new-password"
-                    className="w-full rounded-2xl px-4 py-3 text-sm bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-600 focus:outline-none focus:border-[#C9A84C] transition-colors" />
+                    className="w-full rounded-2xl px-4 py-3 text-sm bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-600 focus:outline-none focus:border-[#C9A84C] transition-colors duration-instant ease-standard" />
                   {quiz.confirmPassword.length > 0 && quiz.password !== quiz.confirmPassword && (
                     <p className="text-red-400 text-xs mt-1 ml-1">{tx(T.pw_mismatch, lang)}</p>
                   )}
@@ -580,7 +580,7 @@ export default function StartPage() {
                 </div>
                 <p className="text-zinc-600 text-xs text-center pt-1">
                   {tx(T.terms_pre, lang)}{" "}
-                  <Link href="/terms" target="_blank" className="underline hover:text-zinc-400 transition-colors">
+                  <Link href="/terms" target="_blank" className="underline hover:text-zinc-400 transition-colors duration-instant ease-standard">
                     {tx(T.terms_link, lang)}
                   </Link>
                   {tx(T.terms_post, lang)}
@@ -600,12 +600,12 @@ export default function StartPage() {
           {step > 1 && (
             <button type="button" onClick={() => { setError(null); setStep((s) => s - 1); }}
               disabled={loading}
-              className="flex-none px-5 py-4 rounded-2xl bg-zinc-800 text-zinc-400 text-sm font-semibold hover:bg-zinc-700 transition-colors disabled:opacity-50">
+              className="flex-none px-5 py-4 rounded-2xl bg-zinc-800 text-zinc-400 text-sm font-semibold hover:bg-zinc-700 transition-colors disabled:opacity-50 duration-instant ease-standard">
               {tx(T.back, lang)}
             </button>
           )}
           <button type="button" onClick={handleContinue} disabled={!canContinue() || loading}
-            className="flex-1 py-4 rounded-2xl font-bold text-black text-sm transition-all active:scale-95 hover:brightness-110 disabled:opacity-40 disabled:pointer-events-none"
+            className="flex-1 py-4 rounded-2xl font-bold text-black text-sm transition-all hover:brightness-110 disabled:opacity-40 disabled:pointer-events-none squash duration-base ease-standard"
             style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}>
             {loading ? (
               <span className="flex items-center justify-center gap-2">

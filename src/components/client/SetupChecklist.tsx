@@ -125,7 +125,7 @@ export default function SetupChecklist({
         </div>
         <button
           onClick={dismiss}
-          className="tap-44 text-zinc-600 hover:text-zinc-400 transition-colors text-xs p-1"
+          className="tap-44 text-zinc-600 hover:text-zinc-400 transition-colors text-xs p-1 duration-instant ease-standard"
           aria-label={extra.close[lang]}
         >
           ✕
@@ -135,7 +135,7 @@ export default function SetupChecklist({
       {/* Progress bar */}
       <div className="h-1.5 rounded-full bg-zinc-800 overflow-hidden">
         <div
-          className="h-full rounded-full transition-all duration-500"
+          className="h-full rounded-full transition-all duration-considered ease-standard"
           style={{
             width: `${pct}%`,
             background: "linear-gradient(90deg, #E8C96B, #C9A84C)",
@@ -147,7 +147,7 @@ export default function SetupChecklist({
       <div className="space-y-2">
         {items.map((item) => {
           const content = (
-            <div className={`flex items-center gap-3 p-2.5 rounded-xl transition-colors ${
+            <div className={`duration-instant ease-standard flex items-center gap-3 p-2.5 rounded-xl transition-colors ${
               !item.done && item.href ? "hover:bg-white/[0.04] cursor-pointer" : ""
             }`}>
               {/* Checkbox */}
@@ -190,7 +190,7 @@ export default function SetupChecklist({
       {/* Dismiss link */}
       <button
         onClick={dismiss}
-        className="w-full text-center text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors pt-1"
+        className="w-full text-center text-[11px] text-zinc-600 hover:text-zinc-400 transition-colors pt-1 duration-instant ease-standard"
       >
         {extra.hide_guide[lang]}
       </button>

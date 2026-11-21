@@ -194,7 +194,7 @@ export default async function EbookSalesPage({
                 <Link href="/ebook?lang=en" className={`px-3 py-1 text-xs font-bold ${isEN ? "text-black" : "text-zinc-500"}`}
                   style={isEN ? { background: "linear-gradient(135deg,#E8C96B,#C9A84C)" } : undefined}>EN</Link>
               </div>
-              <Link href={isEN ? "/?lang=en" : "/"} className="text-zinc-500 hover:text-white text-sm transition-colors">
+              <Link href={isEN ? "/?lang=en" : "/"} className="text-zinc-500 hover:text-white text-sm transition-colors duration-instant ease-standard">
                 {t.nav_app}
               </Link>
             </div>
@@ -225,7 +225,7 @@ export default async function EbookSalesPage({
                 <input type="hidden" name="lang" value={lang} />
                 <button
                   type="submit"
-                  className="w-full sm:w-auto inline-flex items-center justify-center px-10 py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110"
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-10 py-4 rounded-2xl font-bold text-black text-base transition-all hover:brightness-110 squash duration-base ease-standard"
                   style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
                 >
                   {t.cta}
@@ -378,7 +378,7 @@ export default async function EbookSalesPage({
                     style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                     <summary className="flex items-center justify-between px-5 py-4 cursor-pointer list-none select-none">
                       <span className="text-white text-sm font-semibold pr-4">{f.q}</span>
-                      <span className="text-zinc-500 text-lg shrink-0 transition-transform group-open:rotate-45">+</span>
+                      <span className="text-zinc-500 text-lg shrink-0 transition-transform group-open:rotate-45 duration-snap ease-overshoot">+</span>
                     </summary>
                     <div className="px-5 pb-4">
                       <p className="text-zinc-400 text-sm leading-relaxed">{f.a}</p>
@@ -406,7 +406,7 @@ export default async function EbookSalesPage({
                   <input type="hidden" name="lang" value={lang} />
                   <button
                     type="submit"
-                    className="block w-full py-4 rounded-2xl font-bold text-black text-base transition-all active:scale-95 hover:brightness-110"
+                    className="block w-full py-4 rounded-2xl font-bold text-black text-base transition-all hover:brightness-110 squash duration-base ease-standard"
                     style={{ background: "linear-gradient(135deg,#E8C96B,#A8893A)" }}
                   >
                     {t.cta}

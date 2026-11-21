@@ -54,179 +54,6 @@
 
 @layer utilities {
 
-  /* ── Fitts's law, bigger hit areas ──────────────────────────
-     Grows the target a finger has to find without growing the thing that is
-     drawn. For the small icon controls where making the glyph 44px would
-     wreck the layout. */
-  .tap-44 {
-    position: relative;
-  }
-  .tap-44::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: max(100%, 44px);
-    height: max(100%, 44px);
-    transform: translate(-50%, -50%);
-  }
-
-  /* ── Squash and stretch ─────────────────────────────────────
-     A press compresses along the axis of the force. Not a uniform scale: a
-     real object under a thumb gets shorter and a little wider, which is the
-     whole point of the principle. */
-  .press-squash {
-    transition: transform var(--dur-snap) var(--ease-overshoot);
-  }
-  .press-squash:active:not(:disabled) {
-    transform: scale(1.012, 0.955);
-  }
-
-  /* ── Anticipation ───────────────────────────────────────────
-     A committing action winds up before it goes. Only on buttons that spend
-     money or send something, because the pause is the point: it is the last
-     moment to let go. */
-  .press-anticipate {
-    transition: transform var(--dur-base) var(--ease-anticipate),
-                box-shadow var(--dur-base) var(--ease-standard);
-  }
-  .press-anticipate:active:not(:disabled) {
-    transform: translateY(2px) scale(0.985);
-  }
-
-  /* ── Arcs ───────────────────────────────────────────────────
-     Nothing alive moves in a straight line. Two axes on different curves
-     bend the path: the horizontal arrives before the vertical, so the
-     element swings in rather than sliding. */
-  .enter-arc {
-    animation: enter-arc var(--dur-considered) var(--ease-entrance) both;
-  }
-  @keyframes enter-arc {
-    0%   { opacity: 0; transform: translate(-10px, 16px) rotate(-1.5deg); }
-    60%  { opacity: 1; }
-    100% { opacity: 1; transform: translate(0, 0) rotate(0deg); }
-  }
-
-  /* ── Follow through ─────────────────────────────────────────
-     Applied with an inline animation-delay from staggerDelay(). Each item
-     starts before the one in front has landed. */
-  .enter-rise {
-    animation: enter-rise var(--dur-considered) var(--ease-entrance) both;
-  }
-  @keyframes enter-rise {
-    0%   { opacity: 0; transform: translateY(14px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ── Secondary action ───────────────────────────────────────
-     The small thing that moves because the big thing moved. A chevron turning
-     while its panel opens, on the panel's own clock. */
-  .secondary-turn {
-    transition: transform var(--dur-base) var(--ease-overshoot);
-  }
-  [data-open="true"] .secondary-turn,
-  [open] .secondary-turn,
-  details[open] .secondary-turn {
-    transform: rotate(180deg);
-  }
-
-  /* ── Exaggerated feedback ───────────────────────────────────
-     Reserved for a thing being finished. Overshoots, because a confirmation
-     that lands politely is not read as a reward. */
-  .confirm-pop {
-    animation: confirm-pop var(--dur-deliberate) var(--ease-overshoot) both;
-  }
-  @keyframes confirm-pop {
-    0%   { transform: scale(0.82); opacity: 0; }
-    55%  { transform: scale(1.06); opacity: 1; }
-    100% { transform: scale(1);    opacity: 1; }
-  }
-
-  /* ── Staging ────────────────────────────────────────────────
-     One focal point. Everything that is not the subject steps back, by
-     losing colour as well as light, so the eye has nowhere else to go. */
-  .stage-recede {
-    transition: opacity var(--dur-base) var(--ease-standard),
-                filter var(--dur-base) var(--ease-standard);
-  }
-  [data-staged="true"] .stage-recede {
-    opacity: 0.4;
-    filter: saturate(0.5);
-  }
-
-  /* ── Origin awareness ───────────────────────────────────────
-     A panel grows out of the thing that opened it, not out of the middle of
-     the screen. The opener sets --origin-x / --origin-y from its own
-     position, so the eye never loses the object it was looking at. */
-  .from-origin {
-    transform-origin: var(--origin-x, 50%) var(--origin-y, 50%);
-    animation: from-origin var(--dur-base) var(--ease-entrance) both;
-  }
-  @keyframes from-origin {
-    0%   { opacity: 0; transform: scale(0.92); }
-    100% { opacity: 1; transform: scale(1); }
-  }
-
-  /* ── Rubber banding ─────────────────────────────────────────
-     A limit should be felt, not announced. Pulling past the end resists and
-     springs back, which says "there is no more" without a line of copy. */
-  .rubber {
-    overscroll-behavior: contain;
-  }
-  .rubber-band {
-    animation: rubber-band var(--dur-considered) var(--ease-overshoot);
-  }
-  @keyframes rubber-band {
-    0%   { transform: translateX(0); }
-    30%  { transform: translateX(-9px); }
-    60%  { transform: translateX(4px); }
-    100% { transform: translateX(0); }
-  }
-
-  /* ── Von Restorff ───────────────────────────────────────────
-     The isolation effect: one thing that differs is the thing that is
-     remembered, and a second one cancels the first. Gold is that difference
-     in this app, so a view gets exactly one of these. Anything else that
-     wants attention takes .lift-2 and stays the colour of the rest. */
-  .restorff {
-    box-shadow: var(--lift-2), 0 0 0 1px rgba(201,168,76,0.35),
-                0 0 44px -12px rgba(201,168,76,0.5);
-  }
-
-  /* ── Interruptible motion ───────────────────────────────────
-     A person must never have to wait out an animation to act again. State
-     changes therefore use transition, which the browser reverses mid-flight
-     from wherever it had got to; keyframe animations are kept for entrances,
-     which nobody interrupts because they are already looking. This utility
-     marks a surface whose motion must stay cancellable. */
-  .interruptible {
-    transition: transform var(--dur-base) var(--ease-standard),
-                opacity var(--dur-base) var(--ease-standard);
-    animation: none;
-  }
-  .interruptible * {
-    pointer-events: auto;
-  }
-
-  /* ── Peak and end ───────────────────────────────────────────
-     An experience is remembered by its best moment and its last one, so the
-     budget goes there and nowhere else: finishing a session, finishing a
-     week. Slowest tier, biggest overshoot, used perhaps twice in the app. */
-  .peak-moment {
-    animation: peak-moment var(--dur-deliberate) var(--ease-overshoot) both;
-  }
-  @keyframes peak-moment {
-    0%   { opacity: 0; transform: scale(0.7) rotate(-6deg); }
-    45%  { opacity: 1; transform: scale(1.12) rotate(2deg); }
-    70%  { transform: scale(0.97) rotate(-1deg); }
-    100% { opacity: 1; transform: scale(1) rotate(0deg); }
-  }
-
-  /* Depth tokens as utilities, so a component never writes its own shadow. */
-  .lift-1 { box-shadow: var(--lift-1); }
-  .lift-2 { box-shadow: var(--lift-2); }
-  .lift-3 { box-shadow: var(--lift-3); }
-
   .scrollbar-none {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -234,6 +61,196 @@
   .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOTION UTILITIES
+   Deliberately outside @layer utilities. Tailwind strips anything in that
+   layer it cannot find written in a file, which silently deletes a utility
+   the moment its last usage is refactored into a variable. These are
+   hand-written CSS and have to survive on their own.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Fitts's law, bigger hit areas ──────────────────────────
+   Grows the target a finger has to find without growing the thing that is
+   drawn. For the small icon controls where making the glyph 44px would
+   wreck the layout. */
+.tap-44 {
+  position: relative;
+}
+.tap-44::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+  transform: translate(-50%, -50%);
+}
+
+/* ── Squash and stretch ─────────────────────────────────────
+   A press compresses along the axis of the force. Not a uniform scale: a
+   real object under a thumb gets shorter and a little wider, which is the
+   whole point of the principle. */
+.press-squash {
+  transition: transform var(--dur-snap) var(--ease-overshoot);
+}
+.press-squash:active:not(:disabled) {
+  transform: scale(1.012, 0.955);
+}
+
+/* ── Anticipation ───────────────────────────────────────────
+   A committing action winds up before it goes. Only on buttons that spend
+   money or send something, because the pause is the point: it is the last
+   moment to let go. */
+.press-anticipate {
+  transition: transform var(--dur-base) var(--ease-anticipate),
+              box-shadow var(--dur-base) var(--ease-standard);
+}
+.press-anticipate:active:not(:disabled) {
+  transform: translateY(2px) scale(0.985);
+}
+
+/* ── Arcs ───────────────────────────────────────────────────
+   Nothing alive moves in a straight line. Two axes on different curves
+   bend the path: the horizontal arrives before the vertical, so the
+   element swings in rather than sliding. */
+.enter-arc {
+  animation: enter-arc var(--dur-considered) var(--ease-entrance) both;
+}
+@keyframes enter-arc {
+  0%   { opacity: 0; transform: translate(-10px, 16px) rotate(-1.5deg); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+}
+
+/* ── Follow through ─────────────────────────────────────────
+   Applied with an inline animation-delay from staggerDelay(). Each item
+   starts before the one in front has landed. */
+.enter-rise {
+  animation: enter-rise var(--dur-considered) var(--ease-entrance) both;
+}
+@keyframes enter-rise {
+  0%   { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Secondary action ───────────────────────────────────────
+   The small thing that moves because the big thing moved. A chevron turning
+   while its panel opens, on the panel's own clock. */
+.secondary-turn {
+  transition: transform var(--dur-base) var(--ease-overshoot);
+}
+[data-open="true"] .secondary-turn,
+[open] .secondary-turn,
+details[open] .secondary-turn {
+  transform: rotate(180deg);
+}
+
+/* ── Exaggerated feedback ───────────────────────────────────
+   Reserved for a thing being finished. Overshoots, because a confirmation
+   that lands politely is not read as a reward. */
+.confirm-pop {
+  animation: confirm-pop var(--dur-deliberate) var(--ease-overshoot) both;
+}
+@keyframes confirm-pop {
+  0%   { transform: scale(0.82); opacity: 0; }
+  55%  { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+/* ── Staging ────────────────────────────────────────────────
+   One focal point. Everything that is not the subject steps back, by
+   losing colour as well as light, so the eye has nowhere else to go. */
+.stage-recede {
+  transition: opacity var(--dur-base) var(--ease-standard),
+              filter var(--dur-base) var(--ease-standard);
+}
+[data-staged="true"] .stage-recede {
+  opacity: 0.4;
+  filter: saturate(0.5);
+}
+
+/* ── Origin awareness ───────────────────────────────────────
+   A panel grows out of the thing that opened it, not out of the middle of
+   the screen. The opener sets --origin-x / --origin-y from its own
+   position, so the eye never loses the object it was looking at. */
+.from-origin {
+  transform-origin: var(--origin-x, 50%) var(--origin-y, 50%);
+  animation: from-origin var(--dur-base) var(--ease-entrance) both;
+}
+@keyframes from-origin {
+  0%   { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ── Rubber banding ─────────────────────────────────────────
+   A limit should be felt, not announced. Pulling past the end resists and
+   springs back, which says "there is no more" without a line of copy. */
+.rubber {
+  overscroll-behavior: contain;
+}
+.rubber-band {
+  animation: rubber-band var(--dur-considered) var(--ease-overshoot);
+}
+@keyframes rubber-band {
+  0%   { transform: translateX(0); }
+  30%  { transform: translateX(-9px); }
+  60%  { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+/* ── Von Restorff ───────────────────────────────────────────
+   The isolation effect: one thing that differs is the thing that is
+   remembered, and a second one cancels the first. Gold is that difference
+   in this app, so a view gets exactly one of these. Anything else that
+   wants attention takes .lift-2 and stays the colour of the rest. */
+.restorff {
+  box-shadow: var(--lift-2), 0 0 0 1px rgba(201,168,76,0.35),
+              0 0 44px -12px rgba(201,168,76,0.5);
+}
+
+/* ── Interruptible motion ───────────────────────────────────
+   A person must never have to wait out an animation to act again. State
+   changes therefore use transition, which the browser reverses mid-flight
+   from wherever it had got to; keyframe animations are kept for entrances,
+   which nobody interrupts because they are already looking. This utility
+   marks a surface whose motion must stay cancellable. */
+.interruptible {
+  transition: transform var(--dur-base) var(--ease-standard),
+              opacity var(--dur-base) var(--ease-standard);
+  animation: none;
+}
+.interruptible * {
+  pointer-events: auto;
+}
+
+/* ── Peak and end ───────────────────────────────────────────
+   An experience is remembered by its best moment and its last one, so the
+   budget goes there and nowhere else: finishing a session, finishing a
+   week. Slowest tier, biggest overshoot, used perhaps twice in the app. */
+.peak-moment {
+  animation: peak-moment var(--dur-deliberate) var(--ease-overshoot) both;
+}
+@keyframes peak-moment {
+  0%   { opacity: 0; transform: scale(0.7) rotate(-6deg); }
+  45%  { opacity: 1; transform: scale(1.12) rotate(2deg); }
+  70%  { transform: scale(0.97) rotate(-1deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+/* Depth tokens as utilities, so a component never writes its own shadow. */
+.lift-1 { box-shadow: var(--lift-1); }
+.lift-2 { box-shadow: var(--lift-2); }
+.lift-3 { box-shadow: var(--lift-3); }
+
+/* Squash on its own, for an element that already declares a transition of its
+   own. .press-squash brings its own clock; this one only states the pose. */
+.squash:active:not(:disabled) {
+  transform: scale(1.012, 0.955);
+}
+.squash-sm:active:not(:disabled) {
+  transform: scale(1.006, 0.978);
 }
 
 @layer components {

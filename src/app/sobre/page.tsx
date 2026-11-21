@@ -96,7 +96,7 @@ export default async function Sobre() {
             <Link href="/" className="text-xl font-black tracking-tighter">
               KRAV<span className="text-brand-gold">.</span>
             </Link>
-            <Link href="/start" className="text-sm text-zinc-400 hover:text-white transition-colors">
+            <Link href="/start" className="text-sm text-zinc-400 hover:text-white transition-colors duration-instant ease-standard">
               Começar
             </Link>
           </nav>
@@ -234,9 +234,9 @@ export default async function Sobre() {
           </div>
 
           <p className="text-center text-zinc-600 text-xs mt-10">
-            <Link href="/terms" className="hover:text-zinc-400 transition-colors">Termos</Link>
+            <Link href="/terms" className="hover:text-zinc-400 transition-colors duration-instant ease-standard">Termos</Link>
             <span className="mx-2">·</span>
-            <Link href="/privacy" className="hover:text-zinc-400 transition-colors">Privacidade</Link>
+            <Link href="/privacy" className="hover:text-zinc-400 transition-colors duration-instant ease-standard">Privacidade</Link>
           </p>
         </div>
       </div>

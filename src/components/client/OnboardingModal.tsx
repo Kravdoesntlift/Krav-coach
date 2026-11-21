@@ -80,7 +80,7 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
             <button
               key={l.value}
               onClick={() => { setFitnessLevel(l.value); setStep(1); }}
-              className={`w-full text-left p-4 rounded-xl border transition-all ${
+              className={`duration-base ease-standard w-full text-left p-4 rounded-xl border transition-all ${
                 fitnessLevel === l.value
                   ? "border-brand-gold bg-brand-gold/10"
                   : "border-zinc-700 bg-zinc-800 hover:border-zinc-500"
@@ -153,12 +153,12 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setAvailability((n) => Math.max(1, n - 1))}
-                className="w-12 h-12 rounded-full bg-zinc-800 text-white text-xl hover:bg-zinc-700 transition-colors"
+                className="w-12 h-12 rounded-full bg-zinc-800 text-white text-xl hover:bg-zinc-700 transition-colors duration-instant ease-standard"
               >−</button>
               <span className="text-brand-gold text-5xl font-bold w-16 text-center">{availability}</span>
               <button
                 onClick={() => setAvailability((n) => Math.min(7, n + 1))}
-                className="w-12 h-12 rounded-full bg-zinc-800 text-white text-xl hover:bg-zinc-700 transition-colors"
+                className="w-12 h-12 rounded-full bg-zinc-800 text-white text-xl hover:bg-zinc-700 transition-colors duration-instant ease-standard"
               >+</button>
             </div>
           </div>
@@ -181,7 +181,7 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
             <button
               key={eq}
               onClick={() => setEquipment(eq)}
-              className={`w-full text-left px-4 py-3 rounded-xl border text-sm transition-all ${
+              className={`duration-base ease-standard w-full text-left px-4 py-3 rounded-xl border text-sm transition-all ${
                 equipment === eq
                   ? "border-brand-gold bg-brand-gold/10 text-white font-semibold"
                   : "border-zinc-700 bg-zinc-800 text-gray-300 hover:border-zinc-500"
@@ -209,7 +209,7 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
       {/* Progress */}
       <div className="h-1 bg-zinc-800">
         <div
-          className="h-full bg-brand-gold transition-all duration-500"
+          className="h-full bg-brand-gold transition-all duration-considered ease-standard"
           style={{ width: `${((step + 1) / steps.length) * 100}%` }}
         />
       </div>
@@ -229,7 +229,7 @@ export default function OnboardingModal({ clientId, onComplete }: Props) {
         {step > 0 && (
           <button
             onClick={() => setStep((s) => s - 1)}
-            className="mt-4 text-gray-600 text-xs hover:text-gray-400 transition-colors text-center w-full"
+            className="mt-4 text-gray-600 text-xs hover:text-gray-400 transition-colors text-center w-full duration-instant ease-standard"
           >
             {isEN ? "← Back" : "← Voltar"}
           </button>

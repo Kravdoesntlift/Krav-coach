@@ -58,7 +58,7 @@ export default async function ManageClientsPage() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Link href="/coach/dashboard" className="text-zinc-600 hover:text-white text-sm transition-colors">
+            <Link href="/coach/dashboard" className="text-zinc-600 hover:text-white text-sm transition-colors duration-instant ease-standard">
               Dashboard
             </Link>
             <span className="text-zinc-700">/</span>
