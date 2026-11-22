@@ -103,6 +103,7 @@ export default async function GuideReaderPage({
         >
           <Eyebrow>{c.supplementLabel}</Eyebrow>
           <p className="mt-1 text-sm font-semibold text-white">{c.supplementValue}</p>
+          <p className="mt-2 text-xs leading-relaxed text-zinc-400">{c.supplementNote}</p>
         </div>
       </Section>
 

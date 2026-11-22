@@ -24,7 +24,7 @@ interface CardData {
   photoPosition?: string;
   bgStyle: React.CSSProperties;
   centerContent?: React.ReactNode;
-  modal?: { title: string; desc: string; cta: string; href: string };
+  modal?: { title: string; desc: string; cta: string; href: string; note?: string };
 }
 
 /* ─── Icons ──────────────────────────────────────────────────────────────────── */
@@ -278,14 +278,21 @@ function cards(community: CommunityCopy): CardData[] {
     {
       id: "myprotein",
       label: "MyProtein",
-      badge: "PARCEIRO",
-      badgeColor: "white",
+      badge: "O QUE EU TOMO",
+      badgeColor: "gold",
       title: "MyProtein",
-      sub: "Desconto nos suplementos · código MPKRAV",
-      cta: "Ver produtos",
+      sub: "O que eu próprio tomo · código MPKRAV",
+      cta: "Ver o código",
       ctaStyle: "outline",
-      href: "https://www.myprotein.com",
+      href: "https://www.myprotein.pt",
       bgStyle: {},
+      modal: {
+        title: "MyProtein",
+        desc: "Tomo MyProtein, e é por isso que o código é meu. Mas não te vendo milagres: a suplementação é a última coisa a resolver, depois do treino, da comida e do sono. Se já tens essas três e não chegas aos 1,6 a 2 g de proteína por kg só com comida, um batido resolve-te isso por pouco dinheiro. Aplica MPKRAV no checkout deles.",
+        cta: "Ir à MyProtein",
+        href: "https://www.myprotein.pt",
+        note: "Código de parceria: tu ficas com o desconto, eu com uma comissão.",
+      },
     },
   ];
 }
@@ -356,6 +363,7 @@ function Modal({ card, origin, onClose }: { card: CardData; origin: { x: string;
               thing on the page. */}
           {!card.photo && card.id === "ebook" && <EbookBg />}
           {!card.photo && card.id === "community" && <CommunityBg />}
+          {!card.photo && card.id === "myprotein" && <MyProteinBg />}
           <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #0f0c08 0%, transparent 55%)" }} />
           <button onClick={onClose}
             className="tap-44 absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-zinc-500 hover:text-white z-10"
@@ -375,7 +383,9 @@ function Modal({ card, origin, onClose }: { card: CardData; origin: { x: string;
             style={{ background: "linear-gradient(135deg,#E8C96B,#C9A84C,#A8893A)", color: "#000", boxShadow: "0 4px 28px rgba(201,168,76,0.22)" }}>
             {m.cta} <ArrowRight />
           </a>
-          <p className="text-center text-xs" style={{ color: "rgba(255,255,255,0.18)" }}>Sem contratos. Cancela quando quiseres.</p>
+          <p className="text-center text-xs" style={{ color: "rgba(255,255,255,0.18)" }}>
+            {m.note ?? "Sem contratos. Cancela quando quiseres."}
+          </p>
         </div>
       </div>
     </div>

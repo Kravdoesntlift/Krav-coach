@@ -68,6 +68,8 @@ export interface GuideCopy {
   upgradeUrl: string;
   footer: string;
   supplementLabel: string;
+  /** Why the coach puts his own name next to a brand. */
+  supplementNote: string;
   supplementValue: string;
 }
 
@@ -107,8 +109,9 @@ const SHARED_PT: Omit<GuideCopy, "kicker" | "title" | "subtitle" | "intro" | "co
     { title: "Consistência acima de tudo", body: "Não existe dieta perfeita, existe uma boa dieta feita de forma consistente. Uma refeição fora do plano não desfaz uma semana de trabalho." },
   ],
   mistakesTitle: "Os erros que te travam",
-  supplementLabel: "Suplementação oficial",
+  supplementLabel: "O que eu tomo",
   supplementValue: "myprotein.pt · código MPKRAV",
+  supplementNote: "É o que eu próprio tomo. Mas a suplementação vem depois do treino, da comida e do sono, nunca antes.",
   footer: "@kravdoesntlift · zerando máquinas medíocres",
   upgradeTitle: "O que muda se assinares",
   upgradeIntro:
@@ -172,8 +175,9 @@ const SHARED_EN: Omit<GuideCopy, "kicker" | "title" | "subtitle" | "intro" | "co
     { title: "Consistency above all", body: "There is no perfect diet, there is a good diet done consistently. One meal off plan does not undo a week of work." },
   ],
   mistakesTitle: "The mistakes holding you back",
-  supplementLabel: "Official supplements",
+  supplementLabel: "What I take",
   supplementValue: "myprotein.pt · code MPKRAV",
+  supplementNote: "It is what I take myself. But supplements come after training, food and sleep, never before.",
   footer: "@kravdoesntlift · zeroing out mediocre machines",
   upgradeTitle: "What changes if you subscribe",
   upgradeIntro:
