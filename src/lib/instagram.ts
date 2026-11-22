@@ -9,9 +9,15 @@
 
 const HANDLE = /^[A-Za-z0-9._]{1,30}$/;
 
+// The field is required, so somebody who is not on Instagram has to type
+// something. What they are told to type, and the handful of things people
+// type instead, mean the same as leaving it blank.
+const NO_ACCOUNT = /^(n[aã]o\s*tenho|nao|n[aã]o|sem\s*instagram|no\s*account|none|no|n\/?a|-+|x+)$/i;
+
 export function instagramHandle(input: string | null | undefined): string | null {
   const raw = (input ?? "").trim();
   if (!raw) return null;
+  if (NO_ACCOUNT.test(raw)) return null;
 
   let value = raw;
 
