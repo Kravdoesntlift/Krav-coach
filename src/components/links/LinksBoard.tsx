@@ -97,7 +97,15 @@ function EbookBg() {
   );
 }
 
-function MyProteinBg() {
+/**
+ * The code, drawn as the artwork.
+ *
+ * `compact` is the sheet: there the badge and the title are laid over the
+ * bottom of the same box, so the centred block has to move up and give up the
+ * instruction pill, which the sheet's own text repeats anyway. Without it the
+ * two layers land on each other.
+ */
+function MyProteinBg({ compact = false }: { compact?: boolean }) {
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: "#06080a" }}>
       {/* Radial gold glow: center */}
@@ -118,7 +126,7 @@ function MyProteinBg() {
       }}/>
 
       {/* Main content */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 select-none px-4">
+      <div className={`absolute inset-0 flex flex-col items-center gap-2 select-none px-4 ${compact ? "justify-start pt-7" : "justify-center"}`}>
         {/* Tag label */}
         <div className="flex items-center gap-1.5">
           <div className="h-px w-6" style={{ background: "rgba(201,168,76,0.4)" }}/>
@@ -141,7 +149,7 @@ function MyProteinBg() {
         </p>
 
         {/* Instruction */}
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
+        {!compact && <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
           style={{ background: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.22)" }}>
           <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
@@ -149,7 +157,7 @@ function MyProteinBg() {
           <p className="text-[11px] font-bold tracking-wide" style={{ color: "rgba(201,168,76,0.7)" }}>
             aplica no checkout
           </p>
-        </div>
+        </div>}
       </div>
     </div>
   );
@@ -363,7 +371,7 @@ function Modal({ card, origin, onClose }: { card: CardData; origin: { x: string;
               thing on the page. */}
           {!card.photo && card.id === "ebook" && <EbookBg />}
           {!card.photo && card.id === "community" && <CommunityBg />}
-          {!card.photo && card.id === "myprotein" && <MyProteinBg />}
+          {!card.photo && card.id === "myprotein" && <MyProteinBg compact />}
           <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #0f0c08 0%, transparent 55%)" }} />
           <button onClick={onClose}
             className="tap-44 absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-zinc-500 hover:text-white z-10"
